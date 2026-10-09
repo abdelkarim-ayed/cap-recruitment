@@ -3,6 +3,7 @@
 Not a commitment or schedule. Reorder as requirements become clearer.
 
 ## Highest relevance after the central workflow
+- Additional editor presets (phone, availability, portfolio, cover letter/supporting document) and richer preset/task combinations: TODO only. The vacancy schema currently supports bounded generic inputs and document extractSkills configuration; graphical editor/presets are not integrated yet.
 - Export hired applicants as CSV; depends on reliable final outcome data.
 - Review-data CSV export is part of the chosen workflow once applications/extraction exist. Decision reimport is a later option requiring stable application IDs, validated actions, preview/confirmation, and audit; not selected yet.
 - Email templates and selected-recipient/bulk sending; depends on communication audit and safe confirmation.

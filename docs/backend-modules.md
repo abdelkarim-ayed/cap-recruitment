@@ -17,11 +17,11 @@ Analytics can start as a small SQL query service over these records. Branding/se
 
 IdentityModule, DatabaseModule, ConfigurationModule, IntegrationsModule, InfrastructureModule, and HealthModule now implement the foundation boundaries. Business repositories must not depend on AuthService's pool. See [`architecture.md`](architecture.md) for current classes, future consistency fields/data flow/events, and [`integration-testing.md`](integration-testing.md) for replaceable protocol adapters. The feature modules in the table remain proposals.
 
-## Recommended next implementation: vacancies
+## Implemented checkpoint: vacancies
 **Scenario:** a recruiter saves a configured draft, reloads it, publishes it, and an unauthenticated candidate retrieves the job/application form without seeing backend tasks or internal metadata.
 
-### Proposed API surface
-Proposed request/response examples are in [`vacancy-api-draft.md`](vacancy-api-draft.md). Implemented routes only are documented in [`api.md`](api.md) and [`openapi.json`](openapi.json).
+### Implemented API surface
+Request/response examples are in [`vacancy-api.md`](vacancy-api.md). Implemented routes are documented in [`api.md`](api.md) and [`openapi.json`](openapi.json).
 - `POST /api/vacancies`: create draft; creator is responsible recruiter initially.
 - `GET /api/vacancies`: staff list, including drafts; bounded pagination.
 - `GET /api/vacancies/:id`: staff detail with full definition.
@@ -31,10 +31,10 @@ Proposed request/response examples are in [`vacancy-api-draft.md`](vacancy-api-d
 - `GET /api/public/vacancies`: only published/open records.
 - `GET /api/public/vacancies/:id`: explicit public job/form projection, never raw private configuration.
 
-Admin/recruiter management access is proposed; interviewer/candidate cannot edit. Detailed owner-only publishing or admin override is a product policy, not implied by this proposal. Final hiring decisions still belong to the vacancy owner.
+Approved/implemented: admin/recruiter create/read; owner alone edits/publishes/closes. Interviewer/candidate denied staff routes. Collaborator editing/admin override deferred; final hiring decisions unaffected.
 
 ### Definition and persistence
-- Persist vacancy metadata and a versioned domain definition in PostgreSQL. Ordered inputs own their arguments and optional processing tasks; separators yield no answer columns.
+- Persist vacancy metadata plus separate versioned form/processing definitions, saved/published together. Editor tasks remain associated with their source input through sourceInputId; separators yield no answers/tasks. Scheduling/cache/provider settings stay outside vacancy configuration.
 - Runtime-validate the payload and allowed discriminated variants, not just TypeScript types. Reject duplicate field names, unsupported tasks/type combinations, invalid ranges, and oversized definitions.
 - Keep processing metadata private. Derive a candidate-facing definition by allowlisting fields; do not delete a few known private keys from an otherwise raw object.
 - Published intake definitions are immutable. A closed vacancy remains stored; cloning/reposting is a later explicit action, not a mutation of historical applications.
@@ -50,10 +50,10 @@ Admin/recruiter management access is proposed; interviewer/candidate cannot edit
 6. Record persists across API restart; provide curl examples and update `api.md` before frontend work.
 
 ## Following checkpoints
-1. **Submission + documents:** authenticated candidate submits once; preserve application-specific CV and answer snapshot; enforce uniqueness and document ownership server-side. No extraction dependency needed to demonstrate this journey.
-2. **Processing + review/export:** text extraction once per document, supported fact extractors, explicit failures/null, HR corrections, CSV. Fix task/result contracts before selecting worker/polling or external models.
+1. **Submission + documents:** candidate submits once; answers are validated application JSON, files/answers locked after submission. Separate storage references from attachment ownership; application uploads first. Enforce uniqueness and access. No persisted candidate drafts or extraction dependency needed initially.
+2. **Mock processing + review/export:** decoupled application-level executor, text reuse per document, individual task results/status and safe retry eligibility; no ProcessingRun/independent WorkItem tables initially. Per-unit fixture context verifies source/arguments through the real relay. Review means extraction inspection/correction, combined columns, CSV for external preselection. In-memory text reuse is enough initially; no full cache framework.
 3. **Interviews + decisions:** dynamic interviews and assignments, staff schedule, notes, preselection and owner decisions. Resolve negative outcome labels at this boundary.
-4. **Updates + analytics:** deliberate messages/public updates and database-derived metrics. Resolve candidate-visible wording before publishing it.
+4. **Optional updates + analytics:** scope reconsidered after usable review/export. HR may communicate outside the platform; only OTP mail is currently automated. No mail/calendar integration required for the first workflow slice.
 5. **Frontend:** implement the accepted editor and application/recruiter views from the tested API handoff, not in parallel with undefined contracts.
 
 ## Delegation rules

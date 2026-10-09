@@ -5,7 +5,7 @@ Backend first. This document is the frontend handoff; distinguish implemented en
 ## Where to read
 - **This file:** supported endpoints, exact payload examples, and HTTP behavior.
 - **[`openapi.json`](openapi.json):** OpenAPI 3.1 for the implemented client-facing surface; import into an API client/viewer if desired. No Swagger server/UI is installed.
-- **[`vacancy-api-draft.md`](vacancy-api-draft.md):** proposed next-batch payloads, clearly not implemented.
+- **[`vacancy-api.md`](vacancy-api.md):** implemented vacancy payloads, supported field/task arguments, transitions, and permissions.
 - **[`backend-test.md`](backend-test.md):** runnable curl/integration checks.
 - **[`integration-testing.md`](integration-testing.md)** and **[`architecture.md`](architecture.md):** mockable protocols, current classes, data movement, and future consistency boundaries.
 
@@ -163,8 +163,10 @@ Auth errors usually include `{code, message}`; rate-limit errors may have only `
 - Rate limiting takes the socket peer address, via an internal overwritten header. Behind Vite or an SSH proxy users may share a bucket; trusted reverse-proxy client-IP handling is deployment work. Never trust arbitrary forwarded headers.
 - The API defaults to binding localhost; API_HOST can be explicitly changed for a deliberate deployment configuration.
 
-## Next modules and planned endpoints — not implemented
-1. **Vacancies:** staff draft list/create/update; publish/close; public published-vacancy list/detail. JSON input definition and document-owned task configuration are stored with the vacancy. Publish locks the intake schema. Exact endpoints: `/api/vacancies`, `/api/vacancies/:id`, publish/close actions, `/api/public/vacancies`.
+## Vacancy handoff and remaining modules
+Vacancy routes are now implemented: POST/GET `/api/vacancies`, GET/PATCH `/api/vacancies/:id`, POST publish/close actions, and GET public vacancy list/detail. See [`vacancy-api.md`](vacancy-api.md). Admin/recruiter read/create; owner alone mutates. Cookie-authenticated application writes require trusted Origin (WEB_ORIGIN or BETTER_AUTH_URL origin); missing/untrusted Origin returns 403. Public reads require no session. Definition configuration is not task execution.
+
+Remaining feature endpoints—not implemented:
 2. **Applications/documents:** authenticated candidate submits once per vacancy; application-specific documents; staff review and candidate-owned read views. `/api/vacancies/:id/applications`, `/api/applications/:id`, document endpoints. No profile CV storage or arbitrary public file URLs.
 3. **Processing/review/export:** per-document task plan, suggestions/errors, human corrections, CSV. Extraction failure is null plus explicit status; no automatic selection.
 4. **Interviews/decisions:** dynamic interview CRUD/assignment/notes, schedule, preselection and owner decisions. No fixed interview-number pipeline stages.
@@ -172,4 +174,4 @@ Auth errors usually include `{code, message}`; rate-limit errors may have only `
 
 Module names describe business boundaries, not microservices. Shared migrations/interfaces have one owner; independent work can follow a written endpoint contract.
 
-See [`vacancy-api-draft.md`](vacancy-api-draft.md) for proposed vacancy payloads and [`backend-modules.md`](backend-modules.md) for boundaries and checkpoint tests. Only the identity/access and health endpoints above are implemented.
+See [`vacancy-api.md`](vacancy-api.md) for implemented vacancy payloads and [`backend-modules.md`](backend-modules.md) for next checkpoints. Identity/access, health, and vacancy routes are implemented; application/processing/interview routes are not.

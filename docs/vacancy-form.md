@@ -10,6 +10,8 @@ An ordered input list with a separate selected-input settings area. Add/remove p
 
 Keep input arguments (slider min/max/step, choices, file limits) distinct from optional task arguments (skills to extract, request evidence, highest education only). Candidate rendering and backend task plans derive from this configuration. Exact first supported presets remain open.
 
+Implemented vacancy serialization uses separate formDefinition/processingDefinition, linked by task sourceInputId. The editor direction still configures tasks against their source document; both definitions publish together. Current generic input/task argument catalog is in `vacancy-api.md`; richer presets are backlog only. Runtime application-level execution, retries, scheduling, and cache policy stay decoupled; no task runner or integrated graphical editor exists yet.
+
 Example: source `cv`; extractor `skills`; output `extracted_skills`; arguments `React, SQL, project management` and an approved alias dictionary. A second task could extract education. Output columns can be internal-only or paired with explicit candidate answers.
 
 Default identity core remains verified email/name. Proposed field catalog: contact details, CV, portfolio link, availability, education, skills, and generic text/number/slider/yes-no/single-choice/multi-choice fields. First supported field and extractor list is not locked.
@@ -33,6 +35,7 @@ Use a bounded extractor registry with parameter forms, not arbitrary executable 
 - Internal notes/attachments and extraction configuration stay out of candidate-visible responses unless explicitly intended for publication.
 
 ## Export
+Review means inspection of extraction/interpretation columns alongside candidate answers, optionally confirming/correcting extracted values before export. Simple columns and document access come first; precise evidence highlighting/bulk confirmation can follow. Submitted answers/files remain locked. See `architecture.md` for the combined read projection and planned fixture provenance.
 CSV can contain stable application IDs, explicit answers, extracted values, and reviewed values. External tools handle qualification/formulas. Decision reimport is deferred pending validation, confirmation, and audit design.
 
 ## Library shortlist

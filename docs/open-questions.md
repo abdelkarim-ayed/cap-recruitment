@@ -11,12 +11,12 @@ Answer each cluster independently; detailed API/database design comes later.
 - Implemented: Better Auth email codes and cookie sessions, automatic candidate account create/reuse, Mailpit development delivery. Production email setup remains open. See `candidate-access.md` and `api.md`.
 - Google OAuth is desired but deferred pending provider configuration; LinkedIn is optional.
 - Verified email identifies the lightweight account; same-email signup reuses it. Different-email/imported-profile linking remains a later policy; phone is contact data, not the default identity key.
-- Define withdrawal/resubmission and profile changes after submission.
+- First slice: submitted answers/files locked; editing before send does not require saved server drafts. Withdrawal/resubmission, explicit later corrections, and account-profile changes remain later decisions.
 
 ## 3. Vacancy form and screening policy
 - See `vacancy-form.md` for hybrid intake/extraction; `form-tooling.md` for researched library candidates.
-- Editor interaction model is accepted. Select the first premade catalog and exact document constraints; generic-builder selection is no longer a blocker.
-- Which extraction tasks, output columns, and supported parameters should HR configure?
+- Editor interaction model is accepted. First generic field/argument catalog and extractSkills document-task configuration are implemented in `vacancy-api.md`; richer premade inputs are TODO. Upload operational caps/file-count rules remain to finalize with applications.
+- Which additional extraction tasks/providers should be supported beyond the initial skills definition? No task execution is implemented yet.
 - Automated qualification/filtering is outside current scope; reconcile original automated-ranking requirement before claiming coverage.
 - Define uncertain/missing/conflicting evidence handling and bulk confirmation.
 
@@ -40,7 +40,7 @@ Answer each cluster independently; detailed API/database design comes later.
 
 ## Next product checkpoint — proposals, not approvals
 - Main pipeline and lightweight candidate identity are agreed. Finalize candidate-visible updates and review-ready failure/manual-bypass behavior.
-- Recommend automatic receipt confirmation, with subsequent public updates deliberately published by HR.
+- No automatic receipt/business emails required initially; only login codes are automated. HR can use external communication. Revisit messaging/publication/calendar integration after review/export is usable.
 - Recommend submitted snapshots; account holds only contact identity, not a CV profile. Define withdrawal and explicit correction policy.
 - User prefers noneditable published vacancies. Recommend editable drafts, locked published intake definition, and cloning; decide whether closing/unpublishing or descriptive corrections remain allowed.
 - Recommend existing-user interviewers initially; guest invitations deferred. Admin finalization override needs an explicit decision.

@@ -6,6 +6,7 @@ Implementation is authorized. Start with the agreed scenarios; do not expand int
 - `docs/product.md`: confirmed direction, actors, and workflows.
 - `docs/status.md`: current implementation unit, verified checks, and next tasks.
 - `docs/api.md`: implemented backend contract and planned modules; frontend comes after backend handoff.
+- `docs/vacancy-api.md`: implemented vacancy catalog, private task/source args, owner policy, revisions and public projections. Additional presets are TODO only.
 - `docs/backend-modules.md`: proposed feature boundaries and next vacancy checkpoint; not extra approved policies.
 - `docs/architecture.md`: current foundation classes/data flow and proposed future fields, transactions, and events; not implemented feature schemas.
 - `docs/integration-testing.md`: mail/extraction fixtures and protocol adapters. No auth bypass; full mocked-mail auth checks still use PostgreSQL.

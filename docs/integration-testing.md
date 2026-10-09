@@ -56,8 +56,11 @@ Default `EXTRACTION_DRIVER=disabled` returns a failed result with null and disab
 There is no extraction HTTP endpoint or document-processing workflow yet. Tests call the provider directly; future ProcessingService will depend on this port rather than a vendor SDK. A live adapter will need approved task/result contracts, operational timeout/retry/error mapping, provenance, and evaluation examples before it can replace the fixture honestly.
 
 ## Future protocol boundaries—not implemented
+- Per-unit fixtures: trusted optional string `fixtureKey` follows processing/services to the selected unit. Defined means fixture lookup; absent means configured normal adapter (possibly disabled), not guaranteed live AI. Missing fixture fails; no automatic real-provider fallback. Do not accept candidate-controlled fixture instructions.
+- The registry binds logical aliases to actual document/task identities and verifies source hashes and task arguments before returning recorded results. Record calls and assert that distinct applicants/documents/arguments are relayed correctly; preserve fixture provenance through persistence/export. Current task-key-only fixtures do not yet implement this relay validation.
+- Reusable script helpers: seed logical entities/files, resolve aliases, read records, assert properties, and clean owned datasets. Optional reset is restricted to an explicitly verified dedicated test database and known tables, never the normal development database. HTTP/worker connections mean a single rollback transaction cannot isolate every scenario. Central loaders evolve with schema; scenarios should not require repeated bespoke SQL.
 - Document storage: local/memory adapters once upload/ownership contract exists.
 - PDF/DOCX parsing: text-reader port with small file fixtures; unsupported/OCR failures explicit.
-- Job scheduling: durable work records first; choose polling/BullMQ at that checkpoint.
+- Processing: application-level execution with individual saved task progress first; no separate run/history table or independently queued work items required. Cron/polling can later retry eligible failures/reclaim interruptions; catch-and-ignore is not recovery. Original files persist; extracted-text caching can remain in-memory initially.
 
 Do not implement or require accounts for these providers merely to test vacancy persistence. Keep fixture checks separate from optional real integration checks, and never infer real delivery/model quality from a mock passing.

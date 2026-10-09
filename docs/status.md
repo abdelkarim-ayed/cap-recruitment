@@ -1,6 +1,6 @@
 # Implementation status
 
-## Current unit: backend foundation and integration boundaries
+## Current unit: persisted vacancy checkpoint
 Implementation and local checkpoint commits are authorized. Remote creation/publishing remain deferred.
 
 - Created plain pnpm workspace with `apps/web`, `apps/api`, `packages/domain`.
@@ -14,12 +14,19 @@ Implementation and local checkpoint commits are authorized. Remote creation/publ
 - API reference now includes concrete payloads/errors in [`api.md`](api.md), implemented-only [`openapi.json`](openapi.json), and separate [`vacancy-api-draft.md`](vacancy-api-draft.md) proposals. OpenAPI structure/references/examples validated; a one-off local check matched 21 real HTTP responses to the schemas, including session lookup, 429, 413, and readiness 503. This check is not an added CI test or proof of unimplemented vacancy behavior.
 - Foundation now has explicit Identity/Database/Configuration/Integrations/Infrastructure/Health modules. MailSender supports SMTP, private file capture, and memory test override; disabled/fixture extraction carries provenance and does not process candidate documents. Production rejects capture/fixture modes. `auth:mock-check` verifies real PostgreSQL/OTP/sessions without SMTP/Mailpit; real SMTP `auth:check` and `infra:check` remain separate.
 - Real auth also passed a one-off private-file capture check and a memory check with deliberately invalid unused SMTP settings; own captured messages were removed without touching other mail. Repeated `auth:migrate` succeeds; Better Auth reports a numeric/int8 introspection warning for `rateLimit.lastRequest`. No custom schema workaround was applied; auth/rate-limit checks remain functional.
-- Workflow coverage and current/future classes, stable identifiers, transaction boundaries, and possible events are in [`architecture.md`](architecture.md); fixture setup is in [`integration-testing.md`](integration-testing.md). No vacancy/application/interview workflow is implemented yet; no worker/event bus was added.
+- Workflow coverage and current/future classes, stable identifiers, transaction boundaries, and possible events are in [`architecture.md`](architecture.md); fixture setup is in [`integration-testing.md`](integration-testing.md). Application/interview workflows remain unimplemented; no worker/event bus was added. Vacancy backend is verified below, not graphical authoring UI.
+
+## Vacancy implementation
+- Implemented VacanciesModule/controller/service/repository, explicit checksummed application migrations, PostgreSQL persistence and separate form/task definitions. Owner-only edit/publish/close; admin/recruiter staff reads/creates, candidate/interviewer denied. Published/closed records locked; expected revisions and row locks prevent lost updates. Public list/detail expose only published job/form allowlists.
+- Shared runtime schema lives at `packages/domain/src/vacancies.ts` (separate package subpath, no web-shell bundle increase). Supported inputs: text, long_text, number, yes_no, single_choice, multiple_choice, document, separator; extractSkills args/source association validated as configuration only. No live extraction, application uploads/submission, editor UI, templates or extra presets added.
+- Cookie-authenticated Nest writes now require trusted Origin; no auth bypass. `pnpm test` passes 30 tests (11 domain, 19 API/adapter/service); build/typecheck pass. Real PostgreSQL `vacancies:check` verifies role/resource checks, invalid payload atomicity, concurrent edits, public privacy, publish/close and persistence across API/pool recreation. Repeated db:migrate and auth:mock-check pass. No remote CI or browser automation.
+- Implemented handoff: [`vacancy-api.md`](vacancy-api.md), updated OpenAPI, manual/automated instructions in [`backend-test.md`](backend-test.md). Next: authenticated application submission and owned documents, then per-unit fixture processing; not the graphical editor yet.
 
 ## Next independent units, in dependency order
+Latest discussion narrows the first feature slice: vacancies with separate form/task definitions, locked application submissions and storage references, then application-level per-unit mocked processing and extraction review/export. Separate ProcessingRun/queued WorkItem tables, persistent artifact caches, messaging/calendar integrations, and server-saved application drafts are not initial requirements. This is documented direction only; no feature code was added. See `architecture.md` and `integration-testing.md`.
 The concrete proposed module/checkpoint boundaries are in `backend-modules.md`.
 1. Identity/session/role foundation completed; resource ownership checks follow their vacancy/application modules.
-2. Persisted vacancy definition/editor and public application submission with application-specific documents.
+2. Vacancy persistence/public contract completed; next authenticated application submission and application-specific documents. Graphical editor follows backend handoff.
 3. Document-owned extraction tasks, per-document grouping, worker/recovery, review/export. Provider-independent task plan; no arbitrary filtering.
 4. Application progression, editable interviews, assignments/notes, owner decisions.
 5. Published updates, deliberate messaging, dashboard, repeatable demo and presentation.

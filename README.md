@@ -3,7 +3,7 @@
 Company-specific recruitment management with configurable applications, document extraction, HR review/export, interviews, and candidate updates.
 
 ## Current checkpoint
-pnpm monorepo with React/Vite placeholder shell and NestJS backend. Email-code authentication, sessions, and role access checks are implemented; vacancy/application features are next. See [backend tests](docs/backend-test.md) and [API contract](docs/api.md).
+pnpm monorepo with React/Vite placeholder shell and NestJS backend. Email-code access and persisted vacancy draft/publish/close/public retrieval are implemented. Application submission and task execution are next. See [backend tests](docs/backend-test.md), [API contract](docs/api.md), and [vacancy payloads](docs/vacancy-api.md).
 
 ## Development
 Requires Node 24, pnpm 12, and Podman with podman-compose (or Docker Compose using `compose.yaml`). Before the first start, create `.env` from `.env.example` if missing and set a randomly generated BETTER_AUTH_SECRET of at least 32 characters. Do not overwrite an existing `.env`; this workspace already has a generated local secret.
@@ -13,6 +13,7 @@ pnpm install --frozen-lockfile
 pnpm infra:up
 pnpm build
 pnpm --filter @recruitment/api auth:migrate
+pnpm --filter @recruitment/api db:migrate
 pnpm dev
 ```
 
@@ -33,7 +34,7 @@ Local settings: copy `.env.example` to `.env` and set a randomly generated BETTE
 
 ## Product documentation
 - [Architecture and progress toward the workflow](docs/architecture.md) · [Mockable integration tests](docs/integration-testing.md)
-- [API reference and payload examples](docs/api.md) · [OpenAPI specification](docs/openapi.json) · [Proposed vacancy API](docs/vacancy-api-draft.md)
+- [API reference and payload examples](docs/api.md) · [OpenAPI specification](docs/openapi.json) · [Vacancy API](docs/vacancy-api.md)
 - [Product](docs/product.md)
 - [Decisions](docs/decisions.md)
 - [Scenarios](docs/workflows.md)

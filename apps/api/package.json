@@ -10,6 +10,8 @@
     "test": "node --test tests/*.test.mjs",
     "infra:check": "node tests/infra-smoke.mjs",
     "auth:migrate": "node dist/auth/migrate.js",
+    "db:migrate": "node dist/database/migrate.js",
+    "vacancies:check": "node tests/vacancies-smoke.mjs",
     "auth:check": "node tests/auth-smoke.mjs",
     "auth:mock-check": "node tests/auth-memory-smoke.mjs",
     "integrations:check": "node --test tests/integrations.test.mjs",
