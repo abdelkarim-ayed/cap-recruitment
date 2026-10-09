@@ -15,4 +15,36 @@ export const applicationMigrations = [{
   );
   CREATE INDEX vacancies_listing ON vacancies (created_at DESC, id DESC);
   CREATE INDEX vacancies_public_listing ON vacancies (created_at DESC, id DESC) WHERE status = 'published';`,
+}, {
+  id: '002_applications_documents',
+  sql: `CREATE TABLE applications (
+    id uuid PRIMARY KEY,
+    vacancy_id uuid NOT NULL REFERENCES vacancies(id) ON DELETE RESTRICT,
+    candidate_id text NOT NULL REFERENCES "user"(id) ON DELETE RESTRICT,
+    candidate_identity jsonb NOT NULL,
+    vacancy_snapshot jsonb NOT NULL,
+    answers jsonb NOT NULL,
+    stage text NOT NULL DEFAULT 'received' CHECK (stage IN ('received','review_ready','preselected','interview','offer','hired')),
+    processing_state text NOT NULL CHECK (processing_state IN ('pending','not_requested')),
+    submitted_at timestamptz NOT NULL DEFAULT now(),
+    CONSTRAINT applications_candidate_vacancy_unique UNIQUE(candidate_id,vacancy_id)
+  );
+  CREATE INDEX applications_candidate_listing ON applications(candidate_id,submitted_at DESC,id DESC);
+  CREATE INDEX applications_vacancy_listing ON applications(vacancy_id,submitted_at DESC,id DESC);
+  CREATE TABLE stored_files (
+    id uuid PRIMARY KEY,
+    storage_ref text NOT NULL UNIQUE,
+    content_hash text NOT NULL CHECK (content_hash ~ '^[a-f0-9]{64}$'),
+    byte_count integer NOT NULL CHECK (byte_count BETWEEN 1 AND 10485760),
+    filename text NOT NULL,
+    media_type text NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now()
+  );
+  CREATE TABLE application_documents (
+    id uuid PRIMARY KEY,
+    application_id uuid NOT NULL REFERENCES applications(id) ON DELETE RESTRICT,
+    input_id text NOT NULL,
+    stored_file_id uuid NOT NULL UNIQUE REFERENCES stored_files(id) ON DELETE RESTRICT,
+    UNIQUE(application_id,input_id)
+  );`,
 }] as const;

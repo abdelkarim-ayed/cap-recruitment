@@ -10,6 +10,10 @@
     "./vacancies": {
       "types": "./dist/vacancies.d.ts",
       "import": "./dist/vacancies.js"
+    },
+    "./applications": {
+      "types": "./dist/applications.d.ts",
+      "import": "./dist/applications.js"
     }
   },
   "scripts": {

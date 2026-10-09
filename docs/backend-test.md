@@ -12,7 +12,7 @@ pnpm --filter @recruitment/api auth:check
 
 The last command runs real HTTP/database/local-mail tests with a disposable account: incorrect code, successful sign-in, cookie session, role-injection prevention, candidate denied staff access, actual staff provisioning command/session revocation, new staff sign-in, code reuse rejection, unsupported OTP type, logout. It uses unique loopback peers to isolate persistent rate-limit buckets without disabling protections, then deletes only its own user/messages/buckets. Immediate reruns are supported on this Linux container. Wrong/used-code checks assert `INVALID_OTP`, not just any error status.
 
-`pnpm test` runs 30 domain/API/adapter tests without needing running external services, including vacancy schemas/owner/state tests, real bootstrap body caps, anonymous role guards, mail/extraction fixtures, transaction failure/release, and a stalled Redis-protocol fixture. An intentional unavailable-database case can emit a Better Auth schema-check error log; the expected readiness HTTP outcome is 503. CI runs these tests, not optional real PostgreSQL integration checks.
+`pnpm test` runs 35 domain/API/storage tests without external services. Optional real PostgreSQL checks remain separate; expected unavailable-database tests may log Better Auth errors.
 
 For credentials-free protocol tests and full real auth with in-memory mail, see [`integration-testing.md`](integration-testing.md): `integrations:check` needs no running services; `auth:mock-check` needs PostgreSQL only. Manual file capture also avoids any SMTP server/account; OTP/session checks remain real.
 
@@ -50,6 +50,7 @@ Verify its email using the same flow; staff access should be 200. Provisioning d
 Report endpoint, HTTP status, sanitized response/error, and relevant API console output. Do not paste OTPs, session cookies, .env contents, or credentials.
 
 ## Vacancy checkpoint
+Application intake/storage is implemented too: see [`application-api.md`](application-api.md) for multipart curl instructions and `pnpm --filter @recruitment/api applications:check`. This verifies real OTP/session, uploads, authorization, concurrent duplicates, rollback cleanup and API restart using disposable fixtures. No UI/AI testing implied.
 ```sh
 pnpm build
 pnpm --filter @recruitment/api auth:migrate

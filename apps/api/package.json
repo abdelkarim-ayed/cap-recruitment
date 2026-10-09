@@ -12,6 +12,7 @@
     "auth:migrate": "node dist/auth/migrate.js",
     "db:migrate": "node dist/database/migrate.js",
     "vacancies:check": "node tests/vacancies-smoke.mjs",
+    "applications:check": "node tests/applications-smoke.mjs",
     "auth:check": "node tests/auth-smoke.mjs",
     "auth:mock-check": "node tests/auth-memory-smoke.mjs",
     "integrations:check": "node --test tests/integrations.test.mjs",
@@ -28,6 +29,7 @@
     "better-call": "1.4.0",
     "dotenv": "^17.2.0",
     "express": "^5.2.1",
+    "multer": "2.4.0",
     "nodemailer": "^7.0.13",
     "pg": "^8.16.0",
     "redis": "^5.8.0",
@@ -37,6 +39,7 @@
   "devDependencies": {
     "@nestjs/testing": "12.1.2",
     "@types/express": "^5.0.6",
+    "@types/multer": "2.0.0",
     "@types/node": "^24.0.0",
     "@types/nodemailer": "^7.0.12",
     "@types/pg": "^8.15.0",

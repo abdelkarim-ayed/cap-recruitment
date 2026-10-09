@@ -1,6 +1,6 @@
 # Vacancy API — implemented checkpoint
 
-**Implemented and integration-tested.** These routes are also in `openapi.json`. Admin/recruiter may create/read staff vacancies; only the creating owner may edit/publish/close (including idempotent actions). Interviewer/candidate cannot access staff routes. Cookie-authenticated writes require Origin equal to WEB_ORIGIN or BETTER_AUTH_URL's origin. Application submission, document upload, and task execution are not implemented in this checkpoint.
+**Implemented and integration-tested.** Admin/recruiter create/read; owner alone edits/publishes/closes. Interviewer/candidate denied staff vacancy routes. Writes require trusted Origin. Application intake/private documents are implemented separately in [`application-api.md`](application-api.md); task execution is not implemented.
 
 ## Staff create/update
 `POST /api/vacancies` body:
@@ -43,10 +43,10 @@ Every answer/document input requires id, name, label, type, required, args. Sepa
 | number | Optional finite min/max; min ≤ max; optional positive step |
 | yes_no | `{}` |
 | single_choice / multiple_choice | `{"choices":[{"value":"day","label":"Day"}]}`; 1–100 unique values |
-| document | accept: unique nonempty subset of `.pdf`, `.docx`; limit: NO_LIMIT or MAX_BYTES with positive safe-integer bytes |
+| document | Optional accept: 1–32 unique lower-case extensions matching `^\.[a-z0-9]{1,16}$`; optional limit: NO_LIMIT or MAX_BYTES with positive safe-integer bytes |
 | separator | `{}`; display-only, no answer |
 
-extractSkills args require `skills` (1–100 nonempty strings, max 100 chars each, case-insensitively unique) and boolean `evidence`. Task list contains configured active tasks; remove a task to disable it (no enabled flag in this version). The future editor can still show task toggles/settings on the selected document. Unknown task types/args fail validation. Empty task list is valid. Empty form can be saved as draft; publication requires at least one non-separator input. File limits are configuration only until submission/uploads are implemented.
+extractSkills args require skills (1–100 nonempty strings, max 100 chars, case-insensitively unique) and evidence boolean. Remove a task to disable it; no enabled flag. Future editor can show settings on its source document. Unknown types/args fail. Empty task list is valid; publish requires a non-separator input. Omitted accept/limit means no business restriction; uploads still obey 10 MiB/file and 25 MiB combined caps. Extension restrictions are not content verification.
 
 **201** response (illustrative ID, actual responses return UUIDs):
 ```json
@@ -135,4 +135,4 @@ No ownerId, processingDefinition, internal notes, or backend metadata. Projectio
 - Lists omit `description` and form/task definitions. No results returns `items: []` and `total: 0`; `total` counts records visible to that caller.
 - 400 invalid field/task configuration; 401 signed out; 403 management role required; 404 missing/nonpublic record; 409 stale revision/locked state/invalid transition.
 
-Validation errors return 400 with statusCode/error/message plus issues `[ {"path":"processingDefinition.tasks.0.sourceInputId","message":"Task source must be a document input."} ]`. UUID and transition errors use ordinary Nest envelopes. General JSON body limit is 256 KiB; oversized bodies return 413. No delete/cloning, uploads/submission, arbitrary rules, task execution or staff-management API. Next: applications/documents; richer predefined presets are TODOs, not implemented.
+Validation errors return 400 with statusCode/error/message plus issues with path/message. UUID/transition errors use Nest envelopes. General JSON body limit is 256 KiB. No vacancy delete/cloning, arbitrary rules, task execution or staff-management API. Applications/uploads have a separate contract; richer presets remain TODO.

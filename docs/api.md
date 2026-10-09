@@ -156,7 +156,7 @@ Auth errors usually include `{code, message}`; rate-limit errors may have only `
 - Trusted web origin defaults to `http://localhost:5173`; configure WEB_ORIGIN for a different host/tunnel. Origin checks remain enabled.
 - Codes expire after five minutes, have three verification attempts, and are hashed in storage. Used codes cannot sign in again.
 - Sessions expire after seven days without rolling refresh; signing in again creates a fresh session. This avoids renewing database expiry without forwarding cookie updates through the role guard.
-- Auth bodies are capped at 32 KiB before Better Auth parses them; oversized content-length or chunked requests return 413. General application JSON bodies are capped at 256 KiB. Future uploads require a separate bounded path.
+- Auth bodies are capped at 32 KiB; general JSON at 256 KiB. Multipart intake has a separate guarded path: 10 MiB/file, 25 MiB combined, 256 KiB answers. See [`application-api.md`](application-api.md).
 - Code-send HTTP success means the library accepted the request, not proof of delivery: Better Auth logs callback failures without necessarily failing the HTTP response. Local smoke checks verify actual Mailpit delivery; production mail failure visibility is later work. Non-sign-in OTP types are rejected before the callback.
 - MailSender isolates delivery: SMTP defaults to local Mailpit; optional file capture needs no SMTP. Tests can inject memory capture. Production rejects development file capture/AI fixtures, and no auth-bypass endpoint was added. See `integration-testing.md`. Production mail credentials/provider are not configured.
 - Role cache is disabled so server-side changes are read from the database.
@@ -166,12 +166,13 @@ Auth errors usually include `{code, message}`; rate-limit errors may have only `
 ## Vacancy handoff and remaining modules
 Vacancy routes are now implemented: POST/GET `/api/vacancies`, GET/PATCH `/api/vacancies/:id`, POST publish/close actions, and GET public vacancy list/detail. See [`vacancy-api.md`](vacancy-api.md). Admin/recruiter read/create; owner alone mutates. Cookie-authenticated application writes require trusted Origin (WEB_ORIGIN or BETTER_AUTH_URL origin); missing/untrusted Origin returns 403. Public reads require no session. Definition configuration is not task execution.
 
+Application submission/list/detail/private downloads are implemented in [`application-api.md`](application-api.md). All admin/recruiter staff read; candidates read own only; answers/files locked for everyone. No profile CV or public file URLs.
+
 Remaining feature endpoints—not implemented:
-2. **Applications/documents:** authenticated candidate submits once per vacancy; application-specific documents; staff review and candidate-owned read views. `/api/vacancies/:id/applications`, `/api/applications/:id`, document endpoints. No profile CV storage or arbitrary public file URLs.
 3. **Processing/review/export:** per-document task plan, suggestions/errors, human corrections, CSV. Extraction failure is null plus explicit status; no automatic selection.
 4. **Interviews/decisions:** dynamic interview CRUD/assignment/notes, schedule, preselection and owner decisions. No fixed interview-number pipeline stages.
 5. **Communication/analytics:** selected-recipient sending, published candidate updates, SQL metrics. No automatic email for every interview edit.
 
 Module names describe business boundaries, not microservices. Shared migrations/interfaces have one owner; independent work can follow a written endpoint contract.
 
-See [`vacancy-api.md`](vacancy-api.md) for implemented vacancy payloads and [`backend-modules.md`](backend-modules.md) for next checkpoints. Identity/access, health, and vacancy routes are implemented; application/processing/interview routes are not.
+See vacancy/application references and backend-modules.md for next checkpoints. Identity/access, health, vacancy and locked application/document routes are implemented; processing/interview routes are not.

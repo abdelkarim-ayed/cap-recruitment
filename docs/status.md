@@ -1,6 +1,6 @@
 # Implementation status
 
-## Current unit: persisted vacancy checkpoint
+## Current unit: locked application/document checkpoint
 Implementation and local checkpoint commits are authorized. Remote creation/publishing remain deferred.
 
 - Created plain pnpm workspace with `apps/web`, `apps/api`, `packages/domain`.
@@ -14,19 +14,25 @@ Implementation and local checkpoint commits are authorized. Remote creation/publ
 - API reference now includes concrete payloads/errors in [`api.md`](api.md), implemented-only [`openapi.json`](openapi.json), and separate [`vacancy-api-draft.md`](vacancy-api-draft.md) proposals. OpenAPI structure/references/examples validated; a one-off local check matched 21 real HTTP responses to the schemas, including session lookup, 429, 413, and readiness 503. This check is not an added CI test or proof of unimplemented vacancy behavior.
 - Foundation now has explicit Identity/Database/Configuration/Integrations/Infrastructure/Health modules. MailSender supports SMTP, private file capture, and memory test override; disabled/fixture extraction carries provenance and does not process candidate documents. Production rejects capture/fixture modes. `auth:mock-check` verifies real PostgreSQL/OTP/sessions without SMTP/Mailpit; real SMTP `auth:check` and `infra:check` remain separate.
 - Real auth also passed a one-off private-file capture check and a memory check with deliberately invalid unused SMTP settings; own captured messages were removed without touching other mail. Repeated `auth:migrate` succeeds; Better Auth reports a numeric/int8 introspection warning for `rateLimit.lastRequest`. No custom schema workaround was applied; auth/rate-limit checks remain functional.
-- Workflow coverage and current/future classes, stable identifiers, transaction boundaries, and possible events are in [`architecture.md`](architecture.md); fixture setup is in [`integration-testing.md`](integration-testing.md). Application/interview workflows remain unimplemented; no worker/event bus was added. Vacancy backend is verified below, not graphical authoring UI.
+- Workflow coverage is in architecture.md, fixtures in integration-testing.md. Vacancy/application intake backends implemented below; processing/interviews and graphical UI remain unimplemented.
 
 ## Vacancy implementation
 - Implemented VacanciesModule/controller/service/repository, explicit checksummed application migrations, PostgreSQL persistence and separate form/task definitions. Owner-only edit/publish/close; admin/recruiter staff reads/creates, candidate/interviewer denied. Published/closed records locked; expected revisions and row locks prevent lost updates. Public list/detail expose only published job/form allowlists.
-- Shared runtime schema lives at `packages/domain/src/vacancies.ts` (separate package subpath, no web-shell bundle increase). Supported inputs: text, long_text, number, yes_no, single_choice, multiple_choice, document, separator; extractSkills args/source association validated as configuration only. No live extraction, application uploads/submission, editor UI, templates or extra presets added.
+- Shared runtime schema at packages/domain/src/vacancies.ts. Supported generic inputs and extractSkills args/source association; configuration only, no live extraction/editor/presets. Applications added in the next checkpoint below.
 - Cookie-authenticated Nest writes now require trusted Origin; no auth bypass. `pnpm test` passes 30 tests (11 domain, 19 API/adapter/service); build/typecheck pass. Real PostgreSQL `vacancies:check` verifies role/resource checks, invalid payload atomicity, concurrent edits, public privacy, publish/close and persistence across API/pool recreation. Repeated db:migrate and auth:mock-check pass. No remote CI or browser automation.
-- Implemented handoff: [`vacancy-api.md`](vacancy-api.md), updated OpenAPI, manual/automated instructions in [`backend-test.md`](backend-test.md). Next: authenticated application submission and owned documents, then per-unit fixture processing; not the graphical editor yet.
+- Vacancy handoff: vacancy-api.md, OpenAPI, backend-test.md. Application implementation follows below; graphical editor later.
+
+## Application implementation
+- ApplicationsModule submits locked candidate answers/files, freezes published revision/definitions and candidate identity, prevents duplicates with database uniqueness/transaction locks, and coordinates submit versus close. Candidate read-own; all admin/recruiter staff read all answers/downloads, interviewers excluded. No staff answer/file edits.
+- Optional document accept/limit support unrestricted business constraints; one file/input, hard 10 MiB/file and 25 MiB combined. Private local DocumentStorage port, separate storage metadata/business ownership, opaque references, integrity-checked attachment downloads. No parser/malware scan; crash/cleanup failures may leave private orphan files, documented limitation.
+- pnpm test passes 35 tests (14 domain, 21 API/storage/adapter/service). Real applications:check passes OTP/session, multipart limits, invalid-write rejection, storage failure rollback/cleanup, duplicate races, access isolation, byte-identical downloads and API/pool restart. processingState pending/not_requested is not task execution.
+- Contract: application-api.md, OpenAPI, backend-test.md. Explicit migration 002 adds application/document tables. Processing/review/export next; frontend later.
 
 ## Next independent units, in dependency order
-Latest discussion narrows the first feature slice: vacancies with separate form/task definitions, locked application submissions and storage references, then application-level per-unit mocked processing and extraction review/export. Separate ProcessingRun/queued WorkItem tables, persistent artifact caches, messaging/calendar integrations, and server-saved application drafts are not initial requirements. This is documented direction only; no feature code was added. See `architecture.md` and `integration-testing.md`.
+Vacancies and locked intake/storage implemented; next application-level per-unit mocked processing and extraction review/export. Separate ProcessingRun/queued WorkItem tables, persistent caches, messaging/calendar and saved drafts deferred. See architecture.md and integration-testing.md.
 The concrete proposed module/checkpoint boundaries are in `backend-modules.md`.
 1. Identity/session/role foundation completed; resource ownership checks follow their vacancy/application modules.
-2. Vacancy persistence/public contract completed; next authenticated application submission and application-specific documents. Graphical editor follows backend handoff.
+2. Vacancy/application/document backend contracts completed. Graphical editor follows backend handoff.
 3. Document-owned extraction tasks, per-document grouping, worker/recovery, review/export. Provider-independent task plan; no arbitrary filtering.
 4. Application progression, editable interviews, assignments/notes, owner decisions.
 5. Published updates, deliberate messaging, dashboard, repeatable demo and presentation.
@@ -37,7 +43,7 @@ A user-requested subagent verified rootless networking with isolated services an
 - Candidate-visible labels/withdrawal/correction policy remains proposed.
 - Exact extraction methods are not selected; use fixtures only where clearly identified.
 - BullMQ remains the prior direction, but user raised a simpler polling alternative. Do not claim a scheduler/worker exists yet. Group tasks per document and separate execution from provider batching.
-- NO_LIMIT is a business configuration variant, not permission for unbounded HTTP bodies or storage use. Operational upload caps need safe defaults when uploads are implemented.
+- NO_LIMIT/omitted limit is business configuration, not unbounded storage: implemented caps 10 MiB/file and 25 MiB combined. Production abuse/quota/reconciliation policies remain deferred.
 
 ## Auth research
 Better Auth documents direct PostgreSQL integration and email OTP automatic signup/reuse. The implementation uses its Web Request handler with bounded raw request bytes and the official Better Call Node response bridge, plus a small Nest role guard. No handcrafted JWT or community integration package is needed.

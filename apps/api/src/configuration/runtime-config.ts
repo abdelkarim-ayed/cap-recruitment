@@ -14,6 +14,7 @@ export interface RuntimeConfig {
     smtp: { host: string; port: number; secure: boolean; auth?: { user: string; pass: string } };
   };
   extractionDriver: 'disabled' | 'fixture';
+  documentDirectory: string;
 }
 
 export const RUNTIME_CONFIG = Symbol('RUNTIME_CONFIG');
@@ -41,6 +42,7 @@ export function readRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
       smtp,
     },
     extractionDriver,
+    documentDirectory: join(projectRoot, '.local', 'documents'),
   };
 }
 

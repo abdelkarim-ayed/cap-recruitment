@@ -19,7 +19,7 @@ export const vacancyInputSchema = z.discriminatedUnion('type', [
   z.strictObject({ ...base, type: z.literal('yes_no'), args: z.strictObject({}) }),
   z.strictObject({ ...base, type: z.literal('single_choice'), args: z.strictObject({ choices }) }),
   z.strictObject({ ...base, type: z.literal('multiple_choice'), args: z.strictObject({ choices }) }),
-  z.strictObject({ ...base, type: z.literal('document'), args: z.strictObject({ accept: z.array(z.enum(['.pdf', '.docx'])).min(1).max(2).refine(value => new Set(value).size === value.length, 'Duplicate file extension'), limit: documentLimitSchema }) }),
+  z.strictObject({ ...base, type: z.literal('document'), args: z.strictObject({ accept: z.array(z.string().regex(/^\.[a-z0-9]{1,16}$/)).min(1).max(32).refine(value => new Set(value).size === value.length, 'Duplicate file extension').optional(), limit: documentLimitSchema.optional() }) }),
   z.strictObject({ id: key, type: z.literal('separator'), label, args: z.strictObject({}) }),
 ]);
 export const formDefinitionSchema = z.strictObject({ version: z.literal(1), inputs: z.array(vacancyInputSchema).max(100) });

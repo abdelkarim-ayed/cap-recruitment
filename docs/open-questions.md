@@ -15,7 +15,7 @@ Answer each cluster independently; detailed API/database design comes later.
 
 ## 3. Vacancy form and screening policy
 - See `vacancy-form.md` for hybrid intake/extraction; `form-tooling.md` for researched library candidates.
-- Editor interaction model is accepted. First generic field/argument catalog and extractSkills document-task configuration are implemented in `vacancy-api.md`; richer premade inputs are TODO. Upload operational caps/file-count rules remain to finalize with applications.
+- Generic catalog/extractSkills config implemented; presets TODO. One file/input, optional accept/business limit, 10 MiB/file and 25 MiB combined. Admin/recruiter read-all applications, candidate read-own. Allowed-HR registry and production quota/scan/orphan-reconciliation policies deferred.
 - Which additional extraction tasks/providers should be supported beyond the initial skills definition? No task execution is implemented yet.
 - Automated qualification/filtering is outside current scope; reconcile original automated-ranking requirement before claiming coverage.
 - Define uncertain/missing/conflicting evidence handling and bulk confirmation.

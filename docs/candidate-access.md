@@ -11,6 +11,7 @@
 This is account creation without a registration/password screen, not account-free intake. It moves verification earlier than the previous provisional flow to reduce duplicate and unauthorized submissions.
 
 ## Duplicate handling
+Implemented intake contract: [`application-api.md`](application-api.md). IDs key answers; one file/document input. Candidate read-own, admin/recruiter read-all, interviewer excluded. Submitted answers/files immutable for everyone. UI later.
 - Existing verified email: reuse account/profile, do not create another.
 - Existing application for that vacancy: show that application instead of accepting another; enforce uniqueness server-side/database-side, including concurrent submissions.
 - Other vacancy: permit another application linked to the same profile.

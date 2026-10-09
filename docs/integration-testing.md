@@ -1,4 +1,5 @@
 # Replaceable protocols and local fixtures
+Application check: `pnpm --filter @recruitment/api applications:check` after build/db:migrate. Real PostgreSQL/OTP/multipart, mocked mail, isolated private local storage, rollback cleanup and byte-identical downloads; deletes only disposable data. No auth bypass/live extraction. See [`application-api.md`](application-api.md).
 
 Implemented boundaries, not live AI functionality. API payloads remain in [`api.md`](api.md); component/data-flow details are in [`architecture.md`](architecture.md).
 

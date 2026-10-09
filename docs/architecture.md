@@ -3,13 +3,13 @@
 Read this before the next feature batch. **Current classes are implemented; future feature classes, fields, and events below are proposals, not new product-policy approvals.** One NestJS application, one PostgreSQL database, plain pnpm workspaces. No microservices, generic event framework, or extra infrastructure.
 
 ## Progress toward the product
-Identity/session/roles, infrastructure, adapters, and vacancy draft/publish/close/public retrieval are implemented. The form-editor spike is disposable, not application UI. Vacancy preparation works through the API; none of the six scenarios has a complete integrated frontend journey yet. Candidate verification covers part of submission, but applications are still next. A percentage would confuse backend coverage with delivered workflow/UI coverage.
+Identity, vacancies and locked intake/private documents are implemented through the API. Editor spike is disposable, not application UI. No scenario has a complete integrated frontend journey. Backend coverage is not delivered UI coverage.
 
 | Capability | Current evidence | Still missing |
 | --- | --- | --- |
 | Email-code access | Real OTP, cookie sessions, roles; SMTP and captured-mail checks | Production delivery and staff-management UI/API |
 | Vacancy authoring | Persisted draft/publish/close, strict definitions, owner checks and public projections; accepted isolated editor | Integrated graphical editor, extra presets |
-| Applications | Shared vocabulary and account identity | Submission, uniqueness, answers, application-specific documents |
+| Applications | Locked intake, uniqueness, snapshots, private documents, candidate/staff reads | Processing, review/export and integrated UI |
 | Assisted review | Extraction result union; disabled/labelled fixture adapter | Document parsing, live extractors, durable processing, review, CSV |
 | Interviews/decisions | Agreed stage/authority direction | Scheduling, assignments, notes, owner decisions |
 | Candidate updates/metrics | Proposed boundaries | Explicit publication/sending, database-derived reports |
@@ -61,13 +61,13 @@ Feature modules should start small: controller → service → repository. Servi
 | Next module | Approximate classes / collaborators |
 | --- | --- |
 | Vacancies (implemented) | `VacanciesController`, `PublicVacanciesController`, `VacancyService`, `VacancyRepository`; shared strict schemas at domain/vacancies subpath and allowlisted public projection |
-| Applications | `ApplicationsController`, `ApplicationService`, `ApplicationRepository`; later `DocumentService` plus a document-storage port with local/memory adapters |
+| Applications (implemented) | ApplicationsController/ApplicationService using shared DatabaseService; DocumentStorage port with local adapter and memory test override. No processing/review writes yet |
 | Processing/review | `ProcessingService.processApplication`, `processPendingApplications`, result repository, text-reader port, `ExtractionProvider`; application-level execution first, scheduling chosen later |
 | Interviews | `InterviewsController`, `InterviewService`, `InterviewRepository`; assignment-scoped access in service |
 | Communications | `CommunicationService`, repository, existing `MailSender`; separate candidate-publication records and deliberate send commands |
 | Analytics | Small query service over persisted facts; no separate analytics database/service |
 
-No provider SDK imports in vacancy/application services. Storage, parsing, scheduling, and live model adapters will be added only when their feature contracts exist; they are not stubbed-out products today.
+No provider SDK imports in business services. DocumentStorage is implemented; parsing, scheduling and live model adapters remain future contracts.
 
 ## Proposed consistency fields and rules
 These describe what the upcoming schemas must preserve, not tables that already exist.
@@ -76,8 +76,8 @@ These describe what the upcoming schemas must preserve, not tables that already 
 | --- | --- |
 | Vacancy (implemented) `id`, `ownerId`, `status`, `revision` | Server supplies UUID/owner; admin/recruiter read/create, owner alone mutates. Expected revision plus row lock prevents lost draft edits. Published records locked. Collaborator editing/admin override deferred. |
 | Definition `version`, input `id` / `name`, task `id` / `sourceInputId` / `outputKey` | Store form and processing definitions separately but publish atomically. Task source references preserve editor ownership. Wire-schema version is not vacancy edit count. Stable IDs identify sources/tasks; unique names/output keys identify answers/export columns. |
-| Application `id`, `candidateId`, `vacancyId`, definition reference/snapshot, `submittedAt`, `answers` | One submission per candidate/vacancy. Submitted answers are application data, initially validated JSON keyed by input ID, not duplicated for task access. Submitted answers/files are locked; separate reviewed extraction values do not mutate them. Preserve the published definition; exact snapshot storage remains a schema choice. |
-| Stored file `storageRef`, `contentHash`, `byteCount`, media type; attachment ownership/source input | Separate file storage metadata from application attachment ownership. Storage receives an opaque reference/URI after business access checks, not an arbitrary public URL. First implement application uploads; later interview attachments may use the same storage boundary without becoming candidate answers. Verify type/size; NO_LIMIT never disables operational caps. |
+| Application (implemented) `id`, `candidateId`, `vacancyId`, snapshot, `submittedAt`, `answers` | Unique candidate/vacancy; validated JSON by input ID. Frozen published revision/definitions and candidate identity. Answers/files locked. Admin/recruiter read-all; candidate read-own; interviewer excluded. |
+| Stored file (implemented) reference/hash/size; application_document ownership/input | Separate storage metadata/business ownership. Opaque private local references; attachment-only downloads after authorization/hash verification. Optional extension/business constraints, 10 MiB/file and 25 MiB combined. No content/malware verification. Interview attachments later. |
 | Application processing state; task ID/source hash/configuration identity, status, attempts, result | Execute an application's tasks together initially, but retain individual task results/progress. No separate ProcessingRun table or independently scheduled WorkItem table required initially. Persist recoverable progress and prevent duplicate final results; exact retry/claim fields follow the runner contract. |
 | Result source/task identity, `provenance`, status/value/evidence | Keep answer, extracted suggestion, and reviewed value distinct. Failure/null is not successful false/empty. Persist fixture/live provenance; never export fixture values as genuine model facts without labelling. |
 | Review `reviewedBy`, `reviewedAt`, reviewed value | Attribute corrections; extraction retries must not overwrite HR review. |
@@ -88,13 +88,13 @@ These describe what the upcoming schemas must preserve, not tables that already 
 ### Transaction boundaries to establish with features
 - Publish: validate and transition draft under concurrency protection; lock the published intake definition.
 - Submit: coordinate accepting vacancy state with close, validate answers/files against the frozen definition, insert application/doc references and processing state together; enforce uniqueness. Processing occurs outside the submission HTTP request.
-- Document storage is not a PostgreSQL transaction: stage uploads, finalize ownership after validation, and clean orphaned objects with an explicit recovery path.
+- Storage is not a PostgreSQL transaction. Implemented compensation removes objects after confirmed rollback, retains on ambiguous commit. Crash/failed cleanup can leave private orphans; automated reconciliation not implemented (application-api.md).
 - Complete processing: write result/provenance and task status consistently, then recompute review readiness. Failure/manual-bypass readiness policy is still open.
 - Finalize: check actor/resource authority and transition in the same transaction. Do not assume a role guard alone handles ownership or stale revisions.
 - Send: persist selected recipients/send intent before a later external call. Retry/state reconciliation is needed; SMTP cannot promise exactly-once delivery.
 
 ## Agreed first-slice simplifications — not implemented yet
-- Vacancies first, then applications, then a per-unit mocked processing proof. Exact field/task catalog and resource-management permissions still need selection.
+- Vacancies/intake implemented; next per-unit mocked processing. Generic catalog, owner-only vacancy mutation and admin/recruiter read-all application visibility settled; presets deferred.
 - Candidate edits the form before submission; submitted answers/files are noneditable. Persisted application drafts, withdrawal/correction workflows, reprocessing UI, and multiple processing histories are deferred.
 - Keep graphical task configuration associated with source inputs, but serialize separate form/processing definitions. Runtime scheduling, cache policy, and provider credentials are not vacancy fields.
 - Process one application at a time initially, extracting text once per document and saving each task's result/status. Catch individual failures so other tasks can continue. Do not assume NLP/model calls are always cheap; calls need bounds.
@@ -127,4 +127,4 @@ Proposed meaningful boundaries:
 Do not add an event bus just for these names. Polling can consume durable database work records directly. If an external queue is selected later, use an outbox or equivalent reconciliation to avoid the commit/enqueue gap. Persisted events would need `eventId`, schema version, aggregate ID/revision, time, and actor; consumers must be idempotent. See [`open-questions.md`](open-questions.md) for the unresolved worker decision.
 
 ## Next gate
-Test the implemented vacancy contract in [`vacancy-api.md`](vacancy-api.md) using [`backend-test.md`](backend-test.md). Next implement locked candidate submission/answers and owned documents. The bounded field catalog and owner-only vacancy mutation are settled; additional presets are TODOs, live extractors and richer processing still deferred. No infrastructure detour required.
+Test vacancy/application contracts via backend-test.md. Next decoupled per-unit fixture processing and review/export. Additional presets/live extractors deferred; no infrastructure detour.
