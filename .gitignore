@@ -1,0 +1,14 @@
+# Working context and disposable drafts, not project artifacts.
+/docs/.ignore/
+/user-first-draft.md
+
+# Secrets and local runtime artifacts.
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+/uploads/
+/.local/

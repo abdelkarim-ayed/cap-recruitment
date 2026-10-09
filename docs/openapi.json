@@ -1,0 +1,194 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Recruitment backend — implemented client surface",
+    "version": "0.1.0",
+    "description": "Hand-maintained contract for implemented identity/access and health routes. Proposed vacancy APIs are not included. Additional inherited Better Auth routes are outside this supported handoff. See docs/api.md for semantics and test instructions."
+  },
+  "servers": [{ "url": "http://localhost:3000/api", "description": "Local backend; frontend uses /api through its dev proxy" }],
+  "security": [{ "sessionCookie": [] }],
+  "tags": [{ "name": "Auth" }, { "name": "Access" }, { "name": "Health" }],
+  "paths": {
+    "/auth/email-otp/send-verification-otp": {
+      "post": {
+        "tags": ["Auth"], "operationId": "sendSignInCode", "summary": "Request an emailed sign-in code", "security": [],
+        "description": "Only sign-in type is supported. HTTP 200 acknowledges request acceptance, not guaranteed mail delivery. SMTP defaults to local Mailpit; development file mode captures privately without sending. Three requests per peer/path per 60 seconds.",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SendCodeRequest" }, "example": { "email": "candidate@example.test", "type": "sign-in" } } } },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Success" },
+          "400": { "$ref": "#/components/responses/AuthBadRequest" },
+          "403": { "$ref": "#/components/responses/AuthForbidden" },
+          "413": { "$ref": "#/components/responses/BodyTooLarge" },
+          "429": { "$ref": "#/components/responses/RateLimited" },
+          "default": { "$ref": "#/components/responses/Unexpected" }
+        }
+      }
+    },
+    "/auth/sign-in/email-otp": {
+      "post": {
+        "tags": ["Auth"], "operationId": "signInWithEmailCode", "summary": "Verify code; create/reuse account and set session cookie", "security": [],
+        "description": "Role is server-controlled. Name/image are optional initial-account fields. Opaque token in response is sensitive; clients should use the HTTP-only cookie. Email-OTP plugin allows three sign-in requests per socket peer/path per 60 seconds.",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SignInRequest" }, "example": { "email": "candidate@example.test", "otp": "123456", "name": "Demo Candidate" } } } },
+        "responses": {
+          "200": {
+            "description": "Signed in; Set-Cookie establishes session",
+            "headers": { "Set-Cookie": { "description": "HTTP-only session cookie; do not manually parse/store it in application code", "schema": { "type": "string" } } },
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SignInResponse" } } }
+          },
+          "400": { "$ref": "#/components/responses/AuthBadRequest" },
+          "403": { "$ref": "#/components/responses/AuthForbidden" },
+          "413": { "$ref": "#/components/responses/BodyTooLarge" },
+          "429": { "$ref": "#/components/responses/RateLimited" },
+          "default": { "$ref": "#/components/responses/Unexpected" }
+        }
+      }
+    },
+    "/auth/sign-out": {
+      "post": {
+        "tags": ["Auth"], "operationId": "signOut", "summary": "Invalidate session and clear cookie", "security": [{ "sessionCookie": [] }, {}],
+        "description": "Also succeeds without a session. Recommended body is empty JSON. No OAuth provider logout is configured.",
+        "requestBody": { "required": false, "content": { "application/json": { "schema": { "type": "object" }, "example": {} } } },
+        "responses": {
+          "200": { "$ref": "#/components/responses/Success" },
+          "403": { "$ref": "#/components/responses/AuthForbidden" },
+          "413": { "$ref": "#/components/responses/BodyTooLarge" },
+          "429": { "$ref": "#/components/responses/RateLimited" },
+          "default": { "$ref": "#/components/responses/Unexpected" }
+        }
+      }
+    },
+    "/auth/get-session": {
+      "get": {
+        "tags": ["Auth"], "operationId": "getAuthSession", "summary": "Library session lookup; anonymous result is 200 null", "security": [{ "sessionCookie": [] }, {}],
+        "description": "Used by Better Auth client SDK. Session material is sensitive. Prefer /me for the smaller application actor shape.",
+        "responses": {
+          "200": { "description": "Session/user, or JSON null", "content": { "application/json": { "schema": { "anyOf": [{ "$ref": "#/components/schemas/AuthSessionResponse" }, { "type": "null" }] } } } },
+          "429": { "$ref": "#/components/responses/RateLimited" },
+          "default": { "$ref": "#/components/responses/Unexpected" }
+        }
+      }
+    },
+    "/auth/ok": {
+      "get": {
+        "tags": ["Auth"], "operationId": "authLiveness", "summary": "Better Auth handler liveness", "security": [],
+        "responses": { "200": { "description": "Auth handler running", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthLiveness" }, "example": { "ok": true } } } }, "429": { "$ref": "#/components/responses/RateLimited" }, "default": { "$ref": "#/components/responses/Unexpected" } }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": ["Access"], "operationId": "getCurrentActor", "summary": "Get authenticated application identity",
+        "responses": {
+          "200": { "$ref": "#/components/responses/Actor" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "default": { "$ref": "#/components/responses/Unexpected" }
+        }
+      }
+    },
+    "/staff/access": {
+      "get": {
+        "tags": ["Access"], "operationId": "checkStaffAccess", "summary": "Check admin/recruiter/interviewer access",
+        "description": "Temporary protected access-check endpoint, not a staff directory. Candidate receives 403.",
+        "responses": {
+          "200": { "$ref": "#/components/responses/Actor" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "default": { "$ref": "#/components/responses/Unexpected" }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": ["Health"], "operationId": "getLiveness", "summary": "Application liveness and stage vocabulary", "security": [],
+        "responses": { "200": { "description": "API running", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Liveness" } } } } }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "tags": ["Health"], "operationId": "getReadiness", "summary": "Check PostgreSQL and Redis connectivity", "security": [],
+        "responses": {
+          "200": { "description": "Both dependencies available", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Readiness" }, "example": { "status": "ready", "database": "ok", "redis": "ok" } } } },
+          "503": { "description": "At least one dependency unavailable; no credential/error details", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DependencyStatus" }, "example": { "database": "unavailable", "redis": "ok" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionCookie": { "type": "apiKey", "in": "cookie", "name": "better-auth.session_token", "description": "Default development cookie. Let browser/SDK manage it; HTTPS deployments may use a secure-prefixed name." }
+    },
+    "schemas": {
+      "Role": { "type": "string", "enum": ["admin", "recruiter", "interviewer", "candidate"] },
+      "SendCodeRequest": {
+        "type": "object", "required": ["email", "type"],
+        "properties": { "email": { "type": "string", "format": "email" }, "type": { "type": "string", "const": "sign-in" } }
+      },
+      "SignInRequest": {
+        "type": "object", "required": ["email", "otp"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "otp": { "type": "string", "description": "Six-digit emailed code; incorrect/used code returns INVALID_OTP" },
+          "name": { "type": "string", "description": "Initial name for a new account; does not update existing account" },
+          "image": { "type": "string", "description": "Optional initial profile image URL; not required by our UI" }
+        }
+      },
+      "Success": { "type": "object", "required": ["success"], "properties": { "success": { "type": "boolean", "const": true } } },
+      "AuthLiveness": { "type": "object", "required": ["ok"], "properties": { "ok": { "type": "boolean", "const": true } } },
+      "Actor": {
+        "type": "object", "additionalProperties": false, "required": ["id", "email", "name", "role"],
+        "properties": { "id": { "type": "string" }, "email": { "type": "string", "format": "email" }, "name": { "type": "string" }, "role": { "$ref": "#/components/schemas/Role" } }
+      },
+      "ActorResponse": { "type": "object", "additionalProperties": false, "required": ["user"], "properties": { "user": { "$ref": "#/components/schemas/Actor" } } },
+      "AuthUser": {
+        "type": "object", "required": ["id", "email", "name", "emailVerified", "createdAt", "updatedAt", "role"],
+        "properties": {
+          "id": { "type": "string" }, "email": { "type": "string", "format": "email" }, "name": { "type": "string" },
+          "emailVerified": { "type": "boolean" }, "image": { "type": ["string", "null"] },
+          "createdAt": { "type": "string", "format": "date-time" }, "updatedAt": { "type": "string", "format": "date-time" },
+          "role": { "$ref": "#/components/schemas/Role" }
+        }
+      },
+      "SignInResponse": {
+        "type": "object", "required": ["token", "user"],
+        "properties": { "token": { "type": "string", "description": "Sensitive opaque session token; do not log/store in frontend" }, "user": { "$ref": "#/components/schemas/AuthUser" } }
+      },
+      "AuthSession": {
+        "type": "object", "required": ["id", "userId", "token", "expiresAt", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "type": "string" }, "userId": { "type": "string" }, "token": { "type": "string", "description": "Sensitive session material" },
+          "expiresAt": { "type": "string", "format": "date-time" }, "createdAt": { "type": "string", "format": "date-time" }, "updatedAt": { "type": "string", "format": "date-time" },
+          "ipAddress": { "type": ["string", "null"] }, "userAgent": { "type": ["string", "null"] }
+        }
+      },
+      "AuthSessionResponse": { "type": "object", "required": ["session", "user"], "properties": { "session": { "$ref": "#/components/schemas/AuthSession" }, "user": { "$ref": "#/components/schemas/AuthUser" } } },
+      "Liveness": {
+        "type": "object", "additionalProperties": false, "required": ["status", "service", "applicationStages"],
+        "properties": {
+          "status": { "type": "string", "const": "ok" }, "service": { "type": "string", "const": "recruitment-api" },
+          "applicationStages": { "type": "array", "items": { "type": "string", "enum": ["received", "review_ready", "preselected", "interview", "offer", "hired"] } }
+        }
+      },
+      "DependencyStatus": {
+        "type": "object", "required": ["database", "redis"],
+        "properties": { "database": { "type": "string", "enum": ["ok", "unavailable"] }, "redis": { "type": "string", "enum": ["ok", "unavailable"] } }
+      },
+      "Readiness": {
+        "type": "object", "additionalProperties": false, "required": ["status", "database", "redis"],
+        "properties": { "status": { "type": "string", "const": "ready" }, "database": { "type": "string", "const": "ok" }, "redis": { "type": "string", "const": "ok" } }
+      },
+      "AuthError": { "type": "object", "required": ["message"], "properties": { "code": { "type": "string" }, "message": { "type": "string" } } },
+      "NestError": { "type": "object", "required": ["message", "error", "statusCode"], "properties": { "message": { "type": "string" }, "error": { "type": "string" }, "statusCode": { "type": "integer" } } }
+    },
+    "responses": {
+      "Success": { "description": "Accepted/successful operation", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Success" }, "example": { "success": true } } } },
+      "Actor": { "description": "Authenticated actor; no session token", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ActorResponse" }, "example": { "user": { "id": "example-user-id", "email": "candidate@example.test", "name": "Demo Candidate", "role": "candidate" } } } } },
+      "AuthBadRequest": { "description": "Invalid input, unsupported OTP type, or invalid/expired/used code", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthError" }, "example": { "code": "INVALID_OTP", "message": "Invalid OTP" } } } },
+      "AuthForbidden": { "description": "Verification attempts exhausted or origin/security check failed", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthError" } } } },
+      "Unauthenticated": { "description": "Missing/invalid/expired session", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NestError" }, "example": { "message": "Sign in to continue.", "error": "Unauthorized", "statusCode": 401 } } } },
+      "Forbidden": { "description": "Account role is unavailable or not permitted", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NestError" }, "example": { "message": "This action requires a different role.", "error": "Forbidden", "statusCode": 403 } } } },
+      "BodyTooLarge": { "description": "Auth raw body exceeds 32 KiB", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthError" }, "example": { "code": "BODY_TOO_LARGE", "message": "Request body is too large." } } } },
+      "RateLimited": { "description": "Auth HTTP rate limit; not proof of invalid code. Current library uses X-Retry-After, not standard Retry-After. CORS does not currently expose this header to direct cross-origin browser callers.", "headers": { "X-Retry-After": { "description": "Wait time in seconds", "schema": { "type": "string" } } }, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuthError" }, "example": { "message": "Too many requests. Please try again later." } } } },
+      "Unexpected": { "description": "Unexpected server/library failure. Do not reinterpret as a bad code or successful operation; inspect HTTP status and show retry/unavailable state." }
+    }
+  }
+}
