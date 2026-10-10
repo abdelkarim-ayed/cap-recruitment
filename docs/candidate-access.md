@@ -1,29 +1,15 @@
-# Candidate access — approved direction
+# Account access — approved direction
 
-## Approved: email code, no password signup
-1. Candidate opens public vacancy and clicks Apply.
-2. Enters email; receives a short-lived code and verifies it.
-3. Backend creates or reuses the account for that verified email. Name is profile data, not an identity key.
-4. Candidate completes the vacancy form and uploads application-specific documents. Existing contact fields may be prefilled; CV is not an account/profile document.
-5. Submission creates at most one application for this candidate/vacancy.
-6. Returning users use the same email-code login; active sessions do not need another code for each vacancy.
+Updated after manual feedback (2026-10-10): **email/password for staff and candidates**, replacing passwordless UI login.
 
-This is account creation without a registration/password screen, not account-free intake. It moves verification earlier than the previous provisional flow to reduce duplicate and unauthorized submissions.
+- Public signup accepts name/email/password and creates candidate accounts only. Roles are non-client-writable. Existing accounts/passwords are not overwritten by duplicate signup.
+- New candidates verify an emailed code once, then sign in with their password. Password length: 12–128 characters. Existing verified accounts use email/password without a code for every login.
+- Staff accounts/roles are provisioned by a trusted local operator; no public staff registration. Set an initial password through STAFF_INITIAL_PASSWORD or use the email-code password-reset flow. Provisioning revokes prior sessions. Staff still verify email ownership before ordinary password login.
+- Password reset verifies a short-lived emailed code and revokes existing sessions. Legacy OTP sign-in API remains available for compatibility/regression; current UI uses passwords.
+- Demo seed identities/credentials are explicitly synthetic, verified by the trusted demo seed only; forbidden in production. This is not a general auth bypass.
+- Better Auth stores password hashes/codes and validates cookie sessions. SMTP/file/memory adapters remain replaceable; development captures are not real deliveries. Google/OAuth deferred.
 
-## Duplicate handling
-Implemented intake contract: [`application-api.md`](application-api.md). IDs key answers; one file/document input. Candidate read-own, admin/recruiter read-all, interviewer excluded. Submitted answers/files immutable for everyone. UI later.
-- Existing verified email: reuse account/profile, do not create another.
-- Existing application for that vacancy: show that application instead of accepting another; enforce uniqueness server-side/database-side, including concurrent submissions.
-- Other vacancy: permit another application linked to the same profile.
-- Different email: initially a different account. Do not automatically merge using name or phone. Possible duplicates can be reviewed by HR later.
-- HR-entered/imported profile with same email: use a verified linking path; neither merge arbitrarily nor allow access based only on unverified email. Detailed import/linking flow is deferred.
-- Candidate can correct the form before submission. Submitted answers/documents should remain a snapshot; exact post-submission correction/withdrawal policy is open. Changing contact identity must not silently rewrite historical applications.
+## Intake and duplicates
+Public vacancy → candidate signup/verification or existing login → typed answers/upload → immutable application. One application per candidate/vacancy; a repeat returns the existing application unchanged. Different emails are different accounts; no automatic merging by name/phone. Email identity changes must not rewrite frozen application snapshots. Imports/linking/withdrawal remain deferred.
 
-## Scope
-Email/password signup is not selected. Google sign-in may be added later. Better Auth email OTP and cookie sessions implement this flow; local mail delivery uses Mailpit.
-
-## Testing and extensions
-- Local captured email can test actual code delivery/verification without sending real mail.
-- Google sign-in is a later alternative entrance to the same account system, not another profile store. Linking must follow the auth library's safe verified-account rules.
-- Mock OAuth is development-only and is not proof of real Google integration.
-- Google Forms import is deferred; sample imports do not validate live ingestion or identity linking.
+Manual accounts and commands: [demo-guide.md](demo-guide.md). Backend contract: [api.md](api.md), [application-api.md](application-api.md).

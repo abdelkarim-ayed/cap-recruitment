@@ -79,7 +79,7 @@ export async function runAuthScenario(app, delivery) {
     const logout = await request('auth/sign-out', {}, staffCookie);
     equal(logout.status, 200);
     equal((await request('me', undefined, staffCookie)).status, 401);
-    const unsupported = await request('auth/email-otp/send-verification-otp', { email, type: 'email-verification' });
+    const unsupported = await request('auth/email-otp/send-verification-otp', { email, type: 'unsupported' });
     equal(unsupported.status, 400);
     equal((await unsupported.json()).code, 'UNSUPPORTED_OTP_TYPE');
     console.log(`PASS (${delivery.label}): real OTP/session flow, wrong/used-code rejection, safe signup role, transactional provisioning/session revocation, staff authorization, logout.`);

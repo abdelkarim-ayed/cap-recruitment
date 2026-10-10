@@ -2,11 +2,17 @@ import { BadRequestException, ConflictException, ForbiddenException, Inject, Inj
 import { createHash, randomUUID } from 'node:crypto';
 import { validateSubmission, uploadLimits } from '@recruitment/domain/applications';
 import { vacancyListSchema, type Vacancy } from '@recruitment/domain/vacancies';
+import { z } from 'zod';
 import { DatabaseService } from '../database/database.service.js';
 import { DOCUMENT_STORAGE, type DocumentStorage } from '../documents/document-storage.js';
 import type { AuthenticatedRequest } from '../auth/access.js';
 
 type Actor = AuthenticatedRequest['actor'];
+const applicationListSchema=vacancyListSchema.pick({limit:true,offset:true}).extend({
+  processing: z.enum(['pending','not_requested','processing','completed','completed_with_errors']).optional(),
+  review: z.enum(['pending','in_review','completed']).optional(),
+  sort: z.enum(['newest','oldest','candidate','position']).optional().default('newest'),
+});
 interface ApplicationRow {
   id: string; vacancy_id: string; candidate_id: string; candidate_identity: { name: string; email: string };
   vacancy_snapshot: Vacancy; answers: Record<string, unknown>; stage: string; processing_state: string; submitted_at: Date;
@@ -82,13 +88,15 @@ export class ApplicationService {
   }
   async list(actor: Actor, query: unknown, vacancyId?: string) {
     if (!['candidate', 'admin', 'recruiter'].includes(actor.role) || (vacancyId && actor.role === 'candidate')) throw new ForbiddenException('Staff access required.');
-    const parsed = vacancyListSchema.safeParse(query);
+    const parsed = applicationListSchema.safeParse(query);
     if (!parsed.success) throw new BadRequestException('Invalid pagination.');
-    const { limit, offset } = parsed.data;
+    const { limit, offset,processing,review,sort } = parsed.data;
+    if(actor.role==='candidate'&&review)throw new ForbiddenException('Review filters require staff access.');
+    const order=sort==='candidate'?"lower(candidate_identity->>'name'),id":sort==='position'?'lower(title),id':sort==='oldest'?'submitted_at,id':'submitted_at DESC,id DESC';
     const result = await this.database.query(`WITH visible AS (SELECT id,vacancy_id,candidate_id,candidate_identity,stage,processing_state,submitted_at,review_status,review_revision,reviewed_by,reviewed_at,vacancy_snapshot->>'title' AS title FROM applications
-      WHERE ($1::text IS NULL OR candidate_id=$1) AND ($2::uuid IS NULL OR vacancy_id=$2)),
-      page AS (SELECT * FROM visible ORDER BY submitted_at DESC,id DESC LIMIT $3 OFFSET $4)
-      SELECT (SELECT count(*)::integer FROM visible) AS total,coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY submitted_at DESC,id DESC) FROM page),'[]') AS items`, [actor.role === 'candidate' ? actor.id : null, vacancyId ?? null, limit, offset]);
+      WHERE ($1::text IS NULL OR candidate_id=$1) AND ($2::uuid IS NULL OR vacancy_id=$2) AND ($5::text IS NULL OR processing_state=$5) AND ($6::text IS NULL OR review_status=$6)),
+      page AS (SELECT * FROM visible ORDER BY ${order} LIMIT $3 OFFSET $4)
+      SELECT (SELECT count(*)::integer FROM visible) AS total,coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY ${order}) FROM page),'[]') AS items`, [actor.role === 'candidate' ? actor.id : null, vacancyId ?? null, limit, offset,processing??null,review??null]);
     return { items: result.rows[0].items.map((row: Record<string, any>) => ({ id: row.id, vacancyId: row.vacancy_id, vacancyTitle: row.title, candidateId: row.candidate_id, candidate: row.candidate_identity, stage: row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(), ...(actor.role === 'candidate' ? {} : { review: { status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at } }) })), total: result.rows[0].total, limit, offset };
   }
   async download(applicationId: string, documentId: string, actor: Actor) {

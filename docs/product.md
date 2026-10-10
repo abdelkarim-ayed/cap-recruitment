@@ -27,7 +27,7 @@ Confirmed direction: HR administrator, recruiter, candidate, and assigned interv
 ## Representative scenarios
 Detailed bounded scenarios and stage meanings are in `workflows.md`.
 1. HR publishes a vacancy with requirements, questions, and requested documents.
-2. Candidate verifies email via code, then submits contact details, answers, and documents; their account is automatically created or reused.
+2. Candidate signs up with name/email/password and verifies email once, or signs into an existing account, then submits contact details, answers and documents. Internal staff use provisioned email/password accounts. See candidate-access.md.
 3. Uploaded CV is processed asynchronously according to configured extraction tasks. HR reviews suggested facts and evidence alongside candidate answers.
 4. HR reviews/exports a job's applications, optionally processes them externally, and records selection decisions manually in the platform.
 5. HR schedules interviews of different types and records attributable feedback.

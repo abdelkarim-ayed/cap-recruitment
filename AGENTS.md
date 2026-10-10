@@ -9,6 +9,7 @@ Implementation is authorized. Start with the agreed scenarios; do not expand int
 - `docs/vacancy-api.md`: implemented vacancy catalog, private task/source args, owner policy, revisions and public projections. Additional presets are TODO only.
 - `docs/application-api.md`: implemented locked intake, optional document constraints/caps, admin/recruiter read-all and candidate read-own, private storage limitations. Candidate answers/files immutable.
 - `docs/processing-review-api.md`: implemented mock-only context/fixture dispatch, local command/recovery, optional admin/recruiter extraction corrections and ungated CSV. No live AI/parser or candidate answer/file editing.
+- `docs/demo-guide.md`: seeded role accounts, generated synthetic CVs, frontend manual scenarios and local tagged mock commands. `docs/frontend-design.md`: ten approved enterprise-style UI rules.
 - `docs/backend-modules.md`: proposed feature boundaries and next vacancy checkpoint; not extra approved policies.
 - `docs/architecture.md`: current foundation classes/data flow and proposed future fields, transactions, and events; not implemented feature schemas.
 - `docs/integration-testing.md`: mail/extraction fixtures and protocol adapters. No auth bypass; full mocked-mail auth checks still use PostgreSQL.
@@ -20,6 +21,7 @@ Implementation is authorized. Start with the agreed scenarios; do not expand int
 - `docs/backlog.md`: deferred scope and dependencies, not delivery promises.
 - `docs/ai-options.md`: researched AI options and limitations.
 - `docs/candidate-access.md`: approved candidate access flow and duplicate handling.
+- Latest feedback changes access to email/password, candidate-only signup/one-time email verification and code password reset. Legacy OTP API retained, not UI login. Review shows latest effective correction, not historical revisions. RenderCV text-only samples via scripts/render-demo-cvs.py; no image generation. Preserve manual submissions when seeding.
 - `docs/vacancy-form.md`: form and screening direction; bounded first model awaiting approval.
 - `docs/form-tooling.md`: researched builder/renderer shortlist, not integration-tested.
 
@@ -29,7 +31,7 @@ Keep these documents current when the user approves or changes a decision. Do no
 - Use checkpoints, not fixed day-by-day implementation schedules.
 - Use pnpm workspaces; do not introduce Nx or extra services without a reason.
 - No browser tabs or browser automation unless requested. Provide user test instructions.
-- Backend first. Do not delegate parallel frontend work or use screenshots/UI automation; user will manually test and report issues.
+- Backend contracts first; user now authorized the frontend for implemented intake/review/export scope. Do not delegate parallel frontend work or use screenshots/browser automation; user manually tests. DOM component tests are allowed. Interviews/live AI/progression remain deferred.
 - No OpenCode plugins/MCP or changes to global configuration unless approved. Preserve existing secret-access restrictions.
 - Put disposable drafts in `docs/.ignore/tmp/`; sensitive working context in `docs/.ignore/private/`. Neutral technical documentation belongs in tracked `docs/`.
 - Mock AI results must be identifiable as fixtures, never presented as live model output. Do not invent evaluation results.

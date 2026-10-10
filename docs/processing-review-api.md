@@ -1,6 +1,8 @@
 # Mock processing, optional HR review and export
 
-Implemented backend checkpoint; **no live AI, PDF/DOCX parser, frontend or interview management**. Recorded text/results prove data relay and persistence, not extraction quality. Existing legacy ExtractionProvider fixtures remain adapter examples; the workflow uses DocumentTextReader/TaskExecutor execution-context ports.
+Manual-feedback refinements: review adds `review.updatedAt` (last HR save), `review.editor:{id,name,email}|null`, and task `corrector:{id,name,email}|null`. Migration 004 adds save time independently of completion time. Latest effectiveValue is prominent immediately after save/refresh, original extraction/evidence separately expandable. Revision is concurrency protection, not stored history; no revision browser/arrows. Candidate answers/files unchanged. List filters do not limit CSV export.
+
+Implemented backend and HR frontend checkpoint; **no live AI, PDF/DOCX parser or interview management**. Recorded text/results prove relay/persistence, not extraction quality. Legacy ExtractionProvider fixtures remain examples; workflow uses DocumentTextReader/TaskExecutor context ports. Manual UI/seeds/command: demo-guide.md.
 
 ## Mock execution
 ProcessingService executes one application outside submission HTTP. Global Nest providers inject normal reader/executor (disabled); context wrappers select a trusted fixture when fixtureKey is defined. Missing fixture fails without fallback. Candidate-facing requests never accept fixture keys.

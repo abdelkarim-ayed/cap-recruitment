@@ -11,7 +11,7 @@ function parse<T>(schema: { safeParse(value: unknown): { success: true; data: T 
 export class VacancyService {
   constructor(private readonly repository: VacancyRepository) {}
   create(ownerId: string, body: unknown) { return this.repository.create(ownerId, parse(createVacancySchema, body)); }
-  list(publicOnly: boolean, query: unknown) { const { limit, offset } = parse(vacancyListSchema, query); return this.repository.list(publicOnly, limit, offset); }
+  list(publicOnly: boolean, query: unknown) { const { limit, offset,status,sort } = parse(vacancyListSchema, query); return this.repository.list(publicOnly, limit, offset,status,sort); }
   async get(id: string, publicOnly = false) {
     const value = await this.repository.get(id, publicOnly);
     if (!value) throw new NotFoundException('Vacancy not found.');

@@ -10,7 +10,7 @@ An ordered input list with a separate selected-input settings area. Add/remove p
 
 Keep input arguments (slider min/max/step, choices, file limits) distinct from optional task arguments (skills to extract, request evidence, highest education only). Candidate rendering and backend task plans derive from this configuration. Exact first supported presets remain open.
 
-Implemented vacancy serialization uses separate formDefinition/processingDefinition, linked by task sourceInputId. The editor direction still configures tasks against their source document; both definitions publish together. Current generic input/task argument catalog is in `vacancy-api.md`; richer presets are backlog only. Runtime application-level execution, retries, scheduling, and cache policy stay decoupled; no task runner or integrated graphical editor exists yet.
+Integrated editor now configures generic inputs and source-linked task arguments; separate definitions still validate/publish together. Field cards support reordering/removal/settings and a candidate preview below. Current catalog: vacancy-api.md; presets remain backlog. Mock-only local executor/recovery is implemented separately. No live AI/parser.
 
 Example: source `cv`; extractor `skills`; output `extracted_skills`; arguments `React, SQL, project management` and an approved alias dictionary. A second task could extract education. Output columns can be internal-only or paired with explicit candidate answers.
 
@@ -39,7 +39,7 @@ Review means inspection of extraction/interpretation columns alongside candidate
 CSV can contain stable application IDs, explicit answers, extracted values, and reviewed values. External tools handle qualification/formulas. Decision reimport is deferred pending validation, confirmation, and audit design.
 
 ## Library shortlist
-See `form-tooling.md`: current custom-editor/RJSF spike and historical library research. Production renderer integration is not finalized.
+See form-tooling.md for historical custom-editor/RJSF spike. Current app uses a small native React renderer over the shared discriminated input schema; RJSF is not a runtime dependency. Ten design rules: frontend-design.md.
 
 ## Open
-Production renderer, first extractors and parameters, export shape, candidate editing after submission, and exact document constraints. Domain-editor direction is accepted; generic visual-builder selection is no longer a blocker.
+Richer presets, selected-input side-panel refinements and additional extractors later. Generic catalog, document constraints, locked submissions and CSV contract implemented. User browser validation next.

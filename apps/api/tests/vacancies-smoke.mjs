@@ -48,6 +48,7 @@ try {
   equal((await database.query('SELECT count(*)::integer AS count FROM vacancies WHERE owner_id=$1', [owner.id])).rows[0].count, 0, 'Invalid payloads must not create partial rows');
   const created = await request('vacancies', definition, owner.cookie); equal(created.status, 201); const id = created.body.id;
   equal(created.body.ownerId, owner.id); equal(created.body.revision, 1);
+  equal(created.body.owner.name,'Disposable vacancy actor');ok(created.body.owner.email);
   deepEqual(created.body.processingDefinition, definition.processingDefinition);
   equal((await request(`public/vacancies/${id}`)).status, 404);
   equal((await request(`vacancies/${id}`, undefined, other.cookie)).status, 200);
@@ -60,6 +61,9 @@ try {
   equal((await request(`vacancies/${id}`, { expectedRevision: 3, title: 'Locked' }, owner.cookie, settings.webOrigin, 'PATCH')).status, 409);
   equal((await request('vacancies?limit=101', undefined, owner.cookie)).status, 400);
   const page = await request('public/vacancies?limit=1&offset=2147483647'); equal(page.status, 200); equal(page.body.items.length, 0); ok(page.body.total >= 1);
+  const filtered=await request('vacancies?status=published&sort=title',undefined,owner.cookie);equal(filtered.status,200);ok(filtered.body.items.every(item=>item.status==='published'&&item.owner.email));
+  const publicPage=await request('public/vacancies?sort=oldest');equal(publicPage.status,200);ok(publicPage.body.items.every(item=>!('owner' in item)&&!('ownerId' in item)));
+  equal((await request('vacancies?sort=invalid',undefined,owner.cookie)).status,400);
   // Destroy/recreate the API and its pool: persistence must survive restart.
   const secondModule = await Test.createTestingModule({ imports: [AppModule] }).overrideProvider(RUNTIME_CONFIG).useValue(settings).overrideProvider(MAIL_SENDER).useValue(new MemoryMailSender()).compile();
   await app.close();

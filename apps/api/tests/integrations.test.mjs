@@ -43,6 +43,9 @@ test('file mail captures privately and latest message replaces the previous capt
       equal((await stat(join(directory, file))).mode & 0o777, 0o600);
     }
     await rejects(readCapturedMail(directory, 'other@example.test'), { code: 'ENOENT' });
+    await sender.send({to:'other@example.test',subject:'Second mailbox',text:'Other account fixture'});
+    equal((await readCapturedMail(directory,'other@example.test')).message.text,'Other account fixture');
+    equal((await readCapturedMail(directory,'fixture@example.test')).message.text,'Latest fixture');
   } finally { await rm(directory, { recursive: true, force: true }); }
 });
 

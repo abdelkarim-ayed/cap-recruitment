@@ -1,0 +1,56 @@
+[
+  {
+    "alias": "success", "name": "Casey SQL", "location": "Tunis, Tunisia",
+    "summary": "Backend engineer with five years of experience building billing and logistics APIs. Comfortable owning relational data models, investigating production incidents and working with product teams. Seeking a role combining TypeScript services and PostgreSQL performance work.",
+    "experience": [
+      {"company": "CedarRoute Logistics (fictional)", "position": "Backend Engineer", "location": "Tunis", "start_date": "2023-02", "end_date": "present", "highlights": ["Built shipment tracking endpoints in TypeScript and NestJS, supporting idempotent webhook ingestion and customer-specific access rules.", "Reworked PostgreSQL indexes and SQL queries for a dispatch dashboard; reduced median query time from 850 ms to 180 ms in internal load tests.", "Introduced integration tests for reconciliation jobs and wrote a runbook for replaying failed partner events."]},
+      {"company": "AtlasLedger Software (fictional)", "position": "Software Developer", "location": "Sousse", "start_date": "2021-06", "end_date": "2023-01", "highlights": ["Maintained Node.js invoice services and implemented transaction-safe payment reconciliation.", "Diagnosed duplicate invoice imports with customer support; added audit records and regression tests."]}
+    ],
+    "projects": [{"name": "Community Library API", "date": "2024", "highlights": ["Designed a book reservation API using PostgreSQL, TypeScript and Docker; documented authorization rules and race-condition tests."]}],
+    "education": [{"institution": "North Coast Institute of Technology (fictional)", "area": "Computer Science", "degree": "BSc", "start_date": "2017-09", "end_date": "2021-06"}],
+    "skills": [{"label": "Backend", "details": "TypeScript, Node.js, NestJS, REST APIs"}, {"label": "Data and delivery", "details": "SQL, PostgreSQL, Redis, Docker, GitHub Actions"}, {"label": "Testing", "details": "Jest, integration testing, API contract testing"}],
+    "languages": "Arabic (native), French (professional), English (professional)"
+  },
+  {
+    "alias": "failure", "name": "Jordan Failure", "location": "Sfax, Tunisia",
+    "summary": "Application developer with four years of experience maintaining inventory and purchasing systems. Practical background in Java, relational databases and translating operational requirements into maintainable software.",
+    "experience": [
+      {"company": "HarbourWorks Systems (fictional)", "position": "Application Developer", "location": "Sfax", "start_date": "2022-07", "end_date": "present", "highlights": ["Implemented purchase order workflows in Java and Spring Boot, including supplier validation and duplicate detection.", "Wrote SQL reports in PostgreSQL for stock movements and reconciliation checks for nightly imports.", "Collaborated with warehouse staff on release testing and documented incident recovery steps."]},
+      {"company": "OliveStack Services (fictional)", "position": "Developer Intern", "location": "Sfax", "start_date": "2022-02", "end_date": "2022-06", "highlights": ["Built a TypeScript proof of concept for exposing shipment status through an HTTP API."]}
+    ],
+    "projects": [{"name": "Inventory Import Validator", "date": "2023", "highlights": ["Created a Java command-line utility to check CSV stock records before import, reporting row-level issues without changing source files."]}],
+    "education": [{"institution": "Southern Engineering College (fictional)", "area": "Software Engineering", "degree": "BSc", "start_date": "2018-09", "end_date": "2022-06"}],
+    "skills": [{"label": "Programming", "details": "Java, Spring Boot, SQL; limited TypeScript project experience"}, {"label": "Tools", "details": "PostgreSQL, Maven, Git, Linux"}],
+    "languages": "Arabic (native), French (professional), English (intermediate)"
+  },
+  {
+    "alias": "pending", "name": "Drew Pending", "location": "Ariana, Tunisia",
+    "summary": "Data analyst transitioning toward backend engineering. Three years of experience building operational reports, validating incoming data and automating analysis. Interested in reliable data pipelines and API development; TypeScript is not yet a professional skill.",
+    "experience": [
+      {"company": "ClearField Analytics (fictional)", "position": "Data Analyst", "location": "Ariana", "start_date": "2023-09", "end_date": "present", "highlights": ["Prepared supplier performance reports using Python, pandas and SQL queries over PostgreSQL.", "Automated validation of incoming spreadsheet records, flagging missing identifiers and inconsistent dates.", "Worked with operations to define metrics and documented reporting joins for cancelled orders."]},
+      {"company": "MapleRetail Group (fictional)", "position": "Reporting Assistant", "location": "Tunis", "start_date": "2023-02", "end_date": "2023-08", "highlights": ["Maintained Excel reporting templates and checked monthly inventory totals with finance."]}
+    ],
+    "projects": [{"name": "Public Transport Data Explorer", "date": "2025", "highlights": ["Built a small FastAPI service with Python to expose cleaned timetable data; wrote pytest cases for malformed inputs."]}],
+    "education": [{"institution": "Capital School of Applied Sciences (fictional)", "area": "Applied Mathematics", "degree": "BSc", "start_date": "2019-09", "end_date": "2023-06"}],
+    "skills": [{"label": "Analysis", "details": "Python, pandas, SQL, Excel"}, {"label": "Development", "details": "FastAPI, pytest, PostgreSQL, Git"}],
+    "languages": "Arabic (native), French (professional), English (professional)"
+  },
+  {
+    "alias": "empty", "name": "Avery Empty", "location": "Nabeul, Tunisia",
+    "summary": "Junior product designer focused on accessible web interfaces and clear information architecture. Experience conducting usability sessions, preparing wireframes and documenting design decisions. No programming or database experience claimed.",
+    "experience": [{"company": "Sandstone Design Studio (fictional)", "position": "Product Design Intern", "location": "Nabeul", "start_date": "2026-02", "end_date": "2026-07", "highlights": ["Prepared Figma wireframes for appointment booking and tested task completion with five volunteer users.", "Documented keyboard navigation and form error messages for the implementation team.", "Organized design components and tracked stakeholder feedback."]}],
+    "projects": [{"name": "Community Clinic Booking Concept", "date": "2026", "highlights": ["Designed appointment flows with readable summaries and confirmation states; delivered a clickable prototype rather than application code."]}],
+    "education": [{"institution": "Coastal School of Design (fictional)", "area": "Digital Design", "degree": "BA", "start_date": "2022-09", "end_date": "2026-06"}],
+    "skills": [{"label": "Design", "details": "Figma, wireframing, prototyping, usability interviews"}, {"label": "Communication", "details": "Workshop notes, presentation layouts, design documentation"}],
+    "languages": "Arabic (native), French (professional), English (intermediate)"
+  },
+  {
+    "alias": "candidate", "name": "Taylor Candidate", "location": "Tunis, Tunisia",
+    "summary": "Full-stack developer with three years of experience on internal business applications. Enjoys clear domain models, practical automated tests and close collaboration with end users. Looking to focus more deeply on backend services and reliability.",
+    "experience": [{"company": "BlueHarbour Digital (fictional)", "position": "Full-stack Developer", "location": "Tunis", "start_date": "2023-07", "end_date": "present", "highlights": ["Developed a service request portal with React and TypeScript, backed by Node.js endpoints and PostgreSQL.", "Implemented role-based access for staff teams and tested permission boundaries using integration tests.", "Investigated slow report queries with SQL execution plans and measured candidate index improvements.", "Contributed to deployment checklists and paired with support on production issue reproduction."]}],
+    "projects": [{"name": "Volunteer Shift Planner", "date": "2025", "highlights": ["Built a TypeScript scheduling app with optimistic concurrency checks and PostgreSQL persistence."]}],
+    "education": [{"institution": "City Institute of Computing (fictional)", "area": "Information Systems", "degree": "BSc", "start_date": "2019-09", "end_date": "2023-06"}],
+    "skills": [{"label": "Programming", "details": "TypeScript, JavaScript, React, Node.js"}, {"label": "Data and tools", "details": "SQL, PostgreSQL, Docker, Git; basic Redis usage"}],
+    "languages": "Arabic (native), French (professional), English (professional)"
+  }
+]

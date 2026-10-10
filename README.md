@@ -3,7 +3,7 @@
 Company-specific recruitment management with configurable applications, document extraction, HR review/export, interviews, and candidate updates.
 
 ## Current checkpoint
-React/Vite placeholder and NestJS backend. Identity, vacancies/intake/private documents, mock processing and optional HR review/CSV implemented. No live AI/frontend/interviews yet. See [backend tests](docs/backend-test.md), [API](docs/api.md), and [processing/review](docs/processing-review-api.md).
+React/Vite enterprise UI plus NestJS backend: password accounts, candidate signup/verification, owner-labelled vacancies, typed intake/private PDF preview, HR corrections/filter tables and CSV. Mock processing runs locally; no live AI/interviews. **[Demo guide](docs/demo-guide.md)**: accounts/password, RenderCV PDFs and manual scenarios.
 
 ## Development
 Requires Node 24, pnpm 12, and Podman with podman-compose (or Docker Compose using `compose.yaml`). Before the first start, create `.env` from `.env.example` if missing and set a randomly generated BETTER_AUTH_SECRET of at least 32 characters. Do not overwrite an existing `.env`; this workspace already has a generated local secret.
@@ -17,7 +17,7 @@ pnpm --filter @recruitment/api db:migrate
 pnpm dev
 ```
 
-Open `http://localhost:5173` through your container connection. Stop the earlier form-spike server first if it occupies 5173. The API binds to localhost port 3000; the web dev server proxies `/api`. Frontend remains a placeholder shell; use the backend testing guide for auth.
+Open `http://localhost:5173`. API binds to localhost 3000; web proxies `/api`. For seeded manual testing without SMTP, follow [demo-guide.md](docs/demo-guide.md): `demo:seed`, API with MAIL_DRIVER=file, and the local mail:latest command. Do not start duplicate servers if ports are already occupied.
 
 - `GET /api/health`: application liveness.
 - `GET /api/health/ready`: PostgreSQL and Redis connectivity.

@@ -1,6 +1,6 @@
 # Implementation status
 
-## Current unit: mock processing / optional shared review / CSV
+## Current unit: manual-feedback account / HR refinements
 Implementation and local checkpoint commits are authorized. Remote creation/publishing remain deferred.
 
 - Created plain pnpm workspace with `apps/web`, `apps/api`, `packages/domain`.
@@ -14,7 +14,7 @@ Implementation and local checkpoint commits are authorized. Remote creation/publ
 - API reference now includes concrete payloads/errors in [`api.md`](api.md), implemented-only [`openapi.json`](openapi.json), and separate [`vacancy-api-draft.md`](vacancy-api-draft.md) proposals. OpenAPI structure/references/examples validated; a one-off local check matched 21 real HTTP responses to the schemas, including session lookup, 429, 413, and readiness 503. This check is not an added CI test or proof of unimplemented vacancy behavior.
 - Foundation now has explicit Identity/Database/Configuration/Integrations/Infrastructure/Health modules. MailSender supports SMTP, private file capture, and memory test override; disabled/fixture extraction carries provenance and does not process candidate documents. Production rejects capture/fixture modes. `auth:mock-check` verifies real PostgreSQL/OTP/sessions without SMTP/Mailpit; real SMTP `auth:check` and `infra:check` remain separate.
 - Real auth also passed a one-off private-file capture check and a memory check with deliberately invalid unused SMTP settings; own captured messages were removed without touching other mail. Repeated `auth:migrate` succeeds; Better Auth reports a numeric/int8 introspection warning for `rateLimit.lastRequest`. No custom schema workaround was applied; auth/rate-limit checks remain functional.
-- Workflow coverage in architecture.md, fixtures in integration-testing.md. Backend intake/mock processing/review/export implemented below; interviews and graphical UI unimplemented.
+- Backend intake/mock processing/review/export implemented; integrated UI now added below. Interviews/progression/live AI remain deferred.
 
 ## Vacancy implementation
 - Implemented VacanciesModule/controller/service/repository, explicit checksummed application migrations, PostgreSQL persistence and separate form/task definitions. Owner-only edit/publish/close; admin/recruiter staff reads/creates, candidate/interviewer denied. Published/closed records locked; expected revisions and row locks prevent lost updates. Public list/detail expose only published job/form allowlists.
@@ -33,13 +33,27 @@ Implementation and local checkpoint commits are authorized. Remote creation/publ
 - Optional shared admin/recruiter review, separate extraction corrections, actor/time/status and revision protection. Candidate answers/files untouched; interviewer excluded. Review completion never gates CSV: export all applications including failed/pending/unreviewed extraction, with original/effective values, statuses and fixture provenance. No selection/progression/import/interview code.
 - pnpm test: 40 ordinary tests. processing:check verifies real OTP/PostgreSQL/HTTP, fixture relay, recovery/fencing/retry caps, shared corrections, conflicts, privacy and ungated export. Contract/manual commands: [`processing-review-api.md`](processing-review-api.md). Frontend and interviews deferred from this batch; frontend can now follow tested contracts.
 
-## Next independent units, in dependency order
+## Frontend/demo checkpoint
+- User authorized frontend now with simple enterprise/shadcn-like styling, documented in frontend-design.md (native accessible controls, no component registry dependency). React screens cover real OTP/session/role navigation, draft create/edit/reorder/input/task settings/preview/publish/close, dynamic candidate upload/typed answers, locked submission reads/downloads, HR application tables, separate extraction corrections/review markers and CSV.
+- Persistent `demo:seed` adds synthetic accounts across roles, draft/published jobs, four scenario applications, private documents, PDF samples and tagged fixture results. Repeated seed preserved submissions/review. `demo:process UUID success|failure|empty` binds actual source/task identity/hash/args to explicit recorded behavior for new manual submissions; no parser/AI. Local data under ignored .local/demo; no reset.
+- Nine React DOM tests cover login contract, role/query navigation, input/task links, candidate validation/typed answers/preview, review conflict and draft-save/publish locking. All 49 ordinary checks, build/typecheck, frozen install and processing:check pass. No browser automation/screenshots. Real running Vite proxy passed OTP sessions, seed reads, uploaded PDF, local mock CLI, HR correction and CSV; temporary probe data cleaned.
+- Manual entry point: [`demo-guide.md`](demo-guide.md). Browser appearance/interaction remains for user verification. AI options refreshed from official docs on 2026-10-10; recommendations only, no provider credential changes/calls. No interview/progression/import/messaging additions.
+
+## Remaining units
+### Manual-feedback refinements (2026-10-10)
+- User approved design/forms and requested password accounts, clear owner, coloured statuses, dataset filters/sorting and private PDF preview. Clarified revisions: show latest saved correction, not historical versions. Implemented preserving ownership/immutable intake/mock provenance.
+- Better Auth email/password + candidate signup/one-time verification + code reset/session revocation. Public role input cannot elevate accounts. Provisioned staff can receive hashed initial credential via environment or establish one through reset. Legacy OTP API retained; UI uses passwords. Mail capture prints recipient/purpose/timestamp; reported wrong-account capture not reproduced, independent recipient/session checks pass.
+- Migration 004 adds HR save time. Review includes last editor/corrector; latest effective value shown after save/refresh, original unchanged. Owner identity staff-only. Filters/sort execute before counts/pagination; candidate review filter forbidden. Export still all vacancy records.
+- Authorized PDF bytes preview through checked PDF blob/native viewer; no public server inline route. DOM tests verify cleanup/non-PDF rejection; real browser rendering still user-tested.
+- RenderCV 2.8 in ignored local venv; tracked synthetic profiles/generator, five text-only PDFs, no images. New RenderCV seed vacancy preserves old/manual data. Local pypdf check verified extractable text/one page/no images; pypdf is not an app parser/dependency. Fixture failure still simulated, not PDF parse evidence.
+- Verified: 54 ordinary tests, build/typecheck/frozen install, real auth:password-check and legacy auth:mock-check, vacancies:check and processing:check. Running Vite proxy passed all six manual-role password logins, owner/private projections, filter totals, save metadata, RenderCV downloads and ungated CSV, plus fresh signup/verification. Disposable probe account removed. OpenAPI 0.5.0 has 26 paths; references/operation IDs and docs links checked. Native PDF rendering/layout still requires manual browser feedback.
+
 Vacancies, locked intake/storage, mock processing and optional review/export implemented. Separate ProcessingRun/queued WorkItem tables, caches, messaging/calendar and saved drafts deferred.
 The concrete proposed module/checkpoint boundaries are in `backend-modules.md`.
 1. Identity/session/role foundation completed; resource ownership checks follow their vacancy/application modules.
 2. Vacancy/application/document backend contracts completed. Graphical editor follows backend handoff.
 3. Mock per-unit processing/recovery and optional review/export completed. Live extraction much later; no arbitrary filtering.
-4. Application progression, editable interviews, assignments/notes, owner decisions.
+4. User manual frontend test and fixes first; application progression/interviews/notes/owner decisions remain future approval.
 5. Published updates, deliberate messaging, dashboard, repeatable demo and presentation.
 
 A user-requested subagent verified rootless networking with isolated services and cleaned its temporary resources. Main session applied the result to the actual stack. Further delegation should use bounded independent units; shared interfaces and migrations need one owner.

@@ -45,6 +45,7 @@ test('public detail is allowlisted and never includes processing/owner metadata'
   equal(JSON.stringify(publicVacancy(value)).includes('extracted_skills'), false);
 });
 test('pagination rejects unknown keys, nonintegers and unbounded limits', () => {
-  deepEqual(vacancyListSchema.parse({}), { limit: 20, offset: 0 });
-  for (const query of [{ limit: '101' }, { limit: '1.5' }, { offset: '-1' }, { filter: 'anything' }]) equal(vacancyListSchema.safeParse(query).success, false);
+  deepEqual(vacancyListSchema.parse({}), { limit: 20, offset: 0,sort:'newest' });
+  deepEqual(vacancyListSchema.parse({status:'draft',sort:'title',offset:'20'}),{limit:20,offset:20,status:'draft',sort:'title'});
+  for (const query of [{ limit: '101' }, { limit: '1.5' }, { offset: '-1' }, { filter: 'anything' },{status:'invalid'},{sort:'invalid'}]) equal(vacancyListSchema.safeParse(query).success, false);
 });

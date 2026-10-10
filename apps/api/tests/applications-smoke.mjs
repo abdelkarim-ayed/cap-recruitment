@@ -143,6 +143,12 @@ try {
     equal((await patch(admin,{expectedRevision:review.body.review.revision,status:'in_review'})).status,409);
     const corrected=await patch(admin,{expectedRevision:finished.body.review.revision,corrections:[{taskId:'extra',value:{skills:['Rust']}}]}); equal(corrected.status,200); equal(corrected.body.review.status,'in_review');
     const correctedTask=corrected.body.tasks.find(task=>task.taskId==='extra'); deepEqual(correctedTask.effectiveValue,{skills:['Rust']}); equal(correctedTask.result.status,'failed');
+    ok(corrected.body.review.updatedAt);equal(corrected.body.review.editor.id,admin.id);equal(correctedTask.corrector.id,admin.id);
+    const savedAgain=await json(`applications/${application.id}/review`,undefined,recruiter.cookie);deepEqual(savedAgain.body.tasks.find(task=>task.taskId==='extra').effectiveValue,{skills:['Rust']});
+    const filtered=await json(`vacancies/${id}/applications?review=in_review&processing=completed_with_errors&sort=candidate&limit=1`,undefined,recruiter.cookie);equal(filtered.status,200);equal(filtered.body.total,1);equal(filtered.body.items[0].id,application.id);
+    const hidden=await json(`vacancies/${id}/applications?review=completed`,undefined,recruiter.cookie);equal(hidden.status,200);ok(!hidden.body.items.some(item=>item.id===application.id));
+    equal((await json('applications?sort=invalid',undefined,recruiter.cookie)).status,400);
+    equal((await json('applications?review=in_review',undefined,candidate.cookie)).status,403);
     equal((await patch(candidate,{expectedRevision:corrected.body.review.revision,status:'completed'})).status,403);
     csv=await fetch(`${base}/api/vacancies/${id}/export`,{headers:{Cookie:admin.cookie}}); exported=await csv.text(); ok(exported.includes('Rust')); ok(exported.includes('fixture-extra')); ok(exported.includes('failed'));
     const removed=await patch(recruiter,{expectedRevision:corrected.body.review.revision,corrections:[{taskId:'extra',value:null,remove:true}]}); equal(removed.status,200); equal(removed.body.tasks.find(task=>task.taskId==='extra').hasCorrection,false);

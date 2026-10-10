@@ -67,4 +67,8 @@ export const applicationMigrations = [{
     corrected_by text REFERENCES "user"(id) ON DELETE SET NULL, corrected_at timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY(application_id,task_id), FOREIGN KEY(application_id,task_id) REFERENCES application_tasks(application_id,task_id) ON DELETE CASCADE
   );`,
+}, {
+  id: '004_review_saved_at',
+  sql: `ALTER TABLE applications ADD COLUMN review_updated_at timestamptz;
+    UPDATE applications SET review_updated_at=reviewed_at WHERE reviewed_at IS NOT NULL;`,
 }] as const;

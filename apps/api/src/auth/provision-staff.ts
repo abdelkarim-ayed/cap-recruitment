@@ -2,12 +2,15 @@ import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
 import { databaseUrl } from '../configuration/environment.js';
 import { withTransaction } from '../database/database.service.js';
+import { hashPassword } from 'better-auth/crypto';
 
 const [email, role, name] = process.argv.slice(2);
 if (!email || !['admin', 'recruiter', 'interviewer'].includes(role ?? '') || !name) {
   throw new Error('Usage: pnpm staff:provision email role "Name" (admin/recruiter/interviewer).');
 }
 const database = new Pool({ connectionString: databaseUrl(), connectionTimeoutMillis: 3000 });
+const password=process.env.STAFF_INITIAL_PASSWORD;
+if(password&&(password.length<12||password.length>128))throw new Error('STAFF_INITIAL_PASSWORD must be 12–128 characters.');
 try {
   await withTransaction(database, async client => {
     await client.query(`INSERT INTO "user" (id, name, email, "emailVerified", "createdAt", "updatedAt", role)
@@ -15,6 +18,13 @@ try {
     ON CONFLICT (email) DO UPDATE SET role = EXCLUDED.role, "updatedAt" = now()`,
     [randomUUID(), name, email.trim().toLowerCase(), role]);
     await client.query('DELETE FROM session WHERE "userId" = (SELECT id FROM "user" WHERE email = $1)', [email.trim().toLowerCase()]);
+    if(password){
+      const user=(await client.query('SELECT id FROM "user" WHERE email=$1',[email.trim().toLowerCase()])).rows[0];
+      const hash=await hashPassword(password);
+      const existing=await client.query('SELECT id FROM account WHERE "userId"=$1 AND "providerId"=\'credential\'',[user.id]);
+      if(existing.rowCount)await client.query('UPDATE account SET password=$2,"updatedAt"=now() WHERE id=$1',[existing.rows[0].id,hash]);
+      else await client.query('INSERT INTO account(id,"accountId","providerId","userId",password,"createdAt","updatedAt") VALUES($1,$2,\'credential\',$2,$3,now(),now())',[randomUUID(),user.id,hash]);
+    }
   });
-  console.log('Staff account provisioned; email verification is still required to sign in.');
+  console.log('Staff account provisioned. Verify email before password sign-in; without an initial password, use the password-reset flow to set one.');
 } finally { await database.end(); }

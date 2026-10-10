@@ -1,6 +1,8 @@
 # Applications and documents — implemented checkpoint
 
-Backend only. Mock executor, optional extraction review and CSV added separately in [`processing-review-api.md`](processing-review-api.md). No graphical UI, live AI, import, stage mutations, interviews, withdrawal or candidate-answer/file corrections.
+Manual-feedback refinements: list query adds `processing=pending|not_requested|processing|completed|completed_with_errors`, staff-only `review=pending|in_review|completed`, and `sort=newest|oldest|candidate|position` (default newest). Database applies filters/sort before count/pagination, with ID ties. Candidate review filters return 403. CSV remains unfiltered across the vacancy. React PDF preview reuses authorized attachment bytes, checks PDF signature and uses a session-local PDF blob; no public/inline server route. Non-PDFs download-only. Browser PDF support varies; signature is not malware validation.
+
+Backend contract now consumed by the React frontend (demo-guide.md). Mock executor/review/CSV: processing-review-api.md. No live AI, import, stage mutations, interviews, withdrawal or candidate-answer/file corrections.
 
 ## Access
 - Candidate submits using their verified OTP/session account, and reads/downloads only their own applications. Foreign application/document returns 404.

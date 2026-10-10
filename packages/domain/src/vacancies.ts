@@ -68,12 +68,14 @@ export const vacancyActionSchema = z.strictObject({ expectedRevision: z.number()
 export const vacancyListSchema = z.strictObject({
   limit: z.string().regex(/^\d+$/).transform(Number).pipe(z.number().int().min(1).max(100)).optional().default(20),
   offset: z.string().regex(/^\d+$/).transform(Number).pipe(z.number().int().min(0).max(2147483647)).optional().default(0),
+  status: z.enum(['draft','published','closed']).optional(),
+  sort: z.enum(['newest','oldest','title']).optional().default('newest'),
 });
 export type FormDefinition = z.infer<typeof formDefinitionSchema>;
 export type ProcessingDefinition = z.infer<typeof processingDefinitionSchema>;
 export type CreateVacancy = z.infer<typeof createVacancySchema>;
 export type PatchVacancy = z.infer<typeof patchVacancySchema>;
-export interface Vacancy extends CreateVacancy { id: string; ownerId: string; status: 'draft' | 'published' | 'closed'; revision: number; createdAt: string; updatedAt: string }
+export interface Vacancy extends CreateVacancy { id: string; ownerId: string; owner?: {name:string;email:string}; status: 'draft' | 'published' | 'closed'; revision: number; createdAt: string; updatedAt: string }
 
 export function publicVacancy(vacancy: Vacancy) {
   return { id: vacancy.id, title: vacancy.title, description: vacancy.description, ...(vacancy.location === undefined ? {} : { location: vacancy.location }), form: formDefinitionSchema.parse(vacancy.formDefinition) };

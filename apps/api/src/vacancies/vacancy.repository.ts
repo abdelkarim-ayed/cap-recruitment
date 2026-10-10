@@ -9,35 +9,37 @@ interface VacancyRow extends QueryResultRow {
   title: string; description: string; location: string | null;
   form_definition: FormDefinition; processing_definition: ProcessingDefinition;
   created_at: Date | string; updated_at: Date | string;
+  owner_name?: string; owner_email?: string;
 }
-type SummaryRow = Pick<VacancyRow, 'id' | 'owner_id' | 'status' | 'revision' | 'title' | 'location' | 'created_at' | 'updated_at'>;
+type SummaryRow = Pick<VacancyRow, 'id' | 'owner_id' | 'owner_name' | 'owner_email' | 'status' | 'revision' | 'title' | 'location' | 'created_at' | 'updated_at'>;
 interface PageRow extends QueryResultRow { total: number; items: SummaryRow[] }
 
 function record(row: VacancyRow): Vacancy {
   return { id: row.id, ownerId: row.owner_id, status: row.status, revision: row.revision, title: row.title, description: row.description,
     ...(row.location === null ? {} : { location: row.location }), formDefinition: row.form_definition, processingDefinition: row.processing_definition,
-    createdAt: new Date(row.created_at).toISOString(), updatedAt: new Date(row.updated_at).toISOString() };
+    createdAt: new Date(row.created_at).toISOString(), updatedAt: new Date(row.updated_at).toISOString(), ...(row.owner_email?{owner:{name:row.owner_name??'',email:row.owner_email}}:{}) };
 }
 @Injectable()
 export class VacancyRepository {
   constructor(private readonly database: DatabaseService) {}
   async create(ownerId: string, value: CreateVacancy) {
     const result = await this.database.query<VacancyRow>(`INSERT INTO vacancies (id,owner_id,title,description,location,form_definition,processing_definition)
-      VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`, [randomUUID(), ownerId, value.title, value.description, value.location ?? null, JSON.stringify(value.formDefinition), JSON.stringify(value.processingDefinition)]);
+      VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *, (SELECT name FROM "user" WHERE id=owner_id) AS owner_name, (SELECT email FROM "user" WHERE id=owner_id) AS owner_email`, [randomUUID(), ownerId, value.title, value.description, value.location ?? null, JSON.stringify(value.formDefinition), JSON.stringify(value.processingDefinition)]);
     return record(result.rows[0]);
   }
   async get(id: string, publicOnly = false) {
-    const result = await this.database.query<VacancyRow>('SELECT * FROM vacancies WHERE id=$1 AND ($2::boolean=false OR status=\'published\')', [id, publicOnly]);
+    const result = await this.database.query<VacancyRow>('SELECT v.*,u.name AS owner_name,u.email AS owner_email FROM vacancies v JOIN "user" u ON u.id=v.owner_id WHERE v.id=$1 AND ($2::boolean=false OR v.status=\'published\')', [id, publicOnly]);
     return result.rows[0] ? record(result.rows[0]) : undefined;
   }
-  async list(publicOnly: boolean, limit: number, offset: number) {
+  async list(publicOnly: boolean, limit: number, offset: number, status?: Vacancy['status'], sort='newest') {
+    const order = sort==='title'?'lower(title),id':sort==='oldest'?'created_at,id':'created_at DESC,id DESC';
     // One statement gives a consistent total/page even when the page is empty.
     const result = await this.database.query<PageRow>(`WITH visible AS (
-      SELECT id,owner_id,title,location,status,revision,created_at,updated_at FROM vacancies WHERE ($1::boolean=false OR status='published')
-    ), page AS (SELECT * FROM visible ORDER BY created_at DESC,id DESC LIMIT $2 OFFSET $3)
-    SELECT (SELECT count(*)::integer FROM visible) AS total, coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY created_at DESC,id DESC) FROM page),'[]'::jsonb) AS items`, [publicOnly, limit, offset]);
+      SELECT v.id,owner_id,u.name AS owner_name,u.email AS owner_email,title,location,status,revision,created_at,updated_at FROM vacancies v JOIN "user" u ON u.id=v.owner_id WHERE ($1::boolean=false OR status='published') AND ($4::text IS NULL OR status=$4)
+    ), page AS (SELECT * FROM visible ORDER BY ${order} LIMIT $2 OFFSET $3)
+    SELECT (SELECT count(*)::integer FROM visible) AS total, coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY ${order}) FROM page),'[]'::jsonb) AS items`, [publicOnly, limit, offset, status??null]);
     const items = result.rows[0].items.map(row => ({ id: row.id, title: row.title, ...(row.location === null ? {} : { location: row.location }),
-      ...(publicOnly ? {} : { ownerId: row.owner_id, status: row.status, revision: row.revision, createdAt: new Date(row.created_at).toISOString(), updatedAt: new Date(row.updated_at).toISOString() }) }));
+      ...(publicOnly ? {} : { ownerId: row.owner_id, owner:{name:row.owner_name??'',email:row.owner_email??''}, status: row.status, revision: row.revision, createdAt: new Date(row.created_at).toISOString(), updatedAt: new Date(row.updated_at).toISOString() }) }));
     return { items, total: result.rows[0].total, limit, offset };
   }
   async change(id: string, operation: (current: Vacancy) => Vacancy) {
@@ -52,7 +54,7 @@ export class VacancyRepository {
   }
   private async save(client: PoolClient, next: Vacancy) {
     const result = await client.query<VacancyRow>(`UPDATE vacancies SET status=$2,revision=revision+1,title=$3,description=$4,location=$5,
-      form_definition=$6,processing_definition=$7,updated_at=now() WHERE id=$1 RETURNING *`,
+      form_definition=$6,processing_definition=$7,updated_at=now() WHERE id=$1 RETURNING *, (SELECT name FROM "user" WHERE id=owner_id) AS owner_name, (SELECT email FROM "user" WHERE id=owner_id) AS owner_email`,
     [next.id, next.status, next.title, next.description, next.location ?? null, JSON.stringify(next.formDefinition), JSON.stringify(next.processingDefinition)]);
     return record(result.rows[0]);
   }

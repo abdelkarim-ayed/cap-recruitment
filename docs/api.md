@@ -18,7 +18,12 @@ Auth lives at `/api/auth`; application endpoints live at `/api`.
 
 | Endpoint | Access | Behavior |
 | --- | --- | --- |
-| POST `/api/auth/email-otp/send-verification-otp` | Public | `{email, type: "sign-in"}` sends code; does not return it |
+| POST `/api/auth/sign-up/email` | Public | `{email,password,name}` creates candidate only; sends verification code, no session |
+| POST `/api/auth/sign-in/email` | Public | `{email,password}` signs in verified account; role loaded from database |
+| POST `/api/auth/email-otp/verify-email` | Public | `{email,otp}` verifies email ownership; no automatic session |
+| POST `/api/auth/email-otp/request-password-reset` | Public | `{email}` sends reset code if eligible; generic acknowledgement |
+| POST `/api/auth/email-otp/reset-password` | Public | `{email,otp,password}` saves new password and revokes sessions |
+| POST `/api/auth/email-otp/send-verification-otp` | Public | `{email,type}` supports email-verification, forget-password and legacy sign-in; never returns code |
 | POST `/api/auth/sign-in/email-otp` | Public | `{email, otp, name?}` verifies code and creates/reuses candidate account; sets session cookie |
 | POST `/api/auth/sign-out` | Cookie if present | Send `{}`; clears cookie and invalidates session. Also succeeds without a session |
 | GET `/api/auth/get-session` | Cookie if present | Library session/user object, or HTTP 200 with JSON `null` when signed out |
@@ -32,12 +37,15 @@ Roles: admin/recruiter/interviewer/candidate; signup cannot set role. Staff prov
 
 ## Implemented request and response shapes
 
+### Password accounts (current UI)
+Passwords: 12–128 characters on signup/reset, hashed by Better Auth. Public signup cannot set a role; duplicate signup never replaces an existing password/role. Signup sends an email-verification code and returns 200 without a session. Verify via email-otp/verify-email, then sign-in/email sets the same HTTP-only session cookie as legacy OTP login. Unverified password login is 403; invalid credentials 401. Staff creation remains operator-local (staff:provision); seeded demo accounts are trusted synthetic identities only. Reset code flow can establish a password on an older OTP-only account, verifies ownership and revokes sessions. Password sign-in limit: ten requests/socket peer/path/60s; code endpoints retain their tighter limits. No client-side password persistence. See candidate-access.md.
+
 ### Request a code
 `POST /auth/email-otp/send-verification-otp`
 ```json
 {"email":"candidate@example.test","type":"sign-in"}
 ```
-Both fields are required. Only `sign-in` is supported. Success **200**:
+Both fields are required. Supported types: `email-verification`, `forget-password`, legacy `sign-in`. Success **200**:
 ```json
 {"success":true}
 ```
@@ -138,7 +146,7 @@ These health routes do not create or change recruitment records.
 | Status | Scope | Meaning / example |
 | --- | --- | --- |
 | 400 | Auth | Invalid/used code: `{"code":"INVALID_OTP","message":"Invalid OTP"}`; expired code uses `OTP_EXPIRED` |
-| 400 | Code request | Unsupported type: `{"code":"UNSUPPORTED_OTP_TYPE","message":"Only sign-in codes are supported."}` |
+| 400 | Code request | Unsupported type: `{"code":"UNSUPPORTED_OTP_TYPE","message":"Unsupported verification type."}` |
 | 401 | `/me`, `/staff/access` | `{"message":"Sign in to continue.","error":"Unauthorized","statusCode":401}` |
 | 403 | Staff access | `{"message":"This action requires a different role.","error":"Forbidden","statusCode":403}` |
 | 403 | OTP verification | `TOO_MANY_ATTEMPTS` after the configured verification attempt limit; auth origin checks can also return 403 |
@@ -176,4 +184,4 @@ Live extraction/real parsing and more task catalogs remain deferred. Mock proces
 
 Module names describe business boundaries, not microservices. Shared migrations/interfaces have one owner; independent work can follow a written endpoint contract.
 
-Implemented: identity, health, vacancies/intake, local mock processing, review/export. Interviews/progression/frontend remain later checkpoints.
+Implemented: identity, health, vacancies/intake, local mock processing, review/export and React screens against those contracts. Interviews/progression/live AI later. Manual frontend scenarios: demo-guide.md.

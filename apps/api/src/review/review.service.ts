@@ -18,20 +18,23 @@ export class ReviewService {
   private async read(client: PoolClient, id: string, lock = 'FOR SHARE') {
     const result = await client.query(`SELECT * FROM applications WHERE id=$1 ${lock}`, [id]);
     const application = result.rows[0]; if (!application) throw new NotFoundException('Application not found.');
-    const tasks = await client.query(`SELECT t.*,c.value AS correction,c.task_id IS NOT NULL AS has_correction,c.corrected_by,c.corrected_at FROM application_tasks t LEFT JOIN extraction_corrections c USING(application_id,task_id) WHERE t.application_id=$1 ORDER BY t.task_id`, [id]);
+    const editor=application.reviewed_by?(await client.query('SELECT id,name,email FROM "user" WHERE id=$1',[application.reviewed_by])).rows[0]??null:null;
+    application.review_editor=editor;
+    const tasks = await client.query(`SELECT t.*,c.value AS correction,c.task_id IS NOT NULL AS has_correction,c.corrected_by,c.corrected_at,u.name AS corrected_name,u.email AS corrected_email FROM application_tasks t LEFT JOIN extraction_corrections c USING(application_id,task_id) LEFT JOIN "user" u ON u.id=c.corrected_by WHERE t.application_id=$1 ORDER BY t.task_id`, [id]);
     const vacancy: Vacancy = application.vacancy_snapshot;
     return { application, tasks: vacancy.processingDefinition.tasks.map(definition => {
       const row = tasks.rows.find(task => task.task_id === definition.id);
       const result = row?.result ?? { status: row?.status ?? 'pending', value: null };
       return { taskId: definition.id, sourceInputId: definition.sourceInputId, outputKey: definition.outputKey, status: row?.status ?? 'pending', attempts: row?.attempts ?? 0, retryable: row?.retryable ?? false,
         result, provenance: row?.provenance ?? null, hasCorrection: row?.has_correction ?? false, correction: row?.correction ?? null, correctedBy: row?.corrected_by ?? null, correctedAt: row?.corrected_at ?? null,
+        corrector:row?.corrected_email?{id:row.corrected_by,name:row.corrected_name,email:row.corrected_email}:null,
         effectiveValue: row?.has_correction ? row.correction : result.status === 'completed' ? result.value : null };
     }) };
   }
   private projection(view: Awaited<ReturnType<ReviewService['read']>>) {
     const { application: row, tasks } = view;
     return { applicationId: row.id, answers: row.answers, formDefinition: row.vacancy_snapshot.formDefinition,
-      processingState: row.processing_state, review: { status: row.review_status, revision: row.review_revision, reviewedBy: row.reviewed_by, reviewedAt: row.reviewed_at }, tasks };
+      processingState: row.processing_state, review: { status: row.review_status, revision: row.review_revision, reviewedBy: row.reviewed_by, reviewedAt: row.reviewed_at, updatedAt:row.review_updated_at??null, editor:row.review_editor }, tasks };
   }
   get(id: string) { return this.database.transaction(async client => this.projection(await this.read(client,id))); }
   patch(id: string, actor: AuthenticatedRequest['actor'], raw: unknown) {
@@ -50,7 +53,7 @@ export class ReviewService {
         else await client.query(`INSERT INTO extraction_corrections(application_id,task_id,value,corrected_by) VALUES($1,$2,$3,$4) ON CONFLICT(application_id,task_id) DO UPDATE SET value=excluded.value,corrected_by=excluded.corrected_by,corrected_at=now()`, [id,correction.taskId,JSON.stringify(correction.value),actor.id]);
       }
       const status = value.status ?? ((value.corrections?.length ?? 0) ? 'in_review' : view.application.review_status);
-      await client.query(`UPDATE applications SET review_status=$2,review_revision=review_revision+1,reviewed_by=$3,reviewed_at=CASE WHEN $2='completed' THEN now() ELSE NULL END WHERE id=$1`,[id,status,actor.id]);
+      await client.query(`UPDATE applications SET review_status=$2,review_revision=review_revision+1,reviewed_by=$3,review_updated_at=now(),reviewed_at=CASE WHEN $2='completed' THEN now() ELSE NULL END WHERE id=$1`,[id,status,actor.id]);
       return this.projection(await this.read(client,id));
     });
   }

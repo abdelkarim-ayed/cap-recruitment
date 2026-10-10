@@ -8,7 +8,7 @@ Answer each cluster independently; detailed API/database design comes later.
 - Existing company users only, or guest interviewers? Guest invitations add auth and scoping work.
 
 ## 2. Candidate identity and access
-- Implemented: Better Auth email codes and cookie sessions, automatic candidate account create/reuse, Mailpit development delivery. Production email setup remains open. See `candidate-access.md` and `api.md`.
+- Implemented: Better Auth password accounts, candidate-only signup/one-time email verification, code reset/session revocation and trusted staff provisioning. Legacy OTP API retained. Mailpit/file local delivery; production email setup remains open. See candidate-access.md and api.md.
 - Google OAuth is desired but deferred pending provider configuration; LinkedIn is optional.
 - Verified email identifies the lightweight account; same-email signup reuses it. Different-email/imported-profile linking remains a later policy; phone is contact data, not the default identity key.
 - First slice: submitted answers/files locked; editing before send does not require saved server drafts. Withdrawal/resubmission, explicit later corrections, and account-profile changes remain later decisions.

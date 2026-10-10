@@ -3,7 +3,7 @@
 Read this before the next feature batch. **Current classes are implemented; future feature classes, fields, and events below are proposals, not new product-policy approvals.** One NestJS application, one PostgreSQL database, plain pnpm workspaces. No microservices, generic event framework, or extra infrastructure.
 
 ## Progress toward the product
-Identity, vacancies and locked intake/private documents are implemented through the API. Editor spike is disposable, not application UI. No scenario has a complete integrated frontend journey. Backend coverage is not delivered UI coverage.
+Identity, vacancy authoring, locked intake/private documents, optional mock extraction review and CSV have integrated React screens. Historical spike remains disposable. DOM tests and real API/Vite-proxy checks passed; manual browser journey validation remains for the user. Interviews/selection/live AI deferred.
 
 | Capability | Current evidence | Still missing |
 | --- | --- | --- |
@@ -128,4 +128,4 @@ Do not add an event bus just for these names. Polling can consume durable databa
 
 ## Next gate
 Implemented next slice: ProcessingModule application-level command/executor/repository with strict fixture context, task state/attempts/results and lease-token recovery; ReviewModule optional shared corrections/status and snapshot CSV. See processing-review-api.md. No live parser/AI, auto candidate progression or export gate. Frontend remains deferred from this backend batch.
-Backend intake/mock processing/optional review/export contracts now ready for frontend handoff. Frontend not added in this batch; presets/live extractors/interviews deferred.
+Frontend handoff now implemented for existing contracts; next manual browser test/fixes. See demo-guide.md. Presets/live extractors/interviews deferred.
