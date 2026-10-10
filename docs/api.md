@@ -28,7 +28,7 @@ Auth lives at `/api/auth`; application endpoints live at `/api`.
 | GET `/api/health` | Public | Liveness and agreed stage vocabulary |
 | GET `/api/health/ready` | Public | Database/Redis readiness; 503 when unavailable, no credentials/errors exposed |
 
-Roles: `admin`, `recruiter`, `interviewer`, `candidate`. Signup cannot set role. Staff accounts are currently provisioned only through a local operator command, not a public API. Per-vacancy/candidate/interview ownership checks belong in their modules and are not implemented yet.
+Roles: admin/recruiter/interviewer/candidate; signup cannot set role. Staff provisioning remains local operator-only. Vacancy owner checks, candidate read-own and admin/recruiter read-all applications/review are implemented. Interview scoping later.
 
 ## Implemented request and response shapes
 
@@ -164,15 +164,16 @@ Auth errors usually include `{code, message}`; rate-limit errors may have only `
 - The API defaults to binding localhost; API_HOST can be explicitly changed for a deliberate deployment configuration.
 
 ## Vacancy handoff and remaining modules
+Mock-only processing/local command plus optional shared review and ungated CSV are implemented: [`processing-review-api.md`](processing-review-api.md). Admin/recruiter GET/PATCH application review and GET vacancy export. Candidate/interviewer denied; candidate answers/files immutable. Processing does not run in submission HTTP or select candidates.
 Vacancy routes are now implemented: POST/GET `/api/vacancies`, GET/PATCH `/api/vacancies/:id`, POST publish/close actions, and GET public vacancy list/detail. See [`vacancy-api.md`](vacancy-api.md). Admin/recruiter read/create; owner alone mutates. Cookie-authenticated application writes require trusted Origin (WEB_ORIGIN or BETTER_AUTH_URL origin); missing/untrusted Origin returns 403. Public reads require no session. Definition configuration is not task execution.
 
 Application submission/list/detail/private downloads are implemented in [`application-api.md`](application-api.md). All admin/recruiter staff read; candidates read own only; answers/files locked for everyone. No profile CV or public file URLs.
 
 Remaining feature endpoints—not implemented:
-3. **Processing/review/export:** per-document task plan, suggestions/errors, human corrections, CSV. Extraction failure is null plus explicit status; no automatic selection.
+Live extraction/real parsing and more task catalogs remain deferred. Mock processing/review/export is implemented; no automatic selection.
 4. **Interviews/decisions:** dynamic interview CRUD/assignment/notes, schedule, preselection and owner decisions. No fixed interview-number pipeline stages.
 5. **Communication/analytics:** selected-recipient sending, published candidate updates, SQL metrics. No automatic email for every interview edit.
 
 Module names describe business boundaries, not microservices. Shared migrations/interfaces have one owner; independent work can follow a written endpoint contract.
 
-See vacancy/application references and backend-modules.md for next checkpoints. Identity/access, health, vacancy and locked application/document routes are implemented; processing/interview routes are not.
+Implemented: identity, health, vacancies/intake, local mock processing, review/export. Interviews/progression/frontend remain later checkpoints.

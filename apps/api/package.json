@@ -13,6 +13,8 @@
     "db:migrate": "node dist/database/migrate.js",
     "vacancies:check": "node tests/vacancies-smoke.mjs",
     "applications:check": "node tests/applications-smoke.mjs",
+    "processing:run": "node dist/processing/process.js",
+    "processing:check": "node tests/applications-smoke.mjs --processing",
     "auth:check": "node tests/auth-smoke.mjs",
     "auth:mock-check": "node tests/auth-memory-smoke.mjs",
     "integrations:check": "node --test tests/integrations.test.mjs",
@@ -34,7 +36,8 @@
     "pg": "^8.16.0",
     "redis": "^5.8.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.2"
+    "rxjs": "^7.8.2",
+    "zod": "4.6.5"
   },
   "devDependencies": {
     "@nestjs/testing": "12.1.2",

@@ -16,7 +16,7 @@ Answer each cluster independently; detailed API/database design comes later.
 ## 3. Vacancy form and screening policy
 - See `vacancy-form.md` for hybrid intake/extraction; `form-tooling.md` for researched library candidates.
 - Generic catalog/extractSkills config implemented; presets TODO. One file/input, optional accept/business limit, 10 MiB/file and 25 MiB combined. Admin/recruiter read-all applications, candidate read-own. Allowed-HR registry and production quota/scan/orphan-reconciliation policies deferred.
-- Which additional extraction tasks/providers should be supported beyond the initial skills definition? No task execution is implemented yet.
+- Additional extraction tasks/providers remain future decisions. Initial skills task execution is mock-only with persisted recovery, not AI/parser quality verification.
 - Automated qualification/filtering is outside current scope; reconcile original automated-ranking requirement before claiming coverage.
 - Define uncertain/missing/conflicting evidence handling and bulk confirmation.
 
@@ -39,7 +39,7 @@ Answer each cluster independently; detailed API/database design comes later.
 - Production email delivery and optional future OAuth setup; current library/session integration is implemented and tested.
 
 ## Next product checkpoint — proposals, not approvals
-- Main pipeline and lightweight candidate identity are agreed. Finalize candidate-visible updates and review-ready failure/manual-bypass behavior.
+- Pipeline/identity agreed. Review is optional cleanup; failed/unreviewed values may export with status/provenance. Completion not approval/export gate. Candidate-visible updates and automatic stage transition remain future decisions.
 - No automatic receipt/business emails required initially; only login codes are automated. HR can use external communication. Revisit messaging/publication/calendar integration after review/export is usable.
 - Recommend submitted snapshots; account holds only contact identity, not a CV profile. Define withdrawal and explicit correction policy.
 - User prefers noneditable published vacancies. Recommend editable drafts, locked published intake definition, and cloning; decide whether closing/unpublishing or descriptive corrections remain allowed.

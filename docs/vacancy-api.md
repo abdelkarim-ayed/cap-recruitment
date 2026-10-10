@@ -1,6 +1,6 @@
 # Vacancy API — implemented checkpoint
 
-**Implemented and integration-tested.** Admin/recruiter create/read; owner alone edits/publishes/closes. Interviewer/candidate denied staff vacancy routes. Writes require trusted Origin. Application intake/private documents are implemented separately in [`application-api.md`](application-api.md); task execution is not implemented.
+**Implemented and integration-tested.** Admin/recruiter create/read; owner alone mutates. Interviewer/candidate denied staff vacancy routes. Writes require trusted Origin. Intake: application-api.md; mock-only processing/review/export: processing-review-api.md. No live AI.
 
 ## Staff create/update
 `POST /api/vacancies` body:
@@ -30,7 +30,7 @@
 - Verified email comes from the authenticated candidate account, not a freely trusted application-answer field.
 - `formDefinition` holds candidate inputs and their args. `processingDefinition` holds private task args; sourceInputId associates each task with its source field in the graphical editor. No nested input `options`. Scheduling/cache/provider credentials are not part of either definition.
 - Task `id` is stable identity; `outputKey` is unique across task outputs and must not collide with candidate answer names. extractSkills is the first allowed task configuration, document sources only; it does not trigger extraction or select a live provider.
-- `NO_LIMIT` is a business configuration only; a separate operational upload cap must still apply. The shared `MAX_BYTES` variant (`{"kind":"MAX_BYTES","bytes":5242880}`) can impose a smaller business limit; upload enforcement is not implemented yet.
+- NO_LIMIT/omitted limit remains subject to operational 10 MiB/file and 25 MiB combined upload caps. MAX_BYTES may impose a smaller business limit; intake enforces it.
 - If supplied, `location` is a nonempty string; responses omit it when unset. `status` is `draft`, `published`, or `closed`; timestamps are ISO-8601 strings. Vacancy IDs are UUIDs; invalid path IDs return 400.
 - Strings are trimmed; title/location/labels max 200 characters, description max 20000. Unknown fields are rejected, including owner/status injection. Max 100 inputs/tasks; IDs/names/output keys match `^[a-z][a-z0-9_\-]{0,63}$` with reserved keys rejected. Input IDs, answer names, task IDs, and choice values must be unique.
 

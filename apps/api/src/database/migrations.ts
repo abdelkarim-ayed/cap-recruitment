@@ -47,4 +47,24 @@ export const applicationMigrations = [{
     stored_file_id uuid NOT NULL UNIQUE REFERENCES stored_files(id) ON DELETE RESTRICT,
     UNIQUE(application_id,input_id)
   );`,
+}, {
+  id: '003_processing_review',
+  sql: `ALTER TABLE applications DROP CONSTRAINT applications_processing_state_check;
+  ALTER TABLE applications ADD CONSTRAINT applications_processing_state_check CHECK (processing_state IN ('pending','not_requested','processing','completed','completed_with_errors'));
+  ALTER TABLE applications ADD COLUMN processing_token uuid, ADD COLUMN processing_lease_until timestamptz, ADD COLUMN processing_next_at timestamptz;
+  ALTER TABLE applications ADD COLUMN review_status text NOT NULL DEFAULT 'pending' CHECK (review_status IN ('pending','in_review','completed')),
+    ADD COLUMN review_revision integer NOT NULL DEFAULT 1, ADD COLUMN reviewed_by text REFERENCES "user"(id) ON DELETE SET NULL, ADD COLUMN reviewed_at timestamptz;
+  CREATE TABLE application_tasks (
+    application_id uuid NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
+    task_id text NOT NULL, source_input_id text NOT NULL, output_key text NOT NULL, args jsonb NOT NULL,
+    fixture_key text, status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','processing','completed','failed')),
+    attempts integer NOT NULL DEFAULT 0, retryable boolean NOT NULL DEFAULT false,
+    result jsonb, provenance jsonb, reason text, updated_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY(application_id,task_id)
+  );
+  CREATE TABLE extraction_corrections (
+    application_id uuid NOT NULL, task_id text NOT NULL, value jsonb NOT NULL,
+    corrected_by text REFERENCES "user"(id) ON DELETE SET NULL, corrected_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY(application_id,task_id), FOREIGN KEY(application_id,task_id) REFERENCES application_tasks(application_id,task_id) ON DELETE CASCADE
+  );`,
 }] as const;

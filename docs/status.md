@@ -1,6 +1,6 @@
 # Implementation status
 
-## Current unit: locked application/document checkpoint
+## Current unit: mock processing / optional shared review / CSV
 Implementation and local checkpoint commits are authorized. Remote creation/publishing remain deferred.
 
 - Created plain pnpm workspace with `apps/web`, `apps/api`, `packages/domain`.
@@ -14,7 +14,7 @@ Implementation and local checkpoint commits are authorized. Remote creation/publ
 - API reference now includes concrete payloads/errors in [`api.md`](api.md), implemented-only [`openapi.json`](openapi.json), and separate [`vacancy-api-draft.md`](vacancy-api-draft.md) proposals. OpenAPI structure/references/examples validated; a one-off local check matched 21 real HTTP responses to the schemas, including session lookup, 429, 413, and readiness 503. This check is not an added CI test or proof of unimplemented vacancy behavior.
 - Foundation now has explicit Identity/Database/Configuration/Integrations/Infrastructure/Health modules. MailSender supports SMTP, private file capture, and memory test override; disabled/fixture extraction carries provenance and does not process candidate documents. Production rejects capture/fixture modes. `auth:mock-check` verifies real PostgreSQL/OTP/sessions without SMTP/Mailpit; real SMTP `auth:check` and `infra:check` remain separate.
 - Real auth also passed a one-off private-file capture check and a memory check with deliberately invalid unused SMTP settings; own captured messages were removed without touching other mail. Repeated `auth:migrate` succeeds; Better Auth reports a numeric/int8 introspection warning for `rateLimit.lastRequest`. No custom schema workaround was applied; auth/rate-limit checks remain functional.
-- Workflow coverage is in architecture.md, fixtures in integration-testing.md. Vacancy/application intake backends implemented below; processing/interviews and graphical UI remain unimplemented.
+- Workflow coverage in architecture.md, fixtures in integration-testing.md. Backend intake/mock processing/review/export implemented below; interviews and graphical UI unimplemented.
 
 ## Vacancy implementation
 - Implemented VacanciesModule/controller/service/repository, explicit checksummed application migrations, PostgreSQL persistence and separate form/task definitions. Owner-only edit/publish/close; admin/recruiter staff reads/creates, candidate/interviewer denied. Published/closed records locked; expected revisions and row locks prevent lost updates. Public list/detail expose only published job/form allowlists.
@@ -26,14 +26,19 @@ Implementation and local checkpoint commits are authorized. Remote creation/publ
 - ApplicationsModule submits locked candidate answers/files, freezes published revision/definitions and candidate identity, prevents duplicates with database uniqueness/transaction locks, and coordinates submit versus close. Candidate read-own; all admin/recruiter staff read all answers/downloads, interviewers excluded. No staff answer/file edits.
 - Optional document accept/limit support unrestricted business constraints; one file/input, hard 10 MiB/file and 25 MiB combined. Private local DocumentStorage port, separate storage metadata/business ownership, opaque references, integrity-checked attachment downloads. No parser/malware scan; crash/cleanup failures may leave private orphan files, documented limitation.
 - pnpm test passes 35 tests (14 domain, 21 API/storage/adapter/service). Real applications:check passes OTP/session, multipart limits, invalid-write rejection, storage failure rollback/cleanup, duplicate races, access isolation, byte-identical downloads and API/pool restart. processingState pending/not_requested is not task execution.
-- Contract: application-api.md, OpenAPI, backend-test.md. Explicit migration 002 adds application/document tables. Processing/review/export next; frontend later.
+- Intake checkpoint contract: application-api.md; explicit migration 002. Mock processing/review/export added in the following checkpoint below; frontend later.
+
+## Processing/review implementation
+- Mock-only DocumentTextReader/TaskExecutor interfaces with execution context and global injected normal disabled adapters; trusted per-task fixture dispatch verifies identities/hash/args/text and records calls. CLI only, no AI/parser/queue/daemon. Explicit migration 003 stores per-task progress and token-fenced application leases, retry timing/three-attempt cap and interrupted-work recovery.
+- Optional shared admin/recruiter review, separate extraction corrections, actor/time/status and revision protection. Candidate answers/files untouched; interviewer excluded. Review completion never gates CSV: export all applications including failed/pending/unreviewed extraction, with original/effective values, statuses and fixture provenance. No selection/progression/import/interview code.
+- pnpm test: 40 ordinary tests. processing:check verifies real OTP/PostgreSQL/HTTP, fixture relay, recovery/fencing/retry caps, shared corrections, conflicts, privacy and ungated export. Contract/manual commands: [`processing-review-api.md`](processing-review-api.md). Frontend and interviews deferred from this batch; frontend can now follow tested contracts.
 
 ## Next independent units, in dependency order
-Vacancies and locked intake/storage implemented; next application-level per-unit mocked processing and extraction review/export. Separate ProcessingRun/queued WorkItem tables, persistent caches, messaging/calendar and saved drafts deferred. See architecture.md and integration-testing.md.
+Vacancies, locked intake/storage, mock processing and optional review/export implemented. Separate ProcessingRun/queued WorkItem tables, caches, messaging/calendar and saved drafts deferred.
 The concrete proposed module/checkpoint boundaries are in `backend-modules.md`.
 1. Identity/session/role foundation completed; resource ownership checks follow their vacancy/application modules.
 2. Vacancy/application/document backend contracts completed. Graphical editor follows backend handoff.
-3. Document-owned extraction tasks, per-document grouping, worker/recovery, review/export. Provider-independent task plan; no arbitrary filtering.
+3. Mock per-unit processing/recovery and optional review/export completed. Live extraction much later; no arbitrary filtering.
 4. Application progression, editable interviews, assignments/notes, owner decisions.
 5. Published updates, deliberate messaging, dashboard, repeatable demo and presentation.
 

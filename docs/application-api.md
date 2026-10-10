@@ -1,6 +1,6 @@
 # Applications and documents — implemented checkpoint
 
-Backend only. No graphical form, task executor, review edits, export/import, stage mutations, interview notes, withdrawal or correction endpoints yet.
+Backend only. Mock executor, optional extraction review and CSV added separately in [`processing-review-api.md`](processing-review-api.md). No graphical UI, live AI, import, stage mutations, interviews, withdrawal or candidate-answer/file corrections.
 
 ## Access
 - Candidate submits using their verified OTP/session account, and reads/downloads only their own applications. Foreign application/document returns 404.
@@ -18,7 +18,7 @@ Backend only. No graphical form, task executor, review edits, export/import, sta
 
 201 returns the created application; 200 returns an existing candidate/vacancy submission unchanged. Database uniqueness plus transaction/advisory locking prevent duplicate concurrent submissions. The existing record is returned even if the vacancy is now closed. A new submission requires published vacancy; row locking coordinates submit versus close. Malformed request/oversized multipart can still fail before duplicate lookup.
 
-Stored application freezes candidate name/email, published vacancy revision, and form/processing definitions. Original answer JSON is not overwritten or copied for extraction. Stage is received. processingState is pending if configured tasks exist, otherwise not_requested; **pending does not mean a worker exists or has run**.
+Stored application freezes candidate identity and published revision/definitions. Answers are not overwritten/copied for extraction. Stage remains received. Initial processingState pending/not_requested; explicit mock command later sets processing/completed/completed_with_errors. Pending is not proof execution has run. Staff detail/list also receive review metadata; candidates do not.
 
 Example for a published vacancy containing name, available and cv input IDs:
 ```sh

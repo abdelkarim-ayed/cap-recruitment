@@ -52,16 +52,17 @@ This **operator-local command deliberately displays the captured message/code**.
 - Default `MAIL_DRIVER=smtp` preserves the existing Mailpit setup. SMTP credentials are optional, must be paired if used, and are isolated in the adapter; real production delivery/TLS/provider setup is not verified here.
 
 ## Extraction fixtures: exact limits
+Legacy provider examples below remain adapter tests only. The application workflow now uses context-dispatched DocumentTextReader/TaskExecutor with trusted fixture keys and strict actual identity/hash/args/text checks; processing:check exercises real persistence/recovery/HR review/export. See [`processing-review-api.md`](processing-review-api.md). Normal ports disabled, no live AI/parser. Registry records calls; no candidate fixture controls.
 Default `EXTRACTION_DRIVER=disabled` returns a failed result with null and disabled provenance. Fixture mode records `provenance: {mode: "fixture", fixtureId: ...}` next to the existing extraction result union. The supplied `demo-skills` fixture is a fixed example; it **ignores source text**, is not a selected first extractor, and performs no model request. Unknown task keys fail instead of inventing values.
 
-There is no extraction HTTP endpoint or document-processing workflow yet. Tests call the provider directly; future ProcessingService will depend on this port rather than a vendor SDK. A live adapter will need approved task/result contracts, operational timeout/retry/error mapping, provenance, and evaluation examples before it can replace the fixture honestly.
+There is no extraction-trigger HTTP endpoint. ProcessingService runs through the explicit CLI and context ports. Legacy provider tests remain separate. A future live adapter requires approved contracts/cancellation/error mapping/provenance and evaluation before honest replacement.
 
-## Future protocol boundaries—not implemented
+## Processing boundaries and remaining helpers
 - Per-unit fixtures: trusted optional string `fixtureKey` follows processing/services to the selected unit. Defined means fixture lookup; absent means configured normal adapter (possibly disabled), not guaranteed live AI. Missing fixture fails; no automatic real-provider fallback. Do not accept candidate-controlled fixture instructions.
-- The registry binds logical aliases to actual document/task identities and verifies source hashes and task arguments before returning recorded results. Record calls and assert that distinct applicants/documents/arguments are relayed correctly; preserve fixture provenance through persistence/export. Current task-key-only fixtures do not yet implement this relay validation.
+- Implemented workflow registry binds fixture keys to actual application/document/task identities and verifies bytes/hash/args/text relay, recording calls and preserving fixture provenance through storage/export. Legacy task-key-only adapter fixtures remain separate examples.
 - Reusable script helpers: seed logical entities/files, resolve aliases, read records, assert properties, and clean owned datasets. Optional reset is restricted to an explicitly verified dedicated test database and known tables, never the normal development database. HTTP/worker connections mean a single rollback transaction cannot isolate every scenario. Central loaders evolve with schema; scenarios should not require repeated bespoke SQL.
-- Document storage: local/memory adapters once upload/ownership contract exists.
+- Document storage: implemented local adapter/memory test override, separately verified ownership and private download boundaries.
 - PDF/DOCX parsing: text-reader port with small file fixtures; unsupported/OCR failures explicit.
-- Processing: application-level execution with individual saved task progress first; no separate run/history table or independently queued work items required. Cron/polling can later retry eligible failures/reclaim interruptions; catch-and-ignore is not recovery. Original files persist; extracted-text caching can remain in-memory initially.
+- Processing implemented via explicit local command, saved per-task progress and application lease fencing/retry recovery. No run/history or independently queued work items. Cron/polling can later wrap the same executor. Original files persist, local reuse is disposable.
 
 Do not implement or require accounts for these providers merely to test vacancy persistence. Keep fixture checks separate from optional real integration checks, and never infer real delivery/model quality from a mock passing.

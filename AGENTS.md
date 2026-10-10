@@ -7,7 +7,8 @@ Implementation is authorized. Start with the agreed scenarios; do not expand int
 - `docs/status.md`: current implementation unit, verified checks, and next tasks.
 - `docs/api.md`: implemented backend contract and planned modules; frontend comes after backend handoff.
 - `docs/vacancy-api.md`: implemented vacancy catalog, private task/source args, owner policy, revisions and public projections. Additional presets are TODO only.
-- `docs/application-api.md`: implemented locked intake, optional document constraints/caps, admin/recruiter read-all and candidate read-own, private storage limitations. No executor/answer editing yet.
+- `docs/application-api.md`: implemented locked intake, optional document constraints/caps, admin/recruiter read-all and candidate read-own, private storage limitations. Candidate answers/files immutable.
+- `docs/processing-review-api.md`: implemented mock-only context/fixture dispatch, local command/recovery, optional admin/recruiter extraction corrections and ungated CSV. No live AI/parser or candidate answer/file editing.
 - `docs/backend-modules.md`: proposed feature boundaries and next vacancy checkpoint; not extra approved policies.
 - `docs/architecture.md`: current foundation classes/data flow and proposed future fields, transactions, and events; not implemented feature schemas.
 - `docs/integration-testing.md`: mail/extraction fixtures and protocol adapters. No auth bypass; full mocked-mail auth checks still use PostgreSQL.

@@ -11,6 +11,10 @@ import { MAIL_SENDER } from '../dist/integrations/mail/mail-sender.js';
 import { MemoryMailSender } from '../dist/integrations/mail/memory-mail-sender.js';
 import { DOCUMENT_STORAGE } from '../dist/documents/document-storage.js';
 import { LocalDocumentStorage } from '../dist/documents/local-document-storage.js';
+import { ProcessingService } from '../dist/processing/processing.service.js';
+import { ProcessingRepository } from '../dist/processing/processing.repository.js';
+import { FIXTURE_REGISTRY } from '../dist/processing/execution.js';
+import { createHash } from 'node:crypto';
 
 const directory = await mkdtemp('/tmp/opencode/application-check-');
 const settings = { ...readRuntimeConfig({ ...process.env, MAIL_DRIVER: 'file' }), documentDirectory: directory };
@@ -49,6 +53,8 @@ const definition = { title: 'Application fixture', description: 'No real candida
   { id: 'third', name: 'third', label: 'Third', type: 'document', required: false, args: {} },
 ] }, processingDefinition: { version: 1, tasks: [{ id: 'skills', type: 'extractSkills', sourceInputId: 'cv', outputKey: 'extracted_skills', args: { skills: ['SQL'], evidence: true } }] } };
 const answers = { name: 'Fixture name', available: false }, pdf = Buffer.from('%PDF-1.7\nUNTRUSTED DOCUMENT FIXTURE\n');
+const processingCheck = process.argv.includes('--processing');
+if (processingCheck) definition.processingDefinition.tasks.push({ id:'extra',type:'extractSkills',sourceInputId:'cv',outputKey:'extra_skills',args:{skills:['Rust'],evidence:false} });
 async function submit(id, candidate, values = answers, files = [{ field: 'cv', name: 'cv.pdf', bytes: pdf }], origin = settings.webOrigin) {
   const form = new FormData(); form.append('answers', typeof values === 'string' ? values : JSON.stringify(values));
   for (const file of files) form.append(file.field, new Blob([file.bytes]), file.name);
@@ -113,7 +119,45 @@ try {
   equal(noTasks.body.documents[0].byteCount, 10 * 1024 * 1024);
   const locked = await fetch(`${base}/api/applications/${application.id}`, { method: 'PATCH', headers: { Cookie: recruiter.cookie, Origin: settings.webOrigin, 'Content-Type': 'application/json' }, body: JSON.stringify({ answers: { name: 'Attempted edit' } }) });
   equal(locked.status, 404);
-  console.log('PASS: real OTP/HTTP/PostgreSQL/private uploads, limits, rollback cleanup, duplicates/concurrency, staff read access, candidate isolation, byte-identical downloads and API restart. No processing or live AI.');
+  if (processingCheck) {
+    const registry = app.get(FIXTURE_REGISTRY), repository = app.get(ProcessingRepository), processor = app.get(ProcessingService);
+    const fixtures = definition.processingDefinition.tasks.map(task => ({fixtureKey:`fixture-${task.id}`,applicationId:application.id,documentId,sourceHash:createHash('sha256').update(pdf).digest('hex'),taskId:task.id,args:task.args,text:'FIXTURE ONLY: SQL text',result:task.id==='skills' ? {status:'completed',value:{skills:[]},evidence:['FIXTURE ONLY: no skills recorded']} : {status:'failed',value:null,reason:'Recorded fixture failure',retryable:true}}));
+    registry.load(fixtures); await repository.bind(fixtures);
+    // Simulate a killed executor; expired claims must be safely reclaimed.
+    const killed = await repository.claim(application.id); ok(killed); await repository.start(application.id,killed.token,'skills');
+    await database.query("UPDATE applications SET processing_lease_until=now()-interval '1 second' WHERE id=$1",[application.id]);
+    const processed = await Promise.all([processor.processOne(application.id),processor.processOne(application.id)]); equal(processed.filter(Boolean).length,1);
+    await rejectsLease(repository.save(application.id,killed.token,'skills',{result:fixtures[0].result,provenance:{mode:'fixture',fixtureId:'stale'}}));
+    equal(registry.calls.filter(call=>call.unit==='task').length,2);
+    for (let retry=0;retry<2;retry++) { await database.query('UPDATE applications SET processing_next_at=now() WHERE id=$1',[application.id]); equal(await processor.processOne(application.id),true); }
+    equal(await processor.processOne(application.id),false);
+    const review = await json(`applications/${application.id}/review`,undefined,recruiter.cookie); equal(review.status,200);
+    const failed = review.body.tasks.find(task=>task.taskId==='extra'), success=review.body.tasks.find(task=>task.taskId==='skills');
+    equal(failed.attempts,3); equal(failed.effectiveValue,null); deepEqual(success.effectiveValue,{skills:[]}); equal(success.attempts,2);
+    for (const denied of [candidate,interviewer]) equal((await json(`applications/${application.id}/review`,undefined,denied.cookie)).status,403);
+    let csv = await fetch(`${base}/api/vacancies/${id}/export`,{headers:{Cookie:recruiter.cookie}}); equal(csv.status,200); let exported=await csv.text(); ok(exported.includes('fixture-skills')); ok(exported.includes('failed')); ok(exported.includes('pending'));
+    const patch = async (user,body) => {
+      const response = await fetch(`${base}/api/applications/${application.id}/review`,{method:'PATCH',headers:{Cookie:user.cookie,Origin:settings.webOrigin,'Content-Type':'application/json'},body:JSON.stringify(body)}); return {status:response.status,body:await response.json()};
+    };
+    const finished = await patch(recruiter,{expectedRevision:review.body.review.revision,status:'completed'}); equal(finished.status,200,'Failure/unreviewed fields must not block completion');
+    equal((await patch(admin,{expectedRevision:review.body.review.revision,status:'in_review'})).status,409);
+    const corrected=await patch(admin,{expectedRevision:finished.body.review.revision,corrections:[{taskId:'extra',value:{skills:['Rust']}}]}); equal(corrected.status,200); equal(corrected.body.review.status,'in_review');
+    const correctedTask=corrected.body.tasks.find(task=>task.taskId==='extra'); deepEqual(correctedTask.effectiveValue,{skills:['Rust']}); equal(correctedTask.result.status,'failed');
+    equal((await patch(candidate,{expectedRevision:corrected.body.review.revision,status:'completed'})).status,403);
+    csv=await fetch(`${base}/api/vacancies/${id}/export`,{headers:{Cookie:admin.cookie}}); exported=await csv.text(); ok(exported.includes('Rust')); ok(exported.includes('fixture-extra')); ok(exported.includes('failed'));
+    const removed=await patch(recruiter,{expectedRevision:corrected.body.review.revision,corrections:[{taskId:'extra',value:null,remove:true}]}); equal(removed.status,200); equal(removed.body.tasks.find(task=>task.taskId==='extra').hasCorrection,false);
+    const edits = await Promise.all([patch(recruiter,{expectedRevision:removed.body.review.revision,status:'pending'}),patch(admin,{expectedRevision:removed.body.review.revision,status:'completed'})]);
+    deepEqual(edits.map(edit=>edit.status).sort(),[200,409]);
+    const untrusted = await fetch(`${base}/api/applications/${application.id}/review`,{method:'PATCH',headers:{Cookie:admin.cookie,Origin:'https://untrusted.example','Content-Type':'application/json'},body:JSON.stringify({expectedRevision:1,status:'completed'})}); equal(untrusted.status,403);
+    equal((await patch(admin,{expectedRevision:1,answers:{name:'spoof'}})).status,400);
+    deepEqual((await json(`applications/${application.id}`,undefined,candidate.cookie)).body.answers,answers);
+    equal((await fetch(`${base}/api/vacancies/${id}/export`,{headers:{Cookie:candidate.cookie}})).status,403);
+    await app.close(); await start();
+    const persistedReview = await json(`applications/${application.id}/review`,undefined,admin.cookie); equal(persistedReview.status,200); equal(persistedReview.body.tasks.find(task=>task.taskId==='extra').attempts,3);
+    equal(persistedReview.body.tasks.find(task=>task.taskId==='skills').provenance.fixtureId,'fixture-skills');
+    console.log('PASS: tagged relay fixtures, persisted task failures/results, lease recovery/fencing, retry cap, optional shared review, corrections, immutable answers and ungated CSV export.');
+  }
+  console.log('PASS: real OTP/HTTP/PostgreSQL/private uploads, limits, rollback cleanup, duplicates/concurrency, access isolation and downloads after restart. No live AI.');
 } finally {
   try {
     if (database) {
@@ -127,3 +171,4 @@ try {
     }
   } finally { await app?.close(); await rm(directory, { recursive: true, force: true }); }
 }
+async function rejectsLease(operation) { try { await operation; throw new Error('Stale lease accepted'); } catch(error) { equal(error.message,'Processing lease lost.'); } }

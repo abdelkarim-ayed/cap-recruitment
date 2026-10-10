@@ -6,7 +6,7 @@ Concise execution guide, not a full UML specification. Approved direction is mar
 Agreed main stages: Received → Review-ready → Preselected → Interview → Offer → Hired.
 
 - Received: submitted application persisted; background tasks may be pending/running.
-- Review-ready: configured processing has finished and data is available for HR review/export. Exact handling of failed tasks/manual bypass remains to be defined; do not imply extraction succeeded when it failed.
+- Review-ready: conceptual processing milestone, not currently auto-advanced by the mock command. HR review is optional extraction cleanup; failed/unreviewed fields export with null/status/provenance. Review completion never gates export or means candidate approval.
 - Preselected: HR chose to proceed after internal or external review.
 - Interview: one or more editable interview records, not one pipeline stage per interview.
 - Offer/Hired: owner records these business decisions.

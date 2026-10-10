@@ -9,7 +9,7 @@ Identity, vacancies and locked intake/private documents are implemented through 
 | --- | --- | --- |
 | Email-code access | Real OTP, cookie sessions, roles; SMTP and captured-mail checks | Production delivery and staff-management UI/API |
 | Vacancy authoring | Persisted draft/publish/close, strict definitions, owner checks and public projections; accepted isolated editor | Integrated graphical editor, extra presets |
-| Applications | Locked intake, uniqueness, snapshots, private documents, candidate/staff reads | Processing, review/export and integrated UI |
+| Applications | Locked intake/private documents, mock processing/recovery, optional review/export | Live AI/parser, progression and integrated UI |
 | Assisted review | Extraction result union; disabled/labelled fixture adapter | Document parsing, live extractors, durable processing, review, CSV |
 | Interviews/decisions | Agreed stage/authority direction | Scheduling, assignments, notes, owner decisions |
 | Candidate updates/metrics | Proposed boundaries | Explicit publication/sending, database-derived reports |
@@ -78,7 +78,7 @@ These describe what the upcoming schemas must preserve, not tables that already 
 | Definition `version`, input `id` / `name`, task `id` / `sourceInputId` / `outputKey` | Store form and processing definitions separately but publish atomically. Task source references preserve editor ownership. Wire-schema version is not vacancy edit count. Stable IDs identify sources/tasks; unique names/output keys identify answers/export columns. |
 | Application (implemented) `id`, `candidateId`, `vacancyId`, snapshot, `submittedAt`, `answers` | Unique candidate/vacancy; validated JSON by input ID. Frozen published revision/definitions and candidate identity. Answers/files locked. Admin/recruiter read-all; candidate read-own; interviewer excluded. |
 | Stored file (implemented) reference/hash/size; application_document ownership/input | Separate storage metadata/business ownership. Opaque private local references; attachment-only downloads after authorization/hash verification. Optional extension/business constraints, 10 MiB/file and 25 MiB combined. No content/malware verification. Interview attachments later. |
-| Application processing state; task ID/source hash/configuration identity, status, attempts, result | Execute an application's tasks together initially, but retain individual task results/progress. No separate ProcessingRun table or independently scheduled WorkItem table required initially. Persist recoverable progress and prevent duplicate final results; exact retry/claim fields follow the runner contract. |
+| Processing (implemented) app lease token/deadline/next retry; task ID/config/status/attempts/result/provenance | Application-level CLI, strict source/hash/args fixture relay, per-task persistence, fenced recovery and retry cap. No ProcessingRun/independent queue. Future live cancellation/parser and scheduler separate. |
 | Result source/task identity, `provenance`, status/value/evidence | Keep answer, extracted suggestion, and reviewed value distinct. Failure/null is not successful false/empty. Persist fixture/live provenance; never export fixture values as genuine model facts without labelling. |
 | Review `reviewedBy`, `reviewedAt`, reviewed value | Attribute corrections; extraction retries must not overwrite HR review. |
 | Interview `id`, `applicationId`, assigned user IDs, timestamps, `revision` | Multiple editable records, not numbered stages; assignment scopes visibility. Store UTC timestamps, render timezone separately. |
@@ -93,12 +93,12 @@ These describe what the upcoming schemas must preserve, not tables that already 
 - Finalize: check actor/resource authority and transition in the same transaction. Do not assume a role guard alone handles ownership or stale revisions.
 - Send: persist selected recipients/send intent before a later external call. Retry/state reconciliation is needed; SMTP cannot promise exactly-once delivery.
 
-## Agreed first-slice simplifications — not implemented yet
+## Agreed first-slice simplifications
 - Vacancies/intake implemented; next per-unit mocked processing. Generic catalog, owner-only vacancy mutation and admin/recruiter read-all application visibility settled; presets deferred.
 - Candidate edits the form before submission; submitted answers/files are noneditable. Persisted application drafts, withdrawal/correction workflows, reprocessing UI, and multiple processing histories are deferred.
 - Keep graphical task configuration associated with source inputs, but serialize separate form/processing definitions. Runtime scheduling, cache policy, and provider credentials are not vacancy fields.
 - Process one application at a time initially, extracting text once per document and saving each task's result/status. Catch individual failures so other tasks can continue. Do not assume NLP/model calls are always cheap; calls need bounds.
-- A catch must not leave work permanently running or pretend success. Persist failure/retry eligibility; future cron/polling can retry eligible failures and reclaim interrupted claims after a deadline. Bounded attempts and idempotent writes prevent endless retries/duplicates. Cron/BullMQ and exact retry fields are not implemented or locked yet.
+- Implemented CLI persists failures/retry eligibility, three-attempt bounds and two-minute token-fenced leases; retries after 30s/reclaims expired work on next invocation. No cron/BullMQ daemon. Local fixture results are not live analysis.
 - Retry technical failures without editing the original CV or answers. No need to routinely recompute successful tasks. Processing retries must not regress the recruitment stage or overwrite HR corrections.
 - Original files are persistent submission data, not cache. Reuse extracted text within the application execution; an in-memory cache is sufficient initially and disposable on restart. Persistent text artifacts, cross-application caches, eviction policies, and batching are later optimizations, not demo prerequisites.
 
@@ -127,4 +127,5 @@ Proposed meaningful boundaries:
 Do not add an event bus just for these names. Polling can consume durable database work records directly. If an external queue is selected later, use an outbox or equivalent reconciliation to avoid the commit/enqueue gap. Persisted events would need `eventId`, schema version, aggregate ID/revision, time, and actor; consumers must be idempotent. See [`open-questions.md`](open-questions.md) for the unresolved worker decision.
 
 ## Next gate
-Test vacancy/application contracts via backend-test.md. Next decoupled per-unit fixture processing and review/export. Additional presets/live extractors deferred; no infrastructure detour.
+Implemented next slice: ProcessingModule application-level command/executor/repository with strict fixture context, task state/attempts/results and lease-token recovery; ReviewModule optional shared corrections/status and snapshot CSV. See processing-review-api.md. No live parser/AI, auto candidate progression or export gate. Frontend remains deferred from this backend batch.
+Backend intake/mock processing/optional review/export contracts now ready for frontend handoff. Frontend not added in this batch; presets/live extractors/interviews deferred.

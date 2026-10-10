@@ -12,7 +12,7 @@ pnpm --filter @recruitment/api auth:check
 
 The last command runs real HTTP/database/local-mail tests with a disposable account: incorrect code, successful sign-in, cookie session, role-injection prevention, candidate denied staff access, actual staff provisioning command/session revocation, new staff sign-in, code reuse rejection, unsupported OTP type, logout. It uses unique loopback peers to isolate persistent rate-limit buckets without disabling protections, then deletes only its own user/messages/buckets. Immediate reruns are supported on this Linux container. Wrong/used-code checks assert `INVALID_OTP`, not just any error status.
 
-`pnpm test` runs 35 domain/API/storage tests without external services. Optional real PostgreSQL checks remain separate; expected unavailable-database tests may log Better Auth errors.
+`pnpm test` runs 40 domain/API/storage/fixture/CSV tests without external services. Optional real PostgreSQL checks remain separate; expected unavailable-database tests may log Better Auth errors. Mock/review flow: `pnpm --filter @recruitment/api processing:check`, manual contract in processing-review-api.md.
 
 For credentials-free protocol tests and full real auth with in-memory mail, see [`integration-testing.md`](integration-testing.md): `integrations:check` needs no running services; `auth:mock-check` needs PostgreSQL only. Manual file capture also avoids any SMTP server/account; OTP/session checks remain real.
 

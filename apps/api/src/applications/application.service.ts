@@ -10,6 +10,7 @@ type Actor = AuthenticatedRequest['actor'];
 interface ApplicationRow {
   id: string; vacancy_id: string; candidate_id: string; candidate_identity: { name: string; email: string };
   vacancy_snapshot: Vacancy; answers: Record<string, unknown>; stage: string; processing_state: string; submitted_at: Date;
+  review_status: string; review_revision: number; reviewed_by: string | null; reviewed_at: Date | null;
 }
 interface DocumentRow { id: string; input_id: string; filename: string; byte_count: number; media_type: string; storage_ref: string; content_hash: string }
 function document(row: DocumentRow) { return { id: row.id, inputId: row.input_id, filename: row.filename, byteCount: row.byte_count, mediaType: row.media_type }; }
@@ -18,7 +19,8 @@ function visible(row: ApplicationRow, actor: Actor) {
   return { id: row.id, vacancyId: row.vacancy_id, candidateId: row.candidate_id, candidate: row.candidate_identity,
     vacancy: { id: vacancy.id, title: vacancy.title, description: vacancy.description, ...(vacancy.location === undefined ? {} : { location: vacancy.location }), revision: vacancy.revision, formDefinition: vacancy.formDefinition,
       ...(actor.role === 'candidate' ? {} : { processingDefinition: vacancy.processingDefinition }) },
-    answers: row.answers, stage: row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString() };
+    answers: row.answers, stage: row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(),
+    ...(actor.role === 'candidate' ? {} : { review: { status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at } }) };
 }
 @Injectable()
 export class ApplicationService {
@@ -83,11 +85,11 @@ export class ApplicationService {
     const parsed = vacancyListSchema.safeParse(query);
     if (!parsed.success) throw new BadRequestException('Invalid pagination.');
     const { limit, offset } = parsed.data;
-    const result = await this.database.query(`WITH visible AS (SELECT id,vacancy_id,candidate_id,candidate_identity,stage,processing_state,submitted_at,vacancy_snapshot->>'title' AS title FROM applications
+    const result = await this.database.query(`WITH visible AS (SELECT id,vacancy_id,candidate_id,candidate_identity,stage,processing_state,submitted_at,review_status,review_revision,reviewed_by,reviewed_at,vacancy_snapshot->>'title' AS title FROM applications
       WHERE ($1::text IS NULL OR candidate_id=$1) AND ($2::uuid IS NULL OR vacancy_id=$2)),
       page AS (SELECT * FROM visible ORDER BY submitted_at DESC,id DESC LIMIT $3 OFFSET $4)
       SELECT (SELECT count(*)::integer FROM visible) AS total,coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY submitted_at DESC,id DESC) FROM page),'[]') AS items`, [actor.role === 'candidate' ? actor.id : null, vacancyId ?? null, limit, offset]);
-    return { items: result.rows[0].items.map((row: Record<string, any>) => ({ id: row.id, vacancyId: row.vacancy_id, vacancyTitle: row.title, candidateId: row.candidate_id, candidate: row.candidate_identity, stage: row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString() })), total: result.rows[0].total, limit, offset };
+    return { items: result.rows[0].items.map((row: Record<string, any>) => ({ id: row.id, vacancyId: row.vacancy_id, vacancyTitle: row.title, candidateId: row.candidate_id, candidate: row.candidate_identity, stage: row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(), ...(actor.role === 'candidate' ? {} : { review: { status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at } }) })), total: result.rows[0].total, limit, offset };
   }
   async download(applicationId: string, documentId: string, actor: Actor) {
     const owner = await this.database.query<ApplicationRow>('SELECT * FROM applications WHERE id=$1', [applicationId]);

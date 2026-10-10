@@ -3,7 +3,7 @@
 Company-specific recruitment management with configurable applications, document extraction, HR review/export, interviews, and candidate updates.
 
 ## Current checkpoint
-React/Vite placeholder and NestJS backend. Email-code access, vacancies and locked application submission/private documents are implemented. Processing and frontend later. See [backend tests](docs/backend-test.md), [API](docs/api.md), [vacancies](docs/vacancy-api.md), and [applications](docs/application-api.md).
+React/Vite placeholder and NestJS backend. Identity, vacancies/intake/private documents, mock processing and optional HR review/CSV implemented. No live AI/frontend/interviews yet. See [backend tests](docs/backend-test.md), [API](docs/api.md), and [processing/review](docs/processing-review-api.md).
 
 ## Development
 Requires Node 24, pnpm 12, and Podman with podman-compose (or Docker Compose using `compose.yaml`). Before the first start, create `.env` from `.env.example` if missing and set a randomly generated BETTER_AUTH_SECRET of at least 32 characters. Do not overwrite an existing `.env`; this workspace already has a generated local secret.
