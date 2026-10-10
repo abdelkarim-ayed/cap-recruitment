@@ -14,8 +14,8 @@ export function App() {
   return <div className="layout"><aside className="sidebar"><a className="brand" href="#/vacancies"><span className="brand-mark">R</span><span>Recruitment<small>Company workspace</small></span></a><span className="nav-label">WORKSPACE</span><nav>
     <a className={parts[0]==='vacancies'?'active':''} href="#/vacancies">▦ <span>{staff?'Vacancies':'Open positions'}</span></a>
     {actor && actor.role!=='interviewer' && <a className={parts[0]==='applications'?'active':''} href="#/applications">☷ <span>{staff?'Applications':'My applications'}</span></a>}
-  </nav><div className="sidebar-bottom"><Badge>Demo checkpoint</Badge><p>Extraction uses recorded fixtures. No live AI.</p></div></aside>
+  </nav></aside>
     <div className="workspace"><div className="topbar"><span className="muted">Recruitment / {parts[0] || 'Workspace'}</span><div className="actions">{actor ? <><span className="identity">{actor.name || actor.email}<small>{actor.email}</small></span><Badge>{actor.role}</Badge><button onClick={async()=>{try{await post('auth/sign-out',{});setActor(null);sessionStorage.removeItem('returnTo');go('/login');}catch(e){setError(errorMessage(e));}}}>Sign out</button></> : <a className="button primary" href="#/login">Sign in</a>}</div></div>
     <main><Notice message={error}/>{parts[0]==='login' ? <Login onLogin={setActor}/> : parts[0]==='vacancies' ? (parts[1] ? <VacancyPage key={`${path}:${actor?.id}`} id={parts[1]} actor={actor}/> : <VacancyList key={actor?.id||'public'} staff={staff} actorId={actor?.id}/>) : parts[0]==='applications' && actor && actor.role!=='interviewer' ? (parts[1] ? <ApplicationPage key={`${path}:${actor.id}`} id={parts[1]} staff={staff}/> : <ApplicationList key={path} staff={staff}/>) : <Heading title="Sign in to continue" description="This section needs an authorized account."><a className="button primary" href="#/login">Sign in</a></Heading>}
-    {actor?.role==='interviewer' && <p className="notice">Interview access is deferred. You can browse public positions; application data and HR review require a recruiter/admin account.</p>}</main></div></div>;
+    </main></div></div>;
 }

@@ -18,5 +18,5 @@ export function PdfPreview({applicationId,document,onClose}:{applicationId:strin
     })();
     return()=>{active=false;controller.abort();if(objectUrl)URL.revokeObjectURL(objectUrl);};
   },[applicationId,document.id]);
-  return <section className="card pdf-preview" aria-label="Document preview"><div className="section-heading"><div><h2>CV preview</h2><p>{document.filename}</p></div><button onClick={onClose}>Close preview</button></div><Notice message={error}/>{url?<><iframe title={`PDF: ${document.filename}`} src={url} className="pdf-frame"/><p className="small muted">Browser PDF viewer. If unsupported, use Download. Files are fetched using your authorized session.</p></>:!error&&<Loading/>}</section>;
+  return <section className="card pdf-preview" aria-label="Document preview"><div className="section-heading"><div><h2>CV preview</h2><p>{document.filename}</p></div><button onClick={onClose}>Close preview</button></div><Notice message={error}/>{url?<iframe title={`PDF: ${document.filename}`} src={url} className="pdf-frame"/>:!error&&<Loading/>}</section>;
 }

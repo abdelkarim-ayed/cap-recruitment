@@ -20,6 +20,6 @@ export function CandidateForm({vacancy,preview=false}:{vacancy:{id:string;form:F
         {input.type==='single_choice'&&<select required={input.required} value={answers[input.id]??''} onChange={e=>answer(input.id,e.target.value||undefined)}><option value="">Select…</option>{input.args.choices.map(choice=><option key={choice.value} value={choice.value}>{choice.label}</option>)}</select>}
         {input.type==='document'&&<><input type="file" required={input.required} accept={input.args.accept?.join(',')} onChange={e=>{const file=e.target.files?.[0];setFiles(current=>{const next={...current};if(file)next[input.id]=file;else delete next[input.id];return next;});}}/><small>{input.args.accept?.join(', ')||'Any extension'} · One file · Up to {Math.min(10*1024*1024,input.args.limit?.kind==='MAX_BYTES'?input.args.limit.bytes:Infinity).toLocaleString()} bytes. All files combined: 25 MiB.</small></>}
       </label>;
-    })}<div className="form-footer"><p className="small muted">Check your answers before submitting. An existing submission will be returned unchanged.</p><button className="primary" disabled={busy||preview}>{preview?'Preview only':busy?'Submitting…':'Submit application'}</button></div></fieldset>
+    })}<div className="form-footer"><button className="primary" disabled={busy||preview}>{preview?'Preview only':busy?'Submitting…':'Submit application'}</button></div></fieldset>
   </form></section>;
 }

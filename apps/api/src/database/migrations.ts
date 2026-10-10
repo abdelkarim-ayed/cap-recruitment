@@ -71,4 +71,8 @@ export const applicationMigrations = [{
   id: '004_review_saved_at',
   sql: `ALTER TABLE applications ADD COLUMN review_updated_at timestamptz;
     UPDATE applications SET review_updated_at=reviewed_at WHERE reviewed_at IS NOT NULL;`,
+}, {
+  id: '005_no_extraction_review',
+  sql: `UPDATE applications SET review_status='completed',review_revision=review_revision+1
+    WHERE jsonb_array_length(vacancy_snapshot->'processingDefinition'->'tasks')=0 AND review_status<>'completed';`,
 }] as const;

@@ -116,6 +116,13 @@ try {
   equal((await json(`applications/${application.id}`, undefined, candidate.cookie)).status, 200);
   const noTasks = await submit(largeId, other, answers, [{ field: 'cv', name: 'no-extension', bytes: Buffer.alloc(10 * 1024 * 1024) }]);
   equal(noTasks.status, 201); equal(noTasks.body.processingState, 'not_requested');
+  equal(noTasks.body.stage,'received');
+  const automaticReview=await json(`applications/${noTasks.body.id}/review`,undefined,recruiter.cookie);
+  equal(automaticReview.status,200);equal(automaticReview.body.review.required,false);equal(automaticReview.body.review.status,'completed');equal(automaticReview.body.review.reviewedBy,null);equal(automaticReview.body.review.reviewedAt,null);deepEqual(automaticReview.body.tasks,[]);
+  const noReviewPage=await json(`vacancies/${largeId}/applications`,undefined,recruiter.cookie);equal(noReviewPage.status,200);equal(noReviewPage.body.reviewRequired,false);equal(noReviewPage.body.items[0].review.required,false);
+  const manualCompleted=await json(`vacancies/${largeId}/applications?review=completed`,undefined,recruiter.cookie);equal(manualCompleted.body.total,0);
+  equal((await fetch(`${base}/api/applications/${noTasks.body.id}/review`,{method:'PATCH',headers:{Cookie:recruiter.cookie,Origin:settings.webOrigin,'Content-Type':'application/json'},body:JSON.stringify({expectedRevision:automaticReview.body.review.revision,status:'pending'})})).status,400);
+  const noReviewExport=await fetch(`${base}/api/vacancies/${largeId}/export`,{headers:{Cookie:recruiter.cookie}});equal(noReviewExport.status,200);ok((await noReviewExport.text()).includes(noTasks.body.id));
   equal(noTasks.body.documents[0].byteCount, 10 * 1024 * 1024);
   const locked = await fetch(`${base}/api/applications/${application.id}`, { method: 'PATCH', headers: { Cookie: recruiter.cookie, Origin: settings.webOrigin, 'Content-Type': 'application/json' }, body: JSON.stringify({ answers: { name: 'Attempted edit' } }) });
   equal(locked.status, 404);

@@ -34,7 +34,7 @@ export class ReviewService {
   private projection(view: Awaited<ReturnType<ReviewService['read']>>) {
     const { application: row, tasks } = view;
     return { applicationId: row.id, answers: row.answers, formDefinition: row.vacancy_snapshot.formDefinition,
-      processingState: row.processing_state, review: { status: row.review_status, revision: row.review_revision, reviewedBy: row.reviewed_by, reviewedAt: row.reviewed_at, updatedAt:row.review_updated_at??null, editor:row.review_editor }, tasks };
+      processingState: row.processing_state, review: { required:tasks.length>0,status: row.review_status, revision: row.review_revision, reviewedBy: row.reviewed_by, reviewedAt: row.reviewed_at, updatedAt:row.review_updated_at??null, editor:row.review_editor }, tasks };
   }
   get(id: string) { return this.database.transaction(async client => this.projection(await this.read(client,id))); }
   patch(id: string, actor: AuthenticatedRequest['actor'], raw: unknown) {
@@ -44,6 +44,7 @@ export class ReviewService {
     if (new Set(value.corrections?.map(c => c.taskId)).size !== (value.corrections?.length ?? 0)) throw new BadRequestException('Duplicate correction task.');
     return this.database.transaction(async client => {
       const view = await this.read(client,id,'FOR UPDATE');
+      if(!view.tasks.length)throw new BadRequestException('Extraction review is not required for this application.');
       if (view.application.review_revision !== value.expectedRevision) throw new ConflictException('Review changed; reload before retrying.');
       for (const correction of value.corrections ?? []) {
         const definition = (view.application.vacancy_snapshot as Vacancy).processingDefinition.tasks.find(task => task.id === correction.taskId);

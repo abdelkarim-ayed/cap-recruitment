@@ -69,14 +69,16 @@ New seed vacancy: **[DEMO] Backend developer — RenderCV**, containing fresh sc
 ## Fresh vacancy → candidate → mock processing
 1. As recruiter, create/edit a vacancy, configure questions and document extraction, preview, save, publish. Published definitions lock; unsaved changes disable publishing.
 2. Login candidate, fill/upload a RenderCV PDF and submit. Answers/files are immutable; duplicates return existing submission unchanged. For another run use another candidate/vacancy, not a reset.
-3. Login recruiter and open the new application. Expand local processing help; run:
+3. Login recruiter and open the new application. Copy its UUID from the URL (`#/applications/UUID`); operator commands now live only in this guide. Run:
 ```sh
 pnpm --filter @recruitment/api demo:process APPLICATION_UUID success
 ```
 Choose failure/empty instead for those recorded outcomes. Refresh afterward. Unattempted tasks only; refuses overwriting results. Actual source identity/hash/args verified, real persisted executor used. **No parsing/AI**: success chooses first two configured skill names, regardless of CV text. Every result retains fixture provenance. No automatic poller; ordinary submissions stay pending until run. Underlying processing:run and recovery: processing-review-api.md.
 
+For a vacancy with **no extraction tasks**, submit normally: no processing/review action is needed. Review marker auto-completes as not applicable; no reviewer/date or candidate approval implied. Staff screens omit extraction controls; mixed tables show a dash, and review-status filters exclude these records. PDF preview/download and CSV remain available. No bulk “review applications” decision is introduced.
+
 ## Staff outside demo
 Operator-local staff:provision creates/updates staff roles and revokes sessions. Optional STAFF_INITIAL_PASSWORD environment variable sets a password (don't put secrets in CLI arguments/history); without it use password reset to establish one. Verify email ownership before normal login. No public HR/admin signup or staff management UI. See candidate-access.md.
 
 ## Verification
-54 ordinary tests pass; build/typecheck/frozen install pass. DOM tests cover password login/signup, owner labels, dataset filters, latest saved correction/refresh, PDF authorization/signature/URL cleanup and existing forms. Real PostgreSQL auth:password-check covers mailbox isolation, safe roles, reset/session revocation; legacy auth:mock-check and processing/vacancy regressions pass. Running Vite proxy passed all six role password logins, fresh signup/verification, owner privacy, filter totals, review metadata, RenderCV bytes and CSV. User manually validates native PDF viewer, appearance and spreadsheet CSV opening. Report sanitized errors, never credentials/real CV data.
+56 ordinary tests pass; build/typecheck pass. DOM tests also verify no-task applications hide review controls/requests but keep preview/export. Real PostgreSQL processing:check verifies automatic no-task completion, no invented reviewer/date, unchanged stage and review-filter exclusion. Prior auth:password-check/auth:mock-check and vacancy/proxy checks remain documented in status.md. User manually validates native PDF viewer, appearance and spreadsheet CSV opening. Report sanitized errors, never credentials/real CV data.

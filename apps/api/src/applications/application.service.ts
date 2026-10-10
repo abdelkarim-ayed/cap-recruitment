@@ -26,7 +26,7 @@ function visible(row: ApplicationRow, actor: Actor) {
     vacancy: { id: vacancy.id, title: vacancy.title, description: vacancy.description, ...(vacancy.location === undefined ? {} : { location: vacancy.location }), revision: vacancy.revision, formDefinition: vacancy.formDefinition,
       ...(actor.role === 'candidate' ? {} : { processingDefinition: vacancy.processingDefinition }) },
     answers: row.answers, stage: row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(),
-    ...(actor.role === 'candidate' ? {} : { review: { status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at } }) };
+    ...(actor.role === 'candidate' ? {} : { review: { required:vacancy.processingDefinition.tasks.length>0,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at } }) };
 }
 @Injectable()
 export class ApplicationService {
@@ -58,8 +58,9 @@ export class ApplicationService {
         const normalized = files.map(file => ({ ...file, originalname: file.originalname.replace(/[\\/]/g, '_').replace(/[\x00-\x1f\x7f]/g, '_').slice(0, 200) }));
         const checked = validateSubmission(snapshot.formDefinition, rawAnswers, normalized.map(file => ({ inputId: file.fieldname, filename: file.originalname, byteCount: file.size })));
         if (checked.issues.length) throw new BadRequestException({ statusCode: 400, error: 'Bad Request', message: 'Invalid application submission.', issues: checked.issues });
-        await client.query(`INSERT INTO applications(id,vacancy_id,candidate_id,candidate_identity,vacancy_snapshot,answers,processing_state)
-          VALUES ($1,$2,$3,$4,$5,$6,$7)`, [id, vacancyId, actor.id, JSON.stringify({ name: actor.name, email: actor.email }), JSON.stringify(snapshot), JSON.stringify(checked.answers), snapshot.processingDefinition.tasks.length ? 'pending' : 'not_requested']);
+        const needsExtraction=snapshot.processingDefinition.tasks.length>0;
+        await client.query(`INSERT INTO applications(id,vacancy_id,candidate_id,candidate_identity,vacancy_snapshot,answers,processing_state,review_status)
+          VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`, [id, vacancyId, actor.id, JSON.stringify({ name: actor.name, email: actor.email }), JSON.stringify(snapshot), JSON.stringify(checked.answers), needsExtraction ? 'pending' : 'not_requested',needsExtraction?'pending':'completed']);
         for (const file of normalized) {
           const storageRef = await this.storage.put(file.buffer); stored.push(storageRef);
           const fileId = randomUUID();
@@ -93,11 +94,12 @@ export class ApplicationService {
     const { limit, offset,processing,review,sort } = parsed.data;
     if(actor.role==='candidate'&&review)throw new ForbiddenException('Review filters require staff access.');
     const order=sort==='candidate'?"lower(candidate_identity->>'name'),id":sort==='position'?'lower(title),id':sort==='oldest'?'submitted_at,id':'submitted_at DESC,id DESC';
-    const result = await this.database.query(`WITH visible AS (SELECT id,vacancy_id,candidate_id,candidate_identity,stage,processing_state,submitted_at,review_status,review_revision,reviewed_by,reviewed_at,vacancy_snapshot->>'title' AS title FROM applications
-      WHERE ($1::text IS NULL OR candidate_id=$1) AND ($2::uuid IS NULL OR vacancy_id=$2) AND ($5::text IS NULL OR processing_state=$5) AND ($6::text IS NULL OR review_status=$6)),
+    const result = await this.database.query(`WITH scoped AS (SELECT id,vacancy_id,candidate_id,candidate_identity,stage,processing_state,submitted_at,review_status,review_revision,reviewed_by,reviewed_at,vacancy_snapshot->>'title' AS title,jsonb_array_length(vacancy_snapshot->'processingDefinition'->'tasks')>0 AS review_required FROM applications
+      WHERE ($1::text IS NULL OR candidate_id=$1) AND ($2::uuid IS NULL OR vacancy_id=$2)),
+      visible AS (SELECT * FROM scoped WHERE ($5::text IS NULL OR processing_state=$5) AND ($6::text IS NULL OR (review_required AND review_status=$6))),
       page AS (SELECT * FROM visible ORDER BY ${order} LIMIT $3 OFFSET $4)
-      SELECT (SELECT count(*)::integer FROM visible) AS total,coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY ${order}) FROM page),'[]') AS items`, [actor.role === 'candidate' ? actor.id : null, vacancyId ?? null, limit, offset,processing??null,review??null]);
-    return { items: result.rows[0].items.map((row: Record<string, any>) => ({ id: row.id, vacancyId: row.vacancy_id, vacancyTitle: row.title, candidateId: row.candidate_id, candidate: row.candidate_identity, stage: row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(), ...(actor.role === 'candidate' ? {} : { review: { status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at } }) })), total: result.rows[0].total, limit, offset };
+      SELECT (SELECT count(*)::integer FROM visible) AS total,coalesce((SELECT bool_or(review_required) FROM scoped),false) AS review_required,coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY ${order}) FROM page),'[]') AS items`, [actor.role === 'candidate' ? actor.id : null, vacancyId ?? null, limit, offset,processing??null,review??null]);
+    return { items: result.rows[0].items.map((row: Record<string, any>) => ({ id: row.id, vacancyId: row.vacancy_id, vacancyTitle: row.title, candidateId: row.candidate_id, candidate: row.candidate_identity, stage: row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(), ...(actor.role === 'candidate' ? {} : { review: { required:row.review_required,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at } }) })), total: result.rows[0].total, limit, offset,...(actor.role==='candidate'?{}:{reviewRequired:result.rows[0].review_required}) };
   }
   async download(applicationId: string, documentId: string, actor: Actor) {
     const owner = await this.database.query<ApplicationRow>('SELECT * FROM applications WHERE id=$1', [applicationId]);

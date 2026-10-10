@@ -127,3 +127,11 @@ test('PDF preview uses authenticated attachment bytes, rejects non-PDF and relea
     await screen.findByRole('alert');equal(screen.queryByTitle('PDF: bad.pdf'),null);
   }finally{URL.createObjectURL=originalCreate;URL.revokeObjectURL=originalRevoke;}
 });
+test('no-extraction application skips review requests/controls but retains files and export',async()=>{
+  const paths=[];globalThis.fetch=async path=>{paths.push(path);return json({id:'app',vacancyId:'vac',candidate:{name:'Candidate',email:'candidate@example.test'},submittedAt:'2026-10-10T00:00:00Z',stage:'received',processingState:'not_requested',review:{required:false,status:'completed',revision:1},vacancy:{title:'Backend',formDefinition:{inputs:[]}},answers:{},documents:[{id:'doc',filename:'cv.pdf',byteCount:100}]});};
+  render(React.createElement(ApplicationPage,{id:'app',staff:true}));await screen.findByText('Answers');deepEqual(paths,['/api/applications/app']);equal(screen.queryByText('Extraction review'),null);equal(screen.queryByText('Mark review complete'),null);equal(screen.queryByText('Extracted fields'),null);ok(screen.getByText('Preview cv.pdf'));ok(screen.getByText('Export vacancy CSV'));
+});
+test('no-extraction vacancy list hides review filters/columns and never labels candidates reviewed',async()=>{
+  globalThis.fetch=async()=>json({items:[{id:'app',vacancyId:'vac',candidate:{name:'Candidate',email:'candidate@example.test'},vacancyTitle:'Backend',submittedAt:'2026-10-10T00:00:00Z',processingState:'not_requested',review:{required:false,status:'completed'}}],total:1,reviewRequired:false});
+  render(React.createElement(ApplicationList,{staff:true}));await screen.findByText('candidate@example.test');equal(screen.queryByLabelText('Review status'),null);equal(screen.queryByLabelText('Processing status'),null);equal(screen.queryByText('Extraction review'),null);equal(screen.queryByText('completed'),null);
+});

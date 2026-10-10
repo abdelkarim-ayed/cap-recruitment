@@ -1,6 +1,8 @@
 # Implementation status
 
 ## Current unit: manual-feedback account / HR refinements
+Latest small polish: no-task applications auto-complete extraction-review marker (not candidate approval), required=false, no redundant UI controls, review filters exclude them; migration 005 backfills status only. Instructional/demo banners and local command help removed from product screens; fixture provenance labels retained. Operator steps remain in demo-guide.md.
+Verified: 56 ordinary tests, build/typecheck and processing:check; no-task automatic status/no reviewer/date/unchanged stage/filter exclusion/rejected unnecessary PATCH/export verified against PostgreSQL. Existing no-task records checked complete; running frontend proxy readiness/public vacancies 200. No reseed or browser automation.
 Implementation and local checkpoint commits are authorized. Remote creation/publishing remain deferred.
 
 - Created plain pnpm workspace with `apps/web`, `apps/api`, `packages/domain`.

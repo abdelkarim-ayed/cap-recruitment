@@ -22,6 +22,7 @@ Implementation is authorized. Start with the agreed scenarios; do not expand int
 - `docs/ai-options.md`: researched AI options and limitations.
 - `docs/candidate-access.md`: approved candidate access flow and duplicate handling.
 - Latest feedback changes access to email/password, candidate-only signup/one-time email verification and code password reset. Legacy OTP API retained, not UI login. Review shows latest effective correction, not historical revisions. RenderCV text-only samples via scripts/render-demo-cvs.py; no image generation. Preserve manual submissions when seeding.
+- No extraction tasks means no extraction-review workload: marker auto-completes, required=false, controls hidden; not candidate approval/stage change. Keep product UI concise; operator/demo instructions in docs, but actual fixture results must stay labelled.
 - `docs/vacancy-form.md`: form and screening direction; bounded first model awaiting approval.
 - `docs/form-tooling.md`: researched builder/renderer shortlist, not integration-tested.
 
