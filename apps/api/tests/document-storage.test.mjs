@@ -1,12 +1,14 @@
 import { test } from 'node:test';
 import { deepEqual, equal, rejects } from 'node:assert/strict';
 import { mkdtemp, stat, readdir, rm, symlink } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { LocalDocumentStorage } from '../dist/documents/local-document-storage.js';
 import { MemoryDocumentStorage } from '../dist/documents/memory-document-storage.js';
 
 test('private local storage roundtrips bytes, restricts permissions/references and cleans owned files', async () => {
-  const directory = await mkdtemp('/tmp/opencode/document-test-');
+  const directory = await mkdtemp(join(existsSync('/tmp/opencode') ? '/tmp/opencode' : tmpdir(), 'document-test-'));
   try {
     const storage = new LocalDocumentStorage(directory), bytes = Buffer.from('UNTRUSTED FIXTURE');
     const ref = await storage.put(bytes);

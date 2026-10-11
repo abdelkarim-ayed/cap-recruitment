@@ -8,7 +8,7 @@ Source/dependency review, **not a Windows test report**. Current workflow was ex
 |---|---|
 | React/Vite, NestJS, domain, migrations, seeds, mock processing, inbox cleanup | Node/TypeScript tooling is generally portable. Use Node **24** and pnpm **12.9.0**; reachable PostgreSQL/Redis and writable storage are prerequisites. Native execution still needs testing. |
 | Browser use, CSV/PDF downloads, presentation PDF viewing | No Linux requirement for the client PC; API/web can run on another machine. Native file dialogs/PDF viewers vary by browser. |
-| `pnpm build`, `typecheck`, tests | Build/typecheck are expected to be portable. Some current tests hard-code `/tmp/opencode` (`document-storage.test.mjs`, applications/interviews smoke checks), so the test suite is **not native-Windows-ready as written**. Replace these with portable temp-directory handling in a future compatibility checkpoint, or run in a suitable Linux environment. |
+| `pnpm build`, `typecheck`, tests | Build/typecheck are expected to be portable. The document-storage unit test falls back to the system temp directory when `/tmp/opencode` is absent. Applications/interviews smoke checks still hard-code that path; permission/symlink assertions also need native Windows review. The test suite is **not native-Windows-ready as written**. |
 | Shell examples and RMUX | `MAIL_DRIVER=file command`, Bash captures and RMUX are Linux/operator conveniences, not application requirements. Use separate PowerShell terminals; set variables as below. WSL can provide a Linux shell, but does not alone validate networking. |
 
 PowerShell example, from the repository root, after normal environment/infrastructure setup:
