@@ -1,6 +1,11 @@
 # Implementation status
 
-## Current unit: manual-feedback account / HR refinements
+## Current unit: interview pipeline / agenda / internal decisions / inbox
+Approved and implemented: vacancy owner-managed steps frozen once scheduling starts; shared HR preselection/scheduling/rescheduling/cancellation; interviewer scoped application/CV access and final notes/optional score/Pass-Fail. Fail atomically ends application/cancels every other unfinished instance; no reopening. Owner Offer/Hired after all steps pass. Internal candidate decisions not published. Half-hour local start choices + overlap blocking; owner contact metadata; candidate-by-step results; recipient inbox/event notifications with seven-day-after-read cleanup CLI/daily runner. Explicit causal workflows, not generic row hooks. Migration 006, contracts: [interview-api.md](interview-api.md). No live AI/extraction automation or email/chat/calendar integration.
+Verified: 62 ordinary tests (40 existing domain/API + 22 DOM), build/typecheck, real interviews:check and processing:check. Concurrent cross-application overlap and concurrent Fail tested; assignment/doc privacy, pipeline freeze/owner policy, terminal outcomes and retention/persistence pass. Existing/manual data preserved; user browser testing pending. Prior checkpoint details below are historical.
+Password regression also passes. Running RMUX `api`/`web` proxy serves health/public vacancies 200 and protects new routes with 401; health exposes new Not selected vocabulary. `inbox-retention` is active with daily cleanup, first run removed zero rows. No reseed or extraction runner started. OpenAPI 0.6.0 has 41 paths (interview paths reference interview-openapi.json); internal/external references and unique operation IDs checked.
+
+## Previous unit: manual-feedback account / HR refinements
 Latest small polish: no-task applications auto-complete extraction-review marker (not candidate approval), required=false, no redundant UI controls, review filters exclude them; migration 005 backfills status only. Instructional/demo banners and local command help removed from product screens; fixture provenance labels retained. Operator steps remain in demo-guide.md.
 Verified: 56 ordinary tests, build/typecheck and processing:check; no-task automatic status/no reviewer/date/unchanged stage/filter exclusion/rejected unnecessary PATCH/export verified against PostgreSQL. Existing no-task records checked complete; running frontend proxy readiness/public vacancies 200. No reseed or browser automation.
 Implementation and local checkpoint commits are authorized. Remote creation/publishing remain deferred.
@@ -55,7 +60,7 @@ The concrete proposed module/checkpoint boundaries are in `backend-modules.md`.
 1. Identity/session/role foundation completed; resource ownership checks follow their vacancy/application modules.
 2. Vacancy/application/document backend contracts completed. Graphical editor follows backend handoff.
 3. Mock per-unit processing/recovery and optional review/export completed. Live extraction much later; no arbitrary filtering.
-4. User manual frontend test and fixes first; application progression/interviews/notes/owner decisions remain future approval.
+4. Bounded internal interview/progression/inbox checkpoint now implemented above; user manual UI testing next. Extended interviews/publication remain deferred.
 5. Published updates, deliberate messaging, dashboard, repeatable demo and presentation.
 
 A user-requested subagent verified rootless networking with isolated services and cleaned its temporary resources. Main session applied the result to the actual stack. Further delegation should use bounded independent units; shared interfaces and migrations need one owner.

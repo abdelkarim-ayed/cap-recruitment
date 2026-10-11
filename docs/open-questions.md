@@ -3,6 +3,7 @@
 Answer each cluster independently; detailed API/database design comes later.
 
 ## 1. Authority and collaboration
+- Bounded interview policy now implemented: owner pipeline/finalization, shared HR scheduling, assignee-only final assessment, Fail automatically ends application, no reopening. See interview-api.md. Admin override and guest invitations remain deferred.
 - Owner, collaborative recruiters, assigned interviewers, and owner finalization are accepted in principle.
 - Responsible recruiter ownership is approved; hiring-manager capability need not be a separate role. Decide whether admin can override finalization.
 - Existing company users only, or guest interviewers? Guest invitations add auth and scoping work.
@@ -21,6 +22,7 @@ Answer each cluster independently; detailed API/database design comes later.
 - Define uncertain/missing/conflicting evidence handling and bulk confirmation.
 
 ## 4. Public communication
+- Internal event inbox approved/implemented; seven days after first read cleanup, unread retained. No chat, automatic business email or timed reminders. Candidate publication still deferred; current new stages remain internal.
 - Internal main pipeline is settled; see `workflows.md`. Clarify negative outcomes: HR not-selection versus candidate withdrawal versus offer decline.
 - Internal stage labels versus candidate-visible status labels.
 - Publication manual, automatic for selected events, or mixed?

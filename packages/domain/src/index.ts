@@ -1,5 +1,5 @@
 export const applicationStages = [
-  'received', 'review_ready', 'preselected', 'interview', 'offer', 'hired',
+  'received', 'review_ready', 'preselected', 'interview', 'offer', 'hired', 'not_selected',
 ] as const;
 export type ApplicationStage = (typeof applicationStages)[number];
 

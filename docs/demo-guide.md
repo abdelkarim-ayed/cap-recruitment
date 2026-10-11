@@ -1,5 +1,17 @@
 # Manual demo — start here
 
+## Interview checkpoint — manual test
+Current RMUX tabs: `api`, `web`; `inbox-retention` runs notification cleanup only when launched. Routine checks use normal shell execution; see [rmux.md](rmux.md). No extraction worker is started.
+
+1. Sign in as vacancy owner, open vacancy → **Interview pipeline & results**. Add ordered Technical/HR steps and save. Owner contact appears beneath the heading. Steps can be configured for an already-published vacancy independently of the locked intake form, but freeze after the first appointment.
+2. Open application → **Selection & interviews** → Preselect. Schedule a step with an existing staff interviewer (`demo.interviewer@example.test`), date, half-hour start, duration and link/location. A second step can be booked ahead with a non-overlapping slot. Another recruiter may schedule but cannot edit pipeline/finalize owner decisions.
+3. Sign in as interviewer → **My interviews** / **Inbox**. Assigned appointment exposes its application/CV only. Request rescheduling; owner/creator get an inbox message. HR reschedules/reassigns; old assignee loses candidate access. Agenda is grouped by date; week navigation and Needs feedback show past pending appointments.
+4. At/after scheduled start (not before), interviewer submits notes + optional score + Pass/Fail, then confirms. Pass is final feedback, not acceptance. Fail is **terminal**: application Not selected, all remaining unfinished interviews cancelled with explicit failure cause; no reopening or further scheduling. Use a fresh posting/application for another attempt. Do not submit Fail on manual data unless that terminal result is intended.
+5. Owner sees per-step result/score table. Once every step passes, owner records Offer, then Hired. No email or candidate-visible business status is sent/published. Candidate still sees immutable submission, not internal assessment.
+6. Inbox defaults unread. Opening marks read; All retained messages shows read ones. Retention runner deletes seven days after first read, never unread or interview/application records. No chat or timed reminders.
+
+No seeded interview results are fabricated for this checkpoint. Native date/file/PDF UI is manually tested. Automated synthetic clock fixtures in interviews:check are not a runtime bypass. Details/known bounds: [interview-api.md](interview-api.md).
+
 Open **http://localhost:5173** using localhost consistently. Browser layout/interaction remains manually tested; no browser automation/screenshots.
 
 ## Login now uses passwords

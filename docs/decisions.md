@@ -1,6 +1,7 @@
 # Decisions
 
 ## Confirmed
+- Interview checkpoint approved: owner-defined vacancy steps, frozen once instances exist; one application/step instance, shared HR scheduling, assigned interviewer final notes/optional 0–10 score/Pass-Fail. Fail ends the application and cancels every other unfinished interview. No reopening; new posting/application instead. Pass is not acceptance; owner Offer/Hired. Agenda first, half-hour time choices, owner contact metadata. Explicit typed workflow causes determine effects, never generic delete/update hooks. Recipient inbox approved (not chat); delete seven days after first read using separate retention runner, unread retained. See interview-api.md for implemented boundaries.
 - Product is recruitment management for a company, separately deployable and brandable; no multi-tenancy or employee tracking.
 - Candidate has at most one application per vacancy; reposts are separate vacancies.
 - User revised account access after manual feedback: email/password for staff and candidates; candidate-only public signup, one-time email ownership verification, internally provisioned staff, code-based password reset. Current UI no longer uses OTP on each login. See candidate-access.md.

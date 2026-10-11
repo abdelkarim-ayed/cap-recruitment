@@ -12,7 +12,7 @@ test('HTTP health endpoint returns the agreed stage contract', async () => {
     equal(response.status, 200);
     const body = await response.json();
     equal(body.status, 'ok');
-    deepEqual(body.applicationStages, ['received', 'review_ready', 'preselected', 'interview', 'offer', 'hired']);
+    deepEqual(body.applicationStages, ['received', 'review_ready', 'preselected', 'interview', 'offer', 'hired', 'not_selected']);
   } finally {
     await app.close();
   }

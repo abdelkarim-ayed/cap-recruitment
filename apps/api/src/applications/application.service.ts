@@ -24,14 +24,18 @@ function visible(row: ApplicationRow, actor: Actor) {
   const vacancy = row.vacancy_snapshot;
   return { id: row.id, vacancyId: row.vacancy_id, candidateId: row.candidate_id, candidate: row.candidate_identity,
     vacancy: { id: vacancy.id, title: vacancy.title, description: vacancy.description, ...(vacancy.location === undefined ? {} : { location: vacancy.location }), revision: vacancy.revision, formDefinition: vacancy.formDefinition,
-      ...(actor.role === 'candidate' ? {} : { processingDefinition: vacancy.processingDefinition }) },
-    answers: row.answers, stage: row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(),
-    ...(actor.role === 'candidate' ? {} : { review: { required:vacancy.processingDefinition.tasks.length>0,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at } }) };
+      ...(['candidate','interviewer'].includes(actor.role) ? {} : { processingDefinition: vacancy.processingDefinition }) },
+    answers: row.answers, stage: actor.role==='candidate'?'received':row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(),
+    ...(['candidate','interviewer'].includes(actor.role) ? {} : { review: { required:vacancy.processingDefinition.tasks.length>0,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at } }) };
 }
 @Injectable()
 export class ApplicationService {
   constructor(private readonly database: DatabaseService, @Inject(DOCUMENT_STORAGE) private readonly storage: DocumentStorage) {}
-  private authorize(actor: Actor, candidateId: string) {
+  private async authorize(actor: Actor, candidateId: string, applicationId:string) {
+    if(actor.role==='interviewer') {
+      const result=await this.database.query("SELECT id FROM interviews WHERE application_id=$1 AND interviewer_id=$2 AND status IN ('scheduled','completed') LIMIT 1",[applicationId,actor.id]);
+      if(result.rows.length)return;
+    }
     if (!['candidate', 'admin', 'recruiter'].includes(actor.role) || (actor.role === 'candidate' && actor.id !== candidateId)) throw new NotFoundException('Application not found.');
   }
   async submit(vacancyId: string, actor: Actor, body: unknown, files: Express.Multer.File[]) {
@@ -83,7 +87,7 @@ export class ApplicationService {
     const result = await this.database.query<ApplicationRow>('SELECT * FROM applications WHERE id=$1', [id]);
     const row = result.rows[0];
     if (!row) throw new NotFoundException('Application not found.');
-    this.authorize(actor, row.candidate_id);
+    await this.authorize(actor, row.candidate_id,id);
     const refs = await this.database.query<DocumentRow>(`SELECT d.id,d.input_id,f.filename,f.byte_count,f.media_type FROM application_documents d JOIN stored_files f ON f.id=d.stored_file_id WHERE d.application_id=$1 ORDER BY d.input_id`, [id]);
     return { ...visible(row, actor), documents: refs.rows.map(document) };
   }
@@ -99,12 +103,12 @@ export class ApplicationService {
       visible AS (SELECT * FROM scoped WHERE ($5::text IS NULL OR processing_state=$5) AND ($6::text IS NULL OR (review_required AND review_status=$6))),
       page AS (SELECT * FROM visible ORDER BY ${order} LIMIT $3 OFFSET $4)
       SELECT (SELECT count(*)::integer FROM visible) AS total,coalesce((SELECT bool_or(review_required) FROM scoped),false) AS review_required,coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY ${order}) FROM page),'[]') AS items`, [actor.role === 'candidate' ? actor.id : null, vacancyId ?? null, limit, offset,processing??null,review??null]);
-    return { items: result.rows[0].items.map((row: Record<string, any>) => ({ id: row.id, vacancyId: row.vacancy_id, vacancyTitle: row.title, candidateId: row.candidate_id, candidate: row.candidate_identity, stage: row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(), ...(actor.role === 'candidate' ? {} : { review: { required:row.review_required,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at } }) })), total: result.rows[0].total, limit, offset,...(actor.role==='candidate'?{}:{reviewRequired:result.rows[0].review_required}) };
+    return { items: result.rows[0].items.map((row: Record<string, any>) => ({ id: row.id, vacancyId: row.vacancy_id, vacancyTitle: row.title, candidateId: row.candidate_id, candidate: row.candidate_identity, stage: actor.role==='candidate'?'received':row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(), ...(actor.role === 'candidate' ? {} : { review: { required:row.review_required,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at } }) })), total: result.rows[0].total, limit, offset,...(actor.role==='candidate'?{}:{reviewRequired:result.rows[0].review_required}) };
   }
   async download(applicationId: string, documentId: string, actor: Actor) {
     const owner = await this.database.query<ApplicationRow>('SELECT * FROM applications WHERE id=$1', [applicationId]);
     if (!owner.rows[0]) throw new NotFoundException('Document not found.');
-    this.authorize(actor, owner.rows[0].candidate_id);
+    await this.authorize(actor, owner.rows[0].candidate_id,applicationId);
     const result = await this.database.query<DocumentRow>(`SELECT d.id,d.input_id,f.filename,f.byte_count,f.media_type,f.storage_ref,f.content_hash FROM application_documents d JOIN stored_files f ON f.id=d.stored_file_id WHERE d.application_id=$1 AND d.id=$2`, [applicationId, documentId]);
     const row = result.rows[0];
     if (!row) throw new NotFoundException('Document not found.');

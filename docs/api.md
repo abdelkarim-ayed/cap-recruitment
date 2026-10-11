@@ -6,6 +6,7 @@ Backend first. This document is the frontend handoff; distinguish implemented en
 - **This file:** supported endpoints, exact payload examples, and HTTP behavior.
 - **[`openapi.json`](openapi.json):** OpenAPI 3.1 for the implemented client-facing surface; import into an API client/viewer if desired. No Swagger server/UI is installed.
 - **[`vacancy-api.md`](vacancy-api.md):** implemented vacancy payloads, supported field/task arguments, transitions, and permissions.
+- **[`interview-api.md`](interview-api.md)** / **[`interview-openapi.json`](interview-openapi.json)**: implemented pipeline, agenda, assessment, internal decisions and inbox; external path references included in openapi.json.
 - **[`backend-test.md`](backend-test.md):** runnable curl/integration checks.
 - **[`integration-testing.md`](integration-testing.md)** and **[`architecture.md`](architecture.md):** mockable protocols, current classes, data movement, and future consistency boundaries.
 
@@ -33,7 +34,7 @@ Auth lives at `/api/auth`; application endpoints live at `/api`.
 | GET `/api/health` | Public | Liveness and agreed stage vocabulary |
 | GET `/api/health/ready` | Public | Database/Redis readiness; 503 when unavailable, no credentials/errors exposed |
 
-Roles: admin/recruiter/interviewer/candidate; signup cannot set role. Staff provisioning remains local operator-only. Vacancy owner checks, candidate read-own and admin/recruiter read-all applications/review are implemented. Interview scoping later.
+Roles: admin/recruiter/interviewer/candidate; signup cannot set role. Staff provisioning remains local operator-only. Vacancy owner checks, candidate read-own, admin/recruiter read-all applications/review and assigned-interviewer scoped interview/application/document routes are implemented. Generic HR application/review routes remain interviewer-denied.
 
 ## Implemented request and response shapes
 
@@ -129,7 +130,7 @@ This checks the auth handler, not database/Redis readiness.
 ### Health
 `GET /health`, no body/query, **200**:
 ```json
-{"status":"ok","service":"recruitment-api","applicationStages":["received","review_ready","preselected","interview","offer","hired"]}
+{"status":"ok","service":"recruitment-api","applicationStages":["received","review_ready","preselected","interview","offer","hired","not_selected"]}
 ```
 `GET /health/ready`, **200** when both dependencies respond:
 ```json
@@ -179,9 +180,9 @@ Application submission/list/detail/private downloads are implemented in [`applic
 
 Remaining feature endpoints—not implemented:
 Live extraction/real parsing and more task catalogs remain deferred. Mock processing/review/export is implemented; no automatic selection.
-4. **Interviews/decisions:** dynamic interview CRUD/assignment/notes, schedule, preselection and owner decisions. No fixed interview-number pipeline stages.
+4. **Interviews/decisions:** bounded pipeline/agenda/assignment/final notes/score/Pass-Fail, preselection and owner decisions now implemented; see interview-api.md. Extensions remain deferred. No fixed interview-number application stages.
 5. **Communication/analytics:** selected-recipient sending, published candidate updates, SQL metrics. No automatic email for every interview edit.
 
 Module names describe business boundaries, not microservices. Shared migrations/interfaces have one owner; independent work can follow a written endpoint contract.
 
-Implemented: identity, health, vacancies/intake, local mock processing, review/export and React screens against those contracts. Interviews/progression/live AI later. Manual frontend scenarios: demo-guide.md.
+Implemented: identity, health, vacancies/intake, local mock processing, review/export, bounded internal interviews/progression/inbox and React screens against those contracts. Live AI, calendar sync, business email/candidate publication and interview retries remain deferred. Manual frontend scenarios: demo-guide.md.

@@ -17,7 +17,7 @@ export function ApplicationList({staff}:{staff:boolean}) {
   return <>
     <Heading title={staff?'Applications':'My applications'}>
       <button onClick={()=>setRefresh(v=>v+1)}>Refresh</button>
-      {staff&&vacancy&&<button className="primary" disabled={busy} onClick={async()=>{setBusy(true);setError('');try{await download(`vacancies/${vacancy}/export`,`applications-${vacancy}.csv`);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}}>{busy?'Exporting…':'Export all CSV'}</button>}
+      {staff&&vacancy&&<><a className="button" href={`#/vacancies/${vacancy}/interviews`}>Interview results</a><button className="primary" disabled={busy} onClick={async()=>{setBusy(true);setError('');try{await download(`vacancies/${vacancy}/export`,`applications-${vacancy}.csv`);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}}>{busy?'Exporting…':'Export all CSV'}</button></>}
     </Heading><Notice message={error}/>
     {staff&&vacancy&&<p className="small muted"><a href="#/applications">Show all vacancies</a></p>}
     <div className="table-controls">
@@ -68,7 +68,7 @@ export function ApplicationPage({id,staff}:{id:string;staff:boolean}) {
   async function update(body:any){setBusy(true);setError('');setMessage('');try{const saved=await api(`applications/${id}/review`,{method:'PATCH',body:JSON.stringify({...body,expectedRevision:review.review.revision})});setReview(saved);setMessage(`Saved revision ${saved.review.revision}.`);}catch(e){setError(`${errorMessage(e)} Use Refresh to reload the latest saved review before retrying.`);}finally{setBusy(false);}}
   return <><Notice message={error}/>{!record?!error?<Loading/>:<button onClick={()=>setRefresh(v=>v+1)}>Retry</button>:<>
     <Heading title={staff?(record.candidate.name||record.candidate.email):'Your application'} description={`${record.vacancy.title} · Submitted ${new Date(record.submittedAt).toLocaleString()}`}><a className="button" href={staff?`#/applications?vacancy=${record.vacancyId}`:'#/applications'}>Back to applications</a><button disabled={busy} onClick={()=>{setMessage('');setRefresh(v=>v+1);}}>Refresh</button></Heading><Notice message={message} success/>
-    <section className="card"><div className="section-heading"><h2>Answers</h2><div className="actions"><Badge>{record.stage}</Badge>{record.processingState!=='not_requested'&&<Badge>{record.processingState}</Badge>}</div></div><p>{record.candidate.email}</p>
+     {staff&&<p><a className="button primary" href={`#/applications/${id}/interviews`}>Selection & interviews</a></p>}<section className="card"><div className="section-heading"><h2>Answers</h2><div className="actions"><Badge>{record.stage}</Badge>{record.processingState!=='not_requested'&&<Badge>{record.processingState}</Badge>}</div></div><p>{record.candidate.email}</p>
       <dl className="answer-grid">{record.vacancy.formDefinition.inputs.filter((input:any)=>input.type!=='separator'&&input.type!=='document').map((input:any)=><div key={input.id}><dt>{input.label}</dt><dd>{display(record.answers[input.id])}</dd></div>)}</dl><h3>Documents</h3>
       {!record.documents.length?<p className="muted">No documents submitted.</p>:record.documents.map((doc:any)=><div className="document-actions" key={doc.id}>
         {doc.filename.toLowerCase().endsWith('.pdf')&&<button onClick={()=>setPreview(doc)}>Preview {doc.filename}</button>}

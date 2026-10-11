@@ -1,6 +1,6 @@
 # Product direction
 
-Status: backend foundation implemented; recruitment workflows remain to be built. Confirmed constraints are distinguished from proposed behavior. See [`status.md`](status.md) and [`architecture.md`](architecture.md) for evidence and gaps.
+Status: intake/mock review/export and bounded internal interview/progression/inbox workflows implemented. Confirmed constraints are distinguished from proposed behavior. See [`status.md`](status.md), [`interview-api.md`](interview-api.md) and [`architecture.md`](architecture.md) for evidence and gaps.
 
 ## Confirmed purpose
 Company-branded recruitment management, with a separate deployment per company. Not a job marketplace and not multi-tenant SaaS. Target organizations can range from roughly 10 to 1,000 employees; do not claim this as a tested scale.

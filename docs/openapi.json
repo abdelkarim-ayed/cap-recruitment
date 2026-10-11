@@ -2,13 +2,28 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Recruitment backend — implemented client surface",
-    "version": "0.5.1",
-    "description": "Password signup/login/verification/reset, staff-owned vacancies, locked intake, mock-only processing and shared review/CSV. React UI consumes these contracts; no live AI/interviews."
+    "version": "0.6.0",
+    "description": "Password accounts, vacancies, locked intake, mock-only extraction/review/CSV, interview pipeline/agenda/feedback, internal decisions and inbox. Interview path definitions are external references to interview-openapi.json. No live AI or candidate business messages."
   },
   "servers": [{ "url": "http://localhost:3000/api", "description": "Local backend; frontend uses /api through its dev proxy" }],
   "security": [{ "sessionCookie": [] }],
   "tags": [{ "name": "Auth" }, { "name": "Access" }, { "name": "Health" }],
   "paths": {
+    "/vacancies/{id}/interview-pipeline":{"$ref":"interview-openapi.json#/paths/~1vacancies~1{id}~1interview-pipeline"},
+    "/vacancies/{id}/interview-results":{"$ref":"interview-openapi.json#/paths/~1vacancies~1{id}~1interview-results"},
+    "/interviewers":{"$ref":"interview-openapi.json#/paths/~1interviewers"},
+    "/applications/{id}/interviews":{"$ref":"interview-openapi.json#/paths/~1applications~1{id}~1interviews"},
+    "/applications/{id}/stage":{"$ref":"interview-openapi.json#/paths/~1applications~1{id}~1stage"},
+    "/interviews":{"$ref":"interview-openapi.json#/paths/~1interviews"},
+    "/interviews/{id}":{"$ref":"interview-openapi.json#/paths/~1interviews~1{id}"},
+    "/interviews/{id}/schedule":{"$ref":"interview-openapi.json#/paths/~1interviews~1{id}~1schedule"},
+    "/interviews/{id}/cancel":{"$ref":"interview-openapi.json#/paths/~1interviews~1{id}~1cancel"},
+    "/interviews/{id}/scheduling-issue":{"$ref":"interview-openapi.json#/paths/~1interviews~1{id}~1scheduling-issue"},
+    "/interviews/{id}/feedback":{"$ref":"interview-openapi.json#/paths/~1interviews~1{id}~1feedback"},
+    "/interviews/{id}/application":{"$ref":"interview-openapi.json#/paths/~1interviews~1{id}~1application"},
+    "/interviews/{id}/documents/{documentId}":{"$ref":"interview-openapi.json#/paths/~1interviews~1{id}~1documents~1{documentId}"},
+    "/inbox":{"$ref":"interview-openapi.json#/paths/~1inbox"},
+    "/inbox/{id}/read":{"$ref":"interview-openapi.json#/paths/~1inbox~1{id}~1read"},
     "/auth/sign-up/email": {
       "post": { "tags": ["Auth"], "operationId": "signupCandidatePassword", "summary": "Candidate-only password signup; verify email before login", "security": [], "description": "Ignores client role. Duplicate signup never overwrites account. Sends verification code; no session. Password 12–128 characters.", "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PasswordSignup" } } } }, "responses": { "200": { "description": "No session", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PasswordSignupResponse" } } } }, "400": { "$ref": "#/components/responses/AuthBadRequest" }, "403": { "$ref": "#/components/responses/AuthForbidden" }, "413": { "$ref": "#/components/responses/BodyTooLarge" }, "429": { "$ref": "#/components/responses/RateLimited" } } }
     },
@@ -277,7 +292,7 @@
         "type": "object", "additionalProperties": false, "required": ["status", "service", "applicationStages"],
         "properties": {
           "status": { "type": "string", "const": "ok" }, "service": { "type": "string", "const": "recruitment-api" },
-          "applicationStages": { "type": "array", "items": { "type": "string", "enum": ["received", "review_ready", "preselected", "interview", "offer", "hired"] } }
+          "applicationStages": { "type": "array", "items": { "type": "string", "enum": ["received", "review_ready", "preselected", "interview", "offer", "hired", "not_selected"] } }
         }
       },
       "DependencyStatus": {

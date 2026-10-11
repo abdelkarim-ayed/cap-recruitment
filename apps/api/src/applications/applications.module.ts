@@ -4,5 +4,5 @@ import { DocumentsModule } from '../documents/documents.module.js';
 import { ApplicationsController } from './application.controller.js';
 import { ApplicationService } from './application.service.js';
 
-@Module({ imports: [DatabaseModule, DocumentsModule], controllers: [ApplicationsController], providers: [ApplicationService] })
+@Module({ imports: [DatabaseModule, DocumentsModule], controllers: [ApplicationsController], providers: [ApplicationService], exports:[ApplicationService] })
 export class ApplicationsModule {}

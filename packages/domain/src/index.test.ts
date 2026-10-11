@@ -10,5 +10,5 @@ test('successful empty extraction remains distinguishable from failure', () => {
   deepEqual(extractionValue({ status: 'completed', value: [], evidence: [] }), []);
 });
 test('repeated interviews are not hardcoded pipeline stages', () => {
-  deepEqual(applicationStages, ['received', 'review_ready', 'preselected', 'interview', 'offer', 'hired']);
+  deepEqual(applicationStages, ['received', 'review_ready', 'preselected', 'interview', 'offer', 'hired', 'not_selected']);
 });

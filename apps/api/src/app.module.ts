@@ -5,8 +5,9 @@ import { VacanciesModule } from './vacancies/vacancies.module.js';
 import { ApplicationsModule } from './applications/applications.module.js';
 import { ProcessingModule } from './processing/processing.module.js';
 import { ReviewModule } from './review/review.module.js';
+import { InterviewModule } from './interviews/interview.module.js';
 
 @Module({
-  imports: [IdentityModule, HealthModule, VacanciesModule, ApplicationsModule, ProcessingModule, ReviewModule],
+  imports: [IdentityModule, HealthModule, VacanciesModule, ApplicationsModule, ProcessingModule, ReviewModule, InterviewModule],
 })
 export class AppModule {}

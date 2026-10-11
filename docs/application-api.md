@@ -1,5 +1,7 @@
 # Applications and documents — implemented checkpoint
 
+Interview extension: generic HR application routes remain interviewer-denied, but assigned scheduled/completed interviewers can access that application's answers/documents through dedicated interview routes. No extraction-review/configuration access. Internal progression now supported via interview-api.md; candidate-facing stage remains Received until publication policy is approved. Answers/files stay immutable.
+
 No extraction tasks in the frozen snapshot: processing remains not_requested, review status starts completed and staff `review.required=false`. It is automatic housekeeping, not approval; stage stays received. Staff list `reviewRequired` indicates whether the full scoped dataset has any extraction tasks. No candidate answer/file changes. See processing-review-api.md.
 
 Manual-feedback refinements: list query adds `processing=pending|not_requested|processing|completed|completed_with_errors`, staff-only `review=pending|in_review|completed`, and `sort=newest|oldest|candidate|position` (default newest). Database applies filters/sort before count/pagination, with ID ties. Candidate review filters return 403. CSV remains unfiltered across the vacancy. React PDF preview reuses authorized attachment bytes, checks PDF signature and uses a session-local PDF blob; no public/inline server route. Non-PDFs download-only. Browser PDF support varies; signature is not malware validation.

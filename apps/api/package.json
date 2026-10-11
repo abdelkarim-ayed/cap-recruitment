@@ -15,6 +15,8 @@
     "applications:check": "node tests/applications-smoke.mjs",
     "processing:run": "node dist/processing/process.js",
     "processing:check": "node tests/applications-smoke.mjs --processing",
+    "interviews:check": "node tests/interviews-smoke.mjs",
+    "inbox:cleanup": "node dist/interviews/cleanup-inbox.js",
     "demo:seed": "node dist/demo/seed.js",
     "demo:process": "node dist/demo/process.js",
     "auth:check": "node tests/auth-smoke.mjs",

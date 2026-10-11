@@ -15,6 +15,7 @@ const {ApplicationPage,ApplicationList}=await import('../src/applications.tsx');
 const {VacancyPage,VacancyList}=await import('../src/vacancies.tsx');
 const {Login}=await import('../src/login.tsx');
 const {PdfPreview}=await import('../src/pdf-preview.tsx');
+const {ScheduleForm,PipelinePage,InterviewPage,Inbox,cancellationText}=await import('../src/interviews.tsx');
 const {makeInput,removeInput,moveInput}=await import('../src/form-model.ts');
 const {createVacancySchema}=await import('@recruitment/domain/vacancies');
 const originalFetch=globalThis.fetch;
@@ -49,6 +50,21 @@ test('candidate validation blocks unknown/required omissions before HTTP and pre
   render(React.createElement(CandidateForm,{vacancy}));fireEvent.submit(document.querySelector('form'));
   await screen.findByRole('alert');equal(calls,0);cleanup();
   render(React.createElement(CandidateForm,{vacancy,preview:true}));ok(screen.getByText('Preview only').disabled);
+});
+test('candidate PDF selection survives answer edits and submits the selected file as multipart',async()=>{
+  const originalFormData=globalThis.FormData;globalThis.FormData=dom.window.FormData;
+  try{
+    let sent;globalThis.fetch=async(path,init)=>{sent={path,init};return json({id:'uploaded-application'});};
+    const user=userEvent.setup({document});
+    render(React.createElement(CandidateForm,{vacancy:{id:'upload-vacancy',form:{version:1,inputs:[{...makeInput('text','name'),label:'Full name',required:true},{...makeInput('document','cv'),label:'Your CV',required:true,args:{accept:['.pdf','.docx']}}]}}}));
+    const input=screen.getByLabelText(/Your CV/);const file=new File(['%PDF-1.7\nSynthetic CV'],'candidate-cv.pdf',{type:'application/pdf'});
+    await user.upload(input,file);equal(input.files.length,1);equal(input.files[0],file);
+    await user.type(screen.getByLabelText(/Full name/),'Candidate');equal(input.files[0],file);
+    // jsdom's native required-file validity does not reflect user-event's FileList.
+    // Exercise the real submit handler; native file-picker behavior remains manually tested.
+    fireEvent.submit(document.querySelector('form'));await waitFor(()=>ok(sent,screen.queryByRole('alert')?.textContent||'Submission handler did not run'));
+    equal(sent.path,'/api/vacancies/upload-vacancy/applications');equal(sent.init.body.get('cv').name,'candidate-cv.pdf');equal(sent.init.body.get('cv').size,file.size);deepEqual(JSON.parse(sent.init.body.get('answers')),{name:'Candidate'});
+  }finally{globalThis.FormData=originalFormData;}
 });
 test('real /me envelope chooses HR navigation and vacancy-filtered application route',async()=>{
   window.location.hash='/applications?vacancy=vacancy-one';const calls=[];
@@ -134,4 +150,29 @@ test('no-extraction application skips review requests/controls but retains files
 test('no-extraction vacancy list hides review filters/columns and never labels candidates reviewed',async()=>{
   globalThis.fetch=async()=>json({items:[{id:'app',vacancyId:'vac',candidate:{name:'Candidate',email:'candidate@example.test'},vacancyTitle:'Backend',submittedAt:'2026-10-10T00:00:00Z',processingState:'not_requested',review:{required:false,status:'completed'}}],total:1,reviewRequired:false});
   render(React.createElement(ApplicationList,{staff:true}));await screen.findByText('candidate@example.test');equal(screen.queryByLabelText('Review status'),null);equal(screen.queryByLabelText('Processing status'),null);equal(screen.queryByText('Extraction review'),null);equal(screen.queryByText('completed'),null);
+});
+test('schedule form offers half-hour local times and submits explicit timezone/assignment',async()=>{
+  let submitted;globalThis.fetch=async()=>json({items:[{id:'interviewer',name:'Engineer',email:'engineer@example.test'}]});
+  const user=userEvent.setup({document});render(React.createElement(ScheduleForm,{steps:[{id:'step',name:'Technical'}],busy:false,onSave:async body=>{submitted=body;}}));
+  await screen.findByText('Engineer · engineer@example.test');equal(screen.getByLabelText(/Start time/).options.length,48);equal(screen.queryByText('09:15'),null);
+  fireEvent.change(screen.getByLabelText('Date'),{target:{value:'2027-01-12'}});await user.selectOptions(screen.getByLabelText('Start time'),'09:30');await user.selectOptions(screen.getByLabelText('Interviewer'),'interviewer');await user.type(screen.getByLabelText('Meeting link or location'),'Room 2');await user.click(screen.getByText('Schedule interview'));
+  await waitFor(()=>ok(submitted));equal(submitted.stepId,'step');equal(submitted.interviewerId,'interviewer');equal(submitted.durationMinutes,60);equal(submitted.timezone,Intl.DateTimeFormat().resolvedOptions().timeZone);equal(new Date(submitted.startsAt).getMinutes(),30);
+});
+test('frozen pipeline shows comparable results and owner contact, without authoring controls',async()=>{
+  globalThis.fetch=async()=>json({owner:{name:'Owner',email:'owner@example.test'},editable:false,frozen:true,revision:2,steps:[{id:'s',name:'Technical',instructions:''}],items:[{id:'a',candidate:{name:'Candidate',email:'candidate@example.test'},stage:'not_selected',interviews:[{id:'i',stepId:'s',outcome:'fail',score:2}]}],total:1});
+  render(React.createElement(PipelinePage,{id:'v'}));await screen.findByText('candidate@example.test');ok(screen.getByText('Score: 2/10'));equal(screen.queryByText('Save interview steps'),null);ok(screen.getByText('owner@example.test'));equal(screen.getByText('owner@example.test').getAttribute('href'),'mailto:owner@example.test');
+});
+test('interview Fail requires explicit confirmation and submits notes/score separate from outcome',async()=>{
+  const calls=[];let done=false;const record=()=>({id:'i',applicationId:'a',stepName:'Technical',candidate:{name:'Candidate',email:'candidate@example.test'},vacancyTitle:'Backend',owner:{name:'Owner',email:'owner@example.test'},interviewer:{id:'engineer',name:'Engineer',email:'engineer@example.test'},startsAt:'2020-01-01T09:00:00Z',durationMinutes:60,meeting:'Room 1',revision:done?2:1,status:done?'completed':'scheduled',canAssess:!done,canSchedule:false,notes:done?'Not enough technical knowledge.':null,score:done?2:null,outcome:done?'fail':null,submittedAt:done?'2026-10-11T09:00:00Z':null});
+  globalThis.fetch=async(path,init)=>{if(path.endsWith('/feedback')){calls.push(JSON.parse(init.body));done=true;return json(record());}if(path.endsWith('/application'))return json({candidate:{email:'candidate@example.test'},vacancy:{formDefinition:{inputs:[]}},answers:{},documents:[]});return json(record());};
+  const user=userEvent.setup({document});render(React.createElement(InterviewPage,{id:'i',actor:{id:'engineer',role:'interviewer'}}));await user.type(await screen.findByLabelText('Notes'),'Not enough technical knowledge.');await user.type(screen.getByLabelText('Score (optional, 0–10)'),'2');await user.selectOptions(screen.getByLabelText('Interview outcome'),'fail');await user.click(screen.getByText('Submit feedback'));equal(calls.length,0);ok(screen.getByText(/Fail ends this application/));await user.click(screen.getByText('Confirm feedback'));await screen.findByText('Submitted feedback');deepEqual(calls,[{notes:'Not enough technical knowledge.',score:2,outcome:'fail',expectedRevision:1}]);equal(screen.queryByText('Submit feedback'),null);
+});
+test('cancelled interview skips candidate document requests and displays its workflow cause',async()=>{
+  const paths=[];globalThis.fetch=async path=>{paths.push(path);return json({stepName:'HR',candidate:{name:'Candidate'},vacancyTitle:'Backend',owner:{name:'Owner',email:'owner@example.test'},interviewer:{id:'engineer',name:'Engineer',email:'engineer@example.test'},status:'cancelled',startsAt:'2026-10-12T09:00:00Z',meeting:'Room',durationMinutes:30,cancellationCause:{type:'interview_failed',stepName:'Technical'},canAssess:false,canSchedule:false});};
+  render(React.createElement(InterviewPage,{id:'i',actor:{id:'engineer',role:'interviewer'}}));await screen.findByText('Cancelled after Fail in Technical.');deepEqual(paths,['/api/interviews/i']);equal(screen.queryByText('Interview feedback'),null);
+  equal(cancellationText({type:'hr_ended_application',reason:'Withdrawn by HR'}),'Application ended by HR: Withdrawn by HR');
+});
+test('inbox opens through recipient-specific read action and supports retained messages',async()=>{
+  const calls=[];globalThis.fetch=async(path,init)=>{calls.push({path,init});if(init?.method==='POST')return json({id:'n',readAt:'2026-10-11T00:00:00Z'});return json({items:[{id:'n',title:'Interview assigned',body:'Technical interview',createdAt:'2026-10-11T00:00:00Z',readAt:null,interviewId:'i'}],total:1});};
+  const user=userEvent.setup({document});render(React.createElement(Inbox));await screen.findByText('Interview assigned');await user.selectOptions(screen.getByLabelText('Messages'),'all');await waitFor(()=>ok(calls.some(c=>c.path.includes('read=all'))));await user.click(screen.getByText('Open interview'));await waitFor(()=>equal(location.hash,'#/interviews/i'));ok(calls.some(c=>c.path==='/api/inbox/n/read'&&c.init.method==='POST'));
 });

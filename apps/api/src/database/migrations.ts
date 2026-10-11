@@ -75,4 +75,45 @@ export const applicationMigrations = [{
   id: '005_no_extraction_review',
   sql: `UPDATE applications SET review_status='completed',review_revision=review_revision+1
     WHERE jsonb_array_length(vacancy_snapshot->'processingDefinition'->'tasks')=0 AND review_status<>'completed';`,
+}, {
+  id: '006_interviews_inbox',
+  sql: `ALTER TABLE applications DROP CONSTRAINT applications_stage_check;
+    ALTER TABLE applications ADD CONSTRAINT applications_stage_check CHECK(stage IN ('received','review_ready','preselected','interview','offer','hired','not_selected'));
+    ALTER TABLE applications ADD COLUMN flow_revision integer NOT NULL DEFAULT 1;
+    ALTER TABLE applications ADD CONSTRAINT applications_id_vacancy_unique UNIQUE(id,vacancy_id);
+    ALTER TABLE vacancies ADD COLUMN interview_revision integer NOT NULL DEFAULT 1;
+    CREATE TABLE interview_steps (
+      id uuid PRIMARY KEY, vacancy_id uuid NOT NULL REFERENCES vacancies(id) ON DELETE RESTRICT,
+      position integer NOT NULL CHECK(position BETWEEN 0 AND 9), name text NOT NULL CHECK(length(name) BETWEEN 1 AND 100), instructions text NOT NULL DEFAULT '',
+      UNIQUE(vacancy_id,position), UNIQUE(id,vacancy_id)
+    );
+    CREATE TABLE interviews (
+      id uuid PRIMARY KEY, vacancy_id uuid NOT NULL, application_id uuid NOT NULL, step_id uuid NOT NULL,
+      interviewer_id text NOT NULL REFERENCES "user"(id) ON DELETE RESTRICT,
+      created_by text NOT NULL REFERENCES "user"(id) ON DELETE RESTRICT,
+      updated_by text NOT NULL REFERENCES "user"(id) ON DELETE RESTRICT,
+      revision integer NOT NULL DEFAULT 1,
+      starts_at timestamptz NOT NULL, duration_minutes integer NOT NULL CHECK(duration_minutes IN (30,60,90,120)),
+      timezone text NOT NULL, meeting text NOT NULL CHECK(length(meeting) BETWEEN 1 AND 1000),
+      status text NOT NULL DEFAULT 'scheduled' CHECK(status IN ('scheduled','completed','cancelled')),
+      notes text, score integer CHECK(score BETWEEN 0 AND 10), outcome text CHECK(outcome IN ('pass','fail')), submitted_at timestamptz,
+      cancellation_cause jsonb, change_cause jsonb NOT NULL, scheduling_issue text, issue_at timestamptz,
+      created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now(),
+      UNIQUE(application_id,step_id),
+      FOREIGN KEY(application_id,vacancy_id) REFERENCES applications(id,vacancy_id) ON DELETE RESTRICT,
+      FOREIGN KEY(step_id,vacancy_id) REFERENCES interview_steps(id,vacancy_id) ON DELETE RESTRICT,
+      CHECK((status='completed' AND outcome IS NOT NULL AND notes IS NOT NULL AND submitted_at IS NOT NULL) OR (status<>'completed' AND outcome IS NULL AND submitted_at IS NULL)),
+      CHECK((status='cancelled') = (cancellation_cause IS NOT NULL))
+    );
+    CREATE INDEX interviews_agenda ON interviews(interviewer_id,starts_at,id);
+    CREATE INDEX interviews_application ON interviews(application_id);
+    CREATE TABLE inbox_notifications (
+      id uuid PRIMARY KEY, recipient_id text NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      interview_id uuid NOT NULL REFERENCES interviews(id) ON DELETE RESTRICT,
+      kind text NOT NULL CHECK(kind IN ('assigned','rescheduled','cancelled','scheduling_issue','feedback')),
+      title text NOT NULL, body text NOT NULL, cause jsonb NOT NULL,
+      created_at timestamptz NOT NULL DEFAULT now(), read_at timestamptz
+    );
+    CREATE INDEX inbox_recipient ON inbox_notifications(recipient_id,created_at DESC,id);
+    CREATE INDEX inbox_retention ON inbox_notifications(read_at) WHERE read_at IS NOT NULL;`,
 }] as const;
