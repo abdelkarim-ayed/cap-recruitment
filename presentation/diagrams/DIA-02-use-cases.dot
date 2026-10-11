@@ -1,0 +1,34 @@
+// UML use-case diagram. Rectangular actor notation with explicit stereotype.
+digraph UseCases {
+  graph [rankdir=TB, bgcolor="transparent", pad=0.2, nodesep=0.55, ranksep=0.55, splines=polyline, fontname="Liberation Sans", fontsize=18];
+  node [fontname="Liberation Sans", fontsize=18, color="#0f766e", fontcolor="#172b4d", penwidth=1.4, style=filled, fillcolor="#f0f7f6", margin="0.2,0.12"];
+  edge [dir=none, color="#64748b", penwidth=1.3];
+  candidate [shape=box, fillcolor="white", label="« acteur »\nCandidat"];
+  hr [shape=box, fillcolor="white", label="« acteur »\nRH / administrateur"];
+  interviewer [shape=box, fillcolor="white", label="« acteur »\nInterviewer assigné"];
+  {rank=same; candidate; hr; interviewer;}
+  candidate -> hr -> interviewer [style=invis];
+  subgraph cluster_cap {
+    label="CAP · Recrutement"; labeljust=l; color="#cbd5e1"; style=rounded; margin=22;
+    node [shape=ellipse];
+    deposit [label="Déposer et consulter\nses candidatures"];
+    review [label="Examiner, corriger\net exporter les dossiers"];
+    feedback [label="Évaluer son entretien\n{assignation requise}"];
+    configure [label="Configurer l’offre\net son parcours\n{propriétaire}"];
+    schedule [label="Présélectionner et\nplanifier les entretiens"];
+    decision [label="Enregistrer Offer/Hired\n{propriétaire}"];
+    {rank=same; deposit; review; feedback;}
+    {rank=same; configure; schedule; decision;}
+    deposit -> review -> feedback [style=invis];
+    configure -> schedule -> decision [style=invis];
+    deposit -> configure [style=invis];
+    review -> schedule [style=invis];
+    feedback -> decision [style=invis];
+  }
+  candidate -> deposit;
+  hr -> review;
+  hr -> configure;
+  hr -> schedule;
+  hr -> decision;
+  interviewer -> feedback;
+}

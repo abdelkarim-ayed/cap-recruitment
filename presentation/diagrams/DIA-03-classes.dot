@@ -1,0 +1,19 @@
+graph Classes {
+graph [rankdir=LR, bgcolor="transparent", pad=0.22, nodesep=0.45, ranksep=0.8, fontname="Liberation Sans"];
+node [fontname="Liberation Sans", fontsize=18, color="#0f766e", fontcolor="#172b4d", penwidth=1.3];
+edge [fontname="Liberation Sans", fontsize=14, color="#64748b", fontcolor="#475569", penwidth=1.2];
+Offre [shape=plain, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="12" COLOR="#0f766e"><TR><TD BGCOLOR="#e0f2f1"><B>Offre</B></TD></TR><HR/><TR><TD ALIGN="LEFT">titre, statut<BR ALIGN="LEFT"/>formulaire, traitement</TD></TR></TABLE>>];
+Candidature [shape=plain, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="12" COLOR="#0f766e"><TR><TD BGCOLOR="#e0f2f1"><B>Candidature</B></TD></TR><HR/><TR><TD ALIGN="LEFT">réponses figées<BR ALIGN="LEFT"/>progression interne</TD></TR></TABLE>>];
+Document [shape=plain, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="12" COLOR="#0f766e"><TR><TD BGCOLOR="#e0f2f1"><B>Document</B></TD></TR><HR/><TR><TD ALIGN="LEFT">fichier privé<BR ALIGN="LEFT"/>empreinte du contenu</TD></TR></TABLE>>];
+Tache [shape=plain, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="12" COLOR="#0f766e"><TR><TD BGCOLOR="#e0f2f1"><B>TâcheExtraction</B></TD></TR><HR/><TR><TD ALIGN="LEFT">source, paramètres<BR ALIGN="LEFT"/>état, résultat original</TD></TR></TABLE>>];
+Correction [shape=plain, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="12" COLOR="#0f766e"><TR><TD BGCOLOR="#e0f2f1"><B>CorrectionRH</B></TD></TR><HR/><TR><TD ALIGN="LEFT">valeur, auteur, date</TD></TR></TABLE>>];
+Etape [shape=plain, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="12" COLOR="#0f766e"><TR><TD BGCOLOR="#e0f2f1"><B>ÉtapeEntretien</B></TD></TR><HR/><TR><TD ALIGN="LEFT">ordre, consignes</TD></TR></TABLE>>];
+Entretien [shape=plain, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="12" COLOR="#0f766e"><TR><TD BGCOLOR="#e0f2f1"><B>Entretien</B></TD></TR><HR/><TR><TD ALIGN="LEFT">date, interviewer<BR ALIGN="LEFT"/>notes, score, Pass/Fail</TD></TR></TABLE>>];
+Offre -- Candidature [taillabel="1", headlabel="0..*", labeldistance=2, labelangle=25];
+Offre -- Etape [taillabel="1", headlabel="0..*", labeldistance=2, labelangle=25];
+Candidature -- Document [taillabel="1", headlabel="0..*", labeldistance=2, labelangle=25];
+Candidature -- Tache [taillabel="1", headlabel="0..*", labeldistance=2, labelangle=25];
+Tache -- Correction [taillabel="1", headlabel="0..1", labeldistance=2, labelangle=25];
+Candidature -- Entretien [taillabel="1", headlabel="0..*", labeldistance=2, labelangle=25];
+Etape -- Entretien [taillabel="1", headlabel="0..*", labeldistance=2, labelangle=25];
+}

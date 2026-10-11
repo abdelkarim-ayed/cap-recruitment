@@ -1,0 +1,46 @@
+%% Generated from models.mjs; conceptual UML, selected relationships only.
+classDiagram
+direction LR
+class Offre["Offre"] {
+  titre
+  statut
+  formulaire
+  traitement
+}
+class Candidature["Candidature"] {
+  reponsesFigees
+  progressionInterne
+}
+class Document["Document"] {
+  fichierPrive
+  empreinte
+}
+class Tache["TâcheExtraction"] {
+  source
+  parametres
+  etat
+  resultatOriginal
+}
+class Correction["CorrectionRH"] {
+  valeur
+  auteur
+  date
+}
+class Etape["ÉtapeEntretien"] {
+  ordre
+  consignes
+}
+class Entretien["Entretien"] {
+  date
+  interviewer
+  notes
+  score
+  passFail
+}
+Offre "1" -- "0..*" Candidature
+Offre "1" -- "0..*" Etape
+Candidature "1" -- "0..*" Document
+Candidature "1" -- "0..*" Tache
+Tache "1" -- "0..1" Correction
+Candidature "1" -- "0..*" Entretien
+Etape "1" -- "0..*" Entretien

@@ -1,0 +1,19 @@
+%% Generated from models.mjs. Dashed links denote future integration.
+flowchart LR
+  Web["Interface web<br/>React / Vite"]
+  Api["API métier<br/>NestJS / TypeScript"]
+  Db["PostgreSQL<br/>données persistantes"]
+  Files["Documents privés<br/>stockage local"]
+  Mail["Port mail<br/>adaptateur remplaçable"]
+  Extraction["Ports extraction<br/>lecteur + exécuteur"]
+  Fixtures["Fixtures locales<br/>exécution explicite"]
+  Live["Lecture PDF/DOCX + IA<br/>à intégrer"]
+  Web -->|HTTP / JSON| Api
+  Api --> Db
+  Api --> Files
+  Api --> Mail
+  Api --> Extraction
+  Extraction -->|actuel| Fixtures
+  Extraction -.->|extension| Live
+  classDef future fill:#fff8eb,stroke:#b7791f,stroke-dasharray:5 5
+  class Live future

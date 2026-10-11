@@ -1,34 +1,37 @@
-# Progress-meeting presentation workspace
+# Présentation d’avancement
 
-Separate development tooling, not part of the recruitment app/runtime. No presentation structure/content approved yet; current deck/PDF is a **tooling placeholder only**.
+## Version courante
 
-- [brief.md](brief.md): purpose, constraints and pending inputs.
-- [plan.md](plan.md): agreed review gates and current state.
-- [notes.md](notes.md): empty point-only pre-draft, awaiting reference/structure.
-- `deck/`: Reveal.js browser presentation; Mermaid available for approved diagrams.
-- `pdf/`: Typst PDF source. Choose one final deck source before drafting; these are alternatives, not two independently maintained presentations.
-- `diagrams/`: named `.mmd` diagram sources, once approved.
-- `assets/images/`: user-supplied/generated visuals; catalogue in `assets/manifest.json`.
-- `dist/`: ignored generated HTML/PDF/SVG outputs.
+**PDF : `presentation/dist/status.pdf`**. 36 pages : 30 contenus et six intercalaires. Script français révisé, couverture **CAP** (nom proposé), trois diagrammes rendus et six images utilisateur intégrées : illustration p. 3, captures p. 20/21/22/25/27. Images déplacées depuis Downloads, sans recadrage ni déformation ; captures affichées dans une colonne élargie, ajustées en largeur/hauteur selon leurs proportions. Auteur/encadrant/organisme/date renseignés ; établissement/formation reste à compléter. Aucun bandeau « draft/provisoire » sur les slides.
 
-## Tooling
-From project root:
+- [draft.md](draft.md) : texte et notes orales actuels.
+- [metadata.json](metadata.json) : nom, sous-titre, auteur, encadrement, établissement, organisme et date.
+- [assets/requests.md](assets/requests.md) : visuels reçus, noms de fichiers, pages et prompt externe initial.
+- [assets/manifest.json](assets/manifest.json) : provenance et état des visuels.
+- [diagrams/README.md](diagrams/README.md) : sources Mermaid/DOT et rendu.
+- [notes.md](notes.md) : sources et ancien découpage, remplacé par draft.md.
+- [brief.md](brief.md), [plan.md](plan.md), [style-notes.md](style-notes.md) : contraintes, validation et direction visuelle.
+
+## Construction
+
+Depuis la racine :
 ```sh
-pnpm --filter @recruitment/presentation deck:dev
-pnpm --filter @recruitment/presentation deck:build
-pnpm --filter @recruitment/presentation diagram:check
 pnpm --filter @recruitment/presentation pdf:build
+pnpm --filter @recruitment/presentation diagram:check
 ```
-Reveal preview: **http://localhost:5174**, separate from app port 5173. Start in named RMUX `presentation` tab when preview is requested. Vite host is loopback; no app process changes. Tool scripts deliberately avoid generic build/dev/test names so normal application workspace commands do not start/build the presentation.
 
-Typst uses the local official compiler at `.local/tools/typst-0.15.1/typst`, or `TYPST_BIN`/an existing PATH installation. No global install/config. The wrapper restricts the default compilation root to this presentation folder. No Typst-specific agent skill is currently available.
-Installed from [official Typst v0.15.1 release](https://github.com/typst/typst/releases/tag/v0.15.1), Linux x86_64 musl archive. Binary is ignored under .local; a fresh checkout needs that compiler installed again. Reveal.js 6.0.2, Mermaid 12.1.0 and jsdom 30.1.2 are pinned dev tools; jsdom supports syntax checks without browser automation. Vite reuses the existing workspace tool version.
+La construction lit draft.md, insère les intercalaires, écrit `dist/reading-slides.json` et `dist/page-map.md`, produit les SVG puis compile Typst. Les images retournées dans `assets/images/` sous les noms attendus remplacent automatiquement les emplacements vides à la construction suivante. Notes orales conservées dans le script/JSON, sources courtes dans les pieds de page concernés.
 
-Setup verified: frozen pnpm install, deck build, Mermaid syntax self-check and Typst compilation to `presentation/dist/status.pdf`. This PDF/deck contains only the setup placeholder—not a status presentation. Reveal build emits a large-diagram-chunk warning; Mermaid is lazy-loaded only when a diagram exists. Browser layout/print output remains unverified. No presentation server was started; existing app/retention tabs were left untouched.
+`pdf/main.typ` est le rendu actif. Typst officiel **0.15.1** installé localement dans `.local/tools/typst-0.15.1/typst`, ou `TYPST_BIN`/PATH ; aucun réglage global. Racine de compilation limitée à presentation par la commande. Un nouveau checkout doit réinstaller le [compilateur officiel](https://github.com/typst/typst/releases/tag/v0.15.1).
 
-Reveal PDF alternative: open `http://localhost:5174/?print-pdf`, then browser Print → Save as PDF, landscape/no headers/footers. Check page sizing and fonts manually. No browser automation or browser rendering verification performed during setup. Typst produces PDF directly without a browser.
+Les diagrammes de classes/architecture ont une source commune `diagrams/models.mjs`, qui produit Mermaid et DOT. Les cas d’utilisation UML sont définis directement en DOT. SVG rendus par **@viz-js/viz 3.31.0** (Graphviz/WASM), sans navigateur ni installation système ; Mermaid **12.1.0** vérifie les `.mmd`, avec jsdom **30.1.2**. Tout est une dépendance de développement de ce workspace.
 
-## Working agreement
-References → proposed structure → point-only notes → user feedback → prose draft → iterations/image placeholders → diagram sources + bulk image prompts → returned assets → formatted deck/PDF → review/final export. Do not skip content approval because tooling is ready. See plan.md.
+PDF vérifié : compilation, 36 pages, syntaxe Mermaid et inspection de pages rasterisées représentatives (couverture, tableaux, diagrammes, sections, texte). Sorties PDF/SVG/PNG sous `dist/`, ignorées. Données et services de l’application inchangés.
 
-Technical facts come from project docs/tests. Keep mock/live, implemented/planned and verified/unverified distinct. Never publish secrets, captured codes, cookies, real applicant data or the ignored root briefing. Before tracking any user reference/image, check whether it is sensitive; private material stays under `docs/.ignore/private/` and is not published.
+## Reveal.js disponible
+
+Reveal.js **6.0.2** et Vite sont installés ; `deck/` reste le placeholder initial, sans second draft à maintenir. `deck:dev` sert sur `http://localhost:5174`, `deck:build` compile le placeholder. Aucun serveur de présentation ni navigateur lancé. Si prévisualisation web demandée, utiliser un onglet RMUX nommé `presentation`, selon docs/rmux.md.
+
+## Relecture
+
+Structure → points → draft → retours → visuels → assemblage → relecture finale. L’utilisateur a autorisé l’assemblage et les diagrammes pour faciliter la lecture ; cela ne vaut pas approbation finale du texte. En attente : retours sur le contenu/cadrage et établissement/formation. Ne pas convertir une proposition en décision métier, ni une fixture en résultat IA réel. Sources techniques dans docs/ ; contextes sensibles et données réelles restent hors des artefacts publiables.

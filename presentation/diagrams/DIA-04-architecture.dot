@@ -1,0 +1,21 @@
+digraph Architecture {
+graph [rankdir=LR, bgcolor="transparent", pad=0.22, nodesep=0.45, ranksep=0.8, fontname="Liberation Sans"];
+node [fontname="Liberation Sans", fontsize=18, color="#0f766e", fontcolor="#172b4d", penwidth=1.3];
+edge [fontname="Liberation Sans", fontsize=14, color="#64748b", fontcolor="#475569", penwidth=1.2];
+node [shape=box, style="rounded,filled", fillcolor="#f0f7f6", margin="0.22,0.17"];
+Web [label="Interface web\nReact / Vite"];
+Api [label="API métier\nNestJS / TypeScript"];
+Db [label="PostgreSQL\ndonnées persistantes", shape=cylinder];
+Files [label="Documents privés\nstockage local"];
+Mail [label="Port mail\nadaptateur remplaçable"];
+Extraction [label="Ports extraction\nlecteur + exécuteur"];
+Fixtures [label="Fixtures locales\nexécution explicite"];
+Live [label="Lecture PDF/DOCX + IA\nà intégrer", style="rounded,dashed,filled", fillcolor="#fff8eb", color="#b7791f"];
+Web -> Api [label="HTTP / JSON"];
+Api -> Db [label=""];
+Api -> Files [label=""];
+Api -> Mail [label=""];
+Api -> Extraction [label=""];
+Extraction -> Fixtures [label="actuel"];
+Extraction -> Live [label="extension", style=dashed, color="#b7791f"];
+}
