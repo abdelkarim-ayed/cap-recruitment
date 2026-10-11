@@ -83,7 +83,8 @@ try {
   await database.query("UPDATE interviews SET starts_at=date_trunc('hour',now())-interval '2 hours' WHERE id=$1",[i.id]);
   const failure=await call(`interviews/${i.id}/feedback`,other,feedback(i.revision,'fail'));equal(failure.status,201);
   const ended=(await call(`applications/${a.id}/interviews`,owner)).body;equal(ended.stage,'not_selected');equal(ended.interviews[0].outcome,'fail');equal(ended.interviews[0].score,8);equal(ended.interviews[1].status,'cancelled');equal(ended.interviews[1].cancellationCause.type,'interview_failed');equal(ended.interviews[1].cancellationCause.interviewId,i.id);
-  equal((await call(`interviews/${second.body.id}/feedback`,interviewer,feedback(1))).status,409);
+  equal((await call(`interviews/${second.body.id}/feedback`,interviewer,feedback(1))).status,409,'A Pass must not be accepted after another interview fails');
+  const blockedPass=(await call(`interviews/${second.body.id}`,owner)).body;equal(blockedPass.status,'cancelled');equal(blockedPass.outcome,null);equal(blockedPass.notes,null);equal(blockedPass.score,null);
   equal((await call(`applications/${a.id}/stage`,owner,{expectedRevision:ended.revision,stage:'preselected'})).status,409);
   equal((await call(`interviews/${i.id}/feedback`,other,feedback(failure.body.revision))).status,409);
   equal((await call(`interviews/${second.body.id}/application`,interviewer)).status,404);

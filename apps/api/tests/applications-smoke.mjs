@@ -153,12 +153,14 @@ try {
     ok(corrected.body.review.updatedAt);equal(corrected.body.review.editor.id,admin.id);equal(correctedTask.corrector.id,admin.id);
     const savedAgain=await json(`applications/${application.id}/review`,undefined,recruiter.cookie);deepEqual(savedAgain.body.tasks.find(task=>task.taskId==='extra').effectiveValue,{skills:['Rust']});
     const filtered=await json(`vacancies/${id}/applications?review=in_review&processing=completed_with_errors&sort=candidate&limit=1`,undefined,recruiter.cookie);equal(filtered.status,200);equal(filtered.body.total,1);equal(filtered.body.items[0].id,application.id);
+    equal(filtered.body.items[0].review.hasCorrections,true);equal(filtered.body.items[0].processingState,'completed_with_errors');
     const hidden=await json(`vacancies/${id}/applications?review=completed`,undefined,recruiter.cookie);equal(hidden.status,200);ok(!hidden.body.items.some(item=>item.id===application.id));
     equal((await json('applications?sort=invalid',undefined,recruiter.cookie)).status,400);
     equal((await json('applications?review=in_review',undefined,candidate.cookie)).status,403);
     equal((await patch(candidate,{expectedRevision:corrected.body.review.revision,status:'completed'})).status,403);
     csv=await fetch(`${base}/api/vacancies/${id}/export`,{headers:{Cookie:admin.cookie}}); exported=await csv.text(); ok(exported.includes('Rust')); ok(exported.includes('fixture-extra')); ok(exported.includes('failed'));
     const removed=await patch(recruiter,{expectedRevision:corrected.body.review.revision,corrections:[{taskId:'extra',value:null,remove:true}]}); equal(removed.status,200); equal(removed.body.tasks.find(task=>task.taskId==='extra').hasCorrection,false);
+    const noCorrections=await json(`vacancies/${id}/applications`,undefined,recruiter.cookie);equal(noCorrections.body.items.find(item=>item.id===application.id).review.hasCorrections,false);
     const edits = await Promise.all([patch(recruiter,{expectedRevision:removed.body.review.revision,status:'pending'}),patch(admin,{expectedRevision:removed.body.review.revision,status:'completed'})]);
     deepEqual(edits.map(edit=>edit.status).sort(),[200,409]);
     const untrusted = await fetch(`${base}/api/applications/${application.id}/review`,{method:'PATCH',headers:{Cookie:admin.cookie,Origin:'https://untrusted.example','Content-Type':'application/json'},body:JSON.stringify({expectedRevision:1,status:'completed'})}); equal(untrusted.status,403);

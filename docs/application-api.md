@@ -1,6 +1,7 @@
 # Applications and documents — implemented checkpoint
 
 Interview extension: generic HR application routes remain interviewer-denied, but assigned scheduled/completed interviewers can access that application's answers/documents through dedicated interview routes. No extraction-review/configuration access. Internal progression now supported via interview-api.md; candidate-facing stage remains Received until publication policy is approved. Answers/files stay immutable.
+Staff list review metadata adds `hasCorrections`: whether any separate correction exists (including explicit null), not whether all failed fields are repaired. Original processing_state stays unchanged. UI separates Original extraction, HR review and saved corrections; correction availability survives refresh and removal clears the indicator. No extraction state rewrite/retry implied.
 
 No extraction tasks in the frozen snapshot: processing remains not_requested, review status starts completed and staff `review.required=false`. It is automatic housekeeping, not approval; stage stays received. Staff list `reviewRequired` indicates whether the full scoped dataset has any extraction tasks. No candidate answer/file changes. See processing-review-api.md.
 
