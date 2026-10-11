@@ -26,6 +26,7 @@ Implementation is authorized. Start with the agreed scenarios; do not expand int
 - No extraction tasks means no extraction-review workload: marker auto-completes, required=false, controls hidden; not candidate approval/stage change. Keep product UI concise; operator/demo instructions in docs, but actual fixture results must stay labelled.
 - `docs/vacancy-form.md`: form and screening direction; bounded first model awaiting approval.
 - `docs/form-tooling.md`: researched builder/renderer shortlist, not integration-tested.
+- `presentation/README.md`, `presentation/brief.md`, `presentation/plan.md`: approved presentation workspace and review gates. Tooling ready; await user example/structure before point-only notes, then approved draft/visuals/assembly. Reveal/Mermaid are presentation-only dev deps; local Typst compiler, no available Typst skill. Keep generated assets identifiable and project claims evidence-based.
 
 Keep these documents current when the user approves or changes a decision. Do not treat assistant proposals as approvals. Keep documentation concise; link rather than duplicate.
 
@@ -39,6 +40,6 @@ Keep these documents current when the user approves or changes a decision. Do no
 - Put disposable drafts in `docs/.ignore/tmp/`; sensitive working context in `docs/.ignore/private/`. Neutral technical documentation belongs in tracked `docs/`.
 - Mock AI results must be identifiable as fixtures, never presented as live model output. Do not invent evaluation results.
 - Use the existing mail/extraction ports and shared DatabaseService rather than embedding SDK/protocol setup in feature services. Keep SMTP/provider tests separate from local fixtures; development capture/AI fixtures are forbidden in production mode.
-- Local checkpoint commits on `main` are authorized. Do not backdate commits or create/push a remote. Presentation preparation remains deferred.
+- Local checkpoint commits on `main` are authorized. Do not backdate commits or create/push a remote. Presentation preparation now authorized in `presentation/`, following its review gates; optional later report-support decision log only if time/user approval permits.
 
 Application foundation is being implemented; see `docs/status.md` for verification. The disposable domain form spike remains in `docs/.ignore/tmp/form-spike/` and previously passed seven DOM/schema tests. Ginkgo was tested initially but removed. The root briefing remains unchanged and ignored because it contains sensitive context.

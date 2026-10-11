@@ -1,5 +1,7 @@
 # Implementation status
 
+Presentation tooling now prepared separately in [../presentation/README.md](../presentation/README.md): own brief/review plan/empty point notes, Reveal/Mermaid dev tools, local Typst 0.15.1. Placeholder deck/PDF compile and diagram syntax/frozen install checks pass; no presentation narrative or visual assets approved yet. Await user reference/structure; application processes/data unchanged.
+
 ## Current unit: interview pipeline / agenda / internal decisions / inbox
 Latest feedback UX patch: standalone Mark as read + topbar inbox shortcut, unread contrast/icons, related-entity links scoped by role, status chips separated from actions, explicit owner-capability hints. Staff table adds recruitment stage and `review.hasCorrections`; original extraction errors remain recorded while corrections/review are clearly separate. Candidate screens omit internal extraction controls/chips and label submission receipt, not unpublished hiring progress. No new recipients/publication/CSV import or business-state changes. Deferred feedback items in backlog.md.
 UX patch verified: 66 ordinary tests (26 DOM), build/typecheck, real processing:check and interviews:check. List correction indicator/removal and unchanged original failure tested; a later Pass after Fail returns 409 and leaves cancelled interview notes/score/outcome empty. Concurrent failures and overlap tests still pass. No time restriction relaxed or manual records mutated by tests.

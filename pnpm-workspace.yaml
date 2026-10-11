@@ -1,5 +1,6 @@
 packages:
   - apps/*
   - packages/*
+  - presentation
 allowBuilds:
   esbuild: true
