@@ -29,6 +29,7 @@ Open `http://localhost:5173`. API binds to localhost 3000; web proxies `/api`. F
 The scripts use `podman compose`, preferring the newer `.local/bin/podman-compose` provider when available. Every infrastructure service explicitly uses **host networking** and binds to localhost: PostgreSQL `55437`, Redis `56379`, SMTP `51025`, Mailpit HTTP `58025`. No `ports:` mappings or service-name DNS. The API uses localhost too. This is an LXC development workaround with reduced network isolation, not a complete production deployment.
 
 See [networking decision and verification](docs/local-networking.md). Do not switch back to bridge/pasta as part of unrelated development.
+For a Windows client/development PC, see [portability notes](docs/windows-compatibility.md): VM networking, PowerShell examples, test temp paths and optional Typst/RenderCV setup; Windows has not been runtime-tested.
 
 Local settings: copy `.env.example` to `.env` and set a randomly generated BETTER_AUTH_SECRET of at least 32 characters. This workspace already has a generated ignored local secret. Default database/Redis values work with the development compose stack. Compose uses local-only service ports and disposable development credentials, not deployment credentials. No real candidate data belongs in this setup yet.
 
