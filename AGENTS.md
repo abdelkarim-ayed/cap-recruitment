@@ -30,6 +30,8 @@ Implementation is authorized. Start with the agreed scenarios; do not expand int
 
 Keep these documents current when the user approves or changes a decision. Do not treat assistant proposals as approvals. Keep documentation concise; link rather than duplicate.
 
+Presentation export update: the shared, tracked PDF is now `presentation/exports/status.pdf`, rebuilt by `pdf:build`; prior `dist/status.pdf` references describe the earlier local-only workflow. Keep all intermediate SVG/JSON/PNG outputs in ignored `dist/`, never publish the whole directory. For token-efficient visual checks, rasterize only selected pages at low resolution (e.g. `--pages 20,21 --ppi 70`) when necessary; do not export/read every slide preview routinely.
+
 ## Working preferences
 - Prefer normal shell execution for routine commands. Use RMUX mainly for persistent processes, later monitoring, or terminals the user should inspect; follow `docs/rmux.md`. Prefer named tabs/windows (no splits), identify target/action before input, and leave dev processes alive. No pane snapshots (token-heavy): use bounded plain-text capture/health checks or ask for pasted output. May clear unrelated RMUX tab scrollback when useful for focused debugging; never clear Bash/shell command history or discard relevant diagnostics. No Ctrl-C, termination, session reset or cleanup without approval, except managing agent-launched dev processes as authorized.
 - Use checkpoints, not fixed day-by-day implementation schedules.

@@ -1,8 +1,12 @@
 # Présentation d’avancement
 
+**[Ouvrir le PDF partagé](exports/status.pdf)** — seul export binaire publié. `pdf:build` actualise désormais `exports/status.pdf` (suivi par Git) ; `dist/` reste ignoré pour les intermédiaires, SVG de rendu et aperçus PNG. L’ancien `dist/status.pdf` peut subsister localement mais n’est plus la référence. Après modification, reconstruire et committer le PDF avec ses sources.
+
+Contrôle visuel : privilégier la compilation PDF ; rasteriser uniquement les pages à examiner, à basse résolution (par exemple `--pages 20,21 --ppi 70`), jamais systématiquement les 36 pages. Ne lire que les aperçus nécessaires.
+
 ## Version courante
 
-**PDF : `presentation/dist/status.pdf`**. 36 pages : 30 contenus et six intercalaires. Script français révisé, couverture **CAP** (nom proposé), trois diagrammes rendus et six images utilisateur intégrées : illustration p. 3, captures p. 20/21/22/25/27. Images déplacées depuis Downloads, sans recadrage ni déformation ; captures affichées dans une colonne élargie, ajustées en largeur/hauteur selon leurs proportions. Auteur/encadrant/organisme/date renseignés ; établissement/formation reste à compléter. Aucun bandeau « draft/provisoire » sur les slides.
+**PDF : [`exports/status.pdf`](exports/status.pdf)**. 36 pages : 30 contenus et six intercalaires. Couverture CAP (nom proposé), trois diagrammes et six images utilisateur intégrées sans recadrage. Auteur/encadrant/organisme/date renseignés ; établissement/formation reste à compléter. Contenu et cadrage soumis à relecture.
 
 - [draft.md](draft.md) : texte et notes orales actuels.
 - [metadata.json](metadata.json) : nom, sous-titre, auteur, encadrement, établissement, organisme et date.

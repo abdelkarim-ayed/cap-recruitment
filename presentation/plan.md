@@ -1,6 +1,7 @@
 # Presentation review plan
 
 ## Current state
+Shared PDF now tracked at `exports/status.pdf`; `pdf:build` updates it. Old `dist/status.pdf` references below are historical. Intermediate outputs/PNG previews stay ignored; inspect only selected low-resolution pages when needed.
 Revised French script and PDF ready for review: 30 contents + six section dividers = 36 pages. Nominal titles, explicit requirements, Textkernel in the existing-solutions review, prose backlog and direct conclusion. Three diagrams coded/rendered: UML use cases, conceptual classes and architecture, with Mermaid/DOT sources and Graphviz/WASM SVG rendering. Six user-provided images integrated on pages 3/20/21/22/25/27 with no crop; dense portrait captures may need user-directed framing adjustments. Proposed CAP name and content/visual approval remain pending. Cover values provided except institution/program; methodology label/context/duration still to confirm. Reveal remains a tooling placeholder. Earlier outlines are historical; draft.md is authoritative. Obsolete repeated-image placeholder archived under ignored docs/.ignore/tmp/presentation/.
 
 ## Checkpoints

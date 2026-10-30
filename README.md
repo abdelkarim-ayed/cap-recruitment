@@ -31,3 +31,4 @@ Checks: `pnpm test` and `pnpm typecheck`. Infrastructure connectivity: `pnpm inf
 - [Integration testing](docs/integration-testing.md)
 - [Backlog](docs/backlog.md)
 - [Presentation sources and PDF build](presentation/README.md)
+- [Presentation PDF](presentation/exports/status.pdf)
