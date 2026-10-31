@@ -1,20 +1,21 @@
 # Architecture and consistency checkpoints
 
-Read this before the next feature batch. **Current classes are implemented; future feature classes, fields, and events below are proposals, not new product-policy approvals.** One NestJS application, one PostgreSQL database, plain pnpm workspaces. No microservices, generic event framework, or extra infrastructure.
+This file mixes a foundation snapshot and architectural proposals; it is **not an exhaustive current component inventory**. Use [README.md](README.md) and the feature API contracts first. The latest changeability concerns/review scenarios are preserved in [product-checkpoint.md](product-checkpoint.md); no architectural rewrite has been selected. One NestJS application, one PostgreSQL database, plain pnpm workspaces. No microservices or generic event framework.
 
 ## Progress toward the product
-Identity, vacancy authoring, locked intake/private documents, optional mock extraction review and CSV have integrated React screens. Historical spike remains disposable. DOM tests and real API/Vite-proxy checks passed; manual browser journey validation remains for the user. Interviews/selection/live AI deferred.
+Identity, generic vacancy/form authoring, locked intake/private documents, review/CSV, manual preselection, interviews/internal decisions and inbox have integrated React screens. Branch PDF preparation and guarded experimental Jev execution are described separately in jev-gateway-handoff.md; no live provider quality is verified. Manual browser journeys and reported inbox problems remain to review.
 
 | Capability | Current evidence | Still missing |
 | --- | --- | --- |
-| Email-code access | Real OTP, cookie sessions, roles; SMTP and captured-mail checks | Production delivery and staff-management UI/API |
-| Vacancy authoring | Persisted draft/publish/close, strict definitions, owner checks and public projections; accepted isolated editor | Integrated graphical editor, extra presets |
-| Applications | Locked intake/private documents, mock processing/recovery, optional review/export | Live AI/parser, progression and integrated UI |
-| Assisted review | Extraction result union; disabled/labelled fixture adapter | Document parsing, live extractors, durable processing, review, CSV |
-| Interviews/decisions | Agreed stage/authority direction | Scheduling, assignments, notes, owner decisions |
+| Account access | Password UI, one-time verification/reset codes, cookie sessions/roles; legacy OTP checks | Production delivery and staff-management UI/API |
+| Vacancy authoring | Draft/publish/close, strict definitions, owner checks, generic graphical editor and public projections | Rich presets, clone flow, requested publish-time pipeline gate |
+| Applications | Locked intake/private documents, persisted CLI processing/recovery, review/export, internal progression | Continuous extraction runner, bulk selection and external decision import |
+| Assisted review | Separate corrections/results/evidence and CSV; branch real PDF reader and guarded candidate executor | Selected/live-validated extraction method and richer evidence anchors |
+| Interviews/decisions | Pipeline, scheduling/assignee, final notes/Pass-Fail, owner decisions, internal inbox | Panel policy, user-reported inbox fixes and broader workflow clarity |
 | Candidate updates/metrics | Proposed boundaries | Explicit publication/sending, database-derived reports |
 
-## Current component map
+## Historical foundation component map (partial)
+This map omits application/processing/review/interview modules and JevGateway; omission does not mean they are unimplemented. Do not extend its legacy ExtractionProvider seam as though it were the current application executor.
 ```mermaid
 flowchart TD
   App[AppModule] --> Identity[IdentityModule]
@@ -39,13 +40,14 @@ flowchart TD
 | --- | --- |
 | `ConfigurationModule`, `readRuntimeConfig` | Read project environment once at startup; validate selected drivers; reject production captures/fixtures. No secret dumps. |
 | `DatabaseService` | One application pool, parameterized queries, transaction helper, readiness, shutdown. Better Auth uses its pool directly; other business modules must not depend on AuthService for SQL. |
-| `IdentityModule`, `AuthService`, `SessionGuard` | Better Auth owns OTP/session lifecycle and tables. Guard produces a small trusted actor and role checks. Resource permissions remain a feature-service responsibility. |
+| `IdentityModule`, `AuthService`, `SessionGuard` | Better Auth owns password/verification/reset/session lifecycle and tables. Guard produces a small trusted actor and role checks. Resource permissions remain a feature-service responsibility. |
 | `IntegrationsModule`, `MailSender` | Select transport at construction. SMTP protocol/credentials stay in `SmtpMailSender`; file capture and memory tests need no external mail account. |
-| `ExtractionProvider` | Provider seam only. Disabled fails explicitly; fixture returns recorded data with provenance. No live AI, parser, task runner, or candidate processing is implied. |
-| `HealthModule`, `ConnectivityProbe` | Check database and Redis through adapters. Redis is connectivity-only, not an implemented cache/queue. Failure responses contain statuses, not underlying errors. |
+| `ExtractionProvider` | Legacy adapter examples, not the application workflow. Application processing uses DocumentTextReader/TaskExecutor; see processing-review-api.md and branch handoffs. |
+| `HealthModule`, `ConnectivityProbe` | Check database and Redis through adapters. Redis also guards Jev spending; it is not evidence of a task queue/worker. Failure responses contain statuses, not underlying errors. |
 | `configureApplication` | Shared production/test HTTP wiring: trusted socket IP, raw-body cap, cookie forwarding, CORS. Test provider overrides do not introduce HTTP authentication bypasses. |
 
-## Current data movement
+## Historical OTP data movement (still supported regression path)
+Current UI uses password signup/login and one-time verification/reset; see candidate-access.md. This sequence is not the default UI journey.
 1. A code request reaches Better Auth through the bounded auth handler.
 2. Better Auth manages the code/expiry/attempt state in PostgreSQL and calls the injected `MailSender`.
 3. SMTP sends to Mailpit by default; file mode captures privately; tests can intercept messages in memory.
@@ -55,7 +57,8 @@ flowchart TD
 
 Code-send acceptance still does not prove delivery: Better Auth may log sender failures while returning 200. Replacing transport does not silently change that library contract. See [`api.md`](api.md).
 
-## Proposed feature classes and call direction
+## Historical module sketch / proposed call direction
+Several modules below now exist; names and future responsibilities in this sketch are not authoritative code inventory. Read the corresponding contracts before using it as a refactor plan.
 Feature modules should start small: controller → service → repository. Services enforce transitions/ownership; repositories own SQL; adapters own protocols. Do not create a class per field or add interfaces around every ordinary function.
 
 | Next module | Approximate classes / collaborators |
@@ -67,10 +70,10 @@ Feature modules should start small: controller → service → repository. Servi
 | Communications | `CommunicationService`, repository, existing `MailSender`; separate candidate-publication records and deliberate send commands |
 | Analytics | Small query service over persisted facts; no separate analytics database/service |
 
-No provider SDK imports in business services. DocumentStorage is implemented; parsing, scheduling and live model adapters remain future contracts.
+Keep protocol setup out of business services. DocumentStorage and branch PDF parsing are implemented; interview scheduling exists. Final extraction design and continuous task scheduling are separate open work, not all deferred infrastructure.
 
-## Proposed consistency fields and rules
-These describe what the upcoming schemas must preserve, not tables that already exist.
+## Mixed implemented consistency rules / historical field proposals
+Rows explicitly marked implemented are checkpoints; the remaining illustrative fields are not an implemented-schema inventory. In particular, current interviews have one responsible assignee/final assessment and terminal-Fail semantics; future panels need separate policy/schema review.
 
 | Record / field | Consistency purpose |
 | --- | --- |
@@ -89,17 +92,17 @@ These describe what the upcoming schemas must preserve, not tables that already 
 - Publish: validate and transition draft under concurrency protection; lock the published intake definition.
 - Submit: coordinate accepting vacancy state with close, validate answers/files against the frozen definition, insert application/doc references and processing state together; enforce uniqueness. Processing occurs outside the submission HTTP request.
 - Storage is not a PostgreSQL transaction. Implemented compensation removes objects after confirmed rollback, retains on ambiguous commit. Crash/failed cleanup can leave private orphans; automated reconciliation not implemented (application-api.md).
-- Complete processing: write result/provenance and task status consistently, then recompute review readiness. Failure/manual-bypass readiness policy is still open.
+- Complete processing: persist fenced result/provenance/task status, recompute processing state and invalidate a completed review marker without losing separate corrections. Do not advance recruitment stage or treat review completion as selection.
 - Finalize: check actor/resource authority and transition in the same transaction. Do not assume a role guard alone handles ownership or stale revisions.
 - Send: persist selected recipients/send intent before a later external call. Retry/state reconciliation is needed; SMTP cannot promise exactly-once delivery.
 
-## Agreed first-slice simplifications
-- Vacancies/intake implemented; next per-unit mocked processing. Generic catalog, owner-only vacancy mutation and admin/recruiter read-all application visibility settled; presets deferred.
+## Historical first-slice simplifications / retained invariants
+- Vacancies/intake, per-unit processing and review/export are implemented. Generic catalog, owner-only vacancy mutation and admin/recruiter read-all application visibility remain current; richer presets are deferred.
 - Candidate edits the form before submission; submitted answers/files are noneditable. Persisted application drafts, withdrawal/correction workflows, reprocessing UI, and multiple processing histories are deferred.
 - Keep graphical task configuration associated with source inputs, but serialize separate form/processing definitions. Runtime scheduling, cache policy, and provider credentials are not vacancy fields.
 - Process one application at a time initially, extracting text once per document and saving each task's result/status. Catch individual failures so other tasks can continue. Do not assume NLP/model calls are always cheap; calls need bounds.
-- Implemented CLI persists failures/retry eligibility, three-attempt bounds and two-minute token-fenced leases; retries after 30s/reclaims expired work on next invocation. No cron/BullMQ daemon. Local fixture results are not live analysis.
-- Retry technical failures without editing the original CV or answers. No need to routinely recompute successful tasks. Processing retries must not regress the recruitment stage or overwrite HR corrections.
+- Implemented CLI persists failures/retry eligibility, three-attempt bounds and two-minute token-fenced leases; eligible fixture/preparation failures may retry after 30s on a later invocation. Guarded live attempts are terminal/non-retryable. No extraction cron/BullMQ daemon. Local fixture results are not live analysis.
+- Recover eligible technical work without editing original CV/answers or routinely recomputing successful tasks. Never automatically retry live attempts to work around JevGateway. Processing recovery must not regress recruitment stage or overwrite HR corrections.
 - Original files are persistent submission data, not cache. Reuse extracted text within the application execution; an in-memory cache is sufficient initially and disposable on restart. Persistent text artifacts, cross-application caches, eviction policies, and batching are later optimizations, not demo prerequisites.
 
 ## What review/export means
@@ -109,13 +112,14 @@ For example, an application may store `answers: {"full_name":"Alex","availabilit
 
 Start with readable columns and authorized document access; richer evidence highlighting/accept-all UI can follow if time permits. Never promise page highlighting without source-location evidence. Export candidate/answer/extraction/review data to CSV for external spreadsheet/script/manual preselection, preserving fixture labels and review state. Document identifiers/protected links may be exported, not permanent unrestricted URLs. No automatic ranking or selection.
 
-## Later subentities — scope depends on remaining time
+## Historical later-subentity proposals
+Basic interviews/internal decisions/inbox now exist; proposals for additional participants, attachments or candidate-publication records are not implemented by this section.
 - Interview schedule, interviewer assignments, and each author's feedback are distinct concepts. Start with records/notes and attachments if needed; shared calendars/Cal.com are not required.
 - Decision actor/time/outcome differs from current application stage. Candidate-publication content differs from the internal decision/notes.
 - Optional messaging would distinguish content/send intent, selected recipients, and delivery attempts; acceptance is not delivery. Currently only login-code emails are automated. HR may use ordinary external communication; no receipt/interview/rejection/offer emails or in-app/calendar integration are required for the first slice.
 
 ## Events: what exists versus what may be needed
-**Currently: no domain event bus, worker, job queue, or outbox.** Requests call services directly and await results. Redis availability is not evidence of a worker.
+**No domain event bus, extraction daemon, job queue or outbox is implemented.** Services/CLI invoke work explicitly; inbox retention has a separate watch runner. Redis spending admission is not evidence of a task worker.
 
 Proposed meaningful boundaries:
 - `ApplicationSubmitted`: application is eligible for processing through its frozen task definitions; not an automatic selection decision.
@@ -127,5 +131,4 @@ Proposed meaningful boundaries:
 Do not add an event bus just for these names. Polling can consume durable database work records directly. If an external queue is selected later, use an outbox or equivalent reconciliation to avoid the commit/enqueue gap. Persisted events would need `eventId`, schema version, aggregate ID/revision, time, and actor; consumers must be idempotent. See [`open-questions.md`](open-questions.md) for the unresolved worker decision.
 
 ## Next gate
-Implemented next slice: ProcessingModule application-level command/executor/repository with strict fixture context, task state/attempts/results and lease-token recovery; ReviewModule optional shared corrections/status and snapshot CSV. See processing-review-api.md. No live parser/AI, auto candidate progression or export gate. Frontend remains deferred from this backend batch.
-Frontend handoff now implemented for existing contracts; next manual browser test/fixes. See demo-guide.md. Presets/live extractors/interviews deferred.
+Use product-checkpoint.md for the requested changeability review and split AI-MVP/final-product priorities, not this document's historical sequencing. Existing processing/review/frontend/interview workflows are implemented; richer presets, panels/import and a selected/live-validated extractor are not. No change to policy, schema or spending guards is implied by architectural proposals.

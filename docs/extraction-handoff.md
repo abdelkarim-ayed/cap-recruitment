@@ -1,5 +1,7 @@
 # Extraction branch handoff — 2026-10-31
 
+Latest docs-only continuation: [README.md](README.md) gives the reading order; [product-checkpoint.md](product-checkpoint.md) records user feedback and open decisions before further MVP/reorganisation work. It separates the predefined-skills AI branch target from wider inbox/preselection/import/panel/publication/runner requests. No merge to main, feature change or paid call in that docs pass. General docs were corrected/flagged for stale editor/interview/progression/auth/worker claims; historical evidence retained, not promoted into current requirements.
+
 **Extraction decision remains open:** the implemented excerpt-choice Jev executor is experimental/unselected, not an approved extraction method or evidence of live quality. Guarded transport was approved separately. Local-model/provider alternatives and final question design remain undecided. Runtime defaults remain disabled; no safeguards or limits changed by this clarification.
 
 ## Continuation safety update — read before old commands

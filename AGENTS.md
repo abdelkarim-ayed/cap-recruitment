@@ -4,6 +4,7 @@ Jev continuation: read `docs/jev-gateway-handoff.md` first and load project skil
 
 Implementation is authorized. Start with the agreed scenarios; do not expand into deferred features without approval.
 JevGateway's guarded transport approval is separate from extraction design: the existing excerpt-choice JevTaskExecutor is experimental/unselected, not live-validated. Final extraction method/model/question design remain open; keep defaults disabled unless explicitly approved.
+Latest docs checkpoint: read `docs/README.md` and `docs/product-checkpoint.md` for the skills-only branch MVP, wider final-demo requests and unresolved business rules/changeability concerns. Do not erase these in a later docs rewrite or treat target features as approved implementations. No merge to main in that documentation checkpoint.
 
 ## Read selectively
 - `docs/product.md`: confirmed direction, actors, and workflows.

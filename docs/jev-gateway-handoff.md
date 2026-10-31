@@ -1,5 +1,7 @@
 # Jev spending gateway handoff — 2026-10-31
 
+For the latest product/changeability discussion before resuming technical work, read [product-checkpoint.md](product-checkpoint.md); overall reading map: [README.md](README.md). That docs-only checkpoint does not authorize broader feature work, merge, or any spending/limit change.
+
 ## Current reconciliation checkpoint — feature branch
 
 This section supersedes the historical branch/transport/runtime statements below.

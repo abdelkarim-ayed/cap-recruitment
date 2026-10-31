@@ -1,4 +1,5 @@
 # Replaceable protocols and local fixtures
+Current reading map: [README.md](README.md). Branch real PDF preparation and guarded experimental executor are in [jev-gateway-handoff.md](jev-gateway-handoff.md); legacy extraction-provider examples below are not the current application executor. Paid/gateway-limit tests require explicit consent and were not run.
 Application check: `pnpm --filter @recruitment/api applications:check` after build/db:migrate. Real PostgreSQL/OTP/multipart, mocked mail, isolated private local storage, rollback cleanup and byte-identical downloads; deletes only disposable data. No auth bypass/live extraction. See [`application-api.md`](application-api.md).
 
 Implemented boundaries, not live AI functionality. API payloads remain in [`api.md`](api.md); component/data-flow details are in [`architecture.md`](architecture.md).
@@ -52,8 +53,8 @@ This **operator-local command deliberately displays the captured message/code**.
 - Default `MAIL_DRIVER=smtp` preserves the existing Mailpit setup. SMTP credentials are optional, must be paired if used, and are isolated in the adapter; real production delivery/TLS/provider setup is not verified here.
 
 ## Extraction fixtures: exact limits
-Legacy provider examples below remain adapter tests only. The application workflow now uses context-dispatched DocumentTextReader/TaskExecutor with trusted fixture keys and strict actual identity/hash/args/text checks; processing:check exercises real persistence/recovery/HR review/export. See [`processing-review-api.md`](processing-review-api.md). Normal ports disabled, no live AI/parser. Registry records calls; no candidate fixture controls.
-Default `EXTRACTION_DRIVER=disabled` returns a failed result with null and disabled provenance. Fixture mode records `provenance: {mode: "fixture", fixtureId: ...}` next to the existing extraction result union. The supplied `demo-skills` fixture is a fixed example; it **ignores source text**, is not a selected first extractor, and performs no model request. Unknown task keys fail instead of inventing values.
+Legacy provider examples below remain adapter tests only. Application workflow uses context-dispatched DocumentTextReader/TaskExecutor with trusted fixture keys and actual identity/hash/args/text checks; processing:check exercises persistence/recovery/review/export. Default normal ports remain disabled; branch real PDF preparation and experimental guarded execution are described in jev-gateway-handoff.md. No live model-quality verification. Registry records calls; no candidate fixture controls.
+Legacy `EXTRACTION_DRIVER=disabled` returns a failed result with null and disabled provenance. Fixture mode records `provenance: {mode: "fixture", fixtureId: ...}` next to the extraction result union. The supplied legacy `demo-skills` example **ignores source text**, is not a selected extractor, and performs no model request. Application-processing fixtures separately verify frozen identities/hash/args/text. Unknown task keys fail instead of inventing values.
 
 There is no extraction-trigger HTTP endpoint. ProcessingService runs through the explicit CLI and context ports. Legacy provider tests remain separate. A future live adapter requires approved contracts/cancellation/error mapping/provenance and evaluation before honest replacement.
 
@@ -62,7 +63,7 @@ There is no extraction-trigger HTTP endpoint. ProcessingService runs through the
 - Implemented workflow registry binds fixture keys to actual application/document/task identities and verifies bytes/hash/args/text relay, recording calls and preserving fixture provenance through storage/export. Legacy task-key-only adapter fixtures remain separate examples.
 - Reusable script helpers: seed logical entities/files, resolve aliases, read records, assert properties, and clean owned datasets. Optional reset is restricted to an explicitly verified dedicated test database and known tables, never the normal development database. HTTP/worker connections mean a single rollback transaction cannot isolate every scenario. Central loaders evolve with schema; scenarios should not require repeated bespoke SQL.
 - Document storage: implemented local adapter/memory test override, separately verified ownership and private download boundaries.
-- PDF/DOCX parsing: text-reader port with small file fixtures; unsupported/OCR failures explicit.
+- PDF preparation: real bounded text-native PDF reader on the feature branch, with multipage/limit/French-accent fixtures. DOCX/OCR not implemented; model quality and complex layout handling unverified.
 - Processing implemented via explicit local command, saved per-task progress and application lease fencing/retry recovery. No run/history or independently queued work items. Cron/polling can later wrap the same executor. Original files persist, local reuse is disposable.
 
 Do not implement or require accounts for these providers merely to test vacancy persistence. Keep fixture checks separate from optional real integration checks, and never infer real delivery/model quality from a mock passing.

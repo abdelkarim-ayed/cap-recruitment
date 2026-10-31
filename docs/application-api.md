@@ -7,10 +7,10 @@ No extraction tasks in the frozen snapshot: processing remains not_requested, re
 
 Manual-feedback refinements: list query adds `processing=pending|not_requested|processing|completed|completed_with_errors`, staff-only `review=pending|in_review|completed`, and `sort=newest|oldest|candidate|position` (default newest). Database applies filters/sort before count/pagination, with ID ties. Candidate review filters return 403. CSV remains unfiltered across the vacancy. React PDF preview reuses authorized attachment bytes, checks PDF signature and uses a session-local PDF blob; no public/inline server route. Non-PDFs download-only. Browser PDF support varies; signature is not malware validation.
 
-Backend contract now consumed by the React frontend (demo-guide.md). Mock executor/review/CSV: processing-review-api.md. No live AI, import, stage mutations, interviews, withdrawal or candidate-answer/file corrections.
+Backend contract consumed by React (demo-guide.md). Processing/review/CSV: processing-review-api.md; branch PDF/gateway extensions: jev-gateway-handoff.md. Internal stage/interview workflows are implemented separately in interview-api.md. No decision import, withdrawal or candidate-answer/file corrections. Live extraction is not quality-verified.
 
 ## Access
-- Candidate submits using their verified OTP/session account, and reads/downloads only their own applications. Foreign application/document returns 404.
+- Candidate submits using a verified account/session (current UI: email/password plus one-time verification), and reads/downloads only their own applications. Legacy OTP remains a regression API path. Foreign application/document returns 404.
 - All admin/recruiter staff may read all applications and download their documents, not only vacancy owners. Interviewer excluded for now. Staff cannot submit as a candidate.
 - Answers/files are locked for everyone. No application PATCH/DELETE endpoint. Staff coordination/advancement policies are separate checkpoints.
 - Cookie-authenticated POST requires trusted Origin as in [`api.md`](api.md). Responses containing candidate data use private/no-store; document bytes have no public URL.
@@ -45,7 +45,7 @@ Let curl set the multipart boundary; do not set a JSON Content-Type. Only use di
 | GET /api/applications/:id | Locked answers, candidate identity snapshot, frozen vacancy/form, document metadata |
 | GET /api/applications/:id/documents/:documentId | Original attachment bytes after authorization and size/SHA-256 integrity check |
 
-Lists accept only limit (1–100, default 20), offset (0–2147483647, default 0), order newest submittedAt/ID first, and return items/total/limit/offset. No filtering/ranking or PII-bearing public routes.
+Lists accept bounded limit/offset, processing status and sort; staff also have review filters, as described above. Defaults are newest submittedAt/ID first; responses contain items/total/limit/offset. No ranking or PII-bearing public application routes.
 
 Detail keys: id, vacancyId, candidateId, candidate `{name,email}`, vacancy `{id,title,description,location?,revision,formDefinition}`, answers, documents, stage, processingState, submittedAt. Staff vacancy projection also includes processingDefinition; candidates never receive task arguments. Document metadata: id (business document UUID), inputId, filename, byteCount, mediaType (application/octet-stream); storage references/hashes stay private. No reusable profile CV.
 

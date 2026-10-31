@@ -1,5 +1,7 @@
 # AI options — researched, not selected
 
+Research history below is not current implementation/permission. Read jev-gateway-handoff.md and load `typesafe-ai` before Jev work: all real calls must use the mandatory gateway; no paid/limit tests or safeguard changes without consent. User's total development/showcase budget ceiling is $5. Branch target is predefined skills only; final method/question design remains unselected. Latest scope/changeability feedback: product-checkpoint.md. Model/pricing examples retain their original research dates and are not measured charges or evaluation results.
+
 ## Progress-meeting recommendation (2026-10-10)
 With less than a day to the progress meeting, demonstrate the working intake → explicitly labelled fixture extraction → optional HR correction → export flow first. **Do not turn a provider experiment into the demo's dependency.** No live calls or extraction accuracy measurements were made in this batch.
 
