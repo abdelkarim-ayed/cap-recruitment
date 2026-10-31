@@ -40,7 +40,15 @@ Desired review approach, not a completed architectural finding: trace concrete c
 
 ## Next discussion gates
 
-1. Confirm bounded skills-only AI-MVP acceptance and clarify the selected extraction design; keep richer tasks separate.
+### Starter skills decisions clarified after this checkpoint
+
+User selected: HR-configured comma-separated skills, trim/lowercase/deduplicate; detect the candidate's **claimed knowledge/use**, including skills lists, relevant coursework/projects and work experience, while excluding negations, employer requirements and unrelated mentions. One Noul question per skill, grouped against shared CV text; provisional positive threshold **>= 0.8**. This is extraction of claims, not verified competence.
+
+User selected **one result per skill**, not the existing single filtered-list output. Separate yes/no export/review columns are the intended starter direction; exact wire shape, stable column naming and correction behavior need a small contract plan before coding. Below-threshold should be labelled not detected confidently, not proven absent; provider/preparation errors remain unavailable/null rather than successful false. Evidence is deferred until the later task/template/document design, not another excerpt-selection request in this starter.
+
+These choices supersede the experimental excerpt-choice algorithm as the proposed starter approach. They are not implemented by this docs update and do not authorize live calls, wider CV extraction, proficiency levels, years-of-experience outputs or spending-guard changes.
+
+1. Plan the small Noul/per-skill output contract above and then obtain implementation approval; keep richer tasks separate.
 2. Reproduce inbox/preselection failures and decide publication prerequisite semantics. Scope wider-product work independently of the AI checkpoint.
 3. For panel interviews, decide participants, responsible assessor, feedback/result ownership, visibility and overlap rules before schema work.
 4. Architecture review should produce a coupling/change-impact map and small foundation refactors versus deferred structural work. No assumption that changing a business rule always avoids a migration.
