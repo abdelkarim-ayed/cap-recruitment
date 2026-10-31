@@ -36,5 +36,6 @@ upstream installation or experiment instructions.
 
 ## Resume efficiently
 
-Read `docs/jev-gateway-handoff.md` before exploring the repository. The extraction
-feature branch currently has direct calls that must be migrated before live use.
+Read `docs/jev-gateway-handoff.md` before exploring the repository. The feature
+branch has reconciled extraction with JevGateway; its standalone probe is
+parse-only. Earlier commits' direct paths must never be run live.

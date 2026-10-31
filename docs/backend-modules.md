@@ -1,6 +1,7 @@
 # Backend modules and next checkpoint
 
 Implementation proposal, not a new set of approved product policies. Keep one NestJS application and one database; modules are business boundaries, not independently deployed services.
+Historical vacancy-first sequencing below is not the current backlog. Use [README.md](README.md), [product-checkpoint.md](product-checkpoint.md) and feature API contracts for implemented versus requested behavior.
 
 ## Boundaries
 | Module | Owns | Does not own |
@@ -10,12 +11,12 @@ Implementation proposal, not a new set of approved product policies. Keep one Ne
 | Vacancies | Draft/publish/close, responsible recruiter, input/task definition, public projection | Submitted answers, extraction execution |
 | Applications | One application per candidate/vacancy, submitted snapshot, documents, stage, review values, CSV | Authentication credentials, automatic ranking |
 | Processing | Per-document task grouping, execution state, extractor adapters, results/failures, bounded recovery | Changing recruitment decisions or candidate answers |
-| Interviews | Editable interview records, assignments, schedule, attributable feedback | Fixed interview-number pipeline stages or automatic rejection |
+| Interviews | Pipeline, schedules, assignment-scoped final feedback, explicit progression/terminal-Fail effects | Fixed interview-number recruitment stages, inferred row-change effects or unapproved panel policy |
 | Communications | Explicit recipients/send actions, delivery state, candidate-visible updates | Sending on every interview edit |
 
 Analytics can start as a small SQL query service over these records. Branding/settings and staff administration are bounded later endpoints, not reasons to introduce more infrastructure. Vacancy reference documents/templates remain deferred.
 
-IdentityModule, DatabaseModule, ConfigurationModule, IntegrationsModule, InfrastructureModule, and HealthModule now implement the foundation boundaries. Business repositories must not depend on AuthService's pool. See [`architecture.md`](architecture.md) for current classes, future consistency fields/data flow/events, and [`integration-testing.md`](integration-testing.md) for replaceable protocol adapters. The feature modules in the table remain proposals.
+Identity/database/configuration/integration/health foundations and vacancy/application/processing/review/interview feature modules exist. The table is a responsibility sketch, not proof each proposed collaborator/separation is implemented. Business repositories must not depend on AuthService's pool. See feature contracts and integration-testing.md; architecture.md includes historical sketches, not a complete current class map.
 
 ## Implemented checkpoint: vacancies
 **Scenario:** a recruiter saves a configured draft, reloads it, publishes it, and an unauthenticated candidate retrieves the job/application form without seeing backend tasks or internal metadata.
@@ -52,9 +53,9 @@ Approved/implemented: admin/recruiter create/read; owner alone edits/publishes/c
 ## Following checkpoints
 1. **Submission + documents (implemented):** locked JSON by input ID, snapshots, uniqueness/close locks, optional constraints and bounded private storage. Admin/recruiter read-all, candidate read-own. See application-api.md. No saved drafts/extraction. Intake service currently queries shared DatabaseService directly; separate repository can follow shared processing/review query needs.
 2. **Mock processing + review/export (implemented):** application-level CLI/executor, trusted context fixture relay, lease fencing/recovery, per-task attempts/results and local text reuse. Optional shared corrections/status and ungated CSV; no live AI/parser/automatic selection. See processing-review-api.md.
-3. **Interviews + decisions:** dynamic interviews and assignments, staff schedule, notes, preselection and owner decisions. Resolve negative outcome labels at this boundary.
+3. **Interviews + decisions (implemented bounded checkpoint):** owner pipeline, one responsible assignee/instance, staff schedule, final notes/Pass-Fail, manual preselection and owner decisions; terminal Not selected/cancellation rules. Panels and broader workflow changes remain open. See interview-api.md.
 4. **Optional updates + analytics:** scope reconsidered after usable review/export. HR may communicate outside the platform; only OTP mail is currently automated. No mail/calendar integration required for the first workflow slice.
-5. **Frontend:** implement the accepted editor and application/recruiter views from the tested API handoff, not in parallel with undefined contracts.
+5. **Frontend (integrated for existing contracts):** generic editor, intake, review/export, interview/progression/inbox screens. Further changes should follow agreed contracts; reported manual UX defects still need reproduction.
 
 ## Delegation rules
 Database schema, migration ordering, and shared definition contracts need one owner. Once a contract exists, bounded tests or a separate feature module can be delegated. Do not have two agents simultaneously edit auth/bootstrap/shared schemas or mutate the same test accounts. Each checkpoint needs user test instructions, current API docs, and accurate status—not exhaustive API scaffolding for all future modules.

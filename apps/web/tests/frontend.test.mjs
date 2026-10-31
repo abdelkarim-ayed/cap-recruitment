@@ -19,7 +19,28 @@ const {ScheduleForm,PipelinePage,InterviewPage,Inbox,cancellationText}=await imp
 const {makeInput,removeInput,moveInput}=await import('../src/form-model.ts');
 const {createVacancySchema}=await import('@recruitment/domain/vacancies');
 const originalFetch=globalThis.fetch;
+test('per-skill correction preserves unavailable siblings rather than inventing negatives',async()=>{
+  let submitted;
+  const view={review:{status:'pending',revision:1},tasks:[{taskId:'skills',outputKey:'skills',sourceInputId:'cv',status:'failed',attempts:1,result:{status:'failed',value:null},effectiveValue:null,skillResults:[{skill:'sql',original:null,effective:null},{skill:'rust',original:null,effective:null}]}]};
+  globalThis.fetch=async(path,init)=>{if(init?.method==='PATCH'){submitted=JSON.parse(init.body);return json(view);}return path.endsWith('/review')?json(view):json({id:'app',vacancyId:'vac',candidate:{name:'Candidate',email:'candidate@example.test'},submittedAt:'2026-10-31T00:00:00Z',stage:'received',processingState:'completed_with_errors',vacancy:{title:'Backend',formDefinition:{inputs:[]}},answers:{},documents:[]});};
+  render(React.createElement(ApplicationPage,{id:'app',staff:true}));await screen.findByLabelText('Review sql');
+  fireEvent.change(screen.getByLabelText('Review sql'),{target:{value:'true'}});fireEvent.click(screen.getByText('Save correction'));
+  await waitFor(()=>ok(submitted));deepEqual(submitted.corrections[0].value,{skills:['sql'],unavailableSkills:['rust']});
+});
 afterEach(()=>{cleanup();globalThis.fetch=originalFetch;window.location.hash='';sessionStorage.clear();});
+test('review shows readable effective skills and mode-specific provenance without a global mock claim',async()=>{
+  globalThis.fetch=async(path)=>path.endsWith('/review')?json({review:{status:'pending',revision:1},tasks:[{taskId:'skills',outputKey:'skills',sourceInputId:'cv',status:'completed',attempts:1,result:{status:'completed',value:{skills:['SQL']},evidence:['Used SQL']},effectiveValue:{skills:['SQL']},provenance:{mode:'live',provider:'typesafe',reader:'pdfjs-dist@6.4.299',model:'jev-test'}}]}):json({id:'app',vacancyId:'vac',candidate:{name:'Candidate',email:'candidate@example.test'},submittedAt:'2026-10-31T00:00:00Z',stage:'received',processingState:'completed',vacancy:{title:'Backend',formDefinition:{inputs:[]}},answers:{},documents:[]});
+  render(React.createElement(ApplicationPage,{id:'app',staff:true}));
+  await screen.findByText('Jev result');equal(screen.queryByText('Mock extraction'),null);
+  equal(document.querySelector('.effective-skills').textContent,'SQL');
+  equal(document.querySelector('.original-result').open,false);
+  ok(document.querySelector('.original-result').textContent.includes('pdfjs-dist@6.4.299'));
+});
+test('fixture review stays visibly labelled and keeps technical identifiers in collapsed evidence',async()=>{
+  globalThis.fetch=async(path)=>path.endsWith('/review')?json({review:{status:'pending',revision:1},tasks:[{taskId:'skills',outputKey:'skills',sourceInputId:'cv',status:'failed',attempts:1,result:{status:'failed',value:null,reason:'Recorded fixture failure'},effectiveValue:null,provenance:{mode:'fixture',fixtureId:'sample',reader:'pdfjs-dist@6.4.299'}}]}):json({id:'app',vacancyId:'vac',candidate:{name:'Candidate',email:'candidate@example.test'},submittedAt:'2026-10-31T00:00:00Z',stage:'received',processingState:'completed_with_errors',vacancy:{title:'Backend',formDefinition:{inputs:[]}},answers:{},documents:[]});
+  render(React.createElement(ApplicationPage,{id:'app',staff:true}));await screen.findByText('Fixture result');
+  equal(screen.queryByText('Jev result'),null);equal(document.querySelector('.original-result').open,false);ok(document.querySelector('.original-result').textContent.includes('Fixture: sample'));
+});
 const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json'}});
 test('editor input removal drops linked tasks, reorder preserves identities, catalog generates valid inputs',()=>{
   const inputs=['text','long_text','number','yes_no','single_choice','multiple_choice','document','separator'].map((type,i)=>makeInput(type,`field_${i}`));
@@ -34,7 +55,7 @@ test('document extension editing accepts comma-separated values and preserves ta
   render(React.createElement(Host));await user.type(screen.getByLabelText(/Allowed extensions/),'.pdf, .docx');await user.tab();
   deepEqual(saved.f.inputs[0].args.accept,['.pdf','.docx']);
   await user.click(screen.getByText('+ Skills extraction'));
-  equal(saved.p.tasks[0].sourceInputId,'cv');deepEqual(saved.p.tasks[0].args.skills,['SQL','TypeScript']);
+  equal(saved.p.tasks[0].sourceInputId,'cv');deepEqual(saved.p.tasks[0].args.skills,['sql','typescript']);equal(saved.p.tasks[0].args.evidence,false);
 });
 test('candidate submits false and zero as typed answers, document separate from answers',async()=>{
   let sent;

@@ -1,6 +1,7 @@
 # Interview pipeline, scheduling and inbox — implemented
 
 Migration 006; session cookies and trusted Origin on writes. Backend and integrated React UI, no calendar/email provider, no event bus. Live extraction stays deferred and manual mock processing stays unchanged.
+This is the current bounded interview contract, not the final design for panels/bulk selection/publication gates. Latest requested changes and reported inbox concerns: [product-checkpoint.md](product-checkpoint.md). Branch PDF/guarded experimental extraction is documented in jev-gateway-handoff.md and does not alter these interview rules.
 
 ## Model and policy
 - Owner edits an ordered vacancy-level pipeline (0–10 steps, name/instructions), independently of frozen candidate intake. Pipeline becomes immutable once any interview instance exists. Closed vacancies can retain ongoing recruitment; closing intake does not cancel interviews.

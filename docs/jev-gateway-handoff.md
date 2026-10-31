@@ -1,5 +1,54 @@
 # Combined extraction + Jev gateway handoff — 2026-10-31
 
+## Merge/cleanup entry point
+
+Skills starter implemented at `9e5f7c8` and merged locally into main after preserving wrong-session dirty docs in `74d4cf2`. Main's AGENTS conflict was reconciled; original edits remain in Git history. Main is now the cleanup starting point. Earlier branch distinctions/runtime statements below are historical. No live validation, pending-application processing, budget changes, reseed/reset, process restart, presentation change or remote push was performed. Current records are test/demo data per user. Read docs/README.md and docs/product-checkpoint.md before cleanup; preserve the unresolved workflow/changeability feedback rather than replacing it with the narrow skills implementation.
+
+## Selected skills starter — supersedes excerpt-choice notes below
+
+Implemented for the bounded MVP: one grouped Noul question per normalised configured skill (trim/lowercase/deduplicate), asking for claimed knowledge/use, positive at **>=0.8**. Model competence is not verified. Shared state contains CV text once. Missing/invalid answers fail the task, not false. Evidence/quotations deferred; legacy evidence flag is retained for old definitions but Noul emits none. Gateway/model/limits/namespace unchanged; defaults disabled, no live validation or paid/limit tests performed.
+
+Persistence remains the compatible `{skills:[detected names]}` result in JSONB. Review additionally returns `skillResults:[{skill,original:boolean|null,effective:boolean|null}]`, computed from frozen configured skills. Corrections support optional `unavailableSkills` alongside detected `skills`; omitted configured skills are false, explicitly unavailable ones null. UI sends all configured flags so changing one skill never fabricates negatives for unknown siblings. Existing whole-list/null corrections remain supported. Actor/time/revision metadata remains task-level, not per-skill history.
+
+CSV retains prior task/answer columns and appends `<outputKey>.skill.<URI-encoded-lowercase-skill>.original` and `.effective`: true/false, blank for unavailable. Labels in review are Detected / Not detected / Unavailable. “Not detected” means below provisional threshold, not proven absence. Form editor hides quotations and defaults new tasks to evidence=false; skills normalise on blur and server validation. Existing submitted definitions/files/results were not rewritten; no migration/reseed/reset needed.
+
+User confirms current records are test/demo data; scoped re-fixturing can be acceptable, but no broad deletion or spending-counter reset is implied. Current checks: 42 API + 16 domain + 29 DOM tests (87 total), domain/API/web builds, and real PDF/PostgreSQL fixture integration including per-skill projections/corrections/CSV. Real Jev calls, gateway limits and manual browser appearance remain unvalidated. Earlier excerpt-choice tests are replaced by Noul business-port fixtures; no HTTP fallback exists.
+
+Next session: cleanup/changeability review using docs/product-checkpoint.md. Broader workflow requests stay open. This starter does not implement years/proficiency extraction, richer tasks, cron, imports, panels or publication gates. No push to main.
+
+For the latest product/changeability discussion before resuming technical work, read [product-checkpoint.md](product-checkpoint.md); overall reading map: [README.md](README.md). That docs-only checkpoint does not authorize broader feature work, merge, or any spending/limit change.
+
+## Current reconciliation checkpoint — feature branch
+
+This section supersedes the historical branch/transport/runtime statements below.
+
+**Decision clarification:** JevGateway's guarded transport is approved. The excerpt-choice `JevTaskExecutor` is an **experimental, unselected candidate**; its algorithm/question design, production use and final model choice have not been approved or live-evaluated. Its existence in code is not a decision to use it. Defaults remain disabled. Do not promote it or its current character/excerpt/skill caps to product policy without approval.
+
+- Active implementation: `/tmp/opencode/recruitment-extraction`, branch `feat/real-document-extraction`. Merged committed main checkpoint `330e3c9` without resetting, rebasing or moving main. Original extraction commits `2eb4a85`, `751205d` and documentation commit `8633e49` remain in history.
+- Main `/home/ubuntu/code` remains one commit ahead of recorded origin/main, with its existing **uncommitted** `AGENTS.md` and `docs/jev-gateway-handoff.md` edits untouched. Both were read during reconciliation. Their combined extraction summary is covered by [extraction-handoff.md](extraction-handoff.md); no new implementation was present in those dirty docs. Preserve them when later merging back.
+- Skill and guarded configuration from main are now present on this branch. Gateway limits, Redis namespace, endpoint and model are **unchanged** from `330e3c9`. No key read/printed by the agent, real provider call, Redis spending-counter operation, gateway-limit test, reset, reseed or process restart was performed.
+- Extraction's `JevTaskExecutor` now accepts a narrow decision-client port; Nest injects **JevGateway**. There is no direct fetch/key/URL/model override in the executor. The only live HTTP implementation is the gateway, which owns `JEV_API_KEY` and the pinned model. Legacy `TYPESAFE_API_KEY` / `TYPESAFE_MODEL` references were removed from application source.
+- Standalone `extraction:probe` is now **parse-only**, rejecting skill arguments before reading the input. It cannot execute provider calls. Any future live probe must be explicitly approved and use the same gateway.
+- Gateway accepts an optional caller AbortSignal and passes it into its existing HTTP cancellation signal; it checks cancellation before/after admission. No admission rules changed. Cancellation/uncertain admitted calls still consume allowance; no refund/reset was introduced. Added `isConfigured()` for startup preflight without invoking Redis/provider.
+- Every failure after entering a live executor is **non-retryable**, including HTTP/network/guard failures and the outer processing timeout. This intentionally supersedes the old extraction adapter's automatic retry classification. Storage/preparation/fixture recovery policies remain separate. A gateway block is a stop condition, not an instruction to drain/retry pending tasks.
+- Offline business tests use a stub decision client, never `JevGateway.request`. They verify question construction, quote mapping, model ownership, signal forwarding, validation and terminal failure mapping. They do not verify spending guards or actual provider quality. Gateway limit/Redis concurrency tests remain explicitly unexecuted.
+- Verified after integration: API build and 45 API + 14 domain + 28 web DOM tests (**87 total**); real PostgreSQL `extraction:check` with executor explicitly disabled and trusted interpretation fixtures. Existing fake-HTTP business tests were replaced by decision-port fixtures because HTTP now belongs exclusively to the protected gateway. No reduction in live verification claimed: it remains unperformed.
+- Read-only listener inspection found **no listeners on 3000/5173** during this reconciliation. Other-session notes disagree about historical shutdown; do not terminate/restart anything based on those notes. Infrastructure was sufficient for the tagged PostgreSQL fixture check; no infrastructure command was needed here.
+
+### Next safe step
+
+Review integration differences, then request explicit consent for a small chosen synthetic live attempt through the guarded processing CLI. Do not run paid/limit tests merely because the account is funded or implementation is authorized. No automatic poller is registered. Review Redis command timeout/disconnection assumptions before unattended execution; no production guarantee is claimed.
+
+### Token sizing discussion — estimates, not new limits
+
+Official model docs checked 2026-10-31: https://docs.typesafe.ai/models — default 64000 tokens for shared state plus all questions, 32000 for state plus each individual question. No token minimum is specified there. State is ingested once; instructions/criteria still count. Current gateway cap is 60000 **bytes**, not tokens; experimental adapter also has character/excerpt/skill bounds, not tokenizer-based accounting. No limits changed and no provider/limit tests performed.
+
+Planning estimate for a one/two-page French/English CV: roughly 800–3500 source tokens, sometimes 5000 with dense/noisy parsing. A compact batch of 10–20 fixed questions could put the full request around 2000–8000 tokens. Repeated excerpt-choice options can push it into roughly 8000–16000+; estimate is language/tokenizer/payload dependent and unmeasured. Prefer compact questions, not artificial minimum padding or truncation. A 12000–16000-token planning ceiling is a proposal only, not configured enforcement. Actual usage must be checked in a separately approved synthetic live attempt. At the published $0.042/M input-token rate, 8000 tokens cost $0.000336 and 16000 cost $0.000672, before any other charges; minimum account top-up differs from consumption.
+
+Full extraction/UI/history and playground-only proposals: [extraction-handoff.md](extraction-handoff.md). Presentation unchanged. Nothing pushed.
+
+## Imported main checkpoint — historical context
+
 ## Start here; no full-repo reread needed
 - Current checkout: `/home/ubuntu/code`, branch `main`, latest observed `330e3c9` (gateway/skill/handoff checkpoint), one commit ahead of recorded origin/main. Not pushed. `AGENTS.md` and this handoff have subsequent uncommitted changes; preserve them.
 - User now owns a funded Jev account. No credential was supplied/read here; no paid call made.

@@ -42,18 +42,18 @@ export function ApplicationList({staff}:{staff:boolean}) {
 
 function TaskCard({task,onSave,busy}:{task:any;onSave:(correction:any)=>void;busy:boolean}) {
   const [skills,setSkills]=useState<string>((task.effectiveValue?.skills??[]).join(', ')),[nullValue,setNullValue]=useState(task.hasCorrection&&task.correction===null);
+  const [skillFlags,setSkillFlags]=useState<Record<string,string>>(()=>Object.fromEntries((task.skillResults??[]).map((row:any)=>[row.skill,row.effective===null?'unknown':String(row.effective)])));
   return <article className="extraction-card">
-    <div className="section-heading"><div><h3>{task.outputKey}</h3><small>Source: {task.sourceInputId} · Attempt {task.attempts}/3</small></div><div className="status-row"><Badge>{task.hasCorrection?'HR corrections saved':extractionLabel(task.status)}</Badge><Badge>{task.provenance?.mode??'not processed'}</Badge></div></div>
+    <div className="section-heading"><h3>{task.outputKey}</h3><div className="status-row"><Badge>{task.hasCorrection?'HR corrections saved':extractionLabel(task.status)}</Badge>{task.provenance?.mode==='fixture'&&<Badge>Fixture result</Badge>}{task.provenance?.mode==='live'&&<Badge>{task.provenance.provider==='typesafe'?'Jev result':'Live extraction'}</Badge>}</div></div>
     <div className="saved-value" aria-label={`Latest saved value for ${task.outputKey}`}>
       <span className="eyebrow">LATEST SAVED VALUE</span>
       <h4>{task.hasCorrection?'Saved HR correction':task.result.status==='completed'?'Original extraction (no correction)':'Unavailable — extraction has not succeeded'}</h4>
-      <pre>{task.effectiveValue===null?'Unavailable (null)':JSON.stringify(task.effectiveValue,null,2)}</pre>
-      {task.effectiveValue?.skills?.length===0&&<p className="small">No skills found.</p>}
+      {task.skillResults?<dl>{task.skillResults.map((row:any)=><div key={row.skill}><dt>{row.skill}</dt><dd>{row.effective===null?'Unavailable':row.effective?'Detected':'Not detected'}</dd></div>)}</dl>:<p className="effective-skills">{task.effectiveValue===null?'Unavailable (null)':task.effectiveValue?.skills?.length?task.effectiveValue.skills.join(', '):'No skills found.'}</p>}
       {task.hasCorrection&&<small className="saved-state">Saved {task.correctedAt?new Date(task.correctedAt).toLocaleString():''}{task.corrector?` · ${task.corrector.name||task.corrector.email}`:''}</small>}
     </div>
-    <form className="correction-form" onSubmit={e=>{e.preventDefault();onSave({taskId:task.taskId,value:nullValue?null:{skills:skills.split(',').map(v=>v.trim()).filter(Boolean)}});}}>
-      <label>Skills (comma separated)<input disabled={busy||nullValue} value={skills} onChange={e=>setSkills(e.target.value)} placeholder="SQL, TypeScript"/></label>
-      <label className="check"><input disabled={busy} type="checkbox" checked={nullValue} onChange={e=>setNullValue(e.target.checked)}/> Explicitly mark unavailable (null)</label>
+    <form className="correction-form" onSubmit={e=>{e.preventDefault();onSave({taskId:task.taskId,value:task.skillResults?{skills:Object.keys(skillFlags).filter(skill=>skillFlags[skill]==='true'),unavailableSkills:Object.keys(skillFlags).filter(skill=>skillFlags[skill]==='unknown')}:nullValue?null:{skills:skills.split(',').map(v=>v.trim()).filter(Boolean)}});}}>
+      {task.skillResults?<div className="grid two">{task.skillResults.map((row:any)=><label key={row.skill}>Review {row.skill}<select disabled={busy} value={skillFlags[row.skill]} onChange={e=>setSkillFlags({...skillFlags,[row.skill]:e.target.value})}><option value="true">Detected</option><option value="false">Not detected</option><option value="unknown">Unavailable</option></select></label>)}</div>:<><label>Skills (comma separated)<input disabled={busy||nullValue} value={skills} onChange={e=>setSkills(e.target.value)} placeholder="SQL, TypeScript"/></label>
+      <label className="check"><input disabled={busy} type="checkbox" checked={nullValue} onChange={e=>setNullValue(e.target.checked)}/> Explicitly mark unavailable (null)</label></>}
       <div className="actions"><button disabled={busy}>Save correction</button>{task.hasCorrection&&<button type="button" disabled={busy} onClick={()=>onSave({taskId:task.taskId,value:null,remove:true})}>Use original</button>}</div>
     </form>
     <details className="original-result"><summary>Original extraction and evidence · {extractionLabel(task.status)}</summary>
@@ -61,6 +61,7 @@ function TaskCard({task,onSave,busy}:{task:any;onSave:(correction:any)=>void;bus
       {task.result.reason&&<p className="notice">{task.result.reason}</p>}
       {task.result.evidence?.length>0&&<ul className="evidence">{task.result.evidence.map((text:string,i:number)=><li key={i}>{text}</li>)}</ul>}
       {task.provenance?.fixtureId&&<small className="fixture-label">Fixture: {task.provenance.fixtureId}</small>}
+      <dl className="processing-details"><div><dt>Source field</dt><dd>{task.sourceInputId}</dd></div><div><dt>Attempts</dt><dd>{task.attempts}/3</dd></div>{task.provenance?.reader&&<div><dt>Document reader</dt><dd>{task.provenance.reader}</dd></div>}{task.provenance?.model&&<div><dt>Model</dt><dd>{task.provenance.model}</dd></div>}</dl>
     </details>
   </article>;
 }
@@ -86,7 +87,7 @@ export function ApplicationPage({id,staff}:{id:string;staff:boolean}) {
           <div className="actions"><button disabled={busy} onClick={()=>update({status:'in_review'})}>Mark in review</button><button className="primary" disabled={busy} onClick={()=>update({status:'completed'})}>Mark review complete</button><button disabled={busy} onClick={()=>update({status:'pending'})}>Reset to pending</button></div>
           {review.tasks.some((task:any)=>task.hasCorrection)&&<p className="review-summary">HR corrections are saved and used in export. Original extraction results remain unchanged.</p>}<small>Current saved revision {review.review.revision}{review.review.updatedAt?` · Saved ${new Date(review.review.updatedAt).toLocaleString()}`:''}{review.review.editor?` · ${review.review.editor.name||review.review.editor.email}`:''}</small>
         </section>
-        <section className="card"><div className="section-heading"><h2>Extracted fields</h2><Badge>Mock extraction</Badge></div>{review.tasks.map((task:any)=><TaskCard key={`${task.taskId}:${review.review.revision}`} task={task} busy={busy} onSave={correction=>update({corrections:[correction]})}/>)}
+         <section className="card"><div className="section-heading"><h2>Extracted fields</h2></div>{review.tasks.map((task:any)=><TaskCard key={`${task.taskId}:${review.review.revision}`} task={task} busy={busy} onSave={correction=>update({corrections:[correction]})}/>)}
         </section>
       </>}{staff&&<div className="actions"><button disabled={busy} onClick={async()=>{setBusy(true);try{await download(`vacancies/${record.vacancyId}/export`,`applications-${record.vacancyId}.csv`);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}}>Export vacancy CSV</button></div>}</div>
     </div>

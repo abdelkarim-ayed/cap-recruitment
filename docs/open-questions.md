@@ -1,6 +1,7 @@
 # Open decisions
 
 Answer each cluster independently; detailed API/database design comes later.
+Latest prioritised feedback and current-versus-requested matrix: [product-checkpoint.md](product-checkpoint.md). That checkpoint preserves changeability concerns even while business rules remain open.
 
 ## 1. Authority and collaboration
 - Bounded interview policy now implemented: owner pipeline/finalization, shared HR scheduling, assignee-only final assessment, Fail automatically ends application, no reopening. See interview-api.md. Admin override and guest invitations remain deferred.
@@ -17,13 +18,13 @@ Answer each cluster independently; detailed API/database design comes later.
 ## 3. Vacancy form and screening policy
 - See `vacancy-form.md` for hybrid intake/extraction; `form-tooling.md` for researched library candidates.
 - Generic catalog/extractSkills config implemented; presets TODO. One file/input, optional accept/business limit, 10 MiB/file and 25 MiB combined. Admin/recruiter read-all applications, candidate read-own. Allowed-HR registry and production quota/scan/orphan-reconciliation policies deferred.
-- Additional extraction tasks/providers remain future decisions. Initial skills task execution is mock-only with persisted recovery, not AI/parser quality verification.
+- Branch target is predefined skills only; richer tasks/experience/proficiency extraction remain future decisions. PDF preparation is real on the feature branch; guarded Jev executor is experimental/unselected and has no live quality verification. See jev-gateway-handoff.md.
 - Automated qualification/filtering is outside current scope; reconcile original automated-ranking requirement before claiming coverage.
 - Define uncertain/missing/conflicting evidence handling and bulk confirmation.
 
 ## 4. Public communication
 - Internal event inbox approved/implemented; seven days after first read cleanup, unread retained. No chat, automatic business email or timed reminders. Candidate publication still deferred; current new stages remain internal.
-- Internal main pipeline is settled; see `workflows.md`. Clarify negative outcomes: HR not-selection versus candidate withdrawal versus offer decline.
+- Current internal pipeline is implemented, not immune to review: see workflows.md and interview-api.md. Latest questions include publish-time prerequisites, preselection/bulk/import semantics and panel responsibility. HR Not selected is distinct from deferred candidate withdrawal/offer decline.
 - Internal stage labels versus candidate-visible status labels.
 - Publication manual, automatic for selected events, or mixed?
 - Email/in-app basics; bulk messages and external integrations remain separate scope.
@@ -32,7 +33,7 @@ Answer each cluster independently; detailed API/database design comes later.
 ## 5. AI contract and providers
 - Extraction-only scope: choose practical methods for selected facts; no automatic qualification policy.
 - Evidence representation, confidence interpretation, fixture cases, and fallback behavior.
-- Jev/API access or alternative; embeddings only if justified by the ranking approach.
+- Final extraction method/model/question design remains open despite guarded Jev transport being implemented. No in-platform ranking or embeddings requirement follows from this.
 
 ## 6. Presentation and runtime
 - Visual direction and the concrete demo scenario.
@@ -42,8 +43,8 @@ Answer each cluster independently; detailed API/database design comes later.
 
 ## Next product checkpoint — proposals, not approvals
 - Pipeline/identity agreed. Review is optional cleanup; failed/unreviewed values may export with status/provenance. Completion not approval/export gate. Candidate-visible updates and automatic stage transition remain future decisions.
-- No automatic receipt/business emails required initially; only login codes are automated. HR can use external communication. Revisit messaging/publication/calendar integration after review/export is usable.
-- Recommend submitted snapshots; account holds only contact identity, not a CV profile. Define withdrawal and explicit correction policy.
+- No automatic receipt/business emails required initially; identity verification/reset messages are separate. Internal interview inbox exists. HR can use external communication; candidate publication/email/calendar integration remain separate decisions.
+- Submitted definition/identity snapshots and locked answers/files are implemented; account is not a reusable CV profile. Withdrawal and later submitted-content corrections remain separate unapproved policies.
 - User prefers noneditable published vacancies. Recommend editable drafts, locked published intake definition, and cloning; decide whether closing/unpublishing or descriptive corrections remain allowed.
 - Recommend existing-user interviewers initially; guest invitations deferred. Admin finalization override needs an explicit decision.
 - After these, consolidate core functional requirements, permissions, and basic nonfunctional requirements before implementation approval.

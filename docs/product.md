@@ -1,6 +1,7 @@
 # Product direction
 
 Status: intake/mock review/export and bounded internal interview/progression/inbox workflows implemented. Confirmed constraints are distinguished from proposed behavior. See [`status.md`](status.md), [`interview-api.md`](interview-api.md) and [`architecture.md`](architecture.md) for evidence and gaps.
+Latest requested changes and changeability concerns: [product-checkpoint.md](product-checkpoint.md). Branch real PDF/guarded experimental extraction: [jev-gateway-handoff.md](jev-gateway-handoff.md). Future direction below is not a claim every step is implemented.
 
 ## Confirmed purpose
 Company-branded recruitment management, with a separate deployment per company. Not a job marketplace and not multi-tenant SaaS. Target organizations can range from roughly 10 to 1,000 employees; do not claim this as a tested scale.
@@ -31,7 +32,7 @@ Detailed bounded scenarios and stage meanings are in `workflows.md`.
 3. Uploaded CV is processed asynchronously according to configured extraction tasks. HR reviews suggested facts and evidence alongside candidate answers.
 4. HR reviews/exports a job's applications, optionally processes them externally, and records selection decisions manually in the platform.
 5. HR schedules interviews of different types and records attributable feedback.
-6. An authorized user records the hiring decision and publishes a candidate update.
+6. An authorized user records the hiring decision. Publishing a candidate business update remains desired/deferred, not implemented.
 
 ## Authority
 One accountable vacancy owner, collaborative recruiters, assigned interviewers, and owner finalization are agreed in principle. Recruiter batch allocation may be agreed outside the system. No separate recruitment-manager role is necessary by default.
@@ -43,7 +44,7 @@ Owner is the responsible recruiter coordinating the vacancy and recording the fi
 - Document requests and separate extraction tasks define both candidate UI and backend work. Tasks may populate internal export columns rather than candidate-visible questions.
 - Extraction may concern education, certifications, experience, GPA, or normalized skills. Exact automated support is not yet approved; unsupported facts remain explicit/manual.
 - Backend processing suggests facts; HR can confirm, correct, or work fully manually. No automatic qualification, ranking, or rejection in current scope.
-- Staff can add interview notes and supporting attachments outside the candidate form. Internal material is not automatically candidate-visible.
+- Staff can record private interview notes under the assignment rules. Supporting staff attachments remain deferred. Internal material is not automatically candidate-visible.
 - Configurable scores/formulas are deferred. Extract facts for human review/export; no automatic qualification policy or arbitrary executable rules.
 
 See `vacancy-form.md` for the proposed bounded first model.

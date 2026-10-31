@@ -5,7 +5,7 @@ import { createVacancySchema, patchVacancySchema, publicVacancy, vacancyListSche
 function definition(): CreateVacancy {
   return { title: 'Backend', description: 'Build services', formDefinition: { version: 1, inputs: [
     { id: 'cv', name: 'cv', label: 'CV', type: 'document', required: true, args: { accept: ['.pdf'], limit: { kind: 'NO_LIMIT' } } },
-  ] }, processingDefinition: { version: 1, tasks: [{ id: 'skills', sourceInputId: 'cv', outputKey: 'extracted_skills', type: 'extractSkills', args: { skills: ['SQL'], evidence: true } }] } };
+  ] }, processingDefinition: { version: 1, tasks: [{ id: 'skills', sourceInputId: 'cv', outputKey: 'extracted_skills', type: 'extractSkills', args: { skills: ['sql'], evidence: true } }] } };
 }
 test('separate definitions retain input-owned args and document-task association', () => { deepEqual(createVacancySchema.parse(definition()), definition()); });
 test('unknown task/input arguments and executable/provider metadata are rejected', () => {

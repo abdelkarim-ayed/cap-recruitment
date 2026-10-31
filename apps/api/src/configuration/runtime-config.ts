@@ -42,7 +42,7 @@ export function readRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
       smtp,
     },
     extractionDriver,
-    documentDirectory: join(projectRoot, '.local', 'documents'),
+    documentDirectory: env.DOCUMENT_DIRECTORY ?? join(projectRoot, '.local', 'documents'),
   };
 }
 

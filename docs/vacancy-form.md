@@ -1,5 +1,7 @@
 # Vacancy intake and extraction
 
+Latest bounded branch target: predefined skills on a document, not general CV analysis/experience/proficiency tasks. Final extraction method remains open; guarded Jev transport is separate from algorithm approval. Wider authoring/changeability feedback: [product-checkpoint.md](product-checkpoint.md).
+
 ## Confirmed direction
 Hybrid intake, not mandatory CV-first. HR selects contact fields, documents, explicit questions, and extraction tasks. Ask candidates directly where extraction is unreliable; reduce repetitive work where extraction is practical. Keep candidate answers and extracted values distinct for comparison/export.
 
@@ -10,7 +12,7 @@ An ordered input list with a separate selected-input settings area. Add/remove p
 
 Keep input arguments (slider min/max/step, choices, file limits) distinct from optional task arguments (skills to extract, request evidence, highest education only). Candidate rendering and backend task plans derive from this configuration. Exact first supported presets remain open.
 
-Integrated editor now configures generic inputs and source-linked task arguments; separate definitions still validate/publish together. Field cards support reordering/removal/settings and a candidate preview below. Current catalog: vacancy-api.md; presets remain backlog. Mock-only local executor/recovery is implemented separately. No live AI/parser.
+Integrated editor configures generic inputs and source-linked task arguments; definitions validate/publish together. Field cards support reordering/removal/settings and candidate preview. Current catalog: vacancy-api.md; richer presets remain backlog. Branch real PDF preparation and experimental guarded executor: jev-gateway-handoff.md. No live model-quality verification or automatic extraction runner.
 
 Example: source `cv`; extractor `skills`; output `extracted_skills`; arguments `React, SQL, project management` and an approved alias dictionary. A second task could extract education. Output columns can be internal-only or paired with explicit candidate answers.
 

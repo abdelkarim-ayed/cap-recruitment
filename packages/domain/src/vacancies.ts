@@ -1,5 +1,13 @@
 import { z } from 'zod';
 
+export const normalizeSkills = (skills: string[]) => [...new Set(skills.map(skill => skill.trim().toLowerCase()).filter(Boolean))];
+export const skillValueSchema = z.strictObject({ skills: z.array(z.string().trim().min(1).max(100)).max(100), unavailableSkills: z.array(z.string().trim().min(1).max(100)).max(100).optional() }).refine(value => !(value.unavailableSkills ?? []).some(skill => normalizeSkills(value.skills).includes(skill.toLowerCase())), 'A skill cannot be detected and unavailable.');
+export type SkillValue = z.infer<typeof skillValueSchema>;
+export function skillRows(configured: string[], original: SkillValue | null, effective: SkillValue | null) {
+  const flag = (value: SkillValue | null, skill: string) => !value || normalizeSkills(value.unavailableSkills ?? []).includes(skill) ? null : normalizeSkills(value.skills).includes(skill);
+  return normalizeSkills(configured).map(skill => ({ skill, original: flag(original, skill), effective: flag(effective, skill) }));
+}
+
 const key = z.string().regex(/^[a-z][a-z0-9_\-]{0,63}$/).refine(value => !['constructor', 'prototype', '__proto__'].includes(value), 'Reserved key');
 const label = z.string().trim().min(1).max(200);
 const base = { id: key, name: key, label, required: z.boolean() };
@@ -25,7 +33,7 @@ export const vacancyInputSchema = z.discriminatedUnion('type', [
 export const formDefinitionSchema = z.strictObject({ version: z.literal(1), inputs: z.array(vacancyInputSchema).max(100) });
 export const processingDefinitionSchema = z.strictObject({ version: z.literal(1), tasks: z.array(z.strictObject({
   id: key, sourceInputId: key, outputKey: key, type: z.literal('extractSkills'),
-  args: z.strictObject({ skills: z.array(z.string().trim().min(1).max(100)).min(1).max(100).refine(value => new Set(value.map(skill => skill.toLowerCase())).size === value.length, 'Skills must be unique'), evidence: z.boolean() }),
+    args: z.strictObject({ skills: z.array(z.string().trim().min(1).max(100)).min(1).max(100).transform(normalizeSkills), evidence: z.boolean() }),
 })).max(100) });
 
 const definitionFields = { formDefinition: formDefinitionSchema, processingDefinition: processingDefinitionSchema };

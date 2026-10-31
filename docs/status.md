@@ -1,5 +1,9 @@
 # Implementation status
 
+Docs consistency checkpoint: [README.md](README.md) is the reading map; [product-checkpoint.md](product-checkpoint.md) preserves latest feedback, the skills-only AI MVP versus wider final-product target, unresolved policies and changeability concerns. This documentation pass changes no runtime behavior or approval gates. Older implementation batches below remain historical evidence.
+
+Extraction branch checkpoint (2026-10-31): real isolated PDF preparation, real-reader/fixture-executor mode and transport-tested Jev adapter with batched skill/excerpt choices. No paid calls or automatic worker; defaults remain disabled. Branch-specific commands, checks and limitations: [extraction-handoff.md](extraction-handoff.md). Presentation unchanged.
+
 Shared presentation PDF: [../presentation/exports/status.pdf](../presentation/exports/status.pdf), now tracked and rebuilt by `pdf:build`. Only the final PDF is published; intermediate `dist/` outputs stay ignored. Earlier `dist/status.pdf` references below are historical. Visual checks should use selected low-resolution pages only when needed.
 
 Presentation checkpoint: [../presentation/README.md](../presentation/README.md), revised French script and **36-page PDF** (30 contents + six section dividers), proposed CAP name, explicit requirements and three coded Mermaid/DOT diagrams rendered as SVG. All six user-provided images integrated on pages 3/20/21/22/25/27 without cropping. Cover values supplied except institution/program. Content, name and image framing await user review. Build/Mermaid/frozen-install checks verified; exports stay ignored in presentation/dist/. Sources/provenance in notes.md and assets/manifest.json. Reveal remains a tooling placeholder; application processes/data unchanged. UX/refactoring and role/capability review remain backlog items.

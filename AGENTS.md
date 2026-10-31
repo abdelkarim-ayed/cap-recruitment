@@ -1,8 +1,10 @@
 # Project guidance
 
-Jev continuation: read `docs/jev-gateway-handoff.md` first and load project skill `typesafe-ai` when working on Jev. Never bypass JevGateway, raise/reset limits or its Redis namespace, or execute paid/limit tests without explicit user consent. Main gateway is uncommitted; extraction worktree's old direct HTTP path is not guarded and must not be used live as-is. Read-only discussion remains default unless implementation is authorized. Ambiguous “kill” request has no confirmed process target; do not terminate processes on that basis.
+Jev continuation: read `docs/jev-gateway-handoff.md` first and load project skill `typesafe-ai` when working on Jev. Never bypass JevGateway, raise/reset limits or its Redis namespace, or execute paid/limit tests without explicit user consent. Extraction calls use the gateway; standalone probe is parse-only. Live failures are terminal, not automatically retried. Wrong-session documentation was preserved in commit 74d4cf2 before the skills MVP merge. Read-only discussion remains default unless implementation is authorized. Never terminate processes from an ambiguous request; verify current listeners rather than trusting historical showcase notes.
 
 Implementation is authorized. Start with the agreed scenarios; do not expand into deferred features without approval.
+Selected starter: batched Noul for normalised predefined skills, >=0.8 positive, per-skill review/export, quotations deferred. Implemented and fixture-tested, NOT live-validated; old excerpt-choice notes are historical. Keep defaults disabled unless explicitly approved; broader extraction/task design remains open. Current records are test/demo data; scoped re-fixturing may be acceptable, not blanket reset/deletion or spending-counter-reset permission.
+Latest docs checkpoint: read `docs/README.md` and `docs/product-checkpoint.md` for the skills-only branch MVP, wider final-demo requests and unresolved business rules/changeability concerns. Do not erase these in a later docs rewrite or treat target features as approved implementations. No merge to main in that documentation checkpoint.
 
 ## Read selectively
 - `docs/product.md`: confirmed direction, actors, and workflows.

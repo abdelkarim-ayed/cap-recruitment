@@ -1,5 +1,7 @@
 # Vacancy API — implemented checkpoint
 
+Current contract below does not require an interview pipeline at publication. User now requests such a prerequisite; readiness/legacy-record policy remains to resolve before implementation. See [product-checkpoint.md](product-checkpoint.md). Generic skills configuration is implemented; the guarded live extraction method is still experimental/unselected.
+
 Manual-feedback refinements: staff responses include `owner: {name,email}` alongside ownerId; public projections never include owner identity. List query adds `status=draft|published|closed` and `sort=newest|oldest|title` (default newest), applied before pagination with deterministic ID ties. Public lists remain published-only regardless of filter. Existing owner permissions unchanged.
 
 **Implemented and integration-tested.** Admin/recruiter create/read; owner alone mutates. Interviewer/candidate denied staff vacancy routes. Writes require trusted Origin. Intake: application-api.md; mock-only processing/review/export: processing-review-api.md. No live AI.

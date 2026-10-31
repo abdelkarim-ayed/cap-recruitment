@@ -1,15 +1,16 @@
 # Deferred scope
 
 Not a commitment or schedule. Reorder as requirements become clearer.
+Latest final-demo targets versus the bounded AI branch MVP: [product-checkpoint.md](product-checkpoint.md). Items previously labelled deferred can be requested priorities without yet having an approved implementation contract.
 
 ## Highest relevance after the central workflow
 - Latest feedback priority: candidate-safe published progress and notifications (decide visibility/content before exposing internal stages/notes); candidate home/navigation; whether owners should also receive booking/change notices, beyond existing request/feedback notifications. Not included in the rushed staff UX patch.
 - CSV decision reimport, including partial selection: stable application IDs, strict allowed actions, preview/errors, duplicate/stale/foreign-ID handling, explicit confirmation and transaction policy; bulk preselection after that contract. Current selection remains manual and export remains one-way. Do not claim reimport is implemented.
 - Broader UX consistency pass: task-oriented landing pages, actionable unread counts, table/bulk selection and filtering, clearer owner capabilities in shared HR views. No redesign/component-library migration for the current checkpoint.
 - Presentation-preparation feedback: review role versus resource-capability definitions (owner/assigned interviewer/shared HR), document a clear action/resource matrix and check backend enforcement against frontend affordances. Simplify noisy/non-intuitive components and navigation; assess targeted refactoring after the usability review, not an unapproved rewrite. No implementation included in presentation preparation.
-- Additional editor presets (phone, availability, portfolio, cover letter/supporting document) and richer preset/task combinations: TODO only. The vacancy schema currently supports bounded generic inputs and document extractSkills configuration; graphical editor/presets are not integrated yet.
+- Additional editor presets (phone, availability, portfolio, cover letter/supporting document) and richer preset/task combinations: TODO only. The generic graphical editor and source-linked extractSkills configuration are implemented; richer semantic presets are not.
 - Export hired applicants as CSV; depends on reliable final outcome data.
-- Review-data CSV export is part of the chosen workflow once applications/extraction exist. Decision reimport is a later option requiring stable application IDs, validated actions, preview/confirmation, and audit; not selected yet.
+- Review-data CSV export is implemented, with stable application IDs and original/effective values/status/provenance. Repeated subset decision import is now a requested target; its validation/confirmation/conflict policy and implementation remain open.
 - Email templates and selected-recipient/bulk sending; depends on communication audit and safe confirmation.
 - Extended interview scorecards/panels/materials remain deferred; basic notes/optional score/Pass-Fail and assignment-scoped access are implemented (interview-api.md).
 - Processing health/retry screen; depends on async state model.
