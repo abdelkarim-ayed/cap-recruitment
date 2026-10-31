@@ -21,7 +21,7 @@ test('live provenance survives invalid result validation and executor exceptions
   const provenance = { mode: 'live', provider: 'typesafe', model: 'jev-test', usage: { input_tokens: 25, output_tokens: 5 } };
   for (const executor of [{ describe() { return provenance; }, async execute() { throw new ProcessingFailure('Processing unit timed out.', true); } }, { async execute() { return { provenance, result: { status: 'completed', value: { skills: ['Unconfigured'] }, evidence: [] } }; } }]) {
     const { saved, service } = setup({ async read() { return 'SQL'; } }, executor);
-    await service.processOne('app'); equal(saved[0].result.status, 'failed'); equal(saved[0].provenance.mode, 'live'); equal(saved[0].provenance.usage.input_tokens, 25);
+    await service.processOne('app'); equal(saved[0].result.status, 'failed'); equal(saved[0].result.retryable, false); equal(saved[0].provenance.mode, 'live'); equal(saved[0].provenance.usage.input_tokens, 25);
   }
 });
 test('normal tasks sharing a document prepare it once per application invocation', async () => {

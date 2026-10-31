@@ -48,7 +48,7 @@ export class ProcessingService {
       } catch (error) {
         const storageFailure = error instanceof Error && ['ENOENT','EACCES','EIO','ENOSPC'].includes((error as NodeJS.ErrnoException).code ?? '');
         const reason = storageFailure ? 'Document storage unavailable.' : error instanceof Error ? error.message.slice(0,2000) : 'Processing unit failed.';
-        outcome = { provenance, result: { status: 'failed', value: null, reason, retryable: storageFailure || (error instanceof ProcessingFailure && error.retryable) } };
+        outcome = { provenance, result: { status: 'failed', value: null, reason, retryable: provenance.mode !== 'live' && (storageFailure || (error instanceof ProcessingFailure && error.retryable)) } };
       }
       outcome.provenance.reader = readerMode;
       await this.repository.save(claim.id, claim.token, task.task_id, outcome);

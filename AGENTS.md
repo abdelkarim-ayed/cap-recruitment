@@ -1,6 +1,6 @@
 # Project guidance
 
-Jev continuation: read `docs/jev-gateway-handoff.md` first and load project skill `typesafe-ai` when working on Jev. Never bypass JevGateway, raise/reset limits or its Redis namespace, or execute paid/limit tests without explicit user consent. Main gateway checkpoint committed locally, not pushed; extraction worktree's old direct HTTP path is not guarded and must not be used live as-is. Read-only discussion remains default unless implementation is authorized. Showcase API/Vite explicitly stopped; infrastructure/data preserved. Handoff includes conversation summary, delivery priorities and branch distinction.
+Jev continuation: read `docs/jev-gateway-handoff.md` first and load project skill `typesafe-ai` when working on Jev. Never bypass JevGateway, raise/reset limits or its Redis namespace, or execute paid/limit tests without explicit user consent. Feature branch now incorporates main's gateway checkpoint; extraction calls must use it and standalone probe is parse-only. Live failures are terminal, not automatically retried. Main has separate uncommitted handoff edits: preserve them. Read-only discussion remains default unless implementation is authorized. Never terminate processes from an ambiguous request; verify current listeners rather than trusting historical showcase notes.
 
 Implementation is authorized. Start with the agreed scenarios; do not expand into deferred features without approval.
 

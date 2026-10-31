@@ -22,6 +22,7 @@ const RELEASE = `if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call
 
 interface Job {
   body: string;
+  signal?: AbortSignal;
   resolve(value: unknown): void;
   reject(reason: unknown): void;
 }
@@ -35,14 +36,17 @@ export class JevGateway implements OnModuleDestroy {
   private readonly shutdown = new AbortController();
   private busy = false;
   private readonly subscription = this.jobs.pipe(exhaustMap(job =>
-    defer(() => this.perform(job.body)).pipe(
+    defer(() => this.perform(job.body, job.signal)).pipe(
       tap(value => job.resolve(value)),
       catchError(error => { job.reject(error); return EMPTY; }),
       finalize(() => { this.busy = false; }),
     ),
   )).subscribe();
 
-  request(payload: Readonly<Record<string, unknown>>): Promise<unknown> {
+  isConfigured() { return Boolean(JEV_CONFIG.apiKey); }
+
+  request(payload: Readonly<Record<string, unknown>>, signal?: AbortSignal): Promise<unknown> {
+    if (signal?.aborted) return Promise.reject(new Error('Jev request cancelled.'));
     if (!JEV_CONFIG.apiKey) return Promise.reject(new Error('Jev API key is not configured.'));
     if (this.shutdown.signal.aborted) return Promise.reject(new Error('Jev gateway is shut down.'));
     // No unbounded queue: loops receive an error, not thousands of deferred calls.
@@ -52,10 +56,10 @@ export class JevGateway implements OnModuleDestroy {
     catch { return Promise.reject(new Error('Jev payload must be JSON serializable.')); }
     if (Buffer.byteLength(body) > JEV_CONFIG.limits.maxRequestBytes) return Promise.reject(new Error('Jev request exceeds the local size limit.'));
     this.busy = true;
-    return new Promise((resolve, reject) => this.jobs.next({ body, resolve, reject }));
+    return new Promise((resolve, reject) => this.jobs.next({ body, signal, resolve, reject }));
   }
 
-  private async perform(body: string): Promise<unknown> {
+  private async perform(body: string, signal?: AbortSignal): Promise<unknown> {
     const config = JEV_CONFIG, limits = config.limits;
     const client = createClient({ url: config.redisUrl,
       socket: { connectTimeout: 3000, reconnectStrategy: false }, disableOfflineQueue: true });
@@ -65,14 +69,16 @@ export class JevGateway implements OnModuleDestroy {
     let admitted = false;
     try {
       await client.connect();
+      signal?.throwIfAborted();
       const decision = await client.eval(RESERVE, { keys,
         arguments: [String(limits.totalRequests), String(limits.requestsPerMinute), token, String(limits.lockMs)] });
       if (decision !== 'ok') throw new Error(`Jev local spending guard blocked request (${String(decision)}).`);
       admitted = true;
+      signal?.throwIfAborted();
       const response = await fetch(config.url, {
         method: 'POST', redirect: 'error',
         headers: { Authorization: `Bearer ${config.apiKey}`, 'Content-Type': 'application/json' }, body,
-        signal: AbortSignal.any([this.shutdown.signal, AbortSignal.timeout(limits.timeoutMs)]),
+        signal: AbortSignal.any([this.shutdown.signal, AbortSignal.timeout(limits.timeoutMs), ...(signal ? [signal] : [])]),
       });
       if (!response.ok) {
         await response.body?.cancel();

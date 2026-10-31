@@ -1,5 +1,28 @@
 # Jev spending gateway handoff — 2026-10-31
 
+## Current reconciliation checkpoint — feature branch
+
+This section supersedes the historical branch/transport/runtime statements below.
+
+- Active implementation: `/tmp/opencode/recruitment-extraction`, branch `feat/real-document-extraction`. Merged committed main checkpoint `330e3c9` without resetting, rebasing or moving main. Original extraction commits `2eb4a85`, `751205d` and documentation commit `8633e49` remain in history.
+- Main `/home/ubuntu/code` remains one commit ahead of recorded origin/main, with its existing **uncommitted** `AGENTS.md` and `docs/jev-gateway-handoff.md` edits untouched. Both were read during reconciliation. Their combined extraction summary is covered by [extraction-handoff.md](extraction-handoff.md); no new implementation was present in those dirty docs. Preserve them when later merging back.
+- Skill and guarded configuration from main are now present on this branch. Gateway limits, Redis namespace, endpoint and model are **unchanged** from `330e3c9`. No key read/printed by the agent, real provider call, Redis spending-counter operation, gateway-limit test, reset, reseed or process restart was performed.
+- Extraction's `JevTaskExecutor` now accepts a narrow decision-client port; Nest injects **JevGateway**. There is no direct fetch/key/URL/model override in the executor. The only live HTTP implementation is the gateway, which owns `JEV_API_KEY` and the pinned model. Legacy `TYPESAFE_API_KEY` / `TYPESAFE_MODEL` references were removed from application source.
+- Standalone `extraction:probe` is now **parse-only**, rejecting skill arguments before reading the input. It cannot execute provider calls. Any future live probe must be explicitly approved and use the same gateway.
+- Gateway accepts an optional caller AbortSignal and passes it into its existing HTTP cancellation signal; it checks cancellation before/after admission. No admission rules changed. Cancellation/uncertain admitted calls still consume allowance; no refund/reset was introduced. Added `isConfigured()` for startup preflight without invoking Redis/provider.
+- Every failure after entering a live executor is **non-retryable**, including HTTP/network/guard failures and the outer processing timeout. This intentionally supersedes the old extraction adapter's automatic retry classification. Storage/preparation/fixture recovery policies remain separate. A gateway block is a stop condition, not an instruction to drain/retry pending tasks.
+- Offline business tests use a stub decision client, never `JevGateway.request`. They verify question construction, quote mapping, model ownership, signal forwarding, validation and terminal failure mapping. They do not verify spending guards or actual provider quality. Gateway limit/Redis concurrency tests remain explicitly unexecuted.
+- Verified after integration: API build and 45 API + 14 domain + 28 web DOM tests (**87 total**); real PostgreSQL `extraction:check` with executor explicitly disabled and trusted interpretation fixtures. Existing fake-HTTP business tests were replaced by decision-port fixtures because HTTP now belongs exclusively to the protected gateway. No reduction in live verification claimed: it remains unperformed.
+- Read-only listener inspection found **no listeners on 3000/5173** during this reconciliation. Other-session notes disagree about historical shutdown; do not terminate/restart anything based on those notes. Infrastructure was sufficient for the tagged PostgreSQL fixture check; no infrastructure command was needed here.
+
+### Next safe step
+
+Review integration differences, then request explicit consent for a small chosen synthetic live attempt through the guarded processing CLI. Do not run paid/limit tests merely because the account is funded or implementation is authorized. No automatic poller is registered. Review Redis command timeout/disconnection assumptions before unattended execution; no production guarantee is claimed.
+
+Full extraction/UI/history and playground-only proposals: [extraction-handoff.md](extraction-handoff.md). Presentation unchanged. Nothing pushed.
+
+## Imported main checkpoint — historical context
+
 ## Start here; no full-repo reread needed
 - Current checkout: `/home/ubuntu/code`, branch `main`, baseline `26f0b92`.
 - Gateway/skill/handoff checkpoint committed locally on `main` at the end of this session; **not pushed**. Identify its hash with `git log -1`. Do not discard the separate extraction branch.

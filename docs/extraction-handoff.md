@@ -2,9 +2,9 @@
 
 ## Continuation safety update — read before old commands
 
-The main discussion has continued independently. Its entry point is `/home/ubuntu/code/docs/jev-gateway-handoff.md`; read it and load the project `typesafe-ai` skill before Jev work. Main now has a mandatory `JevGateway` spending boundary. **This feature branch's direct Jev executor/probe is not gateway-protected and must not be run live as-is.** The earlier live instructions below have been withdrawn, not grandfathered in by the former consent setting.
+The main discussion continued independently and its committed gateway work was subsequently merged into this feature branch. Read this branch's [jev-gateway-handoff.md](jev-gateway-handoff.md) current reconciliation section and load `typesafe-ai` first. **The direct transport was removed: extraction now uses JevGateway and the standalone probe is parse-only.** Earlier commits' direct paid paths must not be run. Main's separate uncommitted documentation remains untouched.
 
-All future provider calls must use the gateway. Do not change/reset limits, Redis namespace, endpoint/model or introduce bypass keys/routes. Paid calls and limit tests need explicit scoped consent. The main gateway uses `JEV_API_KEY`; this branch's historical `TYPESAFE_API_KEY` transport needs deliberate reconciliation, not silent substitution. Preserve main's commits and any uncommitted changes. No merge or gateway integration was performed in this documentation update.
+All provider calls must use the gateway. Do not change/reset limits, Redis namespace, endpoint/model or introduce bypass keys/routes. Paid calls and limit tests need explicit scoped consent. Runtime uses `JEV_API_KEY` exclusively through gateway configuration; historical `TYPESAFE_API_KEY` transport was removed. Preserve main's commits and uncommitted changes. Merge/integration details and current checks are in the linked handoff; older sections below are historical where superseded.
 
 Branch: `feat/real-document-extraction`. Worktree: `/tmp/opencode/recruitment-extraction`.
 Initial checkpoint committed as `2eb4a85` using the user-supplied author identity via command-scoped Git options; global/repository configuration unchanged. Follow-up work continues on the same branch. No push performed.
@@ -20,11 +20,11 @@ pnpm --filter @recruitment/api extraction:bench
 pnpm --filter @recruitment/api extraction:probe /absolute/path/to/synthetic-cv.pdf
 ```
 
-With **only the PDF path**, the probe parses without a database, environment-file loading, model call or printing CV text. It prints character count, text hash and elapsed time. **Do not append skill arguments:** that selects the old direct paid transport, which is now prohibited pending gateway integration. Former live opt-in/environment instructions are superseded by the main gateway handoff. No key, model call, account access or actual extraction quality was verified here.
+With **only the PDF path**, the probe parses without a database, environment-file loading, model call or printing CV text. It prints character count, text hash and elapsed time. Additional skill arguments are now rejected; this command has no live mode. No key, model call, account access or actual extraction quality was verified here.
 
 ## Application processing
 
-Live application processing is blocked until the direct executor is routed through main's `JevGateway` and explicit live-test consent is obtained. Do not enable `PROCESSING_EXECUTOR=jev` or bulk pending draining on this branch as-is.
+Live application processing is wired through `JevGateway` but has not been live-verified. Do not enable it or bulk pending draining without explicit scoped live-test consent. Failures of live tasks are terminal, not automatically retried.
 
 Historical wiring to preserve during reconciliation: Nest configuration needs `BETTER_AUTH_SECRET` even for CLI processing; `DOCUMENT_DIRECTORY` allows explicit access to an existing private storage directory without copying files. Completed tasks are not rerun; fixture-bound tasks remain fixtures. Future approved live validation should use a newly chosen synthetic application, not reset prior results or consume manual submissions.
 
@@ -54,7 +54,7 @@ pnpm --filter @recruitment/api extraction:check
 
 ## Deliberately left for morning / next checkpoint
 
-1. First reconcile executor/probe with main's mandatory gateway. Only then, with explicit consent, inspect actual provider acceptance, resolved model, usage and skill/evidence quality on bounded synthetic inputs. No live verification was performed here. Old price estimates are not spending permission or measured charges; use main's latest handoff for account/budget context.
+1. Gateway integration is now implemented; with explicit consent, next inspect actual provider acceptance, resolved model, usage and skill/evidence quality on bounded synthetic inputs. No live verification was performed here. Old price estimates are not spending permission or measured charges; use the current gateway handoff for account/budget context.
 2. Exercise a fresh synthetic application UUID end to end with Jev, then manually inspect HR correction/export. Form/review mode labels were corrected in the follow-up below. Static OpenAPI provenance descriptions remain a post-merge documentation alignment item; no broad schema rewrite was made. No automatic fallback to another provider.
 3. Cron deliberately deferred: after live verification, wrap the same service in an opt-in bounded poller with non-overlap and enabled-executor checks. No poller was registered in API startup, so a build/restart cannot unexpectedly consume the database backlog or spend money. Existing two-minute fencing and recovery support this later change; no queue service is needed.
 4. Cross-task batching, persistent preparation artifacts, evidence-per-skill/page refs, Laya compatibility, DOCX and production upload hardening remain deferred. Jev transport is behind the existing TaskExecutor interface; Laya is not assumed protocol-compatible without a test.
@@ -104,4 +104,4 @@ These are **discussion/test suggestions only**, not implemented product fields, 
 1. Main `docs/jev-gateway-handoff.md` and `typesafe-ai` skill (safety and main progress).
 2. This handoff (branch implementation, historical checks, UI details and chat-only ideas).
 3. Feature commits `2eb4a85` and `751205d`; inspect only relevant processing/config/test/UI diffs against current main. Gateway integration may change retry/timeout assumptions; inspect before merging, not after paid execution.
-4. Propose the smallest integration/conflict plan. Do not merge, run live/limit tests, restart processes or overwrite unrelated work merely because both handoffs are available.
+4. The user subsequently authorized reconciliation: main's committed gateway was merged onto this feature branch, not the other way around. See the current gateway handoff for that integration. This does not authorize live/limit tests, process restarts or overwriting unrelated work.
