@@ -1,8 +1,7 @@
-# Jev spending gateway handoff — 2026-10-31
+# Combined extraction + Jev gateway handoff — 2026-10-31
 
 ## Start here; no full-repo reread needed
-- Current checkout: `/home/ubuntu/code`, branch `main`, baseline `26f0b92`.
-- Gateway/skill/handoff checkpoint committed locally on `main` at the end of this session; **not pushed**. Identify its hash with `git log -1`. Do not discard the separate extraction branch.
+- Current checkout: `/home/ubuntu/code`, branch `main`, latest observed `330e3c9` (gateway/skill/handoff checkpoint), one commit ahead of recorded origin/main. Not pushed. `AGENTS.md` and this handoff have subsequent uncommitted changes; preserve them.
 - User now owns a funded Jev account. No credential was supplied/read here; no paid call made.
 - Default remains discussion/read-only unless user authorizes implementation. This gateway/skill/handoff was explicitly authorized. No live/limit tests authorized.
 
@@ -18,7 +17,7 @@
 - This is a conservative **request allowance**, not token/currency accounting. No claim of a 25M-token budget. Redis data loss/namespace change would reset accounting; preserve its volume. The expiring lease is local admission control, not proof a timed-out provider operation stopped billing.
 - Review Redis command timeout/disconnection handling and concurrency lease assumptions before unattended use; do not test spending guards or execute paid probes without authorization.
 - Never use direct fetch/SDK/probe paths to circumvent this gateway. Do not reset total or change limits/namespace/model/endpoint without asking. Externally using the same key is outside this guard.
-- **API and frontend now stopped**, explicitly authorized by user. SIGTERM sent only to the verified API/Vite listeners (ports 3000/5173). They were not restarted with the gateway. PostgreSQL/Redis/Mailpit left running; no data reset. Logs retained: `/tmp/opencode/showcase-web.log`, `/tmp/opencode/showcase-api.log`. No RMUX session created. User permits RMUX for visible logs in future; discover targets first.
+- API was already running from main before this build; **not restarted after gateway changes**. Frontend/backend logs: `/tmp/opencode/showcase-web.log`, `/tmp/opencode/showcase-api.log`. No RMUX session created. User's ambiguous “kill” request needs a target clarification before stopping anything. Do not restart/stop infrastructure or reseed unnecessarily.
 
 ## Other branch — do not lose this distinction
 - Worktree `/tmp/opencode/recruitment-extraction`, branch `feat/real-document-extraction`, latest observed `751205d` (after `2eb4a85`). Not merged into main.
@@ -26,35 +25,44 @@
 - **Its Jev executor/probe still calls the provider directly and is NOT protected by the new gateway. Do not run its paid instructions as-is.** Migrate all live entrypoints to the guarded boundary first, while preserving cancellation/provenance/result validation.
 - That branch uses `TYPESAFE_API_KEY`; main gateway uses `JEV_API_KEY`. Consolidation is pending, not silently implemented. Skills are currently excerpt-choice questions, not free-form generation.
 
+## Extraction branch: combined summary of its previous handoff
+
+This section incorporates the substantive checkpoint from that branch's `docs/extraction-handoff.md`; no need to read it all again for orientation. Its old paid-probe commands are **superseded by the mandatory gateway rule**, not authorized instructions to run.
+
+### Existing product contract (unchanged by extraction branch)
+- Configurable form inputs and private processing definition. Only `extractSkills` task is supported: sourceInputId identifies a document field; args contain configured skills/evidence. No CV semantic category, arbitrary user prompts or general task DAG.
+- Application freezes the submitted definitions/answers/documents. HR corrections are separate; they do not alter originals. Review/export are not hiring approval and do not gate manual selection.
+- Processing is explicitly invoked. Per-application leases, fenced writes, task retries/recovery and persisted results already exist. Document bytes/text reused within one invocation; no persistent parser cache.
+
+### Implemented on feat/real-document-extraction only
+- Commits `2eb4a85` (PDF preparation/opt-in Jev) and `751205d` (failure handling/review cleanup). No database migration or presentation changes; not merged/pushed.
+- **PDF preparation**: PDF.js 6.4.299 in a killable child with no inherited credentials. Text-native PDFs only: signature/10 MiB, 20 pages, 60000 characters, eight-second timeout, 192 MiB V8 heap cap. Explicit corrupt/encrypted/no-text failures. Not an OS sandbox or complete native-memory quota. No OCR/DOCX/rectangles.
+- **Task registry**: bounded `extractSkills` requirements and output validation; task type passed from frozen snapshot. Reader/executor accept AbortSignal. Fixtures may opt into real PDF parsing while retaining fixture-result provenance and expected-text validation.
+- **Jev extraction**: source split into candidate excerpts; one Choice question per configured skill, excerpt IDs plus not_found, actual text included once. Selected IDs map to exact quotations. This preserves source presence but does not establish semantic accuracy, especially negations/prompt injection/ambiguity. No ranking or suitability decisions.
+- Adapter bounds: 12000 source characters, 40 excerpts, 20 skills, serialized payload cap, 1 MB response, nine-second timeout; oversized inputs fail rather than silently truncate. Retains resolved model/usage even when answer validation fails. Auth/funding/schema versus retryable HTTP/network failures distinguished; errors redact payloads and keys.
+- **Storage/provenance**: optional DOCUMENT_DIRECTORY setting, real reader/model metadata and text hash. Reader failure identifies attempted reader; executor failures retain attempted provenance. Existing lease/retry rules maintained. No page/per-skill evidence schema or persistent preparation artifact.
+- **Review UI**: live/fixture labels per task; effective skills rendered as readable text rather than JSON. Reader/model/attempt metadata in collapsed original-result/evidence area. Original errors/evidence/JSON still accessible; saved HR corrections unchanged. Manual browser review pending.
+
+### Previously verified on that branch (not rerun in this session)
+- API/domain/web tests: **88 total** (46 API + 14 domain + 28 DOM), builds and frozen install.
+- Real PostgreSQL processing:check and extraction:check: parsing with fixture interpretation, persistence/recovery, immutable deposits, corrections/export. Tests create/clean tagged data only. No auth bypass or modification of manual records.
+- Synthetic PDF tests cover page order/blank boundaries, French WinAnsi accents, limits, cancellation/recovery. No general Unicode/layout accuracy claim, no two-column sample evaluation or Windows verification.
+- Five synthetic one-page parse runs including child startup: 567/561/512/574/555 ms. This is parser overhead, **not AI accuracy/latency**. Zero paid requests.
+
+### Remaining work and safe next checkpoint
+1. Reconcile the feature branch with main's JevGateway; route **all** executor/probe live traffic through it. Preserve cancellation, bounded responses, model/usage metadata and errors. Resolve the two environment-key names explicitly; never bypass guards to make a probe run.
+2. Obtain explicit consent for a small synthetic live batch. Verify actual provider acceptance, quotation selection, usage and failure cases. A funded account is not standing permission for automated paid experiments.
+3. Run a fresh chosen synthetic application end to end, then inspect correction/export manually. Do not reset completed/fixture-bound tasks or use bulk pending draining as a shortcut.
+4. Align OpenAPI/provenance docs after integration, then choose whether a bounded opt-in poller is necessary. No extraction worker/poller is registered at API startup today.
+5. Defer general DAGs, persistent preparation cache, cross-task batching, page/rectangle highlights, alternative-provider compatibility, OCR/DOCX and broad production hardening unless approved. Provider prices quoted by the old handoff were researched, not measured account charges; recheck before estimating spend.
+
+### Runtime and presentation checkpoint
+- Main frontend/backend were launched for showcasing, infrastructure already running with host networking. Migrations up to date; seed rerun preserved accounts/submissions/passwords. No reset performed. Redis/PostgreSQL readiness and web/API proxy returned 200. No paid execution or extraction daemon launched.
+- No confirmed process target for “kill”: stop nothing implicitly. Processes may have changed since launch; inspect before any management. User permits RMUX for visible logs, but no RMUX session was created here.
+- Presentation sources in `presentation/`, shared tracked PDF `presentation/exports/status.pdf`; rebuild via pdf:build. Thirty content slides + six intercalaires; final presentation/demo and new real-extraction results still need reconciliation. Do not claim unverified IA results. Only rasterize selected low-resolution pages when necessary.
+
 ## Skill installed locally
 `.opencode/skills/typesafe-ai/SKILL.md` is the project safety wrapper. Official raw vendor skill is preserved at `references/upstream-SKILL.md`; docs source, SHA and consent warning in wrapper. No npm package, plugins or global configuration added. New session can load `typesafe-ai`; otherwise read the wrapper directly.
 
 ## Small next-session instruction
-“Read docs/jev-gateway-handoff.md and load the typesafe-ai skill. Main gateway checkpoint is committed but unpushed; extraction work remains on its separate branch. No paid requests, quota tests or safeguard changes. First reconcile that branch's direct transport with JevGateway; propose the integration before editing unless I authorize it.”
-
-## Conversation summary appended for continuation
-
-### Delivery priorities and discussion decisions
-- Student's university instructor now expects a **final presentation/demo ASAP**; progress meeting did not take place. User has about two focused working days, presentation completion weighted heavily. Recorded demo preferred. This is planning context, not a delivery guarantee.
-- Proposed minimal core: real text-native PDF + configured-skills task + trustworthy source excerpts + existing correction/export flow. Avoid broad DAG/cache frameworks, OCR/DOCX, bulk import, ranking or production deployment scope. These remain proposals except work already implemented on the extraction branch.
-- User asked about semantic CV/certificate presets, task preconditions, shared preparation, IDs/caching and evidence. Current main contract is document-source-linked `extractSkills` only; form types are a fixed Zod union, no semantic document category or arbitrary procedures. Reader/executor abstraction exists; no dependency graph. In-memory per-invocation byte/text reuse, persisted task outcomes, no persistent parsed-document cache.
-- Existing evidence is persisted `string[]`, not new from scratch. Page/block references and parser-generated highlights discussed as extensions, not implemented on main. Rectangle coordinates should not be invented by the model. The feature branch maps chosen excerpt IDs to source quotes.
-- A separate expensive-model session was given a selective reading prompt; use its actual branch handoff rather than reconstructing from old proposals. Both handoffs remain relevant; no merge authorized here.
-
-### Showcase performed this session
-- Started main after checking ports/worktrees; no branch process was occupying API/web. Existing infrastructure was healthy; feature branch has no migration changes relative to main.
-- Built main, ran auth/application migrations and **preserving** `demo:seed`; existing accounts/passwords/submissions retained. Application schema was up to date. Auth migration logged a lastRequest int8/type warning but completed.
-- Main API used `MAIL_DRIVER=file`; Vite loopback 5173. Readiness reported PostgreSQL/Redis OK; web/API proxy HTTP 200. No browser automation or extraction executed. Servers subsequently stopped at user request (above).
-- Demo login reminders: candidate `demo.candidate@example.test`, alternate candidate2; initial public synthetic password `DemoRecruitment!2026`, unless changed. HR `demo.hr@example.test`. Credentials are demo-only, not production secrets.
-- User asked about database viewing: pgAdmin/Adminer suggested, **not installed or launched**. Remote-PC localhost/tunnel caveat explained.
-
-### Spending protection request and implementation boundary
-- User bought Jev and is concerned about accidental spending from repeated tests/loops. Requested a server-side RxJS gateway with central hard-coded limits and a warning against other agents changing them.
-- Gateway is a new isolated transport boundary on main, not completion of live extraction integration. No tests of limits or live calls performed, as explicitly requested. Only API compilation/typecheck and whitespace checks ran.
-- Persistent request cap was chosen as a simple conservative safeguard; token-based reservation/reconciliation and currency accounting were only discussed, not implemented. All allowed attempts must use the same gateway/Redis namespace; provider key use outside it cannot be controlled locally.
-- Official skill is installed project-locally from raw vendor Markdown, prefixed via a local safety wrapper. No npm installer/plugin/global config changes. Do not follow upstream live-probing/payload-logging advice without project consent/privacy checks.
-
-### Presentation/repository context
-- Current shared presentation: `presentation/exports/status.pdf`, 36 pages (30 content + six intercalaires), Typst renderer; Reveal.js installed but still a placeholder. French slides, English product UI/project docs mostly English. Metadata and six user images already integrated; no presentation changes in this gateway session.
-- Repository: private `abdelkarim-ayed/cap-recruitment`; `origin/main` last observed at `26f0b92`. Prior CI passed after temp-path fix. No new push or CI run for this gateway work.
-- Root AGENTS.md contains project constraints; read selectively. Do not rasterize every slide: targeted low-resolution previews only if needed.
+“Read docs/jev-gateway-handoff.md and load the typesafe-ai skill. It combines both branch checkpoints. Preserve existing commits/uncommitted work. No paid requests, quota tests or safeguard changes. First reconcile the extraction branch's direct transport with JevGateway; propose the integration before editing unless I authorize it.”
