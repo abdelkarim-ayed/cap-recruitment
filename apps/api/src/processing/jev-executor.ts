@@ -7,6 +7,10 @@ const probability = z.number().min(0).max(1);
 const responseSchema = z.object({ model: z.string().min(1).max(200), usage: z.object({ input_tokens: z.number().int().nonnegative(), output_tokens: z.number().int().nonnegative() }), answers: z.record(z.string(), z.object({ type: z.literal('choice'), choice: z.string(), confidence: probability, probabilities: z.record(z.string(), probability) })) });
 // Narrow port for offline business-validation fixtures; production wiring supplies JevGateway.
 export interface JevDecisionClient { request(payload: Readonly<Record<string, unknown>>, signal?: AbortSignal): Promise<unknown> }
+// EXPERIMENTAL / NOT SELECTED: excerpt-choice skills extraction is a candidate
+// implementation, not an approved extraction method or validated model choice.
+// Approval of JevGateway's spending boundary does not approve this algorithm.
+// Disabled by default; no live evaluation has been performed.
 export class JevTaskExecutor implements TaskExecutor {
   constructor(private readonly gateway: JevDecisionClient) {}
   describe(): ExecutionResult['provenance'] { return { mode: 'live', provider: 'typesafe', model: JEV_CONFIG.model, method: 'skill-excerpt-choice-v1' }; }

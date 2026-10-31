@@ -4,6 +4,8 @@
 
 This section supersedes the historical branch/transport/runtime statements below.
 
+**Decision clarification:** JevGateway's guarded transport is approved. The excerpt-choice `JevTaskExecutor` is an **experimental, unselected candidate**; its algorithm/question design, production use and final model choice have not been approved or live-evaluated. Its existence in code is not a decision to use it. Defaults remain disabled. Do not promote it or its current character/excerpt/skill caps to product policy without approval.
+
 - Active implementation: `/tmp/opencode/recruitment-extraction`, branch `feat/real-document-extraction`. Merged committed main checkpoint `330e3c9` without resetting, rebasing or moving main. Original extraction commits `2eb4a85`, `751205d` and documentation commit `8633e49` remain in history.
 - Main `/home/ubuntu/code` remains one commit ahead of recorded origin/main, with its existing **uncommitted** `AGENTS.md` and `docs/jev-gateway-handoff.md` edits untouched. Both were read during reconciliation. Their combined extraction summary is covered by [extraction-handoff.md](extraction-handoff.md); no new implementation was present in those dirty docs. Preserve them when later merging back.
 - Skill and guarded configuration from main are now present on this branch. Gateway limits, Redis namespace, endpoint and model are **unchanged** from `330e3c9`. No key read/printed by the agent, real provider call, Redis spending-counter operation, gateway-limit test, reset, reseed or process restart was performed.
@@ -18,6 +20,12 @@ This section supersedes the historical branch/transport/runtime statements below
 ### Next safe step
 
 Review integration differences, then request explicit consent for a small chosen synthetic live attempt through the guarded processing CLI. Do not run paid/limit tests merely because the account is funded or implementation is authorized. No automatic poller is registered. Review Redis command timeout/disconnection assumptions before unattended execution; no production guarantee is claimed.
+
+### Token sizing discussion — estimates, not new limits
+
+Official model docs checked 2026-10-31: https://docs.typesafe.ai/models — default 64000 tokens for shared state plus all questions, 32000 for state plus each individual question. No token minimum is specified there. State is ingested once; instructions/criteria still count. Current gateway cap is 60000 **bytes**, not tokens; experimental adapter also has character/excerpt/skill bounds, not tokenizer-based accounting. No limits changed and no provider/limit tests performed.
+
+Planning estimate for a one/two-page French/English CV: roughly 800–3500 source tokens, sometimes 5000 with dense/noisy parsing. A compact batch of 10–20 fixed questions could put the full request around 2000–8000 tokens. Repeated excerpt-choice options can push it into roughly 8000–16000+; estimate is language/tokenizer/payload dependent and unmeasured. Prefer compact questions, not artificial minimum padding or truncation. A 12000–16000-token planning ceiling is a proposal only, not configured enforcement. Actual usage must be checked in a separately approved synthetic live attempt. At the published $0.042/M input-token rate, 8000 tokens cost $0.000336 and 16000 cost $0.000672, before any other charges; minimum account top-up differs from consumption.
 
 Full extraction/UI/history and playground-only proposals: [extraction-handoff.md](extraction-handoff.md). Presentation unchanged. Nothing pushed.
 

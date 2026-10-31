@@ -1,5 +1,7 @@
 # Extraction branch handoff — 2026-10-31
 
+**Extraction decision remains open:** the implemented excerpt-choice Jev executor is experimental/unselected, not an approved extraction method or evidence of live quality. Guarded transport was approved separately. Local-model/provider alternatives and final question design remain undecided. Runtime defaults remain disabled; no safeguards or limits changed by this clarification.
+
 ## Continuation safety update — read before old commands
 
 The main discussion continued independently and its committed gateway work was subsequently merged into this feature branch. Read this branch's [jev-gateway-handoff.md](jev-gateway-handoff.md) current reconciliation section and load `typesafe-ai` first. **The direct transport was removed: extraction now uses JevGateway and the standalone probe is parse-only.** Earlier commits' direct paid paths must not be run. Main's separate uncommitted documentation remains untouched.
