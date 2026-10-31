@@ -1,8 +1,14 @@
 # Extraction branch handoff — 2026-10-31
 
+## Continuation safety update — read before old commands
+
+The main discussion has continued independently. Its entry point is `/home/ubuntu/code/docs/jev-gateway-handoff.md`; read it and load the project `typesafe-ai` skill before Jev work. Main now has a mandatory `JevGateway` spending boundary. **This feature branch's direct Jev executor/probe is not gateway-protected and must not be run live as-is.** The earlier live instructions below have been withdrawn, not grandfathered in by the former consent setting.
+
+All future provider calls must use the gateway. Do not change/reset limits, Redis namespace, endpoint/model or introduce bypass keys/routes. Paid calls and limit tests need explicit scoped consent. The main gateway uses `JEV_API_KEY`; this branch's historical `TYPESAFE_API_KEY` transport needs deliberate reconciliation, not silent substitution. Preserve main's commits and any uncommitted changes. No merge or gateway integration was performed in this documentation update.
+
 Branch: `feat/real-document-extraction`. Worktree: `/tmp/opencode/recruitment-extraction`.
 Initial checkpoint committed as `2eb4a85` using the user-supplied author identity via command-scoped Git options; global/repository configuration unchanged. Follow-up work continues on the same branch. No push performed.
-Main remains unchanged. No presentation files/exports, database migrations, global configuration, credentials or remote publishing changed. Existing Podman containers were started, not recreated/reset; host networking and volumes preserved. Infrastructure health passed. No extraction daemon was started; no existing application was processed. Integration checks create and clean their own tagged records/files.
+The implementation in this discussion did not modify main. Main has since advanced in another discussion; do not interpret this historical checkpoint as current main/runtime status. No presentation files/exports, database migrations, global configuration, credentials or remote publishing changed here. Existing Podman containers were started, not recreated/reset; host networking and volumes preserved. Infrastructure health passed then. No extraction daemon was started here; no existing application was processed. Integration checks create and clean their own tagged records/files.
 
 ## Morning quick start
 
@@ -14,25 +20,13 @@ pnpm --filter @recruitment/api extraction:bench
 pnpm --filter @recruitment/api extraction:probe /absolute/path/to/synthetic-cv.pdf
 ```
 
-The probe parses without a database, environment-file loading, model call or printing CV text. It prints character count, text hash and elapsed time. For a **paid** standalone Jev call, supply a key privately in the shell environment (do not commit or paste it into chat), then:
-
-```sh
-EXTRACTION_LIVE_CONSENT=synthetic pnpm --filter @recruitment/api extraction:probe /absolute/path/to/synthetic-cv.pdf SQL TypeScript
-```
-
-Required environment: `TYPESAFE_API_KEY`. Optional: `TYPESAFE_MODEL` (default pinned `jev-1.14.0`). This probe prints extracted skills/evidence and token usage, so use synthetic data and keep output private. One request contains all configured skills. No key, model call, account access or actual extraction quality has been verified.
+With **only the PDF path**, the probe parses without a database, environment-file loading, model call or printing CV text. It prints character count, text hash and elapsed time. **Do not append skill arguments:** that selects the old direct paid transport, which is now prohibited pending gateway integration. Former live opt-in/environment instructions are superseded by the main gateway handoff. No key, model call, account access or actual extraction quality was verified here.
 
 ## Application processing
 
-For a fresh synthetic submission with pending extraction, use the branch CLI with an **explicit application UUID**, without a fixture file:
+Live application processing is blocked until the direct executor is routed through main's `JevGateway` and explicit live-test consent is obtained. Do not enable `PROCESSING_EXECUTOR=jev` or bulk pending draining on this branch as-is.
 
-```sh
-PROCESSING_READER=pdf PROCESSING_EXECUTOR=jev EXTRACTION_LIVE_CONSENT=synthetic DOCUMENT_DIRECTORY=/home/ubuntu/code/.local/documents pnpm --filter @recruitment/api processing:run APPLICATION_UUID
-```
-
-This also needs `TYPESAFE_API_KEY` and a `BETTER_AUTH_SECRET` of at least 32 characters in this worktree's command environment. The latter is required by existing Nest configuration even though the processing CLI does not authenticate requests; a disposable CLI-only value suffices and does not reconfigure the running API. Database defaults use existing localhost development PostgreSQL; override `DATABASE_URL` if needed. `DOCUMENT_DIRECTORY` explicitly lets this worktree read the original checkout's private document storage, without copying/modifying files.
-
-Only do this for synthetic records you deliberately choose. Do not use `pending`: live batch draining requires the separate `PROCESSING_ALLOW_ALL=true` opt-in. CLI refuses to claim work with disabled executor and no fixture file. Completed tasks are not rerun; previously bound fixture tasks stay fixture-backed. Use a new submission/vacancy for the first live attempt rather than editing database state or erasing fixture results.
+Historical wiring to preserve during reconciliation: Nest configuration needs `BETTER_AUTH_SECRET` even for CLI processing; `DOCUMENT_DIRECTORY` allows explicit access to an existing private storage directory without copying files. Completed tasks are not rerun; fixture-bound tasks remain fixtures. Future approved live validation should use a newly chosen synthetic application, not reset prior results or consume manual submissions.
 
 ## Implemented
 
@@ -60,7 +54,7 @@ pnpm --filter @recruitment/api extraction:check
 
 ## Deliberately left for morning / next checkpoint
 
-1. Fund Jev, run the standalone synthetic probe, inspect actual request acceptance, resolved model, usage and skill/evidence quality. No live verification claimed. Published rate checked 2026-10-31: $0.042/M input tokens, output free. Actual request usage—not earlier hypothetical token estimates—should drive the final estimate. Minimum top-up/account terms unverified.
+1. First reconcile executor/probe with main's mandatory gateway. Only then, with explicit consent, inspect actual provider acceptance, resolved model, usage and skill/evidence quality on bounded synthetic inputs. No live verification was performed here. Old price estimates are not spending permission or measured charges; use main's latest handoff for account/budget context.
 2. Exercise a fresh synthetic application UUID end to end with Jev, then manually inspect HR correction/export. Form/review mode labels were corrected in the follow-up below. Static OpenAPI provenance descriptions remain a post-merge documentation alignment item; no broad schema rewrite was made. No automatic fallback to another provider.
 3. Cron deliberately deferred: after live verification, wrap the same service in an opt-in bounded poller with non-overlap and enabled-executor checks. No poller was registered in API startup, so a build/restart cannot unexpectedly consume the database backlog or spend money. Existing two-minute fencing and recovery support this later change; no queue service is needed.
 4. Cross-task batching, persistent preparation artifacts, evidence-per-skill/page refs, Laya compatibility, DOCX and production upload hardening remain deferred. Jev transport is behind the existing TaskExecutor interface; Laya is not assumed protocol-compatible without a test.
@@ -91,4 +85,23 @@ All details here are the merge-time documentation checklist; wider product/API d
 
 ### Scope / operational state
 - No scheduler added/enabled, production policy claims, global configuration changes, extra services, reseed, manual-record mutations, presentation exports, browser sessions or paid requests.
-- Initial checkpoint was committed with the supplied author identity using per-command Git options. This follow-up is committed separately on the same feature branch. No push to any branch was performed; main checkout remains clean.
+- Initial checkpoint was committed with the supplied author identity using per-command Git options. This follow-up was committed separately on the same feature branch. No push to any branch was performed; main was clean at that checkpoint (not a claim about the later main discussion).
+
+## Playground discussion transferred for the main session
+
+These are **discussion/test suggestions only**, not implemented product fields, new task types, approved hiring policies or model evaluation results:
+
+- User compared Jev, Luna and local Qwen-based decision models (Laya/Kev). At one point the user reported Jev's $5 minimum top-up and considered local inference on the host, outside this container. Main's later handoff records a funded account; preserve the chronology rather than assuming the earlier local-only idea remains the final decision.
+- The proposed manual comparison uses **one generic HR questionnaire chosen before inspecting any CV**, reused unchanged for four realistic synthetic CVs. Avoid tailored answer choices, explicit contrived “I have never used X” statements and artificial parser annotations. Flattened two-column text may interleave left/right lines; plain page numbers may occur alone.
+- Chat supplied four synthetic, at-most-two-page-style examples: English software engineer, French industrial maintenance engineer, English commercial-operations specialist, French infrastructure engineer. They are chat-only examples, not saved fixtures or an evaluated dataset in this branch.
+- Fixed decision questions cover principal professional domain, dated experience bands (reference date 2026-10-31, no double-counting overlaps), current Germany location versus travel/relocation, explicit work authorisation, highest completed degree, stated English level and explicit people management. Skill questions cover SQL/Python/Excel evidence levels and Docker/Kubernetes/Terraform/Linux/Power BI/SAP/Salesforce/Lean-Six-Sigma presence.
+- Evidence levels mean `not_found`, `listed_or_studied`, `applied`, `substantial_responsibility`; they describe what the CV supports, **not independently measured proficiency or candidate ranking**. HR retains interpretation and hiring decisions. Do not infer work authorisation from nationality/name/address.
+- A separate suggested JSON Schema for generative structured extraction includes nullable name/email/phone/LinkedIn/address/current country/experience years, lowercase deduplicated `skills` and `infrastructure_skills` arrays, plus skill/evidence-level/verbatim-quote objects. This schema was not added to the application. Arbitrary strings/open-ended skill discovery are not supported merely by a decision endpoint accepting `choice`/`noul`/`score` questions; verify each actual model wrapper's capabilities.
+- Same CV/configuration across models; inspect factual extraction, missing values, exact quotations, context truncation and latency. Do not compare raw confidence values as if calibrated identically. No playground test, local-model installation, provider benchmark or live accuracy finding was performed in this discussion.
+
+### Minimal reconciliation reading list
+
+1. Main `docs/jev-gateway-handoff.md` and `typesafe-ai` skill (safety and main progress).
+2. This handoff (branch implementation, historical checks, UI details and chat-only ideas).
+3. Feature commits `2eb4a85` and `751205d`; inspect only relevant processing/config/test/UI diffs against current main. Gateway integration may change retry/timeout assumptions; inspect before merging, not after paid execution.
+4. Propose the smallest integration/conflict plan. Do not merge, run live/limit tests, restart processes or overwrite unrelated work merely because both handoffs are available.
