@@ -5,7 +5,7 @@ import type { Vacancy } from '@recruitment/domain/vacancies';
 import { DatabaseService } from '../database/database.service.js';
 import type { ExecutionResult, TaskFixture } from './execution.js';
 
-export interface TaskRow { application_id: string; task_id: string; source_input_id: string; output_key: string; args: { skills: string[]; evidence: boolean }; fixture_key: string | null; status: string; attempts: number; retryable: boolean }
+export interface TaskRow { application_id: string; task_id: string; source_input_id: string; output_key: string; type: 'extractSkills'; args: { skills: string[]; evidence: boolean }; fixture_key: string | null; status: string; attempts: number; retryable: boolean }
 @Injectable()
 export class ProcessingRepository {
   constructor(private readonly database: DatabaseService) {}
@@ -35,7 +35,9 @@ export class ProcessingRepository {
       const token = randomUUID();
       await client.query("UPDATE applications SET processing_state='processing',processing_token=$2,processing_lease_until=now()+interval '2 minutes',processing_next_at=NULL WHERE id=$1", [row.id, token]);
       const tasks = await client.query<TaskRow>('SELECT * FROM application_tasks WHERE application_id=$1 ORDER BY task_id', [row.id]);
-      return { id: row.id as string, token, tasks: tasks.rows };
+      // Task type comes from the immutable snapshot; no migration/rewrite of existing rows.
+      const definitions = (row.vacancy_snapshot as Vacancy).processingDefinition.tasks;
+      return { id: row.id as string, token, tasks: tasks.rows.map(task => ({ ...task, type: definitions.find(definition => definition.id === task.task_id)!.type })) };
     });
   }
   private async fenced<T>(id: string, token: string, operation: (client: PoolClient) => Promise<T>) {

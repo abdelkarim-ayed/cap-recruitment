@@ -15,6 +15,10 @@ import { ProcessingService } from '../dist/processing/processing.service.js';
 import { ProcessingRepository } from '../dist/processing/processing.repository.js';
 import { FIXTURE_REGISTRY } from '../dist/processing/execution.js';
 import { createHash } from 'node:crypto';
+import { syntheticPdf } from './pdf-fixture.mjs';
+
+const realReaderCheck = process.argv.includes('--real-reader');
+if (realReaderCheck) process.env.PROCESSING_READER = 'pdf';
 
 const directory = await mkdtemp('/tmp/opencode/application-check-');
 const settings = { ...readRuntimeConfig({ ...process.env, MAIL_DRIVER: 'file' }), documentDirectory: directory };
@@ -52,7 +56,7 @@ const definition = { title: 'Application fixture', description: 'No real candida
   { id: 'other', name: 'other', label: 'Other', type: 'document', required: false, args: {} },
   { id: 'third', name: 'third', label: 'Third', type: 'document', required: false, args: {} },
 ] }, processingDefinition: { version: 1, tasks: [{ id: 'skills', type: 'extractSkills', sourceInputId: 'cv', outputKey: 'extracted_skills', args: { skills: ['SQL'], evidence: true } }] } };
-const answers = { name: 'Fixture name', available: false }, pdf = Buffer.from('%PDF-1.7\nUNTRUSTED DOCUMENT FIXTURE\n');
+const answers = { name: 'Fixture name', available: false }, pdf = realReaderCheck ? syntheticPdf() : Buffer.from('%PDF-1.7\nUNTRUSTED DOCUMENT FIXTURE\n');
 const processingCheck = process.argv.includes('--processing');
 if (processingCheck) definition.processingDefinition.tasks.push({ id:'extra',type:'extractSkills',sourceInputId:'cv',outputKey:'extra_skills',args:{skills:['Rust'],evidence:false} });
 async function submit(id, candidate, values = answers, files = [{ field: 'cv', name: 'cv.pdf', bytes: pdf }], origin = settings.webOrigin) {
@@ -129,6 +133,7 @@ try {
   if (processingCheck) {
     const registry = app.get(FIXTURE_REGISTRY), repository = app.get(ProcessingRepository), processor = app.get(ProcessingService);
     const fixtures = definition.processingDefinition.tasks.map(task => ({fixtureKey:`fixture-${task.id}`,applicationId:application.id,documentId,sourceHash:createHash('sha256').update(pdf).digest('hex'),taskId:task.id,args:task.args,text:'FIXTURE ONLY: SQL text',result:task.id==='skills' ? {status:'completed',value:{skills:[]},evidence:['FIXTURE ONLY: no skills recorded']} : {status:'failed',value:null,reason:'Recorded fixture failure',retryable:true}}));
+    if (realReaderCheck) for (const fixture of fixtures) { fixture.reader = 'pdf'; fixture.text = 'SQL and TypeScript projects'; }
     registry.load(fixtures); await repository.bind(fixtures);
     // Simulate a killed executor; expired claims must be safely reclaimed.
     const killed = await repository.claim(application.id); ok(killed); await repository.start(application.id,killed.token,'skills');
@@ -170,6 +175,7 @@ try {
     await app.close(); await start();
     const persistedReview = await json(`applications/${application.id}/review`,undefined,admin.cookie); equal(persistedReview.status,200); equal(persistedReview.body.tasks.find(task=>task.taskId==='extra').attempts,3);
     equal(persistedReview.body.tasks.find(task=>task.taskId==='skills').provenance.fixtureId,'fixture-skills');
+    if (realReaderCheck) { equal(persistedReview.body.tasks.find(task=>task.taskId==='skills').provenance.reader,'pdfjs-dist@6.4.299'); console.log('PASS: real PDF parser → trusted fixture interpretation → persisted reader provenance; no live provider call.'); }
     console.log('PASS: tagged relay fixtures, persisted task failures/results, lease recovery/fencing, retry cap, optional shared review, corrections, immutable answers and ungated CSV export.');
   }
   console.log('PASS: real OTP/HTTP/PostgreSQL/private uploads, limits, rollback cleanup, duplicates/concurrency, access isolation and downloads after restart. No live AI.');
