@@ -42,17 +42,18 @@ export function ApplicationList({staff}:{staff:boolean}) {
 
 function TaskCard({task,onSave,busy}:{task:any;onSave:(correction:any)=>void;busy:boolean}) {
   const [skills,setSkills]=useState<string>((task.effectiveValue?.skills??[]).join(', ')),[nullValue,setNullValue]=useState(task.hasCorrection&&task.correction===null);
+  const [skillFlags,setSkillFlags]=useState<Record<string,string>>(()=>Object.fromEntries((task.skillResults??[]).map((row:any)=>[row.skill,row.effective===null?'unknown':String(row.effective)])));
   return <article className="extraction-card">
     <div className="section-heading"><h3>{task.outputKey}</h3><div className="status-row"><Badge>{task.hasCorrection?'HR corrections saved':extractionLabel(task.status)}</Badge>{task.provenance?.mode==='fixture'&&<Badge>Fixture result</Badge>}{task.provenance?.mode==='live'&&<Badge>{task.provenance.provider==='typesafe'?'Jev result':'Live extraction'}</Badge>}</div></div>
     <div className="saved-value" aria-label={`Latest saved value for ${task.outputKey}`}>
       <span className="eyebrow">LATEST SAVED VALUE</span>
       <h4>{task.hasCorrection?'Saved HR correction':task.result.status==='completed'?'Original extraction (no correction)':'Unavailable — extraction has not succeeded'}</h4>
-      <p className="effective-skills">{task.effectiveValue===null?'Unavailable (null)':task.effectiveValue?.skills?.length?task.effectiveValue.skills.join(', '):'No skills found.'}</p>
+      {task.skillResults?<dl>{task.skillResults.map((row:any)=><div key={row.skill}><dt>{row.skill}</dt><dd>{row.effective===null?'Unavailable':row.effective?'Detected':'Not detected'}</dd></div>)}</dl>:<p className="effective-skills">{task.effectiveValue===null?'Unavailable (null)':task.effectiveValue?.skills?.length?task.effectiveValue.skills.join(', '):'No skills found.'}</p>}
       {task.hasCorrection&&<small className="saved-state">Saved {task.correctedAt?new Date(task.correctedAt).toLocaleString():''}{task.corrector?` · ${task.corrector.name||task.corrector.email}`:''}</small>}
     </div>
-    <form className="correction-form" onSubmit={e=>{e.preventDefault();onSave({taskId:task.taskId,value:nullValue?null:{skills:skills.split(',').map(v=>v.trim()).filter(Boolean)}});}}>
-      <label>Skills (comma separated)<input disabled={busy||nullValue} value={skills} onChange={e=>setSkills(e.target.value)} placeholder="SQL, TypeScript"/></label>
-      <label className="check"><input disabled={busy} type="checkbox" checked={nullValue} onChange={e=>setNullValue(e.target.checked)}/> Explicitly mark unavailable (null)</label>
+    <form className="correction-form" onSubmit={e=>{e.preventDefault();onSave({taskId:task.taskId,value:task.skillResults?{skills:Object.keys(skillFlags).filter(skill=>skillFlags[skill]==='true'),unavailableSkills:Object.keys(skillFlags).filter(skill=>skillFlags[skill]==='unknown')}:nullValue?null:{skills:skills.split(',').map(v=>v.trim()).filter(Boolean)}});}}>
+      {task.skillResults?<div className="grid two">{task.skillResults.map((row:any)=><label key={row.skill}>Review {row.skill}<select disabled={busy} value={skillFlags[row.skill]} onChange={e=>setSkillFlags({...skillFlags,[row.skill]:e.target.value})}><option value="true">Detected</option><option value="false">Not detected</option><option value="unknown">Unavailable</option></select></label>)}</div>:<><label>Skills (comma separated)<input disabled={busy||nullValue} value={skills} onChange={e=>setSkills(e.target.value)} placeholder="SQL, TypeScript"/></label>
+      <label className="check"><input disabled={busy} type="checkbox" checked={nullValue} onChange={e=>setNullValue(e.target.checked)}/> Explicitly mark unavailable (null)</label></>}
       <div className="actions"><button disabled={busy}>Save correction</button>{task.hasCorrection&&<button type="button" disabled={busy} onClick={()=>onSave({taskId:task.taskId,value:null,remove:true})}>Use original</button>}</div>
     </form>
     <details className="original-result"><summary>Original extraction and evidence · {extractionLabel(task.status)}</summary>

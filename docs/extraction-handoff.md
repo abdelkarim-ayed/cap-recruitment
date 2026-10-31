@@ -1,5 +1,7 @@
 # Extraction branch handoff — 2026-10-31
 
+**Starter now implemented:** batched Noul at >=0.8 for normalised configured skills; per-skill tri-state review/corrections/CSV; evidence deferred. This supersedes the unselected excerpt-choice implementation discussed historically below. See the current opening section of jev-gateway-handoff.md for exact compatible storage/projection/CSV contract and checks. No real provider call or existing pending application was executed. Current data is test/demo data per user; no reset/re-fixturing was needed.
+
 Latest starter decision: shared-CV batched Noul questions for normalised HR-supplied skills, claimed knowledge/use, provisional >=0.8 positive threshold, **one result per skill**, evidence deferred. Not implemented yet; current excerpt-choice/list executor is not the selected starter. See product-checkpoint.md, “Starter skills decisions clarified after this checkpoint”, before continuing code.
 
 Latest docs-only continuation: [README.md](README.md) gives the reading order; [product-checkpoint.md](product-checkpoint.md) records user feedback and open decisions before further MVP/reorganisation work. It separates the predefined-skills AI branch target from wider inbox/preselection/import/panel/publication/runner requests. No merge to main, feature change or paid call in that docs pass. General docs were corrected/flagged for stale editor/interview/progression/auth/worker claims; historical evidence retained, not promoted into current requirements.

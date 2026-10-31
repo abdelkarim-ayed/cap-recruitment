@@ -2,6 +2,10 @@
 
 Documentation/discussion checkpoint only. No new feature, migration, policy transition, merge or provider call is authorized by this file. Existing contracts stay in effect until deliberately changed. Reading map: [README.md](README.md).
 
+## Test-data and implementation clarification
+
+User confirms current application records/documents are test/demo data, not production recruitment data. Scoped re-fixturing can be acceptable; this is not blanket permission to reset databases, delete volumes, discard work or reset Jev counters. Existing records need not be rewritten for this slice. User subsequently authorized implementing the bounded Noul skills slice and local merge before cleanup. No live validation is required or undertaken; paid calls/limit tests remain separately consent-gated. Preserve this discussion checkpoint during the later cleanup.
+
 ## Two delivery scopes — do not conflate them
 
 **Bounded AI feature-branch MVP:** HR configures a predefined skill set on a document task; text-native PDF preparation; guarded Jev-assisted skills extraction; source evidence; existing separate correction and CSV flow. No years-of-experience extraction, skill-proficiency estimation, arbitrary prompts or expanded CV subtask builder in this MVP. The current excerpt-choice executor is still experimental/unselected: desired capability does not approve its algorithm or establish provider quality. Usable skills/evidence output, failure behavior and HR authoring still need a bounded acceptance discussion and explicitly approved synthetic live validation. See [jev-gateway-handoff.md](jev-gateway-handoff.md).
@@ -46,7 +50,7 @@ User selected: HR-configured comma-separated skills, trim/lowercase/deduplicate;
 
 User selected **one result per skill**, not the existing single filtered-list output. Separate yes/no export/review columns are the intended starter direction; exact wire shape, stable column naming and correction behavior need a small contract plan before coding. Below-threshold should be labelled not detected confidently, not proven absent; provider/preparation errors remain unavailable/null rather than successful false. Evidence is deferred until the later task/template/document design, not another excerpt-selection request in this starter.
 
-These choices supersede the experimental excerpt-choice algorithm as the proposed starter approach. They are not implemented by this docs update and do not authorize live calls, wider CV extraction, proficiency levels, years-of-experience outputs or spending-guard changes.
+These choices supersede the experimental excerpt-choice algorithm. Subsequently implemented as the bounded starter: see the current gateway handoff for per-skill projection/correction/export details and tests. No live validation was performed. This does not authorize live calls, wider CV extraction, proficiency levels, years-of-experience outputs or spending-guard changes. Wider feedback and architecture concerns in this checkpoint remain preserved for cleanup.
 
 1. Plan the small Noul/per-skill output contract above and then obtain implementation approval; keep richer tasks separate.
 2. Reproduce inbox/preselection failures and decide publication prerequisite semantics. Scope wider-product work independently of the AI checkpoint.

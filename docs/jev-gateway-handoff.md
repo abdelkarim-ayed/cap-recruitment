@@ -1,5 +1,17 @@
 # Jev spending gateway handoff — 2026-10-31
 
+## Selected skills starter — supersedes excerpt-choice notes below
+
+Implemented for the bounded MVP: one grouped Noul question per normalised configured skill (trim/lowercase/deduplicate), asking for claimed knowledge/use, positive at **>=0.8**. Model competence is not verified. Shared state contains CV text once. Missing/invalid answers fail the task, not false. Evidence/quotations deferred; legacy evidence flag is retained for old definitions but Noul emits none. Gateway/model/limits/namespace unchanged; defaults disabled, no live validation or paid/limit tests performed.
+
+Persistence remains the compatible `{skills:[detected names]}` result in JSONB. Review additionally returns `skillResults:[{skill,original:boolean|null,effective:boolean|null}]`, computed from frozen configured skills. Corrections support optional `unavailableSkills` alongside detected `skills`; omitted configured skills are false, explicitly unavailable ones null. UI sends all configured flags so changing one skill never fabricates negatives for unknown siblings. Existing whole-list/null corrections remain supported. Actor/time/revision metadata remains task-level, not per-skill history.
+
+CSV retains prior task/answer columns and appends `<outputKey>.skill.<URI-encoded-lowercase-skill>.original` and `.effective`: true/false, blank for unavailable. Labels in review are Detected / Not detected / Unavailable. “Not detected” means below provisional threshold, not proven absence. Form editor hides quotations and defaults new tasks to evidence=false; skills normalise on blur and server validation. Existing submitted definitions/files/results were not rewritten; no migration/reseed/reset needed.
+
+User confirms current records are test/demo data; scoped re-fixturing can be acceptable, but no broad deletion or spending-counter reset is implied. Current checks: 42 API + 16 domain + 29 DOM tests (87 total), domain/API/web builds, and real PDF/PostgreSQL fixture integration including per-skill projections/corrections/CSV. Real Jev calls, gateway limits and manual browser appearance remain unvalidated. Earlier excerpt-choice tests are replaced by Noul business-port fixtures; no HTTP fallback exists.
+
+Next session: cleanup/changeability review using docs/product-checkpoint.md. Broader workflow requests stay open. This starter does not implement years/proficiency extraction, richer tasks, cron, imports, panels or publication gates. No push to main.
+
 For the latest product/changeability discussion before resuming technical work, read [product-checkpoint.md](product-checkpoint.md); overall reading map: [README.md](README.md). That docs-only checkpoint does not authorize broader feature work, merge, or any spending/limit change.
 
 ## Current reconciliation checkpoint — feature branch
