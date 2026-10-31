@@ -1,7 +1,7 @@
 # Extraction branch handoff — 2026-10-31
 
 Branch: `feat/real-document-extraction`. Worktree: `/tmp/opencode/recruitment-extraction`.
-Changes are staged but **not committed**: Git rejected the checkpoint because no author identity is configured. No global/repository identity was invented or changed. Set your preferred identity and commit from this worktree when ready; do not remove the worktree before committing.
+Initial checkpoint committed as `2eb4a85` using the user-supplied author identity via command-scoped Git options; global/repository configuration unchanged. Follow-up work continues on the same branch. No push performed.
 Main remains unchanged. No presentation files/exports, database migrations, global configuration, credentials or remote publishing changed. Existing Podman containers were started, not recreated/reset; host networking and volumes preserved. Infrastructure health passed. No extraction daemon was started; no existing application was processed. Integration checks create and clean their own tagged records/files.
 
 ## Morning quick start
@@ -47,7 +47,7 @@ Only do this for synthetic records you deliberately choose. Do not use `pending`
 
 ## Checks and limits
 
-Verified: API build; 32 API tests + 14 domain + 26 web DOM tests; web build; real PostgreSQL `processing:check` and new `extraction:check` (real parsing + fixture interpretation, including persistence/recovery/immutability/corrections/export). No browser automation or Windows test. Expected database-error log in the ordinary readiness test is its deliberately unreachable database scenario, not actual infrastructure failure.
+Verified after follow-up: API build; 46 API tests + 14 domain + 28 web DOM tests (88 total); web build; frozen install; real PostgreSQL `processing:check` and new `extraction:check` (real parsing + fixture interpretation, including persistence/recovery/immutability/corrections/export). The latter passed again after hardening. No browser automation or Windows test. Expected database-error log in the ordinary readiness test is its deliberately unreachable database scenario, not actual infrastructure failure.
 
 Synthetic one-page PDF benchmark, five child-start-plus-parse runs: 567/561/512/574/555 ms. Zero paid requests. This is local parser overhead, not extraction quality/provider latency. The benchmark is repeatable with `extraction:bench`.
 
@@ -61,8 +61,34 @@ pnpm --filter @recruitment/api extraction:check
 ## Deliberately left for morning / next checkpoint
 
 1. Fund Jev, run the standalone synthetic probe, inspect actual request acceptance, resolved model, usage and skill/evidence quality. No live verification claimed. Published rate checked 2026-10-31: $0.042/M input tokens, output free. Actual request usage—not earlier hypothetical token estimates—should drive the final estimate. Minimum top-up/account terms unverified.
-2. Exercise a fresh synthetic application UUID end to end with Jev, then manually inspect HR correction/export. Current form editor still says “Mock only”; update that badge and static OpenAPI provenance descriptions after deciding how to expose the opt-in live mode. Runtime review renders the stored live mode already. No automatic fallback to another provider.
+2. Exercise a fresh synthetic application UUID end to end with Jev, then manually inspect HR correction/export. Form/review mode labels were corrected in the follow-up below. Static OpenAPI provenance descriptions remain a post-merge documentation alignment item; no broad schema rewrite was made. No automatic fallback to another provider.
 3. Cron deliberately deferred: after live verification, wrap the same service in an opt-in bounded poller with non-overlap and enabled-executor checks. No poller was registered in API startup, so a build/restart cannot unexpectedly consume the database backlog or spend money. Existing two-minute fencing and recovery support this later change; no queue service is needed.
 4. Cross-task batching, persistent preparation artifacts, evidence-per-skill/page refs, Laya compatibility, DOCX and production upload hardening remain deferred. Jev transport is behind the existing TaskExecutor interface; Laya is not assumed protocol-compatible without a test.
 
 Sources: https://docs.typesafe.ai/api ; https://docs.typesafe.ai/models ; https://docs.typesafe.ai/cookbooks/parallel_questions.md . No retraining or accuracy results claimed.
+
+## Follow-up hardening and UI cleanup (same branch)
+
+All details here are the merge-time documentation checklist; wider product/API docs intentionally not refreshed during this pass.
+
+### Backend / local types
+- Added `ProcessingFailure(message,retryable)` for timeout classification. The parser's own 8-second timeout/cancellation is now retryable, not accidentally permanent because its wording differed from the service timeout. Corrupt/unsupported PDFs remain non-retryable.
+- Task executors optionally describe their configured provenance. The service preserves it if execution throws or result validation fails, rather than relabelling a live attempt as disabled. No executor invocation still stays disabled/fixture as appropriate; a parser failure is not claimed as a paid model call.
+- Jev model/usage metadata survives parsed-response answer validation failures, so a paid but unusable response can still be traced. Provider response bodies/credentials are never copied into failure messages. 401/403 mention key/access, 402 funding, 429 later retry and 5xx temporary availability.
+- `SkillExtractionArgs` is inferred from the existing domain processing definition and reused by execution context/task rows. This is a local compile-time deduplication only: no domain wire schema, database migration or persisted shape changed in this follow-up.
+- Added service regressions for typed retry policy, preserved failure provenance and one preparation per shared source in an invocation; Jev regressions for request budgets (zero transport calls), >1 MB streamed response cancellation, stalled-body abort, failed-answer usage retention, empty success, evidence suppression, and redacted auth/funding errors.
+
+### PDF verification
+- Added accurate multipage synthetic PDF fixtures, including explicit WinAnsi French accents. Tests verify page ordering/blank-page boundaries, 20 versus 21 pages, 60000 versus 60001 characters, cumulative page text limits, blank input, >10 MiB input and cancellation followed by a successful new parse.
+- Accent fixture is not arbitrary Unicode coverage. Cancellation test aborts after child launch; it does not deterministically prove PDF.js had started parsing or assert a PID-level cleanup result. Two-column reading order, encrypted PDFs and complex real-world font/layout cases still need manual/sample coverage; no accuracy claim.
+
+### UI changes (not a redesign)
+- Form editor no longer says every extraction is mock-only. It states private HR settings and the readable-PDF-text requirement; it does not claim the live provider is enabled or expose keys/operator commands.
+- Removed global “Mock extraction” badge from extracted fields. Each task visibly identifies `Fixture result` or live/Jev mode from its stored provenance, including mixed real-reader/fixture-executor results. Actual fixture labels remain visible before expanding details.
+- Latest effective skills render as readable comma-separated text instead of a JSON object, with a single empty/unavailable message. Separate HR correction inputs, explicit null, original extraction and export behavior are unchanged.
+- Source field, attempts, reader version and model are in the existing collapsed original-result/evidence section rather than competing in the card header. Original JSON/evidence/failures and fixture ID remain accessible; no evidence or original error was removed.
+- Added DOM checks for truthful live/fixture labels, readable values and collapsed technical details. Existing role/privacy, saved-correction and table distinctions remain tested. Visual appearance still needs user manual browser review.
+
+### Scope / operational state
+- No scheduler added/enabled, production policy claims, global configuration changes, extra services, reseed, manual-record mutations, presentation exports, browser sessions or paid requests.
+- Initial checkpoint was committed with the supplied author identity using per-command Git options. This follow-up is committed separately on the same feature branch. No push to any branch was performed; main checkout remains clean.

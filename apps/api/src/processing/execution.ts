@@ -1,8 +1,10 @@
 import { createHash } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
 import { z } from 'zod';
+import type { ProcessingDefinition } from '@recruitment/domain/vacancies';
 
-export interface ExecutionContext { applicationId: string; documentId: string; sourceHash: string; taskId: string; args: { skills: string[]; evidence: boolean }; fixtureKey?: string; signal?: AbortSignal }
+export type SkillExtractionArgs = ProcessingDefinition['tasks'][number]['args'];
+export interface ExecutionContext { applicationId: string; documentId: string; sourceHash: string; taskId: string; args: SkillExtractionArgs; fixtureKey?: string; signal?: AbortSignal }
 export const taskResultSchema = z.discriminatedUnion('status', [
   z.strictObject({ status: z.literal('completed'), value: z.strictObject({ skills: z.array(z.string().trim().min(1).max(100)).max(100) }), evidence: z.array(z.string().max(2000)).max(100) }),
   z.strictObject({ status: z.literal('failed'), value: z.null(), reason: z.string().min(1).max(2000), retryable: z.boolean() }),
@@ -10,7 +12,7 @@ export const taskResultSchema = z.discriminatedUnion('status', [
 export type TaskResult = z.infer<typeof taskResultSchema>;
 export interface ExecutionResult { result: TaskResult; provenance: { mode: 'fixture' | 'disabled' | 'live'; fixtureId?: string; provider?: string; model?: string; method?: string; textHash?: string; usage?: { input_tokens: number; output_tokens: number }; reader?: string } }
 export interface DocumentTextReader { read(bytes: Buffer, context: ExecutionContext): Promise<string>; describe?(context: ExecutionContext): string }
-export interface TaskExecutor { execute(text: string, context: ExecutionContext): Promise<ExecutionResult> }
+export interface TaskExecutor { execute(text: string, context: ExecutionContext): Promise<ExecutionResult>; describe?(context: ExecutionContext): ExecutionResult['provenance'] }
 export const DOCUMENT_TEXT_READER = Symbol('DOCUMENT_TEXT_READER');
 export const TASK_EXECUTOR = Symbol('TASK_EXECUTOR');
 export const FIXTURE_REGISTRY = Symbol('FIXTURE_REGISTRY');
@@ -54,6 +56,7 @@ export class DisabledTextReader implements DocumentTextReader {
   async read(_bytes: Buffer, _context: ExecutionContext): Promise<string> { throw new Error('No document text reader configured; mock-only checkpoint.'); }
 }
 export class DisabledTaskExecutor implements TaskExecutor {
+  describe(): ExecutionResult['provenance'] { return { mode: 'disabled' }; }
   async execute(_text: string, _context: ExecutionContext): Promise<ExecutionResult> { return { provenance: { mode: 'disabled' }, result: { status: 'failed', value: null, reason: 'No live task executor configured.', retryable: false } }; }
 }
 // Global normal adapters plus trusted per-unit dispatch; never request-controlled.
@@ -71,5 +74,6 @@ export class ContextTextReader implements DocumentTextReader {
 }
 export class ContextTaskExecutor implements TaskExecutor {
   constructor(private readonly normal: TaskExecutor, private readonly fixtures: FixtureRegistry) {}
+  describe(context: ExecutionContext): ExecutionResult['provenance'] { return context.fixtureKey === undefined ? (this.normal.describe?.(context) ?? { mode: 'disabled' }) : { mode: 'fixture', fixtureId: context.fixtureKey }; }
   async execute(text: string, context: ExecutionContext) { return context.fixtureKey === undefined ? this.normal.execute(text, context) : this.fixtures.result(text, context); }
 }

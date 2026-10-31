@@ -1,5 +1,6 @@
 import { fork } from 'node:child_process';
 import type { DocumentTextReader, ExecutionContext } from './execution.js';
+import { ProcessingFailure } from './processing-failure.js';
 
 export class PdfTextReader implements DocumentTextReader {
   describe() { return 'pdfjs-dist@6.4.299'; }
@@ -18,8 +19,8 @@ export class PdfTextReader implements DocumentTextReader {
         worker.kill();
         if (error) reject(error); else resolve(text!);
       };
-      const abort = () => finish(new Error('PDF preparation cancelled.'));
-      const timer = setTimeout(() => finish(new Error('PDF preparation timed out.')), 8000);
+      const abort = () => finish(new ProcessingFailure('PDF preparation cancelled.', true));
+      const timer = setTimeout(() => finish(new ProcessingFailure('PDF preparation timed out.', true)), 8000);
       context.signal?.addEventListener('abort', abort, { once: true });
       worker.once('message', (message: { text?: string; error?: string }) => {
         if (typeof message.text === 'string') finish(undefined, message.text);

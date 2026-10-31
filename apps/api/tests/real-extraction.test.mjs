@@ -62,3 +62,30 @@ test('Jev no-match result is successful empty; evidence=false suppresses source 
   const result = await new JevTaskExecutor('test', undefined, async () => response({ q0: choice('s0'), q1: choice('not_found') })).execute('Used SQL', { ...context, args: { ...context.args, evidence: false } });
   deepEqual(result.result.evidence, []);
 });
+test('Jev rejects budgets before making a paid request and cancels oversized response streams', async () => {
+  let calls = 0;
+  const executor = new JevTaskExecutor('test', undefined, async () => { calls++; throw new Error('must not call'); });
+  for (const [text, input] of [['a'.repeat(12001), context], [Array.from({length:41},()=> 'SQL').join('\n'), context], ['SQL', {...context,args:{skills:Array.from({length:21},(_,i)=>`skill${i}`),evidence:true}}]]) {
+    equal((await executor.execute(text,input)).result.status,'failed');
+  }
+  equal(calls,0);
+  let cancelled = false;
+  const responseStream = new ReadableStream({ start(controller) { controller.enqueue(new Uint8Array(1000001)); }, cancel() { cancelled = true; } });
+  const outcome = await new JevTaskExecutor('test',undefined,async()=>new Response(responseStream)).execute('SQL',context);
+  equal(outcome.result.status,'failed');equal(cancelled,true);
+});
+test('Jev preserves usage on invalid answers and aborts a stalled body', async () => {
+  const invalid = await new JevTaskExecutor('test',undefined,async()=>response({})).execute('SQL',context);
+  equal(invalid.provenance.usage.input_tokens,500);equal(invalid.result.status,'failed');
+  const controller = new AbortController();
+  const stalled = new JevTaskExecutor('test',undefined,async(_url,options)=>new Response(new ReadableStream({ start(stream) { options.signal.addEventListener('abort',()=>stream.error(new DOMException('Cancelled','AbortError')),{once:true}); } })));
+  const pending = stalled.execute('SQL',{...context,signal:controller.signal});
+  setImmediate(()=>controller.abort());
+  const result = await pending;equal(result.result.status,'failed');equal(result.result.retryable,true);
+});
+test('Jev auth and funding failures are actionable, non-retryable and redact provider bodies',async()=>{
+  for(const [status,expected] of [[401,/API key/],[402,/funding/],[403,/access/]]) {
+    const result=await new JevTaskExecutor('secret',undefined,async()=>new Response('private provider body',{status})).execute('SQL',context);
+    equal(result.result.retryable,false);equal(expected.test(result.result.reason),true);equal(JSON.stringify(result).includes('private provider body'),false);
+  }
+});

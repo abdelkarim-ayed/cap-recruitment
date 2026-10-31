@@ -3,9 +3,9 @@ import { randomUUID } from 'node:crypto';
 import type { PoolClient } from 'pg';
 import type { Vacancy } from '@recruitment/domain/vacancies';
 import { DatabaseService } from '../database/database.service.js';
-import type { ExecutionResult, TaskFixture } from './execution.js';
+import type { ExecutionResult, TaskFixture, SkillExtractionArgs } from './execution.js';
 
-export interface TaskRow { application_id: string; task_id: string; source_input_id: string; output_key: string; type: 'extractSkills'; args: { skills: string[]; evidence: boolean }; fixture_key: string | null; status: string; attempts: number; retryable: boolean }
+export interface TaskRow { application_id: string; task_id: string; source_input_id: string; output_key: string; type: 'extractSkills'; args: SkillExtractionArgs; fixture_key: string | null; status: string; attempts: number; retryable: boolean }
 @Injectable()
 export class ProcessingRepository {
   constructor(private readonly database: DatabaseService) {}

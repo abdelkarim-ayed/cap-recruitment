@@ -6,8 +6,9 @@ const probability = z.number().min(0).max(1);
 const responseSchema = z.object({ model: z.string().min(1).max(200), usage: z.object({ input_tokens: z.number().int().nonnegative(), output_tokens: z.number().int().nonnegative() }), answers: z.record(z.string(), z.object({ type: z.literal('choice'), choice: z.string(), confidence: probability, probabilities: z.record(z.string(), probability) })) });
 export class JevTaskExecutor implements TaskExecutor {
   constructor(private readonly key: string, private readonly model = 'jev-1.14.0', private readonly transport: typeof fetch = fetch) {}
+  describe(): ExecutionResult['provenance'] { return { mode: 'live', provider: 'typesafe', model: this.model, method: 'skill-excerpt-choice-v1' }; }
   async execute(text: string, context: ExecutionContext): Promise<ExecutionResult> {
-    const provenance: ExecutionResult['provenance'] = { mode: 'live', provider: 'typesafe', model: this.model, method: 'skill-excerpt-choice-v1', textHash: createHash('sha256').update(text).digest('hex') };
+    const provenance: ExecutionResult['provenance'] = { ...this.describe(), textHash: createHash('sha256').update(text).digest('hex') };
     try {
       // Choices are real source excerpts: the model cannot invent quotations.
       const snippets = text.split(/\n+/).flatMap(line => line.match(/.{1,600}(?:\s|$)|.{1,600}/g) ?? []).filter(line => line.trim()).map(line => line.trim());
@@ -20,7 +21,11 @@ export class JevTaskExecutor implements TaskExecutor {
       if (body.length > 60000) throw new Error('Jev question payload exceeds the demo context budget. Reduce the skills list.');
       const signal = context.signal ? AbortSignal.any([context.signal, AbortSignal.timeout(9000)]) : AbortSignal.timeout(9000);
       const response = await this.transport('https://api.typesafe.ai/v1/systemone', { method: 'POST', redirect: 'error', headers: { Authorization: `Bearer ${this.key}`, 'Content-Type': 'application/json' }, body, signal });
-      if (!response.ok) { await response.body?.cancel(); return { provenance, result: { status: 'failed', value: null, reason: `Jev HTTP ${response.status}.`, retryable: response.status === 429 || response.status >= 500 } }; }
+      if (!response.ok) {
+        await response.body?.cancel();
+        const hint = response.status === 401 || response.status === 403 ? ' Check the configured API key and access.' : response.status === 402 ? ' Check account funding.' : response.status === 429 ? ' Provider rate limit; a later retry may succeed.' : response.status >= 500 ? ' Provider temporarily unavailable.' : '';
+        return { provenance, result: { status: 'failed', value: null, reason: `Jev HTTP ${response.status}.${hint}`, retryable: response.status === 429 || response.status >= 500 } };
+      }
       const chunks: Uint8Array[] = [];
       let size = 0;
       if (!response.body) throw new Error('Jev response has no body.');
@@ -34,7 +39,10 @@ export class JevTaskExecutor implements TaskExecutor {
         }
       } finally { stream.releaseLock(); }
       const raw = Buffer.concat(chunks).toString('utf8');
-      const data = responseSchema.parse(JSON.parse(raw));
+      const parsed: unknown = JSON.parse(raw);
+      // Retain billing/model metadata even when answer validation subsequently fails.
+      Object.assign(provenance, responseSchema.pick({ model: true, usage: true }).parse(parsed));
+      const data = responseSchema.parse(parsed);
       if (Object.keys(data.answers).length !== context.args.skills.length) throw new Error('Missing or unexpected Jev answers.');
       const skills: string[] = [], evidence: string[] = [];
       context.args.skills.forEach((skill, i) => {
