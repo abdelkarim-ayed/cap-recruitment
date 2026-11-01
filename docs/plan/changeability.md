@@ -30,7 +30,7 @@ Current inbox rows require an interview FK. Candidate receipt/preselection notif
 
 - Counters exist for distinct resources; history is not implemented or needed. Remove redundant counter increments only after mapping which commands invalidate which concurrent edits.
 - Semantic equality should compare persisted editable fields after normalization, not IDs/timestamps or raw JSON key order. Pipeline replacement currently regenerates step IDs, so detect no-op before replacing rows.
-- Check authorization and stale revisions inside the transaction before a no-op return; decide stale-identical semantics explicitly. A no-op must not emit notifications, refresh completion timestamps or discard corrections.
+- Check authorization and stale revisions inside the transaction before a no-op return. Selected rule: stale-identical still requires refresh; current-identical does not increment or emit notifications, refresh completion timestamps or discard corrections. Completed review locks corrections; late processing cannot invalidate it.
 - Capability names may express `editOwnVacancy`/`readOwnApplication`; resource resolution still happens server-side. Action availability includes state/prerequisites in addition to permission. Shared policy is not a cache that bypasses fresh mutation checks.
 - Shared review already uses row lock + expected revision. Improve refresh/reapply UX first; exclusive claims introduce expiry, reassignment and abandoned work and are not needed for the selected model.
 
@@ -50,7 +50,7 @@ An additive role→capability map or recipient change among existing notificatio
 
 A new task type does **not inherently require relational tables/columns**: current task type is recovered from frozen definitions and results are JSONB. It does require updated validated contracts, snapshot compatibility and dispatch. Arbitrary result JSON is not enough; validate at input/result boundaries and keep task/output IDs stable.
 
-New enum values require SQL CHECK migration (unless a deliberately reviewed schema replacement is used). Removing `review_ready` need not require removing the stored accepted value immediately; compatibility and data inventory decide. CSV import always needs a contract; whether it needs new tables depends on chosen provenance/reversal/export-history design. Preview and export tracking are independent.
+New enum values require SQL CHECK migration (unless a deliberately reviewed schema replacement is used). Removing `review_ready` need not require removing the stored accepted value immediately; compatibility and data inventory decide. CSV import always needs a contract; new tables depend on provenance/export-history design. Decision reversal has been dropped: editable preview precedes final confirmation. Preview and export tracking are independent; revalidate the included rows at commit, and emit notifications only for committed decisions.
 
 Tests/integration scripts import built `dist/`; rebuild affected packages before trusting a test run. No counted old tests are proof of current behavior after refactoring. Test contracts and invariants, not helper implementation details.
 
