@@ -1,4 +1,4 @@
-# Account access — approved direction
+# Account access — current behavior
 
 Updated after manual feedback (2026-10-10): **email/password for staff and candidates**, replacing passwordless UI login.
 
@@ -12,4 +12,4 @@ Updated after manual feedback (2026-10-10): **email/password for staff and candi
 ## Intake and duplicates
 Public vacancy → candidate signup/verification or existing login → typed answers/upload → immutable application. One application per candidate/vacancy; a repeat returns the existing application unchanged. Different emails are different accounts; no automatic merging by name/phone. Email identity changes must not rewrite frozen application snapshots. Imports/linking/withdrawal remain deferred.
 
-Manual accounts and commands: [demo-guide.md](demo-guide.md). Backend contract: [api.md](api.md), [application-api.md](application-api.md).
+Manual accounts and commands: [demo guide](../guides/demo-guide.md). Backend contract: [api.md](api.md), [application-api.md](application-api.md).

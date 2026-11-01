@@ -1,14 +1,15 @@
-# Replaceable protocols and local fixtures
-Current reading map: [README.md](README.md). Branch real PDF preparation and guarded experimental executor are in [jev-gateway-handoff.md](jev-gateway-handoff.md); legacy extraction-provider examples below are not the current application executor. Paid/gateway-limit tests require explicit consent and were not run.
-Application check: `pnpm --filter @recruitment/api applications:check` after build/db:migrate. Real PostgreSQL/OTP/multipart, mocked mail, isolated private local storage, rollback cleanup and byte-identical downloads; deletes only disposable data. No auth bypass/live extraction. See [`application-api.md`](application-api.md).
+# Integration verification and local fixtures
+Current reading map: [index](../../README.md). Real PDF preparation and selected guarded Noul executor are described in [Jev safety](../jev-safety.md); legacy extraction-provider examples below are not the current application executor. Paid/gateway-limit tests require explicit consent and were not run.
+Application check: `pnpm --filter @recruitment/api applications:check` after build/db:migrate. Real PostgreSQL/OTP/multipart, mocked mail, isolated private local storage, rollback cleanup and byte-identical downloads; deletes only disposable data. No auth bypass/live extraction. See [application contract](../contracts/application-api.md). Explicitly choose disabled live executor/fixture ports for integration runs; do not rely on ambient live configuration.
 
-Implemented boundaries, not live AI functionality. API payloads remain in [`api.md`](api.md); component/data-flow details are in [`architecture.md`](architecture.md).
+API payloads: [contracts](../contracts/api.md); current components/data flow: [architecture](../architecture.md). Adapter implementation is not live model-quality validation.
 
 ## What can be replaced now
 | Boundary | Normal adapter | Mock/local alternative | What the alternative proves |
 | --- | --- | --- | --- |
 | `MailSender` | SMTP through Nodemailer, default local Mailpit | `MemoryMailSender` via Nest test override; `MAIL_DRIVER=file` private local capture | Business/auth code can request mail without SMTP credentials or any mailbox/provider account |
-| `ExtractionProvider` | Disabled: explicit failure/null | `EXTRACTION_DRIVER=fixture`; recorded `FixtureExtractionProvider` | Typed result/provenance and failure handling; **not parsing quality or model accuracy** |
+| `DocumentTextReader` / `TaskExecutor` | Disabled by default; PDF / guarded Jev available through explicit config | Trusted per-unit FixtureRegistry; can combine real PDF with fixture interpretation | Identity/hash/args/text relay, result/review/export; **not model quality** |
+| Legacy `ExtractionProvider` | Disabled: explicit failure/null | `EXTRACTION_DRIVER=fixture`; recorded `FixtureExtractionProvider` | Adapter example only, not the current application path |
 | Database | Shared PostgreSQL pool | Fake query/transaction collaborators in unit tests | Transaction/control flow, not SQL constraints/migrations/session persistence |
 | Redis readiness | Bounded connectivity probe | Fake `ConnectivityProbe` in tests | Readiness branching, not actual Redis health or queue behavior |
 
@@ -53,17 +54,17 @@ This **operator-local command deliberately displays the captured message/code**.
 - Default `MAIL_DRIVER=smtp` preserves the existing Mailpit setup. SMTP credentials are optional, must be paired if used, and are isolated in the adapter; real production delivery/TLS/provider setup is not verified here.
 
 ## Extraction fixtures: exact limits
-Legacy provider examples below remain adapter tests only. Application workflow uses context-dispatched DocumentTextReader/TaskExecutor with trusted fixture keys and actual identity/hash/args/text checks; processing:check exercises persistence/recovery/review/export. Default normal ports remain disabled; branch real PDF preparation and experimental guarded execution are described in jev-gateway-handoff.md. No live model-quality verification. Registry records calls; no candidate fixture controls.
+Legacy provider examples below remain adapter tests only. Application workflow uses context-dispatched DocumentTextReader/TaskExecutor with trusted fixture keys and actual identity/hash/args/text checks; processing:check exercises persistence/recovery/review/export. Default normal ports remain disabled; real PDF and guarded execution are described in [Jev safety](../jev-safety.md). No live model-quality verification. Registry records calls; no candidate fixture controls.
 Legacy `EXTRACTION_DRIVER=disabled` returns a failed result with null and disabled provenance. Fixture mode records `provenance: {mode: "fixture", fixtureId: ...}` next to the extraction result union. The supplied legacy `demo-skills` example **ignores source text**, is not a selected extractor, and performs no model request. Application-processing fixtures separately verify frozen identities/hash/args/text. Unknown task keys fail instead of inventing values.
 
-There is no extraction-trigger HTTP endpoint. ProcessingService runs through the explicit CLI and context ports. Legacy provider tests remain separate. A future live adapter requires approved contracts/cancellation/error mapping/provenance and evaluation before honest replacement.
+There is no extraction-trigger HTTP endpoint. ProcessingService runs through the explicit CLI and context ports. Legacy provider tests remain separate. Jev executor tests use a narrow offline decision-client stub, not the protected gateway; spending guards and live provider behavior remain untested.
 
-## Processing boundaries and remaining helpers
+## Processing boundaries
 - Per-unit fixtures: trusted optional string `fixtureKey` follows processing/services to the selected unit. Defined means fixture lookup; absent means configured normal adapter (possibly disabled), not guaranteed live AI. Missing fixture fails; no automatic real-provider fallback. Do not accept candidate-controlled fixture instructions.
 - Implemented workflow registry binds fixture keys to actual application/document/task identities and verifies bytes/hash/args/text relay, recording calls and preserving fixture provenance through storage/export. Legacy task-key-only adapter fixtures remain separate examples.
-- Reusable script helpers: seed logical entities/files, resolve aliases, read records, assert properties, and clean owned datasets. Optional reset is restricted to an explicitly verified dedicated test database and known tables, never the normal development database. HTTP/worker connections mean a single rollback transaction cannot isolate every scenario. Central loaders evolve with schema; scenarios should not require repeated bespoke SQL.
+- Current seed/fixture commands create synthetic records and preserve existing/manual data. Tests clean only their owned data; HTTP/worker connections mean a single rollback transaction cannot isolate every scenario. Broader fixture/demo orchestration and scoped schema regeneration are [planned](../../plan/tasks.md), not a current reset command.
 - Document storage: implemented local adapter/memory test override, separately verified ownership and private download boundaries.
-- PDF preparation: real bounded text-native PDF reader on the feature branch, with multipage/limit/French-accent fixtures. DOCX/OCR not implemented; model quality and complex layout handling unverified.
+- PDF preparation: real bounded text-native PDF reader merged into main, with multipage/limit/French-accent fixtures. DOCX/OCR not implemented; model quality and complex layout handling unverified.
 - Processing implemented via explicit local command, saved per-task progress and application lease fencing/retry recovery. No run/history or independently queued work items. Cron/polling can later wrap the same executor. Original files persist, local reuse is disposable.
 
 Do not implement or require accounts for these providers merely to test vacancy persistence. Keep fixture checks separate from optional real integration checks, and never infer real delivery/model quality from a mock passing.

@@ -1,7 +1,7 @@
-# Manual demo — start here
+# Manual demo — implemented workflows
 
 ## Interview checkpoint — manual test
-Current RMUX tabs: `api`, `web`; `inbox-retention` runs notification cleanup only when launched. Routine checks use normal shell execution; see [rmux.md](rmux.md). No extraction worker is started.
+Suggested RMUX tab names: `api`, `web`; `inbox-retention` runs notification cleanup only when explicitly launched. Discover actual listeners/tabs before starting or managing anything; these names are not a runtime observation. Routine checks use normal shell execution; see [RMUX](rmux.md). No automatic extraction worker is registered.
 
 1. Sign in as vacancy owner, open vacancy → **Interview pipeline & results**. Add ordered Technical/HR steps and save. Owner contact appears beneath the heading. Steps can be configured for an already-published vacancy independently of the locked intake form, but freeze after the first appointment.
 2. Open application → **Selection & interviews** → Preselect. Schedule a step with an existing staff interviewer (`demo.interviewer@example.test`), date, half-hour start, duration and link/location. A second step can be booked ahead with a non-overlapping slot. Another recruiter may schedule but cannot edit pipeline/finalize owner decisions.
@@ -11,7 +11,7 @@ Current RMUX tabs: `api`, `web`; `inbox-retention` runs notification cleanup onl
 6. Inbox defaults unread. Opening marks read; All retained messages shows read ones. Retention runner deletes seven days after first read, never unread or interview/application records. No chat or timed reminders.
    Alternatively use the small **Mark as read** button without navigation. Inbox is also accessible from the topbar. Owners receive requests/feedback, not booking copies; candidates have no business inbox yet. Staff tables distinguish original extraction errors from Reviewed/HR corrections saved—an HR correction does not rerun or rewrite extraction. CSV selection import is not implemented.
 
-No seeded interview results are fabricated for this checkpoint. Native date/file/PDF UI is manually tested. Automated synthetic clock fixtures in interviews:check are not a runtime bypass. Details/known bounds: [interview-api.md](interview-api.md).
+No seeded interview results are fabricated for this checkpoint. Native date/file/PDF UI requires user testing. Automated synthetic clock fixtures in interviews:check are not a runtime bypass. Details/known bounds: [interview contract](../contracts/interview-api.md).
 
 Open **http://localhost:5173** using localhost consistently. Browser layout/interaction remains manually tested; no browser automation/screenshots.
 
@@ -86,12 +86,12 @@ New seed vacancy: **[DEMO] Backend developer — RenderCV**, containing fresh sc
 ```sh
 pnpm --filter @recruitment/api demo:process APPLICATION_UUID success
 ```
-Choose failure/empty instead for those recorded outcomes. Refresh afterward. Unattempted tasks only; refuses overwriting results. Actual source identity/hash/args verified, real persisted executor used. **No parsing/AI**: success chooses first two configured skill names, regardless of CV text. Every result retains fixture provenance. No automatic poller; ordinary submissions stay pending until run. Underlying processing:run and recovery: processing-review-api.md.
+Choose failure/empty instead for those recorded outcomes. Refresh afterward. Unattempted tasks only; refuses overwriting results. Actual source identity/hash/args verified, real persisted executor used. **No parsing/AI**: success chooses first two configured skill names, regardless of CV text. Every result retains fixture provenance. No automatic poller; ordinary submissions stay pending until run. Underlying processing:run and recovery: [processing contract](../contracts/processing-review-api.md).
 
 For a vacancy with **no extraction tasks**, submit normally: no processing/review action is needed. Review marker auto-completes as not applicable; no reviewer/date or candidate approval implied. Staff screens omit extraction controls; mixed tables show a dash, and review-status filters exclude these records. PDF preview/download and CSV remain available. No bulk “review applications” decision is introduced.
 
 ## Staff outside demo
-Operator-local staff:provision creates/updates staff roles and revokes sessions. Optional STAFF_INITIAL_PASSWORD environment variable sets a password (don't put secrets in CLI arguments/history); without it use password reset to establish one. Verify email ownership before normal login. No public HR/admin signup or staff management UI. See candidate-access.md.
+Operator-local staff:provision creates/updates staff roles and revokes sessions. Optional STAFF_INITIAL_PASSWORD environment variable sets a password (don't put secrets in CLI arguments/history); without it use password reset to establish one. Verify email ownership before normal login. No public HR/admin signup or staff management UI. See [candidate access](../contracts/candidate-access.md).
 
 ## Verification
-56 ordinary tests pass; build/typecheck pass. DOM tests also verify no-task applications hide review controls/requests but keep preview/export. Real PostgreSQL processing:check verifies automatic no-task completion, no invented reviewer/date, unchanged stage and review-filter exclusion. Prior auth:password-check/auth:mock-check and vacancy/proxy checks remain documented in status.md. User manually validates native PDF viewer, appearance and spreadsheet CSV opening. Report sanitized errors, never credentials/real CV data.
+Historical checks and limits are recorded in [status](../status.md); no fresh test run is claimed by this guide. DOM tests cover no-task controls, saved corrections and per-skill review; PostgreSQL processing checks cover no-task completion, privacy, conflicts and CSV. User manually validates native PDF viewer, appearance and spreadsheet CSV opening. Report sanitized errors, never credentials/real CV data. Planned notifications/import/readiness are not available in this demo yet.

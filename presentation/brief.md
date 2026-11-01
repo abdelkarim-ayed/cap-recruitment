@@ -23,4 +23,4 @@
 - Selection is manual; CSV decision reimport and candidate business updates remain deferred.
 - Automated checks are documented; latest UI polish has no further user/browser verification yet.
 
-Current repository evidence: ../docs/status.md, ../docs/product.md, ../docs/decisions.md, ../docs/backlog.md and implemented API docs. Recheck these when drafting.
+Current repository evidence: ../docs/current/status.md, ../docs/current/product.md, ../docs/current/workflows.md and ../docs/current/contracts/. Requested changes and deferred decisions: ../docs/plan/. Recheck these when drafting.

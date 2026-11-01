@@ -1,4 +1,4 @@
-# API contract and module boundaries
+# Identity API and contract index
 
 Backend first. This document is the frontend handoff; distinguish implemented endpoints from planned ones. No browser/screenshot testing.
 
@@ -7,8 +7,8 @@ Backend first. This document is the frontend handoff; distinguish implemented en
 - **[`openapi.json`](openapi.json):** OpenAPI 3.1 for the implemented client-facing surface; import into an API client/viewer if desired. No Swagger server/UI is installed.
 - **[`vacancy-api.md`](vacancy-api.md):** implemented vacancy payloads, supported field/task arguments, transitions, and permissions.
 - **[`interview-api.md`](interview-api.md)** / **[`interview-openapi.json`](interview-openapi.json)**: implemented pipeline, agenda, assessment, internal decisions and inbox; external path references included in openapi.json.
-- **[`backend-test.md`](backend-test.md):** runnable curl/integration checks.
-- **[`integration-testing.md`](integration-testing.md)** and **[`architecture.md`](architecture.md):** mockable protocols, current classes, data movement, and future consistency boundaries.
+- **[Backend checks](../guides/backend-test.md):** runnable curl/integration checks.
+- **[Integration testing](../guides/integration-testing.md)** and **[architecture](../architecture.md):** protocol seams, current responsibilities and data movement.
 
 Examples below use fake IDs/tokens. Base URL: `http://localhost:3000/api`. Bodies are JSON; timestamps are ISO-8601 strings. Treat IDs as opaque strings. This is the supported handoff surface, not an exhaustive inventory of every inherited Better Auth endpoint.
 
@@ -166,23 +166,22 @@ Auth errors usually include `{code, message}`; rate-limit errors may have only `
 - Codes expire after five minutes, have three verification attempts, and are hashed in storage. Used codes cannot sign in again.
 - Sessions expire after seven days without rolling refresh; signing in again creates a fresh session. This avoids renewing database expiry without forwarding cookie updates through the role guard.
 - Auth bodies are capped at 32 KiB; general JSON at 256 KiB. Multipart intake has a separate guarded path: 10 MiB/file, 25 MiB combined, 256 KiB answers. See [`application-api.md`](application-api.md).
-- Code-send HTTP success means the library accepted the request, not proof of delivery: Better Auth logs callback failures without necessarily failing the HTTP response. Local smoke checks verify actual Mailpit delivery; production mail failure visibility is later work. Non-sign-in OTP types are rejected before the callback.
-- MailSender isolates delivery: SMTP defaults to local Mailpit; optional file capture needs no SMTP. Tests can inject memory capture. Production rejects development file capture/AI fixtures, and no auth-bypass endpoint was added. See `integration-testing.md`. Production mail credentials/provider are not configured.
+- Code-send HTTP success means the library accepted the request, not proof of delivery: Better Auth logs callback failures without necessarily failing the HTTP response. Local smoke checks verify actual Mailpit delivery; production mail failure visibility is later work. Supported OTP purposes are verification, password reset and legacy sign-in, as listed above.
+- MailSender isolates delivery: SMTP defaults to local Mailpit; optional file capture needs no SMTP. Tests can inject memory capture. Production rejects development file capture/AI fixtures, and no auth-bypass endpoint was added. See [integration testing](../guides/integration-testing.md). Production mail credentials/provider are not configured.
 - Role cache is disabled so server-side changes are read from the database.
 - Rate limiting takes the socket peer address, via an internal overwritten header. Behind Vite or an SSH proxy users may share a bucket; trusted reverse-proxy client-IP handling is deployment work. Never trust arbitrary forwarded headers.
 - The API defaults to binding localhost; API_HOST can be explicitly changed for a deliberate deployment configuration.
 
 ## Vacancy handoff and remaining modules
-Mock-only processing/local command plus optional shared review and ungated CSV are implemented: [`processing-review-api.md`](processing-review-api.md). Admin/recruiter GET/PATCH application review and GET vacancy export. Candidate/interviewer denied; candidate answers/files immutable. Processing does not run in submission HTTP or select candidates.
+Explicit processing/local command plus optional shared review and ungated CSV are implemented: [`processing-review-api.md`](processing-review-api.md). Real PDF and guarded skills adapters exist with disabled defaults and no live validation. Admin/recruiter GET/PATCH application review and GET vacancy export. Candidate/interviewer denied; candidate answers/files immutable. Processing does not run in submission HTTP or select candidates.
 Vacancy routes are now implemented: POST/GET `/api/vacancies`, GET/PATCH `/api/vacancies/:id`, POST publish/close actions, and GET public vacancy list/detail. See [`vacancy-api.md`](vacancy-api.md). Admin/recruiter read/create; owner alone mutates. Cookie-authenticated application writes require trusted Origin (WEB_ORIGIN or BETTER_AUTH_URL origin); missing/untrusted Origin returns 403. Public reads require no session. Definition configuration is not task execution.
 
 Application submission/list/detail/private downloads are implemented in [`application-api.md`](application-api.md). All admin/recruiter staff read; candidates read own only; answers/files locked for everyone. No profile CV or public file URLs.
 
-Remaining feature endpoints—not implemented:
-Live extraction/real parsing and more task catalogs remain deferred. Mock processing/review/export is implemented; no automatic selection.
-4. **Interviews/decisions:** bounded pipeline/agenda/assignment/final notes/score/Pass-Fail, preselection and owner decisions now implemented; see interview-api.md. Extensions remain deferred. No fixed interview-number application stages.
-5. **Communication/analytics:** selected-recipient sending, published candidate updates, SQL metrics. No automatic email for every interview edit.
+Interviews/decisions: bounded pipeline/agenda/assignment/final notes/score/Pass-Fail, preselection and owner decisions are implemented; see [interview contract](interview-api.md). No fixed interview-number application stages.
+
+Unimplemented: candidate business publication, bulk decision import, continuous extraction scheduling, extended task catalog, selected-recipient business email/calendar and analytics. Selected directions and open contracts are in [plan](../../plan/README.md).
 
 Module names describe business boundaries, not microservices. Shared migrations/interfaces have one owner; independent work can follow a written endpoint contract.
 
-Implemented: identity, health, vacancies/intake, local mock processing, review/export, bounded internal interviews/progression/inbox and React screens against those contracts. Live AI, calendar sync, business email/candidate publication and interview retries remain deferred. Manual frontend scenarios: demo-guide.md.
+Manual frontend scenarios: [demo guide](../guides/demo-guide.md). Static OpenAPI gaps (per-skill/live-provenance extensions) are listed in [status](../status.md#contract-gaps). The health vocabulary includes `review_ready` as an accepted value; no current workflow writes that stage.

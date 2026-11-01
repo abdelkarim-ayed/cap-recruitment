@@ -1,28 +1,30 @@
-# Documentation reading map
+# Documentation index
 
-## Resume without rereading the history
+Read by question; do not reload the whole documentation tree.
 
-1. [Product checkpoint and open feedback](product-checkpoint.md): latest user concerns, branch MVP versus wider delivery target, unresolved rules and proposed changeability review. Desired behavior is not automatically implemented or authorized.
-2. [Jev gateway handoff](jev-gateway-handoff.md): current feature-branch integration and mandatory spending restrictions. Load project skill `typesafe-ai` before Jev work. No paid/limit tests without explicit consent.
-3. [Extraction handoff](extraction-handoff.md): implementation history, verified checks, UI changes, remaining limitations and playground-only discussion.
-4. [Status](status.md): verification checkpoints; older batches are history, not a current feature inventory.
-
-## Which document answers which question?
-
-| Question | Source |
+| Need | Start here |
 | --- | --- |
-| Purpose, actors and scope | [product.md](product.md), [decisions.md](decisions.md) |
-| Latest requested changes / not-yet-decided behavior | [product-checkpoint.md](product-checkpoint.md), [open-questions.md](open-questions.md) |
-| Current intake, file, task and owner contracts | [vacancy-api.md](vacancy-api.md), [application-api.md](application-api.md) |
-| Processing, separate corrections and export | [processing-review-api.md](processing-review-api.md), then branch handoffs for PDF/gateway extensions |
-| Current preselection, interview authority, notifications and retention | [interview-api.md](interview-api.md) |
-| Identity endpoints / generated API schema | [api.md](api.md), [openapi.json](openapi.json), [interview-openapi.json](interview-openapi.json) |
-| Manual scenarios and synthetic data | [demo-guide.md](demo-guide.md); Windows is unverified: [windows-compatibility.md](windows-compatibility.md) |
-| UI principles | [frontend-design.md](frontend-design.md) |
-| Test modes and local infrastructure | [integration-testing.md](integration-testing.md), [backend-test.md](backend-test.md), [local-networking.md](local-networking.md) |
-| Architectural history/proposals | [architecture.md](architecture.md), [backend-modules.md](backend-modules.md); not evidence that an old proposal is implemented |
-| Deferred possibilities / research | [backlog.md](backlog.md), [ai-options.md](ai-options.md), [form-tooling.md](form-tooling.md) |
+| What runs today? | [Current index](current/README.md), then [status](current/status.md) |
+| How is it built / where is a rule owned? | [Architecture](current/architecture.md) |
+| What happens to an application? | [Workflows and vocabulary](current/workflows.md) |
+| What did the user request next? | [Planning index](plan/README.md), [product decisions](plan/product-decisions.md) |
+| Next checkpoints / deferred work | [Task board](plan/tasks.md) |
+| Refactor evidence and unresolved obstacles | [Changeability review](plan/changeability.md) |
+| Extraction design discussion | [Tasks and evidence](plan/extraction-design.md) |
+| Jev safety / opt-in execution | [Mandatory safeguards](current/jev-safety.md); load project `typesafe-ai` skill before Jev work |
+| Report-support history | [Journal](journal.md): selective context, not the current specification |
 
-Read implemented contracts for current behavior; read the latest checkpoint for requested changes. When they differ, preserve the difference until explicitly resolved. A user-reported bug is a report to reproduce, not proof that every path is broken. Passing automated checks does not disprove a reported manual failure.
+## Meaning of the folders
 
-No broad schema/API rewrite is part of this documentation pass. Static OpenAPI live-provenance alignment and the architectural proposal review remain tracked follow-ups. Presentation content is separate; no slides/exports changed here.
+- `current/`: implemented behavior and present operating constraints. Contracts live in `current/contracts/`; runnable instructions in `current/guides/`. Known gaps are explicit, not described as delivered features.
+- `plan/`: requested changes, design proposals, unresolved decisions, tasks and deferred work. Selection of a direction does not mean implementation is finished or the whole backlog is authorized.
+- `plan/research/`: optional research inputs, not requirements or verified integrations.
+- `journal.md`: append significant decisions/checkpoints only. Git preserves superseded document versions; no duplicate archive tree.
+- `docs/.ignore/private/`: ignored sensitive handoffs/context. `docs/.ignore/tmp/`: disposable work. Keep personal context out of tracked technical documentation.
+- `demo-cvs.json`: synthetic source data consumed by `scripts/render-demo-cvs.py`; retained at its existing path because it is executable tooling input, not a prose document.
+
+## Maintenance
+
+Update the relevant current contract when behavior ships; keep unimplemented changes in the plan. Link instead of copying a policy across handoffs. Prose and OpenAPI may describe the same contract in different formats; differences must be flagged. [Static schema gaps](current/status.md#contract-gaps) are known, so OpenAPI is not assumed to fully describe the latest skills response.
+
+Current task: documentation reorganisation only. Code refactoring, data changes, provider calls and running-process management await their own checkpoints. Presentation sources/review gates remain in [presentation/README.md](../presentation/README.md).

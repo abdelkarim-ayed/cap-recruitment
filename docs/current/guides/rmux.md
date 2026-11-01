@@ -1,4 +1,4 @@
-# Shared RMUX terminals
+# Shared RMUX terminals — operator guide
 
 Use the user's existing RMUX session for persistent development terminals. Prefer separate tabs/windows, not split panes. User and agent can inspect the same terminals; the agent need not own the attached client.
 

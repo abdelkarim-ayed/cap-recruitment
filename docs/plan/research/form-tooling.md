@@ -1,6 +1,6 @@
-# Form tooling shortlist
+# Form tooling research — optional future reference
 
-Research date: 2026-10-09. Ginkgo/RJSF were tested in an isolated gitignored spike; Form.io and SurveyJS were not integration-tested. User prefers custom domain authoring over Ginkgo's generic builder. Current spike removes Ginkgo and uses a custom input editor with RJSF rendering. No application library integration has started.
+Research date: 2026-10-09. Historical experiment, retained only as optional future reference. Ginkgo/RJSF were tested in an isolated gitignored spike; Form.io and SurveyJS were not integration-tested. User preferred custom domain authoring. The application now uses a native React editor/renderer over shared typed schemas, not Ginkgo/RJSF. No library migration is selected; current behavior is in [vacancy contract](../../current/contracts/vacancy-api.md).
 
 ## First candidate: Ginkgo builder + react-jsonschema-form (RJSF)
 - Ginkgo supplies a React visual authoring component producing JSON Schema and UI schema. Apache-2.0.

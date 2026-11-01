@@ -1,10 +1,10 @@
-# Vacancy API — implemented checkpoint
+# Vacancy API — implemented contract
 
-Current contract below does not require an interview pipeline at publication. User now requests such a prerequisite; readiness/legacy-record policy remains to resolve before implementation. See [product-checkpoint.md](product-checkpoint.md). Generic skills configuration is implemented; the guarded live extraction method is still experimental/unselected.
+Current publication does not require an interview pipeline. The requested prerequisite and publish-time pipeline freeze are [planned](../../plan/product-decisions.md#publication-and-vacancy-lifecycle). Guarded Noul skills extraction is implemented with disabled defaults, not live-validated; see [Jev safety](../jev-safety.md).
 
 Manual-feedback refinements: staff responses include `owner: {name,email}` alongside ownerId; public projections never include owner identity. List query adds `status=draft|published|closed` and `sort=newest|oldest|title` (default newest), applied before pagination with deterministic ID ties. Public lists remain published-only regardless of filter. Existing owner permissions unchanged.
 
-**Implemented and integration-tested.** Admin/recruiter create/read; owner alone mutates. Interviewer/candidate denied staff vacancy routes. Writes require trusted Origin. Intake: application-api.md; mock-only processing/review/export: processing-review-api.md. No live AI.
+**Implemented; integration verification recorded in [status](../status.md).** Admin/recruiter create/read; owner alone mutates. Interviewer/candidate denied staff vacancy routes. Writes require trusted Origin. [Intake](application-api.md); [processing/review/export](processing-review-api.md).
 
 ## Staff create/update
 `POST /api/vacancies` body:
@@ -23,7 +23,7 @@ Manual-feedback refinements: staff responses include `owner: {name,email}` along
   },
   "processingDefinition":{
     "version":1,
-    "tasks":[{"id":"cv-skills","sourceInputId":"cv","outputKey":"extracted_skills","type":"extractSkills","args":{"skills":["SQL","TypeScript"],"evidence":true}}]
+    "tasks":[{"id":"cv-skills","sourceInputId":"cv","outputKey":"extracted_skills","type":"extractSkills","args":{"skills":["sql","typescript"],"evidence":false}}]
   }
 }
 ```
@@ -50,7 +50,7 @@ Every answer/document input requires id, name, label, type, required, args. Sepa
 | document | Optional accept: 1–32 unique lower-case extensions matching `^\.[a-z0-9]{1,16}$`; optional limit: NO_LIMIT or MAX_BYTES with positive safe-integer bytes |
 | separator | `{}`; display-only, no answer |
 
-extractSkills args require skills (1–100 nonempty strings, max 100 chars, case-insensitively unique) and evidence boolean. Remove a task to disable it; no enabled flag. Future editor can show settings on its source document. Unknown types/args fail. Empty task list is valid; publish requires a non-separator input. Omitted accept/limit means no business restriction; uploads still obey 10 MiB/file and 25 MiB combined caps. Extension restrictions are not content verification.
+extractSkills args require skills (1–100 nonempty strings before normalization, max 100 chars each) and evidence boolean. Skills trim/lowercase/deduplicate on validation. Remove a task to disable it; no enabled flag. Editor settings are attached to the source document. Evidence remains accepted for compatibility, but new tasks default false and Noul emits no quotes. Adapter execution bounds differ from the definition schema; see [Jev safety](../jev-safety.md). Unknown types/args fail. Empty task list is valid; publish requires a non-separator input. Omitted accept/limit means no business restriction; uploads still obey 10 MiB/file and 25 MiB combined caps. Extension restrictions are not content verification.
 
 **201** response (illustrative ID, actual responses return UUIDs):
 ```json
@@ -72,7 +72,7 @@ extractSkills args require skills (1–100 nonempty strings, max 100 chars, case
   },
   "processingDefinition":{
     "version":1,
-    "tasks":[{"id":"cv-skills","sourceInputId":"cv","outputKey":"extracted_skills","type":"extractSkills","args":{"skills":["SQL","TypeScript"],"evidence":true}}]
+    "tasks":[{"id":"cv-skills","sourceInputId":"cv","outputKey":"extracted_skills","type":"extractSkills","args":{"skills":["sql","typescript"],"evidence":false}}]
   },
   "createdAt":"2026-10-09T12:00:00.000Z",
   "updatedAt":"2026-10-09T12:00:00.000Z"
@@ -88,7 +88,7 @@ For definition changes, send both definitions as a replacement pair. Validation 
 
 ## Publish/close
 - `POST /api/vacancies/:id/publish`, body `{"expectedRevision":1}`: validate draft, publish and lock the entire record. Return 200 with status published and incremented revision.
-- `POST /api/vacancies/:id/close`, body `{"expectedRevision":2}`: close a published vacancy without deleting it; remove it from public routes. Return 200 with status closed and incremented revision. Use actual last-read revision; submission eligibility will use this state when applications are implemented.
+- `POST /api/vacancies/:id/close`, body `{"expectedRevision":2}`: close a published vacancy without deleting it; remove it from public routes. Return 200 with status closed and incremented revision. Use actual last-read revision; new submissions require published state. Existing recruitment continues.
 - Owner-authorized same-state actions return the current record unchanged even with an old revision. A stale revision on a real transition or illegal transition returns 409. Draft cannot close; closed cannot reopen. Row locking prevents two stale concurrent edits from both succeeding.
 
 ## Public detail

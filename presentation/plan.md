@@ -14,4 +14,4 @@ Revised French script and PDF ready for review: 30 contents + six section divide
 7. **Optional report-support log:** organize existing decisions/implementation/checks and known gaps into a linked notes log. Not a fabricated audit trail, not required before the meeting.
 
 ## Session continuity
-Keep this session while context is helpful. A new session is optional, not needed for tooling. If switching, hand off this folder, current review checkpoint and docs/status.md; do not rely on chat memory alone. No presentation-only subagents or extra services authorized by this plan.
+Keep this session while context is helpful. A new session is optional, not needed for tooling. If switching, hand off this folder, current review checkpoint and docs/current/status.md; do not rely on chat memory alone. No presentation-only subagents or extra services authorized by this plan.

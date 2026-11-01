@@ -34,7 +34,7 @@ PDF vérifié : compilation, 36 pages, syntaxe Mermaid et inspection de pages ra
 
 ## Reveal.js disponible
 
-Reveal.js **6.0.2** et Vite sont installés ; `deck/` reste le placeholder initial, sans second draft à maintenir. `deck:dev` sert sur `http://localhost:5174`, `deck:build` compile le placeholder. Aucun serveur de présentation ni navigateur lancé. Si prévisualisation web demandée, utiliser un onglet RMUX nommé `presentation`, selon docs/rmux.md.
+Reveal.js **6.0.2** et Vite sont installés ; `deck/` reste le placeholder initial, sans second draft à maintenir. `deck:dev` sert sur `http://localhost:5174`, `deck:build` compile le placeholder. Aucun serveur de présentation ni navigateur lancé. Si prévisualisation web demandée, utiliser un onglet RMUX nommé `presentation`, selon docs/current/guides/rmux.md.
 
 ## Relecture
 

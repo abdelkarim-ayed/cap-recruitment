@@ -16,7 +16,7 @@ User explicitly authorized `podman system reset --force`; executed successfully.
 
 Standalone test `/tmp/opencode/redis-volume-probe.py` (not Compose): Redis with host networking, localhost port 58961, named volume, AOF. Wrote a key, stopped/removed the container, created a fresh container on the same volume, and read the original value successfully. Only that test's container/volume were cleaned afterward. A system reset deletes volumes; ordinary container removal does not.
 
-Actual recruitment stack started successfully with `podman compose`. Inspection confirms all three services use host networking. `pnpm infra:check` verifies PostgreSQL/Redis connectivity plus Mailpit HTTP and SMTP. Containers remain running; no further reset is authorized implicitly.
+At the recorded networking checkpoint, the recruitment stack started successfully with `podman compose` and all three services were verified in host mode. `pnpm infra:check` checks PostgreSQL/Redis connectivity plus Mailpit HTTP and SMTP. Discover current listeners/container state before management; no further reset is authorized implicitly. Redis now also holds spending counters, so volume preservation is essential.
 
 ## Historical diagnosis
 Compose normally places services on a shared bridge and supports container-to-container names. This host-mode choice is not a claim that rootless DNS is impossible. The current environment failed bridge startup with missing slirp4netns and stale/missing rootless runtime state. Saved history suggests it worked previously. Further recovery is deferred.

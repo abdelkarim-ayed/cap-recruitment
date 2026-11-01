@@ -259,11 +259,11 @@ Consultation : 11 octobre 2026. Ajouter les références courtes en pied des sli
 
 ## Preuves internes — liens à relire avant le draft
 
-- **I1** — [État et vérifications](../docs/status.md).
-- **I2** — [Produit](../docs/product.md), [workflows](../docs/workflows.md), [décisions](../docs/decisions.md).
-- **I3** — [Offres et révisions](../docs/vacancy-api.md), [dépôt et documents](../docs/application-api.md).
-- **I4** — [Traitement, corrections et export](../docs/processing-review-api.md).
-- **I5** — [Entretiens, politiques et inbox](../docs/interview-api.md).
-- **I6** — [Options IA — recherchées, non sélectionnées](../docs/ai-options.md), [backlog](../docs/backlog.md).
-- **I7** — [Workflow CI configuré](../.github/workflows/ci.yml), [tests d’intégration](../docs/integration-testing.md).
-- **I8** — [Scénarios et limites de démo](../docs/demo-guide.md).
+- **I1** — [État et vérifications](../docs/current/status.md).
+- **I2** — [Produit](../docs/current/product.md), [workflows](../docs/current/workflows.md), [décisions futures](../docs/plan/product-decisions.md).
+- **I3** — [Offres et révisions](../docs/current/contracts/vacancy-api.md), [dépôt et documents](../docs/current/contracts/application-api.md).
+- **I4** — [Traitement, corrections et export](../docs/current/contracts/processing-review-api.md).
+- **I5** — [Entretiens, politiques et inbox](../docs/current/contracts/interview-api.md).
+- **I6** — [Options IA — recherche](../docs/plan/research/ai-options.md), [backlog](../docs/plan/tasks.md).
+- **I7** — [Workflow CI configuré](../.github/workflows/ci.yml), [tests d’intégration](../docs/current/guides/integration-testing.md).
+- **I8** — [Scénarios et limites de démo](../docs/current/guides/demo-guide.md).

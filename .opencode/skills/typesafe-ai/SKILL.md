@@ -36,6 +36,7 @@ upstream installation or experiment instructions.
 
 ## Resume efficiently
 
-Read `docs/jev-gateway-handoff.md` before exploring the repository. The feature
-branch has reconciled extraction with JevGateway; its standalone probe is
-parse-only. Earlier commits' direct paths must never be run live.
+Read `docs/current/jev-safety.md` before exploring the repository. Extraction
+is merged into main and uses JevGateway; its standalone probe is parse-only.
+Earlier commits' direct paths must never be run live. Interrupted-live recovery
+is a documented gap to resolve before unattended execution, not retry permission.
