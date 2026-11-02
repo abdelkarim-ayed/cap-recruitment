@@ -4,7 +4,7 @@ Current publication does not require an interview pipeline. Publish-time validat
 
 Manual-feedback refinements: staff responses include `owner: {name,email}` alongside ownerId; public projections never include owner identity. List query adds `status=draft|published|closed` and `sort=newest|oldest|title` (default newest), applied before pagination with deterministic ID ties. Public lists remain published-only regardless of filter. Existing owner permissions unchanged.
 
-**Implemented; integration verification recorded in [status](../status.md).** Admin/recruiter create/read; owner alone mutates. Interviewer/candidate denied staff vacancy routes. Writes require trusted Origin. [Intake](application-api.md); [processing/review/export](processing-review-api.md).
+**Implemented; historical integration evidence and checkpoint-specific verification limits are recorded in [status](../status.md).** Admin/recruiter create/read; owner alone mutates. Interviewer/candidate denied staff vacancy routes. Writes require trusted Origin. [Intake](application-api.md); [processing/review/export](processing-review-api.md).
 
 ## Staff create/update
 `POST /api/vacancies` body:
@@ -78,11 +78,13 @@ extractSkills args require skills (1–100 nonempty strings before normalization
   "updatedAt":"2026-10-09T12:00:00.000Z"
 }
 ```
-`GET /api/vacancies/:id` returns this same full shape with **200**. `revision` is the server-controlled edit counter, distinct from `formDefinition.version` (wire-schema version). `PATCH /api/vacancies/:id` requires positive-integer expectedRevision (max 2147483647) plus at least one editable field. Each successful PATCH increments revision. Definitions replace the whole pair rather than merging individual inputs. Example:
+`GET /api/vacancies/:id` returns this same full shape with **200**. `revision` is the server-controlled edit counter, distinct from `formDefinition.version` (wire-schema version). `PATCH /api/vacancies/:id` requires positive-integer expectedRevision (max 2147483647) plus at least one editable field. Revision increments once only for a real change; an unchanged current draft returns the existing record without an UPDATE or timestamp change. Definitions replace the whole pair rather than merging individual inputs. Example:
 ```json
 {"expectedRevision":1,"title":"Senior backend developer"}
 ```
 Return the full staff shape with **200**, incrementing revision on change. Only drafts are editable; stale revision or published/closed edits return 409. Reject client-supplied `id`, `ownerId`, `status`, `revision`, or timestamps in create/update payloads.
+
+R3a no-op comparison happens after owner, draft-state and expectedRevision checks under the vacancy row lock: even an identical stale PATCH returns 409, and an identical unauthorized PATCH is still denied. Compare only submitted fields using the existing patch schema's normalization (including trimming and skill normalization), ignoring object-key order but retaining array order. Omitted fields are untouched; null/blank location remains invalid rather than a new clearing operation. No-op responses retain owner metadata like ordinary staff responses. A valid replacement can still repair invalid old field data; unrelated stored fields are not revalidated by a metadata-only comparison. Automated regression is deferred as Q-R3A, not reported passed.
 
 For definition changes, send both definitions as a replacement pair. Validation covers source references, compatible types and unique IDs/output keys; failure writes nothing. This does not imply live skill extraction exists.
 

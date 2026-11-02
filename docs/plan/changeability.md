@@ -1,6 +1,6 @@
 # Changeability review and implementation obstacles
 
-Source audit baseline: `fd9fe9e`; planning implications updated 2026-11-02, with targeted rereads of `ProcessingService.processOne` and `InterviewService.stage`, then the R2 staff policy extraction. References below are repository paths, with symbols to survive formatting. Findings are source-level evidence, not a fresh runtime test result. Selected behavior in [decisions](product-decisions.md) supersedes earlier mandatory review/minimum-interview proposals.
+Source audit baseline: `fd9fe9e`; planning implications updated 2026-11-02, with targeted rereads of `ProcessingService.processOne` and `InterviewService.stage`, then R2 staff policy extraction and R3a draft vacancy no-ops. References below are repository paths, with symbols to survive formatting. Findings are source-level evidence, not a fresh runtime test result. Selected behavior in [decisions](product-decisions.md) supersedes earlier mandatory review/minimum-interview proposals.
 
 ## Priorities and local boundaries
 
@@ -14,7 +14,7 @@ Source audit baseline: `fd9fe9e`; planning implications updated 2026-11-02, with
 | Medium | `ReviewService.read/patch/export` owns skill correction, original/effective projection and CSV expansion; `execution.ts` skill-specific port | Stable typed output descriptors and shared review/export projection, only after one additional template is designed |
 | Medium | `integrations/extraction/*` only used by its adapter wiring/tests; current workflow uses context reader/executor | Retire legacy production wiring after dependency inventory; retain meaningful fixture ports and tests, not parallel demo implementations |
 | Medium | RuntimeConfig vs `processing/settings.ts` vs `jev.config.ts`; retry/lease/durations/caps in SQL/UI | Typed configuration ownership; separate operational limits, business policy and immutable spending controls. No giant global constants file or admin settings feature |
-| Medium | Vacancy/pipeline/review saves and workflow revision increments | No-op comparisons and frontend dirty guard, scoped revision helper; counters stay concurrency fences |
+| R3a implemented; remaining medium | Draft vacancy PATCH now skips normalized no-ops; interview-plan/review saves still increment on identical input | Q-R3A verifies vacancy regression later; R3b/c/d cover remaining resource comparisons/dirty guards; counters stay concurrency fences |
 
 Paths under `apps/api/src/` unless specified. Current application/review services query DatabaseService directly; the earlier claim that controller→service→repository was consistently implemented was too broad. JSONB and repeated validation are not automatically defects. Backend/frontend validation both remain appropriate.
 
@@ -30,6 +30,7 @@ Current inbox rows require an interview FK. Candidate receipt/preselection notif
 
 ## Revisions and permissions
 
+- R3a implements draft PATCH no-ops after owner/editability/stale checks under the existing vacancy lock. It normalizes only submitted stored fields using the same patch schema and deep-compares object content while preserving array order; invalid old selected data does not block a valid repair. The locked read also loads owner metadata so no-op and saved staff projections agree. No new generic revision framework or publish/close-policy change; application tests deferred as Q-R3A.
 - Counters exist for distinct resources; history is not implemented or needed. Remove redundant counter increments only after mapping which commands invalidate which concurrent edits.
 - Semantic equality should compare persisted editable fields after normalization, not IDs/timestamps or raw JSON key order. Pipeline replacement currently regenerates step IDs, so detect no-op before replacing rows.
 - Check authorization and stale revisions inside the transaction before a no-op return. Selected rule: stale-identical still requires refresh; current-identical does not increment or emit notifications, refresh completion timestamps or discard corrections. Completed review locks corrections; late processing cannot invalidate it.

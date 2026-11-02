@@ -44,7 +44,7 @@ export class VacancyRepository {
   }
   async change(id: string, operation: (current: Vacancy) => Vacancy) {
     return this.database.transaction(async client => {
-      const result = await client.query<VacancyRow>('SELECT * FROM vacancies WHERE id=$1 FOR UPDATE', [id]);
+      const result = await client.query<VacancyRow>('SELECT v.*,u.name AS owner_name,u.email AS owner_email FROM vacancies v JOIN "user" u ON u.id=v.owner_id WHERE v.id=$1 FOR UPDATE OF v', [id]);
       if (!result.rows[0]) return undefined;
       const current = record(result.rows[0]);
       const next = operation(current);
