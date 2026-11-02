@@ -18,4 +18,4 @@
 | UI conventions | [Frontend design](guides/frontend-design.md) |
 | Host networking / terminals / portability | [Networking](guides/local-networking.md), [RMUX](guides/rmux.md), [Windows notes](guides/windows-compatibility.md) |
 
-These documents describe code at the merged skills checkpoint `fd9fe9e` plus documentation corrections. New publication gates, notifications, readiness behavior and import rules belong to [plan/](../plan/README.md), not to the implementation inventory.
+These documents describe code at the merged skills checkpoint `fd9fe9e`, documentation corrections and the 2026-11-02 R2 staff notification-policy extraction. R2 has static-check evidence only; behavioral tests are deferred in [status](status.md). New publication gates, candidate/owner notification effects, readiness behavior and import rules belong to [plan/](../plan/README.md), not to the implementation inventory.

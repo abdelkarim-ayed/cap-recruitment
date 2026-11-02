@@ -1,6 +1,6 @@
 # Planning index
 
-Latest discussion checkpoint: 2026-11-02. D0 documentation reorganisation is complete. **Code work remains in planning.** Current authorization covers recording/committing the settled screening/interview decisions in a docs-only branch/worktree. Implementation, data operations and any local merge/worktree removal need their bounded scope/authorization; no push.
+Latest discussion checkpoint: 2026-11-02. D0 is complete and decision-docs commit `9ecfebd` is merged into local main. R2 alone is authorized for implementation/commit/local merge/worktree removal, preserving existing staff effects; application tests and manual UX checks are deferred explicitly on the [board](tasks.md). Other product changes remain planned, not delivered or authorized; no push or provider/data/process work.
 
 Screening may happen before extraction/review finishes; either outcome freezes extraction/review without inventing completion. The interview plan may be empty, freezes at publication, and never replaces explicit owner Offer/Hired actions. See [product decisions](product-decisions.md) for the selected rules and [task board](tasks.md) for proposed decomposition, dependencies and remaining gates. Earlier mandatory reviewed-only screening/minimum-one-interview directions are superseded, not implemented contracts.
 

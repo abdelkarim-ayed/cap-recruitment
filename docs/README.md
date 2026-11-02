@@ -16,8 +16,8 @@ Read by question; do not reload the whole documentation tree.
 
 ## Meaning of the folders
 
-- `current/`: implemented behavior and present operating constraints. Contracts live in `current/contracts/`; runnable instructions in `current/guides/`. Known gaps are explicit, not described as delivered features.
-- `plan/`: requested changes, design proposals, unresolved decisions, tasks and deferred work. Selection of a direction does not mean implementation is finished or the whole backlog is authorized.
+- `current/`: actual codebase behavior, business/authorization rules currently honored by it, architecture and present operating constraints. Contracts live in `current/contracts/`; runnable instructions in `current/guides/`. Known gaps and verification limits are explicit, not described as delivered features.
+- `plan/`: forward directions, selected future business decisions, proposals, unresolved questions and kanban-style tasks/deferred work. Even an agreed decision stays here until implemented; selection does not authorize the whole backlog.
 - `plan/research/`: optional research inputs, not requirements or verified integrations.
 - `journal.md`: append significant decisions/checkpoints only. Git preserves superseded document versions; no duplicate archive tree.
 - `docs/.ignore/private/`: ignored sensitive handoffs/context. `docs/.ignore/tmp/`: disposable work. Keep personal context out of tracked technical documentation.
@@ -27,4 +27,6 @@ Read by question; do not reload the whole documentation tree.
 
 Update the relevant current contract when behavior ships; keep unimplemented changes in the plan. Link instead of copying a policy across handoffs. Prose and OpenAPI may describe the same contract in different formats; differences must be flagged. [Static schema gaps](current/status.md#contract-gaps) are known, so OpenAPI is not assumed to fully describe the latest skills response.
 
-Documentation reorganisation (D0) is complete. Current authorized checkpoint: update and commit planning docs for the 2026-11-02 screening/interview decisions. Code/UI implementation, data changes, provider calls and running-process management await their own checkpoints. Presentation sources/review gates remain in [presentation/README.md](../presentation/README.md).
+Agents may moderately add, decompose, reorder or mark backlog items **maybe later / deferred** as obstacles become clear. Preserve user expectations and selected business decisions; label proposals, dependencies and incomplete work honestly. Board maintenance is not authorization to implement another card, drop requested behavior or invent verification. Deferred automated regression and later batched manual UX checks remain visible tasks, not implicit passes.
+
+D0 is complete and the 2026-11-02 decision docs are merged locally. R2 is the authorized bounded checkpoint: preserve existing staff notification behavior, commit, merge into local main and remove its worktree. Application tests/manual UX are deferred explicitly; static checks may be recorded separately. Other code/UI features, data operations, provider calls and process management remain outside this scope. Presentation sources/review gates remain in [presentation/README.md](../presentation/README.md).

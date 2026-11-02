@@ -1,6 +1,6 @@
 # Implementation status
 
-Baseline: local main merge `fd9fe9e` (skills implementation `9e5f7c8`). Documentation review: 2026-11-01. This is an inventory, not a process/listener report.
+Product baseline: local main merge `fd9fe9e` (skills implementation `9e5f7c8`), plus documentation updates and R2 notification-policy extraction on 2026-11-02. This is an inventory, not a process/listener report.
 
 ## Implemented
 
@@ -12,6 +12,7 @@ Baseline: local main merge `fd9fe9e` (skills implementation `9e5f7c8`). Document
 - Selected guarded Noul skills starter: normalized predefined skills, >=0.8 positive, per-skill original/effective tri-state projection, corrections and CSV. No quotations from Noul; defaults disabled; no live validation.
 - Shared HR extraction review; no-task records automatically marked not applicable/completed. CSV exports all vacancy applications regardless of review, filters or recruitment stage.
 - Vacancy interview steps, HR scheduling, one responsible assignee per application/step, final assessment, terminal Fail, owner Offer/Hired, internal inbox and read-retention command.
+- R2: pure typed existing staff notification policy, separate command-cause types and unchanged transactional persistence. Recipient/content ownership moved out of InterviewService; no candidate effects, schema/API/UI changes or runtime acceptance claim.
 
 ## Important current limits
 
@@ -29,6 +30,8 @@ Baseline: local main merge `fd9fe9e` (skills implementation `9e5f7c8`). Document
 Reported at the 2026-10-31 skills checkpoint: 42 API + 16 domain + 29 DOM tests (87 total), domain/API/web builds and real PDF/PostgreSQL fixture integration including per-skill correction/export. Earlier checkpoints report vacancy/intake/interview concurrency, private-file authorization and password/OTP integration checks. These are historical check results, not a fresh test run or live-provider evaluation.
 
 The docs-only reorganisation checks paths, links, JSON references and unchanged runtime sources. It does not rerun application integration scripts, start services or mutate fixture data. Native browser behavior, inbox reports and actual provider quality remain unverified in this pass.
+
+2026-11-02 R2 checkpoint: API `typecheck` (`tsc --noEmit`), whitespace checks, 148 local Markdown links/anchors and 341 OpenAPI references passed. Application unit/integration/DOM tests were not run, at the user's request; automated matrix/rollback/privacy regression remains Q-R2A and later batched manual UX remains Q-R2U on the [board](../plan/tasks.md). Static checks are not evidence those behavioral checks pass. No browser automation, provider calls, data changes or process management performed.
 
 ## Contract gaps
 

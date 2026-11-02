@@ -45,6 +45,21 @@ Explicit workflow methods carry typed causes: hr_scheduled, hr_rescheduled, hr_c
 UX refinement: separate Mark as read without opening an interview; Open interview still marks read. Read messages stay in All retained messages; unread default removes them after refresh. Topbar inbox shortcut plus role-scoped related links on interview/workflow/pipeline pages. Owner is a resource capability on recruiter/admin, not a new role; only pipeline editing/finalization differ. No extra booking notices added for owners: existing creator/owner recipients are scheduling requests and feedback.
 Assigned/rescheduled/cancelled → interviewer (reassignment also informs previous assignee with no candidate payload/link). Scheduling request/feedback → creator + owner, deduplicated. No automatic email, chat, public candidate update or timed reminder. Unread default; retained read messages accessible through All.
 
+Recipient/content rules live in the pure `apps/api/src/interviews/interview-notification.policy.ts`; command causes are defined separately in `interview-cause.ts`. InterviewService supplies loaded context and writes typed intents in its existing mutation transaction. R2 changes ownership, not API/schema/UI or notification behavior:
+
+| Cause / command | Existing recipients / content |
+| --- | --- |
+| HR scheduled | Assignee; interview name and vacancy title |
+| HR rescheduled, same assignee | Assignee once; updated-schedule prompt |
+| HR reassigned | Old/new assignee, deduplicated; generic change message without candidate details; existing inbox projection removes revoked links |
+| HR cancelled appointment | Assignee; supplied cancellation reason |
+| HR ended application | Assignee of each cancelled appointment; application-ended reason |
+| Interview failed | Assignee of each remaining cancelled appointment; failed interview name |
+| Rescheduling requested / feedback submitted | Creator and owner, deduplicated; request reason / interview name and Pass/Fail title |
+| Preselected / Offer / Hired | Explicitly no notification intents in the current policy; new candidate/owner effects remain planned |
+
+Deduplication is within an appointment/event, not across all cancelled appointments. Actors are not excluded when they are also a required recipient. A feedback Fail notice and remaining-appointment cancellations retain distinct causes/content. No results from rerunning policy/integration/DOM tests are claimed for this refactor; see [status](../status.md) and deferred Q-R2A/Q-R2U on the [board](../../plan/tasks.md).
+
 `pnpm --filter @recruitment/api inbox:cleanup` deletes only notifications read more than seven days ago, measured from first read. `... inbox:cleanup --watch` runs immediately and daily until stopped. Separate local retention process, not OS cron/API-startup job; no extraction execution or business record changes. Unread survives indefinitely. Production scheduling/abuse limits remain future hardening.
 
 ## Verification / limits

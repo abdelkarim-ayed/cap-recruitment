@@ -16,7 +16,8 @@ One pnpm workspace, one Nest application, one PostgreSQL database; React/Vite fr
 | `apps/api/src/documents/` | Storage port/local adapter, opaque references, integrity-checked bytes, bounded multipart collection |
 | `apps/api/src/processing/` | Service orchestration; repository leases/task state/review invalidation; typed ports, trusted fixtures, PDF child and guarded skills adapter; CLI invocation |
 | `apps/api/src/review/review.service.ts` | Shared review SQL, separate corrections, effective projection, CSV column naming/serialization and snapshot export |
-| `apps/api/src/interviews/interview.service.ts` | Request schemas, policy, locks/SQL, scheduling, progression, recipient selection, inbox reads/writes and projections |
+| `apps/api/src/interviews/interview.service.ts` | Request schemas, authority, locks/SQL, scheduling, progression, transactional notification persistence, inbox reads/writes and projections |
+| `apps/api/src/interviews/interview-cause.ts`, `interview-notification.policy.ts` | Command-cause types and pure typed staff notification intents: recipients, deduplication, content and deliberate no-effect decisions; no DB/network work |
 | `apps/api/src/integrations/` | Mail protocol adapters, mandatory JevGateway, legacy ExtractionProvider still wired but not the application executor |
 | `apps/web/src/` | Hash routing, form authoring/rendering, review/export, interview/workflow/inbox UI; many response models use `any`, role/stage guards partly repeat backend rules |
 
@@ -32,7 +33,7 @@ Current business stage transitions are centralized in InterviewService, but acti
 
 - Vacancy edits/publish/close lock the vacancy row. Intake acquires a candidate/vacancy advisory lock and a vacancy share lock, then inserts frozen content/doc references. Storage compensation retains files on ambiguous commit.
 - Processing runs outside submission HTTP. Claims and saves use application-row locking and token/expiry fencing. Results invalidate completed review markers while retaining corrections. Source bytes/text reused in-memory within an invocation.
-- Interview commands lock vacancy → application → interview, plus interviewer advisory locks for overlapping appointments. State, cancellations and notifications commit together. Typed causes originate in commands; SQL updates do not infer events.
+- Interview commands lock vacancy → application → interview, plus interviewer advisory locks for overlapping appointments. State, cancellations and notifications commit together. Commands supply typed causes and loaded context to the pure staff notification policy, then persist its intents through the same transaction client; SQL updates do not infer events. There is no event bus or automatic mail coupling.
 - CSV uses a repeatable-read transaction, caps at 1,000 applications/10 MiB. No batch export ledger/import exists.
 - Retention CLI runs once or daily with `--watch`; no extraction poller, event bus, job queue, outbox or persistent parser cache exists.
 

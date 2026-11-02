@@ -4,16 +4,11 @@ import type { PoolClient } from 'pg';
 import { z } from 'zod';
 import { DatabaseService } from '../database/database.service.js';
 import type { AuthenticatedRequest } from '../auth/access.js';
+import type { InterviewCause } from './interview-cause.js';
+import { staffInterviewNotifications, type StaffInterviewNotificationEvent } from './interview-notification.policy.js';
 
 type Actor = AuthenticatedRequest['actor'];
-// Causes belong to initiating workflows, not persistence hooks. Future effects can
-// branch on these types without making every row cancellation behave identically.
-export type InterviewCause =
-  | { type: 'hr_scheduled' | 'hr_rescheduled'; actorId: string }
-  | { type: 'hr_cancelled'; actorId: string; reason: string }
-  | { type: 'hr_ended_application'; actorId: string; reason: string }
-  | { type: 'interview_failed'; actorId: string; interviewId: string; stepName: string }
-  | { type: 'feedback_submitted' | 'reschedule_requested'; actorId: string };
+export type { InterviewCause } from './interview-cause.js';
 const revision = z.number().int().positive();
 const scheduleFields = {
   interviewerId: z.string().min(1).max(200), startsAt: z.iso.datetime({ offset: true }),
@@ -73,13 +68,16 @@ export class InterviewService {
       AND starts_at<$2::timestamptz+make_interval(mins=>$3::integer) AND starts_at+make_interval(mins=>duration_minutes)>$2::timestamptz`,[value.interviewerId,value.startsAt,value.durationMinutes,except??null]);
     if(clash.rows.length)throw new ConflictException('The interviewer already has an overlapping appointment.');
   }
-  private async notify(client:PoolClient,recipients:string[],id:string,kind:string,title:string,body:string,cause:InterviewCause) {
-    for(const recipient of new Set(recipients))await client.query('INSERT INTO inbox_notifications(id,recipient_id,interview_id,kind,title,body,cause) VALUES($1,$2,$3,$4,$5,$6,$7)',[randomUUID(),recipient,id,kind,title,body,JSON.stringify(cause)]);
+  private async notify(client:PoolClient,event:StaffInterviewNotificationEvent) {
+    for(const notification of staffInterviewNotifications(event))await client.query('INSERT INTO inbox_notifications(id,recipient_id,interview_id,kind,title,body,cause) VALUES($1,$2,$3,$4,$5,$6,$7)',[randomUUID(),notification.recipientId,notification.interviewId,notification.kind,notification.title,notification.body,JSON.stringify(notification.cause)]);
   }
   private async cancelRemaining(client:PoolClient,applicationId:string,cause:Extract<InterviewCause,{type:'interview_failed'}>|Extract<InterviewCause,{type:'hr_ended_application'}>) {
     const changed=await client.query(`UPDATE interviews SET status='cancelled',cancellation_cause=$2,change_cause=$2,updated_by=$3,updated_at=now(),revision=revision+1,scheduling_issue=NULL,issue_at=NULL WHERE application_id=$1 AND status='scheduled' RETURNING id,interviewer_id`,[applicationId,JSON.stringify(cause),cause.actorId]);
-    const body=cause.type==='interview_failed'?`Remaining interview cancelled after a Fail result in ${cause.stepName}.`:`HR ended this application: ${cause.reason}`;
-    for(const row of changed.rows)await this.notify(client,[row.interviewer_id],row.id,'cancelled','Interview cancelled',body,cause);
+    for(const row of changed.rows) {
+      const assignment={interviewId:row.id,interviewerId:row.interviewer_id};
+      if(cause.type==='interview_failed')await this.notify(client,{type:'interview_failed',cause,...assignment});
+      else await this.notify(client,{type:'hr_ended_application',cause,...assignment});
+    }
   }
   async pipeline(id:string,actor:Actor) {
     staff(actor);return this.database.transaction(async client=>{
@@ -131,7 +129,7 @@ export class InterviewService {
       const cause:InterviewCause={type:'hr_scheduled',actorId:actor.id};
       await client.query(`INSERT INTO interviews(id,vacancy_id,application_id,step_id,interviewer_id,created_by,updated_by,starts_at,duration_minutes,timezone,meeting,change_cause) VALUES($1,$2,$3,$4,$5,$6,$6,$7,$8,$9,$10,$11)`,[interviewId,row.vacancy_id,id,value.stepId,value.interviewerId,actor.id,value.startsAt,value.durationMinutes,value.timezone,value.meeting,JSON.stringify(cause)]);
       await client.query("UPDATE applications SET stage='interview',flow_revision=flow_revision+1 WHERE id=$1",[id]);
-      await this.notify(client,[value.interviewerId],interviewId,'assigned','Interview assigned',`${step.name} · ${vacancy.title}`,cause);
+      await this.notify(client,{type:cause.type,cause,interviewId,interviewerId:value.interviewerId,interviewName:step.name,vacancyTitle:vacancy.title});
     });return this.get(interviewId,actor);
   }
   async reschedule(id:string,actor:Actor,raw:unknown) {
@@ -140,8 +138,7 @@ export class InterviewService {
       const {row,interview:i}=await this.lockInterview(client,id,actor,true);this.active(row);this.scheduled(i);sameRevision(i.revision,value.expectedRevision);
       await this.validateSlot(client,value,id);const cause:InterviewCause={type:'hr_rescheduled',actorId:actor.id};
       await client.query(`UPDATE interviews SET interviewer_id=$2,starts_at=$3,duration_minutes=$4,timezone=$5,meeting=$6,change_cause=$7,updated_by=$8,updated_at=now(),revision=revision+1,scheduling_issue=NULL,issue_at=NULL WHERE id=$1`,[id,value.interviewerId,value.startsAt,value.durationMinutes,value.timezone,value.meeting,JSON.stringify(cause),actor.id]);
-      // Former assignee loses candidate access. Their notification contains no candidate payload.
-      await this.notify(client,[i.interviewer_id,value.interviewerId],id,'rescheduled','Interview schedule changed',i.interviewer_id===value.interviewerId?'Open the interview for the updated schedule.':'The interview assignment or schedule changed.',cause);
+      await this.notify(client,{type:cause.type,cause,interviewId:id,previousInterviewerId:i.interviewer_id,interviewerId:value.interviewerId});
     });return this.get(id,actor);
   }
   async cancel(id:string,actor:Actor,raw:unknown) {
@@ -150,7 +147,7 @@ export class InterviewService {
       const {row,interview:i}=await this.lockInterview(client,id,actor,true);this.active(row);this.scheduled(i);sameRevision(i.revision,value.expectedRevision);
       const cause:InterviewCause={type:'hr_cancelled',actorId:actor.id,reason:value.reason};
       await client.query(`UPDATE interviews SET status='cancelled',cancellation_cause=$2,change_cause=$2,updated_by=$3,updated_at=now(),revision=revision+1,scheduling_issue=NULL,issue_at=NULL WHERE id=$1`,[id,JSON.stringify(cause),actor.id]);
-      await this.notify(client,[i.interviewer_id],id,'cancelled','Interview cancelled',value.reason,cause);
+      await this.notify(client,{type:cause.type,cause,interviewId:id,interviewerId:i.interviewer_id});
     });return this.get(id,actor);
   }
   async issue(id:string,actor:Actor,raw:unknown) {
@@ -158,8 +155,9 @@ export class InterviewService {
     await this.database.transaction(async client=>{
       const {row,vacancy,interview:i}=await this.lockInterview(client,id,actor);if(i.interviewer_id!==actor.id)throw new ForbiddenException('Only the assigned interviewer can request rescheduling.');
       this.active(row);this.scheduled(i);sameRevision(i.revision,value.expectedRevision);
-      await client.query('UPDATE interviews SET scheduling_issue=$2,issue_at=now(),updated_by=$3,updated_at=now(),revision=revision+1,change_cause=$4 WHERE id=$1',[id,value.reason,actor.id,JSON.stringify({type:'reschedule_requested',actorId:actor.id})]);
-      await this.notify(client,[i.created_by,vacancy.owner_id],id,'scheduling_issue','Rescheduling requested',value.reason,{type:'reschedule_requested',actorId:actor.id});
+      const cause:InterviewCause={type:'reschedule_requested',actorId:actor.id};
+      await client.query('UPDATE interviews SET scheduling_issue=$2,issue_at=now(),updated_by=$3,updated_at=now(),revision=revision+1,change_cause=$4 WHERE id=$1',[id,value.reason,actor.id,JSON.stringify(cause)]);
+      await this.notify(client,{type:cause.type,cause,interviewId:id,createdBy:i.created_by,ownerId:vacancy.owner_id,reason:value.reason});
     });return this.get(id,actor);
   }
   async feedback(id:string,actor:Actor,raw:unknown) {
@@ -170,7 +168,7 @@ export class InterviewService {
       if(new Date(i.starts_at).getTime()>Date.now())throw new ConflictException('Feedback can be submitted once the interview starts.');
       const cause:InterviewCause={type:'feedback_submitted',actorId:actor.id};
       await client.query(`UPDATE interviews SET status='completed',notes=$2,score=$3,outcome=$4,submitted_at=now(),updated_at=now(),updated_by=$5,revision=revision+1,scheduling_issue=NULL,issue_at=NULL,change_cause=$6 WHERE id=$1`,[id,value.notes,value.score,value.outcome,actor.id,JSON.stringify(cause)]);
-      await this.notify(client,[i.created_by,vacancy.owner_id],id,'feedback',`Interview ${value.outcome==='pass'?'passed':'failed'}`,`${i.step_name}: feedback submitted.`,cause);
+      await this.notify(client,{type:cause.type,cause,interviewId:id,createdBy:i.created_by,ownerId:vacancy.owner_id,interviewName:i.step_name,outcome:value.outcome});
       if(value.outcome==='fail'){
         await client.query("UPDATE applications SET stage='not_selected',flow_revision=flow_revision+1 WHERE id=$1",[row.id]);
         await this.cancelRemaining(client,row.id,{type:'interview_failed',actorId:actor.id,interviewId:id,stepName:i.step_name});
@@ -197,6 +195,7 @@ export class InterviewService {
         }
       }
       await client.query('UPDATE applications SET stage=$2,flow_revision=flow_revision+1 WHERE id=$1',[id,value.stage]);
+      if(value.stage!=='not_selected')await this.notify(client,{type:'stage_changed',stage:value.stage});
     });return this.application(id,actor);
   }
   async agenda(actor:Actor,raw:unknown) {

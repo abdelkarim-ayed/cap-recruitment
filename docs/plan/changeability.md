@@ -1,13 +1,13 @@
 # Changeability review and implementation obstacles
 
-Source audit baseline: `fd9fe9e`; planning implications updated 2026-11-02, with targeted rereads of `ProcessingService.processOne` and `InterviewService.stage`. References below are repository paths, with symbols to survive formatting. Findings are source-level evidence, not a fresh runtime test result. Selected behavior in [decisions](product-decisions.md) supersedes earlier mandatory review/minimum-interview proposals.
+Source audit baseline: `fd9fe9e`; planning implications updated 2026-11-02, with targeted rereads of `ProcessingService.processOne` and `InterviewService.stage`, then the R2 staff policy extraction. References below are repository paths, with symbols to survive formatting. Findings are source-level evidence, not a fresh runtime test result. Selected behavior in [decisions](product-decisions.md) supersedes earlier mandatory review/minimum-interview proposals.
 
 ## Priorities and local boundaries
 
 | Priority | Evidence | Proposed bounded change |
 | --- | --- | --- |
 | High | `interviews/interview.service.ts` owns pipeline, schedule SQL, stage rules, inbox and projections; `web/src/interviews.tsx` repeats stage/action checks | Separate typed command schemas, pure progression/availability policies, transactional orchestration and SQL helpers. Split UI by journey with typed responses; retain one transaction owner |
-| High | `InterviewService.create/reschedule/cancel/issue/feedback/cancelRemaining` choose recipients inline; `notify` accepts untyped kind | Reviewable exhaustive cause→effect policy, explicit recipients/privacy/channel decisions, tested as a matrix; no event bus |
+| R2 implemented; regression deferred | `interview-notification.policy.ts` owns existing typed staff recipients/content; InterviewService supplies loaded context and persists intents | Q-R2A/Q-R2U verify matrix/rollback/privacy later; new candidate/owner effects and channel decisions remain B2/P0-N, not part of this refactor |
 | High | `InterviewService.stage`, domain `index.ts`, database constraints and UI lists include unused `review_ready`; ApplicationService masks candidate stage | Define independent processing/review/recruitment/public projections before changing enums; derive action capabilities from the same rule owners |
 | High | Role checks distributed through decorators, service helpers, ApplicationService authorization and UI | Typed action policies for role/resource/state requirements and UI availability; preserve current 401/403/404 and no-owner-override semantics in a behavior-preserving first pass |
 | High before runner | `ProcessingRepository.claim/start/save` and `ProcessingService.processOne` | Distinguish interrupted pre-call work from uncertain admitted live work; enforce no automatic paid reattempt, then discuss runner lifecycle |
@@ -20,7 +20,9 @@ Paths under `apps/api/src/` unless specified. Current application/review service
 
 ## Notification policy (clarified C1)
 
-Behavior-preserving extraction first: function(s) take typed cause plus loaded context and return notification intents. Each intent identifies recipient, public/internal content and safe target; persistence writes in the existing transaction. Existing cause alone may be insufficient: reassignment needs old/new assignee, a bulk action needs grouping context. A typed exhaustive mapping forces explicit handling of new causes, including deliberate `none`; it cannot decide importance automatically.
+**R2 implemented:** pure staff-only function takes a typed cause/event plus loaded context and returns intents with recipient, interview subject, kind, content and cause. The context map covers every current cause; the switch is exhaustive, including explicit no-effects for current preselection/Offer/Hired. Persistence remains in the command transaction. Reassignment supplies old/new assignee, existing actor copies/deduplication remain unchanged, and the read-side access projection is untouched. See the [current matrix](../current/contracts/interview-api.md#inbox-and-retention); behavioral tests are deferred, not reported passed.
+
+Future effects still need recipient/privacy/channel design; a typed mapping cannot decide importance automatically. Bulk actions need grouping context rather than inferring policy from generic SQL changes.
 
 Separate a policy matrix by recipient relation (actor, candidate, owner, responsible interviewer, future participant) and channel (toast/tray/email/work counter). Return empty effects explicitly where expected. Do not default everyone or every actor to a notification. New candidate/public effects are later behavior changes, not part of a behavior-preserving C1 refactor.
 
