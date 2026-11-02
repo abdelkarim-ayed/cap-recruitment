@@ -36,6 +36,12 @@ Base `/api`. GET/PUT success 200, POST success 201. All path IDs UUID. Bad reque
 
 Interview detail includes application/vacancy/step IDs, names/instructions, candidate identity, applicationStage, interviewer/owner identity, revision/status, startsAt/durationMinutes/timezone/meeting, notes/score/outcome/submittedAt, cancellationCause/changeCause, schedulingIssue/issueAt and updatedAt.
 
+## Interview-plan saves
+
+R3b changes owner PUT behavior only for an unchanged editable plan. The existing role/owner check, expected `interview_revision` check and scheduling-freeze check remain separate and precede comparison under the vacancy row lock. Even identical stale or frozen requests return 409; admin has no owner override. Publication itself still does not freeze this list.
+
+Compare the ordered saved names/instructions using the same schema normalization as the request: trim strings, default omitted instructions to empty, ignore object-key order and preserve interview order. Generated IDs/positions are not editable comparison fields. A current-identical plan, including an empty list, returns the existing projection with no DELETE/INSERT/UPDATE, preserving IDs, positions and revision. A real change retains the existing replace-all behavior/new IDs and increments `interview_revision` once; other counters, notifications and UI are unchanged. Regression is deferred as Q-R3B; see [status](../status.md).
+
 ## Scheduling and causal effects
 Date picker + half-hour time select (00/30), duration 30/60/90/120 minutes. UI uses browser timezone, submits ISO instant + IANA zone; server validates zone, half-hour local time and future start. UI rejects nonexistent DST local times; ambiguous DST times use browser's default offset (no offset chooser). No availability/calendar sync/recurrences. Overlapping scheduled appointments blocked using interviewer advisory transaction lock + interval query; adjacent intervals allowed.
 

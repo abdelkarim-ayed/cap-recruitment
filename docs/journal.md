@@ -39,3 +39,9 @@ API `tsc --noEmit`, whitespace checks, 148 local Markdown links/anchors and 341 
 User approved this bounded backend checkpoint with docs/commit/local merge/worktree cleanup and static checks only. Draft PATCH now compares only submitted fields using existing schema normalization under the vacancy lock, after owner/editability/stale-revision checks. Unchanged current content skips UPDATE/revision/time changes; stale-identical still conflicts. Locked reads include owner metadata for the full unchanged staff projection. Interview/review saves, UI guards and publish/close rules are unchanged; current prose/OpenAPI describe only the delivered slice.
 
 API `tsc --noEmit -p apps/api/tsconfig.json`, whitespace checks, 150 local Markdown links/anchors and 341 OpenAPI references passed; the OpenAPI diff changes only the vacancy PATCH description. Application regression is deferred explicitly as Q-R3A, not reported passed. No application execution, DB operations, provider calls, browser work or process management.
+
+## 2026-11-02 — R3b interview-plan no-op saves
+
+User approved implementation/docs/commit/local merge/worktree cleanup. Under the existing vacancy lock, separate owner/revision/scheduling-freeze checks still precede ordered name/instruction comparison with existing schema normalization. Identical plans, including empty, skip row replacement/counter updates and preserve IDs; stale/frozen-identical requests still fail. Real edits retain replace-all/new-ID behavior. No UI, notification or publication-rule changes; no generic combined permission/concurrency helper.
+
+API `tsc --noEmit -p apps/api/tsconfig.json`, whitespace checks, 152 local Markdown links/anchors and 341 OpenAPI references passed; interview OpenAPI changes only the plan PUT description. Application regression is deferred explicitly as Q-R3B, not reported passed. No application execution, DB operations, provider calls, browser work or process management.

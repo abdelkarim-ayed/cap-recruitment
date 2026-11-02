@@ -1,5 +1,6 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
 import type { PoolClient } from 'pg';
 import { z } from 'zod';
 import { DatabaseService } from '../database/database.service.js';
@@ -92,6 +93,10 @@ export class InterviewService {
       const v=await this.vacancy(client,id,'FOR UPDATE');if(v.owner_id!==actor.id)throw new ForbiddenException('Only the vacancy owner can edit interview steps.');
       sameRevision(v.interview_revision,value.expectedRevision);
       if((await client.query('SELECT id FROM interviews WHERE vacancy_id=$1 LIMIT 1',[id])).rows.length)throw new ConflictException('Interview steps are frozen once scheduling starts.');
+      const existing=await client.query<z.infer<typeof pipelineSchema>['steps'][number]>('SELECT name,instructions FROM interview_steps WHERE vacancy_id=$1 ORDER BY position',[id]);
+      // Compare normalized editable content, not generated IDs; order still matters.
+      const normalized=pipelineSchema.shape.steps.safeParse(existing.rows);
+      if(normalized.success&&isDeepStrictEqual(normalized.data,value.steps))return;
       await client.query('DELETE FROM interview_steps WHERE vacancy_id=$1',[id]);
       for(const [index,step] of value.steps.entries())await client.query('INSERT INTO interview_steps(id,vacancy_id,position,name,instructions) VALUES($1,$2,$3,$4,$5)',[randomUUID(),id,index,step.name,step.instructions]);
       await client.query('UPDATE vacancies SET interview_revision=interview_revision+1 WHERE id=$1',[id]);

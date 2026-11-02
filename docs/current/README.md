@@ -18,4 +18,4 @@
 | UI conventions | [Frontend design](guides/frontend-design.md) |
 | Host networking / terminals / portability | [Networking](guides/local-networking.md), [RMUX](guides/rmux.md), [Windows notes](guides/windows-compatibility.md) |
 
-These documents describe code at the merged skills checkpoint `fd9fe9e`, documentation corrections and the 2026-11-02 R2 staff notification-policy extraction/R3a draft vacancy no-op saves. R2/R3a have static-check evidence only; behavioral tests are deferred in [status](status.md). New publication gates, candidate/owner notification effects, readiness behavior and import rules belong to [plan/](../plan/README.md), not to the implementation inventory.
+These documents describe implemented code: the merged skills baseline `fd9fe9e` plus subsequent checkpoints recorded in [status](status.md). R2/R3a/b have static-check evidence only; behavioral tests are explicitly deferred there. New publication gates, candidate/owner notification effects, readiness behavior and import rules belong to [plan/](../plan/README.md), not to the implementation inventory.
