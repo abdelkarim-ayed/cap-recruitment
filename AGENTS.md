@@ -7,7 +7,7 @@ Recruitment prototype: pnpm workspaces (`apps/api` NestJS, `apps/web` React/Vite
 - `docs/current/`: implemented behavior, architecture and operating constraints; `contracts/` and `guides/` are inside it. [Status](docs/current/status.md) records dated verification, not current process state.
 - `docs/plan/`: requested changes, selected directions, unresolved decisions and deferred tasks. Start with [task board](docs/plan/tasks.md) and [product decisions](docs/plan/product-decisions.md); [changeability](docs/plan/changeability.md) holds code evidence/obstacles. Do not describe plans as delivered.
 - `docs/journal.md`: sparse significant checkpoints for report support, not source of truth. Replace obsolete docs with current facts; Git preserves prior versions. Keep docs concise and linked.
-- Current authorization is documentation reorganisation, local merge and removal of its worktree. Code refactoring remains planning until a bounded checkpoint is approved. Do not treat old implementation authorizations or assistant recommendations as approval of the whole backlog.
+- D0 documentation reorganisation is complete. Current authorization is the docs-only planning update and commit for the 2026-11-02 screening/interview decisions. Code/UI work, data operations and local merge/worktree removal await their own authorization. Do not treat old authorizations or assistant recommendations as approval of the whole backlog.
 - Future work preference: branch/worktree outside `/tmp`, scoped changes/checks, local merge to main and remove that worktree when authorized. Preserve existing/unfamiliar changes; no remote creation/push or backdated commits.
 
 ## Spending and data red lines

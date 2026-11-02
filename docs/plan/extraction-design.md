@@ -26,6 +26,8 @@ All six were considered useful by the user; **no second-template priority was fi
 3. Separate correction layer overrides selected output values; unset override differs from explicit unknown/null. Shared revision counter protects changes; full history is not required.
 4. One effective projection feeds review controls and CSV; it does not duplicate candidate answers or mutate originals.
 
+Editing follows the [screening/review boundary](product-decisions.md#readiness-review-and-progression): whole-application review starts after normal task settlement or manual release, and corrections lock at review completion or either committed screening outcome. Extraction is optional screening support, not a decision prerequisite; decision import never writes extraction values.
+
 Relational identities/foreign keys for application, document, task and correction; JSONB for genuinely dynamic values. Runtime schemas complement TypeScript types. Current per-task corrections/results can remain until a second template proves another structure necessary. A suggested `extraction(id,result)` or `review_revision(id,generation,...)` table was illustrative, not selected schema. Default values must not turn unavailable/errors into false/zero. Stable export keys need documented collision/normalization rules.
 
 ## Evidence: quotes first, geometry later

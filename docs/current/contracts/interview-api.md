@@ -1,7 +1,7 @@
 # Interview pipeline, scheduling and inbox — implemented contract
 
 Migration 006; session cookies and trusted Origin on writes. Backend and integrated React UI, no interview calendar/email integration or event bus. [Current extraction](../jev-safety.md) does not alter these interview rules.
-This is the implemented bounded contract. Candidate notifications/timeline, explicit hide, publish-time pipeline freeze, screening reversal and related requests are in [plan](../../plan/product-decisions.md). They have not replaced the rules below.
+This is the implemented bounded contract. Candidate notifications/progress, explicit hide, publish-time interview-plan freeze, zero-interview owner finalization and screening locks are in [plan](../../plan/product-decisions.md). Screening reversal is not planned. Selected changes have not replaced the implemented rules below.
 
 ## Model and policy
 - Owner edits an ordered vacancy-level pipeline (0–10 steps, name/instructions), independently of frozen candidate intake. Pipeline becomes immutable once any interview instance exists. Closed vacancies can retain ongoing recruitment; closing intake does not cancel interviews.

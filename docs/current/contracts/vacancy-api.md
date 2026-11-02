@@ -1,6 +1,6 @@
 # Vacancy API — implemented contract
 
-Current publication does not require an interview pipeline. The requested prerequisite and publish-time pipeline freeze are [planned](../../plan/product-decisions.md#publication-and-vacancy-lifecycle). Guarded Noul skills extraction is implemented with disabled defaults, not live-validated; see [Jev safety](../jev-safety.md).
+Current publication does not require an interview pipeline. Publish-time validation/freezing of a possibly empty interview plan is [planned](../../plan/product-decisions.md#publication-and-vacancy-lifecycle). Guarded Noul skills extraction is implemented with disabled defaults, not live-validated; see [Jev safety](../jev-safety.md).
 
 Manual-feedback refinements: staff responses include `owner: {name,email}` alongside ownerId; public projections never include owner identity. List query adds `status=draft|published|closed` and `sort=newest|oldest|title` (default newest), applied before pagination with deterministic ID ties. Public lists remain published-only regardless of filter. Existing owner permissions unchanged.
 

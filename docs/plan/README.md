@@ -1,6 +1,8 @@
 # Planning index
 
-Latest discussion checkpoint: 2026-11-01. **Code work remains in planning.** User prioritized documentation reorganisation in an external non-`/tmp` branch worktree, then local merge and removal of that worktree. Future implementation proceeds through separately scoped checkpoints after obstacles/design are reviewed.
+Latest discussion checkpoint: 2026-11-02. D0 documentation reorganisation is complete. **Code work remains in planning.** Current authorization covers recording/committing the settled screening/interview decisions in a docs-only branch/worktree. Implementation, data operations and any local merge/worktree removal need their bounded scope/authorization; no push.
+
+Screening may happen before extraction/review finishes; either outcome freezes extraction/review without inventing completion. The interview plan may be empty, freezes at publication, and never replaces explicit owner Offer/Hired actions. See [product decisions](product-decisions.md) for the selected rules and [task board](tasks.md) for proposed decomposition, dependencies and remaining gates. Earlier mandatory reviewed-only screening/minimum-one-interview directions are superseded, not implemented contracts.
 
 | Question | Read |
 | --- | --- |

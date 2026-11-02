@@ -27,4 +27,4 @@ Read by question; do not reload the whole documentation tree.
 
 Update the relevant current contract when behavior ships; keep unimplemented changes in the plan. Link instead of copying a policy across handoffs. Prose and OpenAPI may describe the same contract in different formats; differences must be flagged. [Static schema gaps](current/status.md#contract-gaps) are known, so OpenAPI is not assumed to fully describe the latest skills response.
 
-Current task: documentation reorganisation only. Code refactoring, data changes, provider calls and running-process management await their own checkpoints. Presentation sources/review gates remain in [presentation/README.md](../presentation/README.md).
+Documentation reorganisation (D0) is complete. Current authorized checkpoint: update and commit planning docs for the 2026-11-02 screening/interview decisions. Code/UI implementation, data changes, provider calls and running-process management await their own checkpoints. Presentation sources/review gates remain in [presentation/README.md](../presentation/README.md).

@@ -23,4 +23,4 @@ Authentication uses password/cookie sessions and verified identity; ownership is
 - Closing intake does not end recruitment or archive applications.
 - Upload business restrictions differ from backend operational caps; fixtures never imply live AI quality.
 
-See [workflows](workflows.md) for implemented behavior and [planned decisions](../plan/product-decisions.md) for the latest requested changes. That plan includes candidate updates, reviewed-only selection exports, readiness, publication prerequisites and manual reversal; none is silently included in this baseline.
+See [workflows](workflows.md) for implemented behavior and [planned decisions](../plan/product-decisions.md) for requested changes: screening freezes extraction/review without requiring their completion, publication freezes an optionally empty interview plan, and candidate updates/decision import remain future work. Reviewed-only screening and manual reversal proposals are superseded; none of the new rules is silently included in this baseline.
