@@ -59,6 +59,8 @@ For the bounded version prefer rescheduling over standalone appointment cancella
 
 ## Export and final selection wizard
 
+[P0-I contract draft](screening-import-contract.md) develops these selected rules into CSV/preview/apply behavior. Its concrete limits, assertion requirement, atomicity, rejection reason and freshness/repeat recommendations remain proposals pending choice; none is delivered. User wants continuity toward this target workflow, not an import implementation built first on old screening/closure semantics.
+
 **[selected direction, supersedes reviewed-only selection export]** Any undecided application can participate in screening export/import regardless of processing/review completion. Unavailable extraction values export blank/null with truthful original status/provenance; HR decides whether available information is adequate. Review/processing filters can help HR choose records, but must not become mandatory screening gates. Exclude already-decided records from the selection set. **[needs contract]** retain today's diagnostic export-all separately or provide an explicit selection mode; do not silently remove diagnostic access.
 
 - Desired filters: dates, previously exported/not exported, search; regex is only a possible request, with syntax/performance unresolved. Externally apply complex language/math rules, spreadsheets, agents or manual selection; no in-platform arbitrary ranking engine.
