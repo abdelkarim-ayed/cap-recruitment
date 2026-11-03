@@ -4,6 +4,7 @@ import { fromNodeHeaders } from 'better-auth/node';
 import { AuthService } from './auth.service.js';
 import { roles, type Role, type AuthenticatedRequest } from './access.js';
 import { RUNTIME_CONFIG, type RuntimeConfig } from '../configuration/runtime-config.js';
+import { roleAllows, type Action } from '@recruitment/domain';
 
 @Injectable()
 export class SessionGuard implements CanActivate {
@@ -23,6 +24,8 @@ export class SessionGuard implements CanActivate {
     if (!roles.includes(role as Role)) throw new ForbiddenException('Account role is unavailable.');
     const allowed = this.reflector.getAllAndOverride<Role[]>('roles', targets);
     if (allowed && !allowed.includes(role as Role)) throw new ForbiddenException('This action requires a different role.');
+    const action = this.reflector.getAllAndOverride<Action>('action', targets);
+    if (action && !roleAllows(role as Role, action)) throw new ForbiddenException('This action requires a different role.');
     request.actor = { id: session.user.id, email: session.user.email, name: session.user.name, role: role as Role };
     return true;
   }

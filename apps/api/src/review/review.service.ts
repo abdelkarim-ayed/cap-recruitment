@@ -5,6 +5,9 @@ import type { Vacancy } from '@recruitment/domain/vacancies';
 import { skillRows, skillValueSchema, normalizeSkills } from '@recruitment/domain/vacancies';
 import { DatabaseService } from '../database/database.service.js';
 import type { AuthenticatedRequest } from '../auth/access.js';
+import { availability, firstDenied, requirePolicy, rolePolicy } from '../auth/action-policy.js';
+import { reviewEditable } from './review.policy.js';
+import type { ReviewView } from '@recruitment/domain';
 
 const patchSchema = z.strictObject({ expectedRevision: z.number().int().positive(), status: z.enum(['pending','in_review','completed']).optional(), corrections: z.array(z.strictObject({ taskId: z.string().min(1).max(64), value: skillValueSchema.nullable(), remove: z.boolean().optional() })).max(100).optional() }).refine(value => value.status !== undefined || (value.corrections?.length ?? 0) > 0, 'Supply status or corrections.');
 function csvCell(value: unknown) {
@@ -32,12 +35,13 @@ export class ReviewService {
         effectiveValue: row?.has_correction ? row.correction : result.status === 'completed' ? result.value : null };
     }) };
   }
-  private projection(view: Awaited<ReturnType<ReviewService['read']>>) {
+  private projection(view: Awaited<ReturnType<ReviewService['read']>>,actor:AuthenticatedRequest['actor']):ReviewView {
     const { application: row, tasks } = view;
     return { applicationId: row.id, answers: row.answers, formDefinition: row.vacancy_snapshot.formDefinition,
-      processingState: row.processing_state, review: { required:tasks.length>0,status: row.review_status, revision: row.review_revision, reviewedBy: row.reviewed_by, reviewedAt: row.reviewed_at, updatedAt:row.review_updated_at??null, editor:row.review_editor }, tasks };
+      processingState: row.processing_state, review: { required:tasks.length>0,status: row.review_status, revision: row.review_revision, reviewedBy: row.reviewed_by, reviewedAt: row.reviewed_at, updatedAt:row.review_updated_at??null, editor:row.review_editor }, tasks,
+      actions:{edit:availability(firstDenied(rolePolicy(actor,'review.edit'),reviewEditable(tasks.length>0)))} };
   }
-  get(id: string) { return this.database.transaction(async client => this.projection(await this.read(client,id))); }
+  get(id: string,actor:AuthenticatedRequest['actor']) { return this.database.transaction(async client => this.projection(await this.read(client,id),actor)); }
   patch(id: string, actor: AuthenticatedRequest['actor'], raw: unknown) {
     const parsed = patchSchema.safeParse(raw);
     if (!parsed.success) throw new BadRequestException('Invalid review patch.');
@@ -45,7 +49,7 @@ export class ReviewService {
     if (new Set(value.corrections?.map(c => c.taskId)).size !== (value.corrections?.length ?? 0)) throw new BadRequestException('Duplicate correction task.');
     return this.database.transaction(async client => {
       const view = await this.read(client,id,'FOR UPDATE');
-      if(!view.tasks.length)throw new BadRequestException('Extraction review is not required for this application.');
+      requirePolicy(reviewEditable(view.tasks.length>0));
       if (view.application.review_revision !== value.expectedRevision) throw new ConflictException('Review changed; reload before retrying.');
       for (const correction of value.corrections ?? []) {
         const definition = (view.application.vacancy_snapshot as Vacancy).processingDefinition.tasks.find(task => task.id === correction.taskId);
@@ -57,7 +61,7 @@ export class ReviewService {
       }
       const status = value.status ?? ((value.corrections?.length ?? 0) ? 'in_review' : view.application.review_status);
       await client.query(`UPDATE applications SET review_status=$2,review_revision=review_revision+1,reviewed_by=$3,review_updated_at=now(),reviewed_at=CASE WHEN $2='completed' THEN now() ELSE NULL END WHERE id=$1`,[id,status,actor.id]);
-      return this.projection(await this.read(client,id));
+      return this.projection(await this.read(client,id),actor);
     });
   }
   export(vacancyId: string) {

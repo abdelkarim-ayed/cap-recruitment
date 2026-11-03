@@ -1,5 +1,5 @@
 import { Controller, Get, Req } from '@nestjs/common';
-import { Roles, type AuthenticatedRequest } from './access.js';
+import { RequireAction, type AuthenticatedRequest } from './access.js';
 
 @Controller()
 export class AccessController {
@@ -7,6 +7,6 @@ export class AccessController {
   me(@Req() request: AuthenticatedRequest) { return { user: request.actor }; }
 
   @Get('staff/access')
-  @Roles('admin', 'recruiter', 'interviewer')
+  @RequireAction('staff.access')
   staff(@Req() request: AuthenticatedRequest) { return { user: request.actor }; }
 }

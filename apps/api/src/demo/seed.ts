@@ -69,7 +69,7 @@ try{
     const id=result.application.id;manifest.applications[alias]=id;
     if(alias!=='pending'){
       const fixtures=await processDemo(app,id,alias as 'success'|'failure'|'empty');await writeFile(join(directory,`${alias}-fixtures.json`),JSON.stringify(fixtures,null,2)+'\n',{mode:0o600});
-      if(alias==='success'){const review=await app.get(ReviewService).get(id);await app.get(ReviewService).patch(id,actors.hr,{expectedRevision:review.review.revision,status:'completed'});}
+      if(alias==='success'){const review=await app.get(ReviewService).get(id,actors.hr);await app.get(ReviewService).patch(id,actors.hr,{expectedRevision:review.review.revision,status:'completed'});}
     }
   }
   await writeFile(join(directory,'manifest.json'),JSON.stringify(manifest,null,2)+'\n',{mode:0o600});

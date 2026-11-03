@@ -6,6 +6,8 @@ import { z } from 'zod';
 import { DatabaseService } from '../database/database.service.js';
 import { DOCUMENT_STORAGE, type DocumentStorage } from '../documents/document-storage.js';
 import type { AuthenticatedRequest } from '../auth/access.js';
+import { roleAllows, type ApplicationView, type ReviewMetadata } from '@recruitment/domain';
+import { applicationActions, canReadApplication } from './application.policy.js';
 
 type Actor = AuthenticatedRequest['actor'];
 const applicationListSchema=vacancyListSchema.pick({limit:true,offset:true}).extend({
@@ -16,30 +18,31 @@ const applicationListSchema=vacancyListSchema.pick({limit:true,offset:true}).ext
 interface ApplicationRow {
   id: string; vacancy_id: string; candidate_id: string; candidate_identity: { name: string; email: string };
   vacancy_snapshot: Vacancy; answers: Record<string, unknown>; stage: string; processing_state: string; submitted_at: Date;
-  review_status: string; review_revision: number; reviewed_by: string | null; reviewed_at: Date | null;
+  review_status: ReviewMetadata['status']; review_revision: number; reviewed_by: string | null; reviewed_at: Date | null;
 }
 interface DocumentRow { id: string; input_id: string; filename: string; byte_count: number; media_type: string; storage_ref: string; content_hash: string }
 function document(row: DocumentRow) { return { id: row.id, inputId: row.input_id, filename: row.filename, byteCount: row.byte_count, mediaType: row.media_type }; }
-function visible(row: ApplicationRow, actor: Actor) {
+function visible(row: ApplicationRow, actor: Actor):Omit<ApplicationView,'documents'> {
   const vacancy = row.vacancy_snapshot;
   return { id: row.id, vacancyId: row.vacancy_id, candidateId: row.candidate_id, candidate: row.candidate_identity,
     vacancy: { id: vacancy.id, title: vacancy.title, description: vacancy.description, ...(vacancy.location === undefined ? {} : { location: vacancy.location }), revision: vacancy.revision, formDefinition: vacancy.formDefinition,
-      ...(['candidate','interviewer'].includes(actor.role) ? {} : { processingDefinition: vacancy.processingDefinition }) },
+      ...(roleAllows(actor.role,'review.read') ? { processingDefinition: vacancy.processingDefinition } : {}) },
     answers: row.answers, stage: actor.role==='candidate'?'received':row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(),
-    ...(['candidate','interviewer'].includes(actor.role) ? {} : { review: { required:vacancy.processingDefinition.tasks.length>0,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at } }) };
+    ...(roleAllows(actor.role,'review.read') ? { review: { required:vacancy.processingDefinition.tasks.length>0,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at?new Date(row.reviewed_at).toISOString():null }, actions:applicationActions(actor) } : {}) };
 }
 @Injectable()
 export class ApplicationService {
   constructor(private readonly database: DatabaseService, @Inject(DOCUMENT_STORAGE) private readonly storage: DocumentStorage) {}
   private async authorize(actor: Actor, candidateId: string, applicationId:string) {
+    let hasAssignment=false;
     if(actor.role==='interviewer') {
       const result=await this.database.query("SELECT id FROM interviews WHERE application_id=$1 AND interviewer_id=$2 AND status IN ('scheduled','completed') LIMIT 1",[applicationId,actor.id]);
-      if(result.rows.length)return;
+      hasAssignment=result.rows.length>0;
     }
-    if (!['candidate', 'admin', 'recruiter'].includes(actor.role) || (actor.role === 'candidate' && actor.id !== candidateId)) throw new NotFoundException('Application not found.');
+    if (!canReadApplication(actor,candidateId,hasAssignment)) throw new NotFoundException('Application not found.');
   }
   async submit(vacancyId: string, actor: Actor, body: unknown, files: Express.Multer.File[]) {
-    if (actor.role !== 'candidate') throw new ForbiddenException('Only candidates can submit applications.');
+    if (!roleAllows(actor.role,'application.submit')) throw new ForbiddenException('Only candidates can submit applications.');
     if (!body || typeof body !== 'object' || Object.keys(body).length !== 1 || !Object.hasOwn(body, 'answers') || typeof (body as { answers: unknown }).answers !== 'string') throw new BadRequestException('Multipart body requires only an answers JSON field.');
     const text = (body as { answers: string }).answers;
     if (Buffer.byteLength(text) > uploadLimits.answersBytes) throw new BadRequestException('Answers exceed the 256 KiB limit.');
@@ -83,7 +86,7 @@ export class ApplicationService {
       throw error;
     }
   }
-  async get(id: string, actor: Actor) {
+  async get(id: string, actor: Actor):Promise<ApplicationView> {
     const result = await this.database.query<ApplicationRow>('SELECT * FROM applications WHERE id=$1', [id]);
     const row = result.rows[0];
     if (!row) throw new NotFoundException('Application not found.');
@@ -92,11 +95,11 @@ export class ApplicationService {
     return { ...visible(row, actor), documents: refs.rows.map(document) };
   }
   async list(actor: Actor, query: unknown, vacancyId?: string) {
-    if (!['candidate', 'admin', 'recruiter'].includes(actor.role) || (vacancyId && actor.role === 'candidate')) throw new ForbiddenException('Staff access required.');
+    if (!roleAllows(actor.role,vacancyId?'application.listVacancy':'application.list')) throw new ForbiddenException('Staff access required.');
     const parsed = applicationListSchema.safeParse(query);
     if (!parsed.success) throw new BadRequestException('Invalid pagination.');
     const { limit, offset,processing,review,sort } = parsed.data;
-    if(actor.role==='candidate'&&review)throw new ForbiddenException('Review filters require staff access.');
+    if(review&&!roleAllows(actor.role,'review.read'))throw new ForbiddenException('Review filters require staff access.');
     const order=sort==='candidate'?"lower(candidate_identity->>'name'),id":sort==='position'?'lower(title),id':sort==='oldest'?'submitted_at,id':'submitted_at DESC,id DESC';
     const result = await this.database.query(`WITH scoped AS (SELECT id,vacancy_id,candidate_id,candidate_identity,stage,processing_state,submitted_at,review_status,review_revision,reviewed_by,reviewed_at,vacancy_snapshot->>'title' AS title,jsonb_array_length(vacancy_snapshot->'processingDefinition'->'tasks')>0 AS review_required,
       EXISTS(SELECT 1 FROM extraction_corrections c WHERE c.application_id=applications.id) AS has_corrections FROM applications

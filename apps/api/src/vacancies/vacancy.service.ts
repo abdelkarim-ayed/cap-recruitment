@@ -1,7 +1,9 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { isDeepStrictEqual } from 'node:util';
 import { createVacancySchema, patchVacancySchema, publicVacancy, vacancyActionSchema, vacancyListSchema, vacancyDefinitionsSchema, type PatchVacancy, type Vacancy } from '@recruitment/domain/vacancies';
 import { VacancyRepository } from './vacancy.repository.js';
+import { requirePolicy } from '../auth/action-policy.js';
+import { editableDraft, publishableIntake, vacancyOwner, vacancyTransition } from './vacancy.policy.js';
 
 function parse<T>(schema: { safeParse(value: unknown): { success: true; data: T } | { success: false; error: { issues: readonly { path: readonly PropertyKey[]; message: string }[] } } }, value: unknown): T {
   const result = schema.safeParse(value);
@@ -24,6 +26,8 @@ export class VacancyService {
   constructor(private readonly repository: VacancyRepository) {}
   create(ownerId: string, body: unknown) { return this.repository.create(ownerId, parse(createVacancySchema, body)); }
   list(publicOnly: boolean, query: unknown) { const { limit, offset,status,sort } = parse(vacancyListSchema, query); return this.repository.list(publicOnly, limit, offset,status,sort); }
+  get(id: string, publicOnly?: false): Promise<Vacancy>;
+  get(id: string, publicOnly: true): Promise<ReturnType<typeof publicVacancy>>;
   async get(id: string, publicOnly = false) {
     const value = await this.repository.get(id, publicOnly);
     if (!value) throw new NotFoundException('Vacancy not found.');
@@ -32,7 +36,7 @@ export class VacancyService {
   async patch(id: string, actorId: string, body: unknown) {
     const { expectedRevision, ...changes } = parse(patchVacancySchema, body);
     return this.change(id, actorId, current => {
-      if (current.status !== 'draft') throw new ConflictException('Only draft vacancies can be edited.');
+      requirePolicy(editableDraft(current.status));
       this.checkRevision(current, expectedRevision);
       if (sameDraftChanges(current, changes)) return current;
       return { ...current, ...changes };
@@ -43,10 +47,10 @@ export class VacancyService {
     return this.change(id, actorId, current => {
       if (current.status === target) return current;
       this.checkRevision(current, expectedRevision);
-      if ((target === 'published' && current.status !== 'draft') || (target === 'closed' && current.status !== 'published')) throw new ConflictException('Invalid vacancy transition.');
+      requirePolicy(vacancyTransition(current.status,target));
       if (target === 'published') {
         parse(vacancyDefinitionsSchema, { formDefinition: current.formDefinition, processingDefinition: current.processingDefinition });
-        if (!current.formDefinition.inputs.some(input => input.type !== 'separator')) throw new BadRequestException('Publish requires at least one answer/document input.');
+        requirePolicy(publishableIntake(current));
       }
       return { ...current, status: target };
     });
@@ -54,7 +58,7 @@ export class VacancyService {
   private checkRevision(current: Vacancy, expected: number) { if (current.revision !== expected) throw new ConflictException('Vacancy changed; reload before retrying.'); }
   private async change(id: string, actorId: string, operation: (current: Vacancy) => Vacancy) {
     const result = await this.repository.change(id, current => {
-      if (current.ownerId !== actorId) throw new ForbiddenException('Only the vacancy owner can change this vacancy.');
+      requirePolicy(vacancyOwner(actorId,current.ownerId));
       return operation(current);
     });
     if (!result) throw new NotFoundException('Vacancy not found.');
