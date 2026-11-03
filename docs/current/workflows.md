@@ -1,5 +1,7 @@
 # Implemented workflows and vocabulary
 
+R1 centralizes existing role/resource requirements and adds advisory UI availability; see the [action inventory](contracts/action-policies.md). It does not change the implemented workflow below. Revision checks remain separate and authoritative under the existing locks.
+
 ## Submission, processing and review are separate state dimensions
 
 | Dimension | Stored field / meaning |

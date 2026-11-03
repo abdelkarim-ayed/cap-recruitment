@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { api, download, errorMessage } from './api';
 import { Badge, Heading, Notice, Loading, Empty, Pager, display } from './ui';
 import { PdfPreview } from './pdf-preview';
+import type { ApplicationView, ReviewTask, ReviewView } from '@recruitment/domain';
+import type { SkillValue } from '@recruitment/domain/vacancies';
 
 export function extractionLabel(state:string) {
   return ({completed_with_errors:'Original extraction errors',failed:'Original extraction failed',completed:'Extracted',pending:'Extraction pending',processing:'Extracting',not_requested:'No extraction'} as Record<string,string>)[state]||state;
@@ -40,7 +42,7 @@ export function ApplicationList({staff}:{staff:boolean}) {
   </>;
 }
 
-function TaskCard({task,onSave,busy}:{task:any;onSave:(correction:any)=>void;busy:boolean}) {
+function TaskCard({task,onSave,busy}:{task:ReviewTask;onSave:(correction:{taskId:string;value:SkillValue|null;remove?:boolean})=>void;busy:boolean}) {
   const [skills,setSkills]=useState<string>((task.effectiveValue?.skills??[]).join(', ')),[nullValue,setNullValue]=useState(task.hasCorrection&&task.correction===null);
   const [skillFlags,setSkillFlags]=useState<Record<string,string>>(()=>Object.fromEntries((task.skillResults??[]).map((row:any)=>[row.skill,row.effective===null?'unknown':String(row.effective)])));
   return <article className="extraction-card">
@@ -59,7 +61,7 @@ function TaskCard({task,onSave,busy}:{task:any;onSave:(correction:any)=>void;bus
     <details className="original-result"><summary>Original extraction and evidence · {extractionLabel(task.status)}</summary>
       <pre>{task.result.status==='completed'?JSON.stringify(task.result.value,null,2):'Unavailable (null)'}</pre>
       {task.result.reason&&<p className="notice">{task.result.reason}</p>}
-      {task.result.evidence?.length>0&&<ul className="evidence">{task.result.evidence.map((text:string,i:number)=><li key={i}>{text}</li>)}</ul>}
+       {(task.result.evidence?.length??0)>0&&<ul className="evidence">{task.result.evidence?.map((text:string,i:number)=><li key={i}>{text}</li>)}</ul>}
       {task.provenance?.fixtureId&&<small className="fixture-label">Fixture: {task.provenance.fixtureId}</small>}
       <dl className="processing-details"><div><dt>Source field</dt><dd>{task.sourceInputId}</dd></div><div><dt>Attempts</dt><dd>{task.attempts}/3</dd></div>{task.provenance?.reader&&<div><dt>Document reader</dt><dd>{task.provenance.reader}</dd></div>}{task.provenance?.model&&<div><dt>Model</dt><dd>{task.provenance.model}</dd></div>}</dl>
     </details>
@@ -67,12 +69,12 @@ function TaskCard({task,onSave,busy}:{task:any;onSave:(correction:any)=>void;bus
 }
 
 export function ApplicationPage({id,staff}:{id:string;staff:boolean}) {
-  const [record,setRecord]=useState<any>(null),[review,setReview]=useState<any>(null),[error,setError]=useState(''),[message,setMessage]=useState(''),[busy,setBusy]=useState(false),[refresh,setRefresh]=useState(0);
+  const [record,setRecord]=useState<ApplicationView|null>(null),[review,setReview]=useState<ReviewView|null>(null),[error,setError]=useState(''),[message,setMessage]=useState(''),[busy,setBusy]=useState(false),[refresh,setRefresh]=useState(0);
   const [preview,setPreview]=useState<{id:string;filename:string}|null>(null);
-  useEffect(()=>{let active=true;setError('');setRecord(null);setReview(null);(async()=>{const record=await api(`applications/${id}`);const needsReview=staff&&record.processingState!=='not_requested'&&record.review?.required!==false;const review=needsReview?await api(`applications/${id}/review`):null;if(active){setRecord(record);setReview(review);}})().catch(e=>{if(active)setError(errorMessage(e));});return()=>{active=false;};},[id,staff,refresh]);
-  async function update(body:any){setBusy(true);setError('');setMessage('');try{const saved=await api(`applications/${id}/review`,{method:'PATCH',body:JSON.stringify({...body,expectedRevision:review.review.revision})});setReview(saved);setMessage(`Saved revision ${saved.review.revision}.`);}catch(e){setError(`${errorMessage(e)} Use Refresh to reload the latest saved review before retrying.`);}finally{setBusy(false);}}
+  useEffect(()=>{let active=true;setError('');setRecord(null);setReview(null);(async()=>{const record=await api<ApplicationView>(`applications/${id}`);const needsReview=record.actions?.review.allowed&&record.processingState!=='not_requested'&&record.review?.required!==false;const review=needsReview?await api<ReviewView>(`applications/${id}/review`):null;if(active){setRecord(record);setReview(review);}})().catch(e=>{if(active)setError(errorMessage(e));});return()=>{active=false;};},[id,staff,refresh]);
+  async function update(body:Record<string,unknown>){if(!review)return;setBusy(true);setError('');setMessage('');try{const saved=await api<ReviewView>(`applications/${id}/review`,{method:'PATCH',body:JSON.stringify({...body,expectedRevision:review.review.revision})});setReview(saved);setMessage(`Saved revision ${saved.review.revision}.`);}catch(e){setError(`${errorMessage(e)} Use Refresh to reload the latest saved review before retrying.`);}finally{setBusy(false);}}
   return <><Notice message={error}/>{!record?!error?<Loading/>:<button onClick={()=>setRefresh(v=>v+1)}>Retry</button>:<>
-    <Heading title={staff?(record.candidate.name||record.candidate.email):'Your application'} description={`${record.vacancy.title} · Submitted ${new Date(record.submittedAt).toLocaleString()}`} status={staff?<Badge>{record.stage}</Badge>:<Badge>Application received</Badge>}><a className="button" href={staff?`#/applications?vacancy=${record.vacancyId}`:'#/applications'}>← Applications</a>{staff&&<a className="button primary" href={`#/applications/${id}/interviews`}>Selection & interviews</a>}<button disabled={busy} onClick={()=>{setMessage('');setRefresh(v=>v+1);}}>Refresh</button></Heading><p className="related-links"><a href={`#/vacancies/${record.vacancyId}`}>Vacancy details</a>{staff&&<a href={`#/vacancies/${record.vacancyId}/interviews`}>Pipeline & results</a>}</p><Notice message={message} success/>
+    <Heading title={staff?(record.candidate.name||record.candidate.email):'Your application'} description={`${record.vacancy.title} · Submitted ${new Date(record.submittedAt).toLocaleString()}`} status={staff?<Badge>{record.stage}</Badge>:<Badge>Application received</Badge>}><a className="button" href={staff?`#/applications?vacancy=${record.vacancyId}`:'#/applications'}>← Applications</a>{record.actions?.workflow.visible&&<a className="button primary" href={`#/applications/${id}/interviews`}>Selection & interviews</a>}<button disabled={busy} onClick={()=>{setMessage('');setRefresh(v=>v+1);}}>Refresh</button></Heading><p className="related-links"><a href={`#/vacancies/${record.vacancyId}`}>Vacancy details</a>{record.actions?.workflow.visible&&<a href={`#/vacancies/${record.vacancyId}/interviews`}>Pipeline & results</a>}</p><Notice message={message} success/>
      <section className="card"><div className="section-heading"><h2>Answers</h2></div><p>{record.candidate.email}</p>
       <dl className="answer-grid">{record.vacancy.formDefinition.inputs.filter((input:any)=>input.type!=='separator'&&input.type!=='document').map((input:any)=><div key={input.id}><dt>{input.label}</dt><dd>{display(record.answers[input.id])}</dd></div>)}</dl><h3>Documents</h3>
       {!record.documents.length?<p className="muted">No documents submitted.</p>:record.documents.map((doc:any)=><div className="document-actions" key={doc.id}>
@@ -82,14 +84,14 @@ export function ApplicationPage({id,staff}:{id:string;staff:boolean}) {
     </section>
     <div className={`review-workspace ${preview&&review?.tasks.length?'with-preview':''}`}>
       {preview&&<PdfPreview key={preview.id} applicationId={id} document={preview} onClose={()=>setPreview(null)}/>}
-      <div>{staff&&review?.tasks.length>0&&<>
+       <div>{review&&review.actions.edit.visible&&review.tasks.length>0&&<>
         <section className="card"><div className="section-heading"><h2>Extraction review</h2><Badge>{review.review.status}</Badge></div>
-          <div className="actions"><button disabled={busy} onClick={()=>update({status:'in_review'})}>Mark in review</button><button className="primary" disabled={busy} onClick={()=>update({status:'completed'})}>Mark review complete</button><button disabled={busy} onClick={()=>update({status:'pending'})}>Reset to pending</button></div>
+           <div className="actions"><button disabled={busy||!review.actions.edit.allowed} onClick={()=>update({status:'in_review'})}>Mark in review</button><button className="primary" disabled={busy||!review.actions.edit.allowed} onClick={()=>update({status:'completed'})}>Mark review complete</button><button disabled={busy||!review.actions.edit.allowed} onClick={()=>update({status:'pending'})}>Reset to pending</button></div>
           {review.tasks.some((task:any)=>task.hasCorrection)&&<p className="review-summary">HR corrections are saved and used in export. Original extraction results remain unchanged.</p>}<small>Current saved revision {review.review.revision}{review.review.updatedAt?` · Saved ${new Date(review.review.updatedAt).toLocaleString()}`:''}{review.review.editor?` · ${review.review.editor.name||review.review.editor.email}`:''}</small>
         </section>
          <section className="card"><div className="section-heading"><h2>Extracted fields</h2></div>{review.tasks.map((task:any)=><TaskCard key={`${task.taskId}:${review.review.revision}`} task={task} busy={busy} onSave={correction=>update({corrections:[correction]})}/>)}
-        </section>
-      </>}{staff&&<div className="actions"><button disabled={busy} onClick={async()=>{setBusy(true);try{await download(`vacancies/${record.vacancyId}/export`,`applications-${record.vacancyId}.csv`);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}}>Export vacancy CSV</button></div>}</div>
+         </section>
+       </>}{record.actions?.export.visible&&<div className="actions"><button disabled={busy||!record.actions.export.allowed} onClick={async()=>{setBusy(true);try{await download(`vacancies/${record.vacancyId}/export`,`applications-${record.vacancyId}.csv`);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}}>Export vacancy CSV</button></div>}</div>
     </div>
   </>}</>;
 }

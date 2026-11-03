@@ -1,4 +1,5 @@
-export interface Actor { id: string; name: string; email: string; role: 'admin' | 'recruiter' | 'candidate' | 'interviewer' }
+import type { Role } from '@recruitment/domain';
+export interface Actor { id: string; name: string; email: string; role: Role }
 export async function api<T = any>(path: string, init: RequestInit = {}): Promise<T> {
   const response = await fetch(`/api/${path}`, { credentials: 'include', ...init, headers: { ...(typeof init.body === 'string' ? { 'Content-Type': 'application/json' } : {}), ...init.headers } });
   const body = await response.json().catch(() => ({}));

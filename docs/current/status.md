@@ -1,6 +1,6 @@
 # Implementation status
 
-Product baseline: local main merge `fd9fe9e` (skills implementation `9e5f7c8`), plus documentation updates, R2 notification-policy extraction and R3a/b vacancy draft/interview-plan no-op saves on 2026-11-02. This is an inventory, not a process/listener report.
+Product baseline: local main merge `fd9fe9e` (skills implementation `9e5f7c8`), R2/R3a/b changes on 2026-11-02 and R1 existing-workflow action policies on 2026-11-03. This is an inventory, not a process/listener report.
 
 ## Implemented
 
@@ -15,6 +15,7 @@ Product baseline: local main merge `fd9fe9e` (skills implementation `9e5f7c8`), 
 - R2: pure typed existing staff notification policy, separate command-cause types and unchanged transactional persistence. Recipient/content ownership moved out of InterviewService; no candidate effects, schema/API/UI changes or runtime acceptance claim.
 - R3a: current-identical normalized draft vacancy PATCH returns unchanged revision/time and full staff owner metadata. Owner/draft/stale checks remain authoritative; real changes increment once. No UI/interview/review or publish/close-policy changes.
 - R3b: current-identical normalized interview-plan PUT preserves IDs/positions and `interview_revision`, including empty plans. Separate owner/revision/scheduling-freeze checks remain authoritative; real edits still replace all rows/new IDs and increment the counter once. No UI, notification or publication-rule changes.
+- R1: shared static action-role map, feature-scoped existing ownership/assignment/state policies, additive typed action availability and UI consumption. Legacy fields/Origin/session/private projections and current workflow remain; [inventory/contracts](contracts/action-policies.md) distinguish authorization, visibility and future rules. Pure policy specifications/DOM fixtures are written/updated but not executed.
 
 ## Important current limits
 
@@ -38,6 +39,8 @@ The docs-only reorganisation checks paths, links, JSON references and unchanged 
 2026-11-02 R3a checkpoint: API `tsc --noEmit -p apps/api/tsconfig.json`, whitespace checks, 150 local Markdown links/anchors and 341 OpenAPI references passed; the OpenAPI diff is limited to the vacancy PATCH description. Unit/repository/HTTP/DB regression was not run, as approved; Q-R3A remains outstanding on the board. Existing tests are historical evidence, not verification of the changed behavior. No application execution, UI/browser work, provider calls, database operations or process management performed.
 
 2026-11-02 R3b checkpoint: API `tsc --noEmit -p apps/api/tsconfig.json`, whitespace checks, 152 local Markdown links/anchors and 341 OpenAPI references passed; the interview OpenAPI diff changes only the plan PUT description. Application/DB/DOM regression was not run; Q-R3B remains outstanding, not reported passed. No application execution, browser work, provider calls, database operations or process management performed.
+
+2026-11-03 R1 checkpoint: domain build, API/web typechecks, whitespace/test-source syntax checks, 166 local links/anchors and 366 OpenAPI references passed. OpenAPI changes are additive action response schemas only; endpoints, request schemas and existing fields are unchanged. Pure policy specifications and existing DOM fixtures were drafted/updated, not executed; no unit/HTTP/DB/DOM test run. Q-R1A/Q-R1U retain automated/manual regression work. No application startup, browser automation, provider calls, seed/data operations, spending changes or process restart/stop. Static checks do not establish behavioral/security parity.
 
 ## Contract gaps
 

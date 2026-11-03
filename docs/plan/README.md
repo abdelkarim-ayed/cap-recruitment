@@ -1,6 +1,6 @@
 # Planning index
 
-Latest discussion checkpoint: 2026-11-02. D0, decision-docs merge `9ecfebd`, R2 merge `0a41acb` and R3a merge `a3de11d` are complete. R3b alone is authorized next: backend interview-plan no-op saves, docs/commit/local merge/worktree removal, static checks only. Deferred application regression/manual UX stays on the [board](tasks.md). Other product changes remain planned, not delivered or authorized; no push or provider/data/process work.
+Latest discussion checkpoint: 2026-11-03. D0, decision-docs merge `9ecfebd`, R2 merge `0a41acb` and R3a/b merges `a3de11d` / `ae47c1f` are complete. R1 alone is authorized: enumerate/refactor the old enforced workflow into action policies across backend/UI, typed advisory availability, docs/commits/local merge/worktree removal; static checks only. The [current inventory](../current/contracts/action-policies.md) distinguishes this from planned business-rule changes. Deferred application regression/manual UX stays on the [board](tasks.md); no push or provider/data/process work.
 
 Screening may happen before extraction/review finishes; either outcome freezes extraction/review without inventing completion. The interview plan may be empty, freezes at publication, and never replaces explicit owner Offer/Hired actions. See [product decisions](product-decisions.md) for the selected rules and [task board](tasks.md) for proposed decomposition, dependencies and remaining gates. Earlier mandatory reviewed-only screening/minimum-one-interview directions are superseded, not implemented contracts.
 

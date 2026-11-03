@@ -12,7 +12,7 @@ Keep vacancy requirements, applications/documents, assisted extraction, human re
 - Recruiter/admin: shared application reads/review/preselection/scheduling; creates vacancies. The owning recruiter/admin alone edits/publishes/closes that vacancy and records Offer/Hired. Admin has no automatic owner override.
 - Interviewer: assigned appointment/answers/files and own final assessment. Staff may also be assigned interviewers. One responsible assignee, not a panel.
 
-Authentication uses password/cookie sessions and verified identity; ownership is resolved from stored records. No capability mapper or JWT migration has been implemented.
+Authentication uses password/cookie sessions and verified identity; ownership is resolved from stored records. R1 adds static action-role eligibility and feature-scoped policies with typed UI availability, not a new permission framework or JWT migration. The [current action inventory](contracts/action-policies.md) preserves the existing workflow; future product rules remain planned.
 
 ## Current invariants
 

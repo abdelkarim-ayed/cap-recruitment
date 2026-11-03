@@ -3,6 +3,8 @@
 Migration 006; session cookies and trusted Origin on writes. Backend and integrated React UI, no interview calendar/email integration or event bus. [Current extraction](../jev-safety.md) does not alter these interview rules.
 This is the implemented bounded contract. Candidate notifications/progress, explicit hide, publish-time interview-plan freeze, zero-interview owner finalization and screening locks are in [plan](../../plan/product-decisions.md). Screening reversal is not planned. Selected changes have not replaced the implemented rules below.
 
+R1 adds typed `actions` to interview-plan, workflow and interview projections. Existing `editable`, `isOwner`, `canAssess` and `canSchedule` fields remain compatible. Separate action eligibility, presentation visibility and mutation authority are described in [action policies](action-policies.md); current scheduling-time freeze/nonempty-offer/review behavior is unchanged.
+
 ## Model and policy
 - Owner edits an ordered vacancy-level pipeline (0–10 steps, name/instructions), independently of frozen candidate intake. Pipeline becomes immutable once any interview instance exists. Closed vacancies can retain ongoing recruitment; closing intake does not cancel interviews.
 - Each application/step has at most one instance: one existing staff interviewer, start/duration/timezone, link or location, status, final notes/optional integer score 0–10, Pass/Fail. Cancelled/completed records remain; no deletes, retries, reopening, panels or historical revisions.

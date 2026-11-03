@@ -4,6 +4,8 @@ Current publication does not require an interview pipeline. Publish-time validat
 
 Manual-feedback refinements: staff responses include `owner: {name,email}` alongside ownerId; public projections never include owner identity. List query adds `status=draft|published|closed` and `sort=newest|oldest|title` (default newest), applied before pagination with deterministic ID ties. Public lists remain published-only regardless of filter. Existing owner permissions unchanged.
 
+R1 adds `actions:{edit,publish,close}` to full staff responses only; each entry has `{allowed,visible,reason}`. Public/list projections are unchanged. Availability is advisory and does not bypass owner/state/revision/request checks; see [action policies](action-policies.md).
+
 **Implemented; historical integration evidence and checkpoint-specific verification limits are recorded in [status](../status.md).** Admin/recruiter create/read; owner alone mutates. Interviewer/candidate denied staff vacancy routes. Writes require trusted Origin. [Intake](application-api.md); [processing/review/export](processing-review-api.md).
 
 ## Staff create/update
@@ -59,6 +61,11 @@ extractSkills args require skills (1–100 nonempty strings before normalization
   "status":"draft",
   "revision":1,
   "ownerId":"example-recruiter-id",
+  "actions":{
+    "edit":{"allowed":true,"visible":true,"reason":null},
+    "publish":{"allowed":true,"visible":true,"reason":null},
+    "close":{"allowed":false,"visible":false,"reason":"Invalid vacancy transition."}
+  },
   "title":"Backend developer",
   "description":"Build and maintain our internal services.",
   "location":"Tunis / hybrid",

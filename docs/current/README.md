@@ -6,6 +6,7 @@
 | Product purpose and boundaries | [Product](product.md) |
 | Responsibility map and persistence | [Architecture](architecture.md) |
 | State dimensions, permissions, revisions | [Workflows](workflows.md) |
+| Existing action requirements and typed UI availability | [Action policies](contracts/action-policies.md) |
 | Spending boundary and extraction wiring | [Jev safety](jev-safety.md) |
 | Identity and API index | [API](contracts/api.md), [candidate access](contracts/candidate-access.md) |
 | Authoring / publication | [Vacancy contract](contracts/vacancy-api.md) |
@@ -18,4 +19,4 @@
 | UI conventions | [Frontend design](guides/frontend-design.md) |
 | Host networking / terminals / portability | [Networking](guides/local-networking.md), [RMUX](guides/rmux.md), [Windows notes](guides/windows-compatibility.md) |
 
-These documents describe implemented code: the merged skills baseline `fd9fe9e` plus subsequent checkpoints recorded in [status](status.md). R2/R3a/b have static-check evidence only; behavioral tests are explicitly deferred there. New publication gates, candidate/owner notification effects, readiness behavior and import rules belong to [plan/](../plan/README.md), not to the implementation inventory.
+These documents describe implemented code: the merged skills baseline `fd9fe9e` plus subsequent checkpoints recorded in [status](status.md). R2/R3a/b/R1 have static-check evidence only; behavioral tests are explicitly deferred there. New publication gates, candidate/owner notification effects, readiness behavior and import rules belong to [plan/](../plan/README.md), not to the implementation inventory.

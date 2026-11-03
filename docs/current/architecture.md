@@ -9,7 +9,8 @@ One pnpm workspace, one Nest application, one PostgreSQL database; React/Vite fr
 | `packages/domain/src/vacancies.ts` | Strict form/task definitions, source constraints, normalized skills and tri-state skill projection |
 | `packages/domain/src/applications.ts` | Shared intake validation and operational upload limits |
 | `packages/domain/src/index.ts` | Stage vocabulary and legacy generic extraction types; vocabulary does not own transitions |
-| `apps/api/src/auth/`, `bootstrap.ts` | Better Auth lifecycle, trusted actor/roles/origin and bounded HTTP protocol bridge |
+| `packages/domain/src/actions.ts`, `workflow-views.ts` | Static role eligibility, action-availability contracts and shared typed response views; no trusted resource grants |
+| `apps/api/src/auth/`, `bootstrap.ts` | Better Auth lifecycle, trusted actor/role/Origin, action-role guard and small policy→existing-error adapter; bounded HTTP protocol bridge |
 | `apps/api/src/database/` | Shared pool/transaction helper, explicit checksummed migrations |
 | `apps/api/src/vacancies/` | Service owns draft/owner/publication policy, repository SQL and projections |
 | `apps/api/src/applications/application.service.ts` | Submit transaction, file compensation, authorization, snapshot/list/detail/download SQL and projections |
@@ -19,7 +20,8 @@ One pnpm workspace, one Nest application, one PostgreSQL database; React/Vite fr
 | `apps/api/src/interviews/interview.service.ts` | Request schemas, authority, locks/SQL, scheduling, progression, transactional notification persistence, inbox reads/writes and projections |
 | `apps/api/src/interviews/interview-cause.ts`, `interview-notification.policy.ts` | Command-cause types and pure typed staff notification intents: recipients, deduplication, content and deliberate no-effect decisions; no DB/network work |
 | `apps/api/src/integrations/` | Mail protocol adapters, mandatory JevGateway, legacy ExtractionProvider still wired but not the application executor |
-| `apps/web/src/` | Hash routing, form authoring/rendering, review/export, interview/workflow/inbox UI; many response models use `any`, role/stage guards partly repeat backend rules |
+| Feature `*.policy.ts` files | Pure scoped ownership/assignment/state decisions, reused for transactional command checks and advisory availability; business rules remain with their feature |
+| `apps/web/src/` | Hash routing, form authoring/rendering, review/export and interview/workflow/inbox UI; action-bearing detail views typed, UI consumes server availability and shared coarse role map. Some list/dynamic editor models still use `any` |
 
 ## Persistence and guarantees
 
@@ -27,7 +29,7 @@ Relational: vacancy owner/status/revision, application candidate/vacancy uniquen
 
 JSONB: frozen candidate identity and vacancy/form/task snapshot; dynamic answers; task args/result/provenance; correction values; workflow causes. Corrections are relational rows keyed by application/task, not one unstructured review document. Runtime validation constrains dynamic values; TypeScript alone does not validate JSON from clients or stored rows.
 
-Current business stage transitions are centralized in InterviewService, but action visibility and string vocabularies are not. Role guards protect routes; resource checks live in services. ReviewService relies on controller role protection (internal callers are trusted). Assigned document access is resolved in ApplicationService, with an additional InterviewController lookup.
+Current business stage orchestration remains in InterviewService; scoped policy functions own its extracted prerequisites. SessionGuard resolves static action-role eligibility; service policies resolve current records, with revision/input/overlap checks kept separate. ReviewService retains its controller role boundary for trusted internal callers. Assigned document access is still resolved in ApplicationService, with an additional InterviewController lookup. See the [action inventory](contracts/action-policies.md) for exact current-versus-planned boundaries.
 
 ## Transactions and external work
 

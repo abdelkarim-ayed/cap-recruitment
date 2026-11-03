@@ -48,6 +48,8 @@ Migration 003 stores per-task status/results/provenance/attempts plus one applic
 processingState: pending/not_requested/processing/completed/completed_with_errors. No automatic candidate-stage advancement yet: optional review is not preselection or a hiring decision. Optional missing documents can produce failed/null extraction, not a fabricated empty result.
 
 ## Optional shared review
+
+R1 adds `actions.edit:{allowed,visible,reason}` to HR review responses and staff-only `actions:{review,workflow,export}` on application detail. Candidate/interviewer application projections omit these HR hints. This is the [existing-workflow refactor](action-policies.md), not delivery of the planned review-readiness/completion/selection locks; current review editing/export behavior below is unchanged.
 Admin/recruiter, including owner, can read/change review on any application. Candidate/interviewer cannot. No assigned-HR registry, exclusive claim, permissions override or selection rules.
 
 `GET /api/applications/:id/review` returns applicationId, immutable answers/formDefinition, processingState, review metadata and configured task columns. Pending tasks appear even before command initialization. Each task includes original result/evidence/failure, provenance, attempts/retryability, separate correction/hasCorrection/actor/time and effectiveValue.
