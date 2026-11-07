@@ -9,6 +9,7 @@ import type { AuthenticatedRequest } from '../auth/access.js';
 import { roleAllows, type ApplicationView, type ReviewMetadata } from '@recruitment/domain';
 import { applicationActions, canReadApplication } from './application.policy.js';
 import { applicationFilterShape } from './application-filters.js';
+import { processingClosed } from '../processing/processing-policy.js';
 
 type Actor = AuthenticatedRequest['actor'];
 const applicationListSchema=vacancyListSchema.pick({limit:true,offset:true}).extend({
@@ -19,6 +20,7 @@ interface ApplicationRow {
   id: string; vacancy_id: string; candidate_id: string; candidate_identity: { name: string; email: string };
   vacancy_snapshot: Vacancy; answers: Record<string, unknown>; stage: string; processing_state: string; submitted_at: Date;
   review_status: ReviewMetadata['status']; review_revision: number; reviewed_by: string | null; reviewed_at: Date | null;
+  processing_released_at: Date | null;
 }
 interface DocumentRow { id: string; input_id: string; filename: string; byte_count: number; media_type: string; storage_ref: string; content_hash: string }
 function document(row: DocumentRow) { return { id: row.id, inputId: row.input_id, filename: row.filename, byteCount: row.byte_count, mediaType: row.media_type }; }
@@ -28,7 +30,7 @@ function visible(row: ApplicationRow, actor: Actor):Omit<ApplicationView,'docume
     vacancy: { id: vacancy.id, title: vacancy.title, description: vacancy.description, ...(vacancy.location === undefined ? {} : { location: vacancy.location }), revision: vacancy.revision, formDefinition: vacancy.formDefinition,
       ...(roleAllows(actor.role,'review.read') ? { processingDefinition: vacancy.processingDefinition } : {}) },
     answers: row.answers, stage: actor.role==='candidate'?'received':row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(),
-    ...(roleAllows(actor.role,'review.read') ? { processingClosed:!['received','review_ready'].includes(row.stage)||row.review_status==='completed',review: { required:vacancy.processingDefinition.tasks.length>0,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at?new Date(row.reviewed_at).toISOString():null }, actions:applicationActions(actor) } : {}) };
+    ...(roleAllows(actor.role,'review.read') ? { processingClosed:processingClosed(row),review: { required:vacancy.processingDefinition.tasks.length>0,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at?new Date(row.reviewed_at).toISOString():null }, actions:applicationActions(actor) } : {}) };
 }
 @Injectable()
 export class ApplicationService {

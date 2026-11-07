@@ -2,7 +2,7 @@
 
 Current skills starter: guarded batched Noul for normalised HR skills, >=0.8 detection; per-task compatible skills-list storage with per-skill `skillResults` projection (original/effective boolean or null). Corrections may add `unavailableSkills` for partial unknowns. Review UI uses per-skill selects; CSV appends URI-encoded skill original/effective columns while keeping prior columns. No quotes in this version, no live validation. See [Jev safety](../jev-safety.md); older fixture contracts below remain supported.
 
-Real PDF reader and guarded Noul skills executor are merged; defaults disabled, no automatic extraction polling/live verification. JevGateway mandatory. Returned live failures terminal; uncertain interrupted-live recovery remains a [known gap](../jev-safety.md#recovery-limitation). The [screening slice](screening-api.md) adds source-level closure and decision CSV; migration/integration pending. Whole-application readiness/manual release remain planned.
+Real PDF reader and guarded Noul skills executor are merged; defaults disabled, no automatic extraction polling/live verification. JevGateway mandatory. Returned live failures terminal; uncertain interrupted-live recovery remains a [known gap](../jev-safety.md#recovery-limitation). The [screening slice](screening-api.md) adds source-level closure and decision CSV. B1-R adds backend whole-application readiness/manual release; migrations 007/008 remain unapplied, integration/manual verification and release UI remain pending. Current checkpoint uses fixtures/disabled ports only; no live-provider smoke testing.
 
 HR corrections never rewrite original task/aggregate failure. Staff lists show `review.hasCorrections`; details separate saved corrections from original evidence. Explicit null is a correction, not successful extraction. CSV preserves original/effective/status; decision import never changes these fields.
 
@@ -49,9 +49,25 @@ processingState: pending/not_requested/processing/completed/completed_with_error
 
 ## Optional shared review
 
-R1 action hints remain. SI now locks review after completion or screening and adds staff-only `processingClosed` to review/application detail; candidate/interviewer projections omit it and other HR metadata. Admin/recruiter share review while open; no exclusive claim/assignment/owner override. Review-start readiness/manual release is not delivered.
+Admin/recruiter share review while ready/open; no exclusive claim/assignment/owner override. Completion or screening locks review. Staff-only `processingClosed` in review/application detail includes manual release as well as completion/screening; candidate/interviewer projections omit it and other HR metadata.
 
-`GET /api/applications/:id/review` returns applicationId, immutable answers/formDefinition, processingState, review metadata and configured task columns. Pending tasks appear even before command initialization. Each task includes original result/evidence/failure, provenance, attempts/retryability, separate correction/hasCorrection/actor/time and effectiveValue.
+Normal readiness is derived across every frozen task definition, including pending placeholders for uninitialized rows. All tasks must be successful or failed with structured `failureCategory=ordinary_terminal` and `retryable=false`; the processing invocation must no longer be active (`processingState=processing` keeps review waiting, even with final results saved). Retry exhaustion is not ordinary settlement. `operational`, `uncertain`, `unclassified` and legacy null failure categories remain blocked until explicitly released. No message-text classification or historical failure rewrite.
+
+`readiness` is staff-only `{state,reason}`: `not_required`, `waiting`, `blocked`, `ready`, `released`, `locked`. Completion/screening takes precedence over release; no-task review stays not applicable. Editing/status changes/completion require `ready` or `released`. Viewing original answers/files/results remains allowed before readiness. Screening/export remain independent of review readiness.
+
+### Explicit manual release
+
+`POST /api/applications/:id/review/release` requires shared HR, trusted Origin/session and `{expectedRevision}` (positive review revision; no extra fields). Returns 200 with the refreshed review view. Any unfinished processing can be released, including pending, active, operationally blocked or uncertain work; no stall timer. No-task, naturally ready and completed/screened records deny. A current-revision already-released request returns unchanged; stale duplicates return 409. Refresh after an unknown response; no automatic retry.
+
+Under the application lock, release stores `processing_released_at/by`, increments review revision once and clears token/lease/next retry. It preserves review status/editor/save/completion attribution, original task statuses/results/provenance/attempts, corrections, answers and recruitment stage. Release does not complete review, decide screening or emit notifications. Response `release` is null or `{at,actor}` (actor may be null after deletion).
+
+Bind/claim/start/pre-execution/save/finish reject released work, including expired-lease recovery. Claim/start/save/finish changes affecting evidence/readiness increment review revision under the application lock; heartbeats and skipped starts do not. Save-first makes an older release conflict; release-first fences late saves/finish. Screening-first denies release; release-first still permits screening, which freezes unfinished review without completing it. Existing external requests may continue/cost money; there is no billing cancellation guarantee.
+
+Failure categories are separate from retryability: absent submitted source and supported document parsing failures are ordinary terminal; timeouts/storage/disabled execution and fixture setup problems are operational; unexpected failures default unclassified. Trusted deliberate terminal fixture failures default ordinary terminal; fixture provenance remains visible. Recovered interrupted tasks are marked uncertain, but existing unsafe live-retry recovery is **not fixed** by this classification; no continuous/live runner is authorized. Gateway/defaults/limits are unchanged.
+
+Release UI/confirmation and matching factual list/filter presentation remain B1-J. Do not claim the endpoint is available in running services before migrations/deployment and integration verification.
+
+`GET /api/applications/:id/review` returns applicationId, immutable answers/formDefinition, processingState, readiness/release, review metadata and configured task columns. Pending tasks appear even before command initialization. Each task includes original result/evidence/failure and nullable failureCategory, provenance, attempts/retryability, separate correction/hasCorrection/actor/time and effectiveValue. Actions include edit/release availability; hints never authorize stale mutations.
 
 `PATCH /api/applications/:id/review` requires trusted Origin and expectedRevision:
 ```json

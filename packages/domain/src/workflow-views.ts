@@ -2,6 +2,8 @@ import type { ApplicationActions, InterviewActions, InterviewPlanActions, Review
 import type { FormDefinition, ProcessingDefinition, SkillValue, Vacancy } from './vacancies.js';
 
 export interface Person { id: string; name: string; email: string }
+export type ProcessingFailureCategory = 'ordinary_terminal' | 'operational' | 'uncertain' | 'unclassified';
+export interface ReviewReadiness { state: 'not_required' | 'waiting' | 'blocked' | 'ready' | 'released' | 'locked'; reason: string | null }
 export interface Page<T> { items: T[]; total: number; limit: number; offset: number }
 export type StaffVacancy = Vacancy & { actions: VacancyActions };
 export interface InterviewPlanEntry { id: string; position: number; name: string; instructions: string }
@@ -49,6 +51,7 @@ export interface ApplicationView {
 }
 export interface ReviewTask {
   taskId: string; sourceInputId: string; outputKey: string; status: string; attempts: number; retryable: boolean;
+  failureCategory?: ProcessingFailureCategory | null;
   result: { status: string; value: SkillValue | null; reason?: string; evidence?: string[] };
   skillResults: { skill: string; original: boolean | null; effective: boolean | null }[];
   provenance: { mode: string; fixtureId?: string; provider?: string; reader?: string; model?: string } | null;
@@ -58,6 +61,7 @@ export interface ReviewTask {
 export interface ReviewView {
   applicationId: string; answers: Record<string, unknown>; formDefinition: FormDefinition;
   processingState: string; review: ReviewMetadata; tasks: ReviewTask[]; actions: ReviewActions; processingClosed?: boolean;
+  readiness?: ReviewReadiness; release?: { at: string; actor: Person | null } | null;
 }
 export interface NotificationView {
   id: string; kind: string; title: string; body: string; cause: InterviewCause | { type:'screening'; decision:'preselected'|'rejected' };

@@ -6,11 +6,13 @@ import { skillRows, skillValueSchema, normalizeSkills } from '@recruitment/domai
 import { DatabaseService } from '../database/database.service.js';
 import type { AuthenticatedRequest } from '../auth/access.js';
 import { availability, firstDenied, requirePolicy, rolePolicy } from '../auth/action-policy.js';
-import { reviewEditable } from './review.policy.js';
+import { reviewEditable, reviewReleasable } from './review.policy.js';
+import { reviewReadiness, processingClosed } from './review-readiness.js';
 import type { ReviewView } from '@recruitment/domain';
 import { screeningExportSchema } from '../applications/application-filters.js';
 
 const patchSchema = z.strictObject({ expectedRevision: z.number().int().positive(), status: z.enum(['pending','in_review','completed']).optional(), corrections: z.array(z.strictObject({ taskId: z.string().min(1).max(64), value: skillValueSchema.nullable(), remove: z.boolean().optional() })).max(100).optional() }).refine(value => value.status !== undefined || (value.corrections?.length ?? 0) > 0, 'Supply status or corrections.');
+const releaseSchema = z.strictObject({ expectedRevision: z.number().int().positive() });
 function csvCell(value: unknown) {
   let text = value === null || value === undefined ? '' : typeof value === 'object' ? JSON.stringify(value) : String(value);
   if (/^[\s\u0000-\u001f]*[=+\-@]/.test(text) || /^[\t\r\n]/.test(text)) text = `'${text}`;
@@ -25,12 +27,14 @@ export class ReviewService {
     const application = result.rows[0]; if (!application) throw new NotFoundException('Application not found.');
     const editor=application.reviewed_by?(await client.query('SELECT id,name,email FROM "user" WHERE id=$1',[application.reviewed_by])).rows[0]??null:null;
     application.review_editor=editor;
+    application.release_actor=application.processing_released_by?(await client.query('SELECT id,name,email FROM "user" WHERE id=$1',[application.processing_released_by])).rows[0]??null:null;
     const tasks = await client.query(`SELECT t.*,c.value AS correction,c.task_id IS NOT NULL AS has_correction,c.corrected_by,c.corrected_at,u.name AS corrected_name,u.email AS corrected_email FROM application_tasks t LEFT JOIN extraction_corrections c USING(application_id,task_id) LEFT JOIN "user" u ON u.id=c.corrected_by WHERE t.application_id=$1 ORDER BY t.task_id`, [id]);
     const vacancy: Vacancy = application.vacancy_snapshot;
     return { application, tasks: vacancy.processingDefinition.tasks.map(definition => {
       const row = tasks.rows.find(task => task.task_id === definition.id);
       const result = row?.result ?? { status: row?.status ?? 'pending', value: null };
       return { taskId: definition.id, sourceInputId: definition.sourceInputId, outputKey: definition.outputKey, status: row?.status ?? 'pending', attempts: row?.attempts ?? 0, retryable: row?.retryable ?? false,
+        failureCategory: row?.failure_category ?? null,
         result, skillResults: skillRows(definition.args.skills, result.status === 'completed' ? result.value : null, row?.has_correction ? row.correction : result.status === 'completed' ? result.value : null), provenance: row?.provenance ?? null, hasCorrection: row?.has_correction ?? false, correction: row?.correction ?? null, correctedBy: row?.corrected_by ?? null, correctedAt: row?.corrected_at ?? null,
         corrector:row?.corrected_email?{id:row.corrected_by,name:row.corrected_name,email:row.corrected_email}:null,
         effectiveValue: row?.has_correction ? row.correction : result.status === 'completed' ? result.value : null };
@@ -38,19 +42,41 @@ export class ReviewService {
   }
   private projection(view: Awaited<ReturnType<ReviewService['read']>>,actor:AuthenticatedRequest['actor']):ReviewView {
     const { application: row, tasks } = view;
+    const readiness = reviewReadiness(row,tasks);
     return { applicationId: row.id, answers: row.answers, formDefinition: row.vacancy_snapshot.formDefinition,
-      processingState: row.processing_state, processingClosed:!['received','review_ready'].includes(row.stage)||row.review_status==='completed',review: { required:tasks.length>0,status: row.review_status, revision: row.review_revision, reviewedBy: row.reviewed_by, reviewedAt: row.reviewed_at, updatedAt:row.review_updated_at??null, editor:row.review_editor }, tasks,
-      actions:{edit:availability(firstDenied(rolePolicy(actor,'review.edit'),reviewEditable(tasks.length>0,row.stage,row.review_status)),true)} };
+      processingState: row.processing_state, processingClosed:processingClosed(row),readiness,
+      release:row.processing_released_at?{at:new Date(row.processing_released_at).toISOString(),actor:row.release_actor}:null,
+      review: { required:tasks.length>0,status: row.review_status, revision: row.review_revision, reviewedBy: row.reviewed_by, reviewedAt: row.reviewed_at, updatedAt:row.review_updated_at??null, editor:row.review_editor }, tasks,
+      actions:{edit:availability(firstDenied(rolePolicy(actor,'review.edit'),reviewEditable(tasks.length>0,row.stage,row.review_status,readiness)),true),
+        release:availability(firstDenied(rolePolicy(actor,'review.release'),reviewReleasable(readiness)),true)} };
   }
-  get(id: string,actor:AuthenticatedRequest['actor']) { return this.database.transaction(async client => this.projection(await this.read(client,id),actor)); }
+  get(id: string,actor:AuthenticatedRequest['actor']) { requirePolicy(rolePolicy(actor,'review.read'));return this.database.transaction(async client => this.projection(await this.read(client,id),actor)); }
+  release(id: string,actor:AuthenticatedRequest['actor'],raw:unknown) {
+    requirePolicy(rolePolicy(actor,'review.release'));
+    const parsed=releaseSchema.safeParse(raw);
+    if(!parsed.success)throw new BadRequestException('Invalid release request.');
+    return this.database.transaction(async client=>{
+      const view=await this.read(client,id,'FOR UPDATE');
+      const readiness=reviewReadiness(view.application,view.tasks);
+      // Current-revision duplicate is an unchanged response; closed/no-task
+      // requests still deny, and stale duplicates never bypass concurrency.
+      if(readiness.state!=='released')requirePolicy(reviewReleasable(readiness));
+      if(view.application.review_revision!==parsed.data.expectedRevision)throw new ConflictException('Review changed; reload before releasing.');
+      if(readiness.state==='released')return this.projection(view,actor);
+      await client.query(`UPDATE applications SET processing_released_at=now(),processing_released_by=$2,
+        processing_token=NULL,processing_lease_until=NULL,processing_next_at=NULL,review_revision=review_revision+1 WHERE id=$1`,[id,actor.id]);
+      return this.projection(await this.read(client,id),actor);
+    });
+  }
   patch(id: string, actor: AuthenticatedRequest['actor'], raw: unknown) {
+    requirePolicy(rolePolicy(actor,'review.edit'));
     const parsed = patchSchema.safeParse(raw);
     if (!parsed.success) throw new BadRequestException('Invalid review patch.');
     const value = parsed.data;
     if (new Set(value.corrections?.map(c => c.taskId)).size !== (value.corrections?.length ?? 0)) throw new BadRequestException('Duplicate correction task.');
     return this.database.transaction(async client => {
       const view = await this.read(client,id,'FOR UPDATE');
-      requirePolicy(reviewEditable(view.tasks.length>0,view.application.stage,view.application.review_status));
+      requirePolicy(reviewEditable(view.tasks.length>0,view.application.stage,view.application.review_status,reviewReadiness(view.application,view.tasks)));
       if (view.application.review_revision !== value.expectedRevision) throw new ConflictException('Review changed; reload before retrying.');
       for (const correction of value.corrections ?? []) {
         const definition = (view.application.vacancy_snapshot as Vacancy).processingDefinition.tasks.find(task => task.id === correction.taskId);

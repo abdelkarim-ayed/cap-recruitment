@@ -7,7 +7,7 @@ export type SkillExtractionArgs = ProcessingDefinition['tasks'][number]['args'];
 export interface ExecutionContext { applicationId: string; documentId: string; sourceHash: string; taskId: string; args: SkillExtractionArgs; fixtureKey?: string; signal?: AbortSignal }
 export const taskResultSchema = z.discriminatedUnion('status', [
   z.strictObject({ status: z.literal('completed'), value: z.strictObject({ skills: z.array(z.string().trim().min(1).max(100)).max(100) }), evidence: z.array(z.string().max(2000)).max(100) }),
-  z.strictObject({ status: z.literal('failed'), value: z.null(), reason: z.string().min(1).max(2000), retryable: z.boolean() }),
+  z.strictObject({ status: z.literal('failed'), value: z.null(), reason: z.string().min(1).max(2000), retryable: z.boolean(), failureCategory: z.enum(['ordinary_terminal','operational','uncertain','unclassified']).optional() }),
 ]);
 export type TaskResult = z.infer<typeof taskResultSchema>;
 export interface ExecutionResult { result: TaskResult; provenance: { mode: 'fixture' | 'disabled' | 'live'; fixtureId?: string; provider?: string; model?: string; method?: string; textHash?: string; usage?: { input_tokens: number; output_tokens: number }; reader?: string } }
@@ -49,7 +49,11 @@ export class FixtureRegistry {
     this.calls.push({ unit: 'task', context: structuredClone(recorded), textHash: createHash('sha256').update(text).digest('hex') });
     const fixture = this.resolve(context);
     if (fixture.text !== text) throw new Error('Fixture text relay mismatch.');
-    return { provenance: { mode: 'fixture', fixtureId: fixture.fixtureKey }, result: structuredClone(fixture.result) };
+    const result = structuredClone(fixture.result);
+    // A deliberately recorded terminal fixture failure models ordinary unavailable
+    // evidence. Fixture setup/identity exceptions are operational, never settlement.
+    if (result.status === 'failed') result.failureCategory ??= result.retryable ? 'operational' : 'ordinary_terminal';
+    return { provenance: { mode: 'fixture', fixtureId: fixture.fixtureKey }, result };
   }
 }
 export class DisabledTextReader implements DocumentTextReader {
@@ -57,7 +61,7 @@ export class DisabledTextReader implements DocumentTextReader {
 }
 export class DisabledTaskExecutor implements TaskExecutor {
   describe(): ExecutionResult['provenance'] { return { mode: 'disabled' }; }
-  async execute(_text: string, _context: ExecutionContext): Promise<ExecutionResult> { return { provenance: { mode: 'disabled' }, result: { status: 'failed', value: null, reason: 'No live task executor configured.', retryable: false } }; }
+  async execute(_text: string, _context: ExecutionContext): Promise<ExecutionResult> { return { provenance: { mode: 'disabled' }, result: { status: 'failed', value: null, reason: 'No live task executor configured.', retryable: false, failureCategory: 'operational' } }; }
 }
 // Global normal adapters plus trusted per-unit dispatch; never request-controlled.
 export class ContextTextReader implements DocumentTextReader {

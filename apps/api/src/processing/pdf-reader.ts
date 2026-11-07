@@ -5,7 +5,7 @@ import { ProcessingFailure } from './processing-failure.js';
 export class PdfTextReader implements DocumentTextReader {
   describe() { return 'pdfjs-dist@6.4.299'; }
   async read(bytes: Buffer, context: ExecutionContext): Promise<string> {
-    if (bytes.length > 10 * 1024 * 1024 || !bytes.subarray(0, 5).equals(Buffer.from('%PDF-'))) throw new Error('Only PDF documents up to 10 MiB are supported.');
+    if (bytes.length > 10 * 1024 * 1024 || !bytes.subarray(0, 5).equals(Buffer.from('%PDF-'))) throw new ProcessingFailure('Only PDF documents up to 10 MiB are supported.', false, 'ordinary_terminal');
     context.signal?.throwIfAborted();
     return new Promise((resolve, reject) => {
       const worker = fork(new URL('./pdf-worker.js', import.meta.url), [], {
@@ -24,7 +24,8 @@ export class PdfTextReader implements DocumentTextReader {
       context.signal?.addEventListener('abort', abort, { once: true });
       worker.once('message', (message: { text?: string; error?: string }) => {
         if (typeof message.text === 'string') finish(undefined, message.text);
-        else finish(new Error(message.error ?? 'PDF preparation failed.'));
+        else if (typeof message.error === 'string') finish(new ProcessingFailure(message.error, false, 'ordinary_terminal'));
+        else finish(new ProcessingFailure('PDF parser returned an invalid response.', false));
       });
       worker.once('error', () => finish(new Error('PDF parser process unavailable.')));
       worker.once('exit', () => { if (!settled) finish(new Error('PDF parser process exited unexpectedly.')); });

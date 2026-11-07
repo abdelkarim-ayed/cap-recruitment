@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Header, Param, ParseUUIDPipe, Patch, Query, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Header, HttpCode, Param, ParseUUIDPipe, Patch, Post, Query, Req, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { RequireAction, type AuthenticatedRequest } from '../auth/access.js';
 import { ReviewService } from './review.service.js';
@@ -11,6 +11,8 @@ export class ReviewController {
   get(@Param('id',new ParseUUIDPipe()) id: string,@Req() request:AuthenticatedRequest) { return this.service.get(id,request.actor); }
   @Patch('applications/:id/review') @RequireAction('review.edit') @Header('Cache-Control','private, no-store')
   patch(@Param('id',new ParseUUIDPipe()) id: string,@Req() request: AuthenticatedRequest,@Body() body: unknown) { return this.service.patch(id,request.actor,body); }
+  @Post('applications/:id/review/release') @HttpCode(200) @RequireAction('review.release') @Header('Cache-Control','private, no-store')
+  release(@Param('id',new ParseUUIDPipe()) id: string,@Req() request:AuthenticatedRequest,@Body() body:unknown) { return this.service.release(id,request.actor,body); }
   @Get('vacancies/:id/export') @RequireAction('review.export')
   async export(@Param('id',new ParseUUIDPipe()) id: string,@Res() response: Response) {
     const csv = await this.service.export(id);

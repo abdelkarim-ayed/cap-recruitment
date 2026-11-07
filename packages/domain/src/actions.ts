@@ -15,7 +15,7 @@ export const actionRoles = {
   'application.list': applicants, 'application.listVacancy': hr,
   'application.read': applicants, 'application.readAll': hr, 'application.download': applicants,
   'application.submit': ['candidate'],
-  'review.read': hr, 'review.edit': hr, 'review.export': hr,
+  'review.read': hr, 'review.edit': hr, 'review.release': hr, 'review.export': hr,
   'workflow.read': hr, 'workflow.change': hr,
   'interview.list': staff, 'interview.read': staff, 'interview.readAll': hr, 'interview.directory': hr,
   'interview.schedule': hr, 'interview.reschedule': hr, 'interview.cancel': hr,
@@ -35,5 +35,5 @@ export type VacancyActions = Record<'edit' | 'publish' | 'close', ActionAvailabi
 export type InterviewPlanActions = Record<'edit', ActionAvailability>;
 export type WorkflowActions = Record<'preselect' | 'reject' | 'offer' | 'hire' | 'schedule', ActionAvailability>;
 export type InterviewActions = Record<'reschedule' | 'cancel' | 'requestRescheduling' | 'submitFeedback' | 'readApplication', ActionAvailability>;
-export type ReviewActions = Record<'edit', ActionAvailability>;
+export type ReviewActions = Record<'edit', ActionAvailability> & { release?: ActionAvailability };
 export type ApplicationActions = Record<'review' | 'workflow' | 'export', ActionAvailability>;

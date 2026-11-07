@@ -17,11 +17,11 @@ API paths below are relative to `/api`; source paths without a package prefix ar
 | Actions | Eligible actors and resource/state rules |
 | --- | --- |
 | `vacancy.read/create` | Admin/recruiter (shared HR); create makes the actor owner. Public vacancy routes remain separately allowlisted and published-only. |
-| `vacancy.edit/publish/close` | HR plus stored owner; edit draft only. Publish validates intake and a non-separator input, not an interview plan. Close stops intake only. Same-state owner publish/close stays idempotent even with an old revision. |
+| `vacancy.edit/publish/close` | HR plus stored owner; edit draft only. Publish validates intake/non-separator input and the optionally empty interview plan, checking both counters. Close stops intake only. Same-state owner publish/close stays idempotent even with an old revision. |
 | `interviewPlan.read/edit` | HR reads; owner edits drafts only, defensively denied if appointments exist. Publication freezes even empty/unscheduled plans; close does not reopen. Publish checks both counters under the same vacancy lock. Separate interview revision/draft no-ops retained. |
 | `application.submit/list/listVacancy/read/download` | Candidate submits; candidates list/read only their own applications. HR has shared access; vacancy-wide lists are HR-only. Direct generic application/document routes still deny interviewer role at the route guard. |
 | `application.readAll`, `interview.application/document` | HR has shared application access. Through scoped interview routes, an interviewer needs current assignment to that interview plus at least one scheduled/completed assignment on the application for answers/files. Cancelled-only assignments grant no application access. Ownership/assignment is resolved from PostgreSQL, not UI flags. |
-| `review.read/edit/export` | Shared HR; no owner restriction. Edit requires tasks and undecided/not-completed review; selection/completion locks corrections. Whole-application readiness/manual release remains unimplemented. Diagnostic export-all unchanged; screening export excludes decided records with optional filters. |
+| `review.read/edit/release/export` | Shared HR; no owner restriction. Edit requires tasks, undecided/not-completed review and whole-application normal settlement or manual release. Release accepts any unfinished work, including active, and permanently fences processing; completion/screening locks corrections. Backend release requires unapplied migration 008; UI remains planned. Diagnostic export-all unchanged; screening export excludes decided records with optional filters. |
 | `workflow.read/change` | Shared HR screening from received/compatible review_ready without readiness gate. Individual/import use one transaction-owned screening command with closure and candidate notice. Screening-rejection text optional; later recruitment rejection still requires reason, shared HR through preselected and owner afterwards. Hired/not_selected terminal; no screening undo. |
 | Workflow Offer/Hired policies | HR owner only: empty plan requires preselected; nonempty requires interview stage and every configured interview completed/Pass. Owner explicitly records Offer; Hired separately requires Offer. No automatic offer, artificial appointment, screening/readiness gate or admin owner override. |
 | `interview.list/read/readAll/directory` | HR reads all; interviewer only their assignments. Staff directory is HR-only. Metadata of an assigned cancelled interview remains readable, but does not itself grant documents. |
@@ -37,7 +37,7 @@ API paths below are relative to `/api`; source paths without a package prefix ar
 | Full staff vacancy create/get/patch/publish/close | `edit`, `publish`, `close` |
 | Interview-plan get/put and interview results metadata | `edit` |
 | HR application detail | `review`, `workflow`, `export` (omitted for candidate/interviewer projections) |
-| Extraction review get/patch | `edit` |
+| Extraction review get/patch/release | `edit`, `release` |
 | Application interview/workflow view | `preselect`, `reject`, `offer`, `hire`, `schedule` |
 | Interview detail/list/result projections | `reschedule`, `cancel`, `requestRescheduling`, `submitFeedback`, `readApplication` |
 
@@ -57,6 +57,6 @@ Candidate/public application projections do not gain HR action reasons, review m
 
 ## Explicitly not delivered
 
-Whole-application review readiness/manual release, broader candidate timeline/notification effects and hide/lifetime remain planned. SI implements screening/closure/import/notices; B1-P validates/freezes publication; B1-F enables explicit zero-interview owner Offer. Spending/provider controls unchanged.
+Readiness/release backend is source-implemented; its UI/list/filter presentation, broader candidate timeline/notification effects and hide/lifetime remain planned. SI implements screening/closure/import/notices; B1-P validates/freezes publication; B1-F enables explicit zero-interview owner Offer. Spending/provider controls unchanged.
 
 Q-R1A still covers broader guard/HTTP/privacy/concurrency regression; Q-R1U later manual UX. B1-F ran the 8 current pure policy specifications plus new finalization model/DOM cases; that is not completion of the deferred R1 security/HTTP/DB regression. See dated evidence in status.

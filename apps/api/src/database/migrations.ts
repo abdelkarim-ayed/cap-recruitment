@@ -130,4 +130,10 @@ export const applicationMigrations = [{
       created_at timestamptz NOT NULL DEFAULT now(), read_at timestamptz
     );
     CREATE INDEX screening_notifications_recipient ON screening_notifications(recipient_id,created_at DESC,id);`,
+}, {
+  id: '008_review_release',
+  sql: `ALTER TABLE applications ADD COLUMN processing_released_at timestamptz,
+    ADD COLUMN processing_released_by text REFERENCES "user"(id) ON DELETE SET NULL;
+    ALTER TABLE applications ADD CONSTRAINT applications_release_attribution CHECK(processing_released_at IS NOT NULL OR processing_released_by IS NULL);
+    ALTER TABLE application_tasks ADD COLUMN failure_category text CHECK(failure_category IN ('ordinary_terminal','operational','uncertain','unclassified'));`,
 }] as const;

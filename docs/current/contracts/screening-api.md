@@ -10,7 +10,7 @@ Shared admin/recruiter screening, one vacancy per wizard. Only undecided applica
 
 Review PATCH also rejects writes after review completion; completing review invalidates the processing lease. Processing claim/start/pre-execution-check/save/finish and fixture binding reject closed applications. External calls admitted before a concurrent closure may still run/cost money; late writes are fenced. No live recovery/guard/default/runner changes; the [uncertain-interruption gap](../jev-safety.md#recovery-limitation) remains.
 
-Whole-application review readiness/manual release are **not implemented here**. Before completion/screening, the existing review-start behavior remains. Staff application/review detail adds `processingClosed`; candidate/interviewer projections do not gain this HR field or screening reasons. Retained task/aggregate states are original execution states, not proof a runner is still eligible.
+Whole-application review readiness/manual release now have a separate [B1-R backend contract](processing-review-api.md#optional-shared-review), requiring unapplied migration 008; their UI remains planned. These do not gate screening. Staff application/review detail includes `processingClosed` for release/completion/screening; candidate/interviewer projections do not gain this HR field or screening reasons. Retained task/aggregate states are original execution states, not proof a runner is still eligible.
 
 ## Export and input
 

@@ -27,12 +27,12 @@ export class ProcessingService {
       let provenance: ExecutionResult['provenance'] = task.fixture_key === null ? { mode: 'disabled' } : { mode: 'fixture', fixtureId: task.fixture_key };
       try {
         const source = await this.repository.source(claim.id, task.source_input_id);
-        if (!source) throw new Error('Source document was not submitted.');
+        if (!source) throw new ProcessingFailure('Source document was not submitted.', false, 'ordinary_terminal');
         const context: ExecutionContext = { applicationId: claim.id, documentId: source.id, sourceHash: source.content_hash, taskId: task.task_id, args: task.args, ...(task.fixture_key === null ? {} : { fixtureKey: task.fixture_key }) };
-        if (!taskRegistry[task.type]) throw new Error('Unsupported extraction task type.');
+        if (!taskRegistry[task.type]) throw new ProcessingFailure('Unsupported extraction task type.', false);
         readerMode = this.reader.describe?.(context) ?? 'unknown';
         const bytes = documents.get(source.id) ?? await bounded(() => this.storage.read(source.storage_ref));
-        if (bytes.length !== source.byte_count || createHash('sha256').update(bytes).digest('hex') !== source.content_hash) throw new Error('Source integrity mismatch.');
+        if (bytes.length !== source.byte_count || createHash('sha256').update(bytes).digest('hex') !== source.content_hash) throw new ProcessingFailure('Source integrity mismatch.', false);
         documents.set(source.id,bytes);
         // Reader fixture identity validated per task; parsed text reused per document.
         const key = `${source.id}:${source.content_hash}:${task.fixture_key === null ? 'normal' : 'fixture'}`;
@@ -47,11 +47,13 @@ export class ProcessingService {
         outcome = await bounded(signal => this.executor.execute(previous ?? readText, { ...context, signal }));
         provenance = outcome.provenance;
         outcome.result = taskResultSchema.parse(outcome.result);
+        if (outcome.result.status === 'failed') outcome.result.failureCategory ??= 'unclassified';
         if (task.fixture_key === null) taskRegistry[task.type].validateResult(outcome.result, task.args);
       } catch (error) {
         const storageFailure = error instanceof Error && ['ENOENT','EACCES','EIO','ENOSPC'].includes((error as NodeJS.ErrnoException).code ?? '');
         const reason = storageFailure ? 'Document storage unavailable.' : error instanceof Error ? error.message.slice(0,2000) : 'Processing unit failed.';
-        outcome = { provenance, result: { status: 'failed', value: null, reason, retryable: provenance.mode !== 'live' && (storageFailure || (error instanceof ProcessingFailure && error.retryable)) } };
+        outcome = { provenance, result: { status: 'failed', value: null, reason, retryable: provenance.mode !== 'live' && (storageFailure || (error instanceof ProcessingFailure && error.retryable)),
+          failureCategory: error instanceof ProcessingFailure ? error.category : storageFailure || provenance.mode === 'fixture' ? 'operational' : 'unclassified' } };
       }
       outcome.provenance.reader = readerMode;
       await this.repository.save(claim.id, claim.token, task.task_id, outcome);

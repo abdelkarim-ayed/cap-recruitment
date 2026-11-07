@@ -6,7 +6,8 @@ import { reviewEditable } from '../dist/review/review.policy.js';
 import { vacancyActions } from '../dist/vacancies/vacancy.policy.js';
 import { editableInterviewPlan, interviewActions, workflowActions } from '../dist/interviews/interview.policy.js';
 
-// Pure/offline specifications. Execution is deferred as Q-R1A; rebuild first.
+// Pure/offline specifications; rebuild first. Broader guard/HTTP/privacy/race
+// coverage remains Q-R1A even when these focused specifications are executed.
 test('coarse eligibility does not turn ownership or assignment into a role', () => {
   equal(roleAllows('admin', 'vacancy.edit'), true);
   equal(roleAllows('interviewer', 'application.read'), false);
@@ -31,8 +32,10 @@ test('vacancy owner/state rules preserve same-state command eligibility', () => 
   equal(published.publish.visible, false);
   equal(published.close.visible, true);
 });
-test('review is locked after completion or screening', () => {
-  equal(reviewEditable(true).allowed, true);
+test('review requires readiness/release and locks after completion or screening', () => {
+  equal(reviewEditable(true).allowed, false);
+  equal(reviewEditable(true,'received','pending',{state:'ready',reason:null}).allowed,true);
+  equal(reviewEditable(true,'received','pending',{state:'released',reason:null}).allowed,true);
   equal(reviewEditable(true,'preselected','pending').allowed,false);
   equal(reviewEditable(true,'received','completed').allowed,false);
   equal(reviewEditable(false).allowed, false);

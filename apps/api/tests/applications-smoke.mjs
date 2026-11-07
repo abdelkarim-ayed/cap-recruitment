@@ -135,7 +135,7 @@ try {
     const fixtures = definition.processingDefinition.tasks.map(task => ({fixtureKey:`fixture-${task.id}`,applicationId:application.id,documentId,sourceHash:createHash('sha256').update(pdf).digest('hex'),taskId:task.id,args:task.args,text:'FIXTURE ONLY: SQL text',result:task.id==='skills' ? {status:'completed',value:{skills:[]},evidence:['FIXTURE ONLY: no skills recorded']} : {status:'failed',value:null,reason:'Recorded fixture failure',retryable:true}}));
     if (realReaderCheck) for (const fixture of fixtures) { fixture.reader = 'pdf'; fixture.text = 'SQL and TypeScript projects'; }
     registry.load(fixtures); await repository.bind(fixtures);
-    // Simulate a killed executor; expired claims must be safely reclaimed.
+    // Fixture-only killed executor recovery, not proof of safe live reattempts.
     const killed = await repository.claim(application.id); ok(killed); await repository.start(application.id,killed.token,'skills');
     await database.query("UPDATE applications SET processing_lease_until=now()-interval '1 second' WHERE id=$1",[application.id]);
     const processed = await Promise.all([processor.processOne(application.id),processor.processOne(application.id)]); equal(processed.filter(Boolean).length,1);
@@ -152,9 +152,19 @@ try {
     const patch = async (user,body) => {
       const response = await fetch(`${base}/api/applications/${application.id}/review`,{method:'PATCH',headers:{Cookie:user.cookie,Origin:settings.webOrigin,'Content-Type':'application/json'},body:JSON.stringify(body)}); return {status:response.status,body:await response.json()};
     };
-    const finished = await patch(recruiter,{expectedRevision:review.body.review.revision,status:'completed'}); equal(finished.status,200,'Failure/unreviewed fields must not block completion');
+    equal(review.body.readiness.state,'blocked');equal(failed.failureCategory,'operational');
+    equal((await patch(recruiter,{expectedRevision:review.body.review.revision,status:'completed'})).status,409,'Retry exhaustion must not imply normal review readiness');
+    const release=async(user,revision,origin=settings.webOrigin)=>{
+      const response=await fetch(`${base}/api/applications/${application.id}/review/release`,{method:'POST',headers:{Cookie:user.cookie,Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({expectedRevision:revision})});return {status:response.status,body:await response.json()};
+    };
+    for(const denied of [candidate,interviewer])equal((await release(denied,review.body.review.revision)).status,403);
+    equal((await release(admin,review.body.review.revision,'https://untrusted.example')).status,403);
+    const released=await release(recruiter,review.body.review.revision);equal(released.status,200);equal(released.body.readiness.state,'released');equal(released.body.review.status,'pending');equal(released.body.release.actor.id,recruiter.id);
+    deepEqual(released.body.tasks,review.body.tasks);equal(await processor.processOne(application.id),false);
+    equal((await release(admin,review.body.review.revision)).status,409);
+    deepEqual((await release(admin,released.body.review.revision)).body,released.body);
     equal((await patch(admin,{expectedRevision:review.body.review.revision,status:'in_review'})).status,409);
-    const corrected=await patch(admin,{expectedRevision:finished.body.review.revision,corrections:[{taskId:'extra',value:{skills:['Rust']}}]}); equal(corrected.status,200); equal(corrected.body.review.status,'in_review');
+    const corrected=await patch(admin,{expectedRevision:released.body.review.revision,corrections:[{taskId:'extra',value:{skills:['Rust']}}]}); equal(corrected.status,200); equal(corrected.body.review.status,'in_review');
     const correctedTask=corrected.body.tasks.find(task=>task.taskId==='extra'); deepEqual(correctedTask.effectiveValue,{skills:['Rust']}); equal(correctedTask.result.status,'failed');
     ok(corrected.body.review.updatedAt);equal(corrected.body.review.editor.id,admin.id);equal(correctedTask.corrector.id,admin.id);
     const savedAgain=await json(`applications/${application.id}/review`,undefined,recruiter.cookie);deepEqual(savedAgain.body.tasks.find(task=>task.taskId==='extra').effectiveValue,{skills:['Rust']});
@@ -167,7 +177,7 @@ try {
     csv=await fetch(`${base}/api/vacancies/${id}/export`,{headers:{Cookie:admin.cookie}}); exported=await csv.text(); ok(exported.includes('Rust')); ok(exported.includes('fixture-extra')); ok(exported.includes('failed'));
     const removed=await patch(recruiter,{expectedRevision:corrected.body.review.revision,corrections:[{taskId:'extra',value:null,remove:true}]}); equal(removed.status,200); equal(removed.body.tasks.find(task=>task.taskId==='extra').hasCorrection,false);
     const noCorrections=await json(`vacancies/${id}/applications`,undefined,recruiter.cookie);equal(noCorrections.body.items.find(item=>item.id===application.id).review.hasCorrections,false);
-    const edits = await Promise.all([patch(recruiter,{expectedRevision:removed.body.review.revision,status:'pending'}),patch(admin,{expectedRevision:removed.body.review.revision,status:'completed'})]);
+    const edits = await Promise.all([patch(recruiter,{expectedRevision:removed.body.review.revision,status:'pending'}),patch(admin,{expectedRevision:removed.body.review.revision,status:'in_review'})]);
     deepEqual(edits.map(edit=>edit.status).sort(),[200,409]);
     const untrusted = await fetch(`${base}/api/applications/${application.id}/review`,{method:'PATCH',headers:{Cookie:admin.cookie,Origin:'https://untrusted.example','Content-Type':'application/json'},body:JSON.stringify({expectedRevision:1,status:'completed'})}); equal(untrusted.status,403);
     equal((await patch(admin,{expectedRevision:1,answers:{name:'spoof'}})).status,400);
@@ -178,6 +188,9 @@ try {
     const partial=await patch(admin,{expectedRevision:persistedReview.body.review.revision,corrections:[{taskId:'extra',value:{skills:[],unavailableSkills:['rust']}}]});equal(partial.status,200);equal(partial.body.tasks.find(task=>task.taskId==='extra').skillResults[0].effective,null);
     const perSkill=await patch(admin,{expectedRevision:partial.body.review.revision,corrections:[{taskId:'extra',value:{skills:['rust'],unavailableSkills:[]}}]});equal(perSkill.status,200);equal(perSkill.body.tasks.find(task=>task.taskId==='extra').skillResults[0].effective,true);equal(perSkill.body.tasks.find(task=>task.taskId==='extra').result.status,'failed');
     const perSkillCsv=await (await fetch(`${base}/api/vacancies/${id}/export`,{headers:{Cookie:admin.cookie}})).text();ok(perSkillCsv.includes('extracted_skills.skill.sql.original'));ok(perSkillCsv.includes('extra_skills.skill.rust.effective'));
+    const finished=await patch(admin,{expectedRevision:perSkill.body.review.revision,status:'completed'});equal(finished.status,200,'Released failed/unavailable values do not block human completion');
+    equal((await patch(recruiter,{expectedRevision:finished.body.review.revision,status:'in_review'})).status,409);
+    equal((await release(recruiter,finished.body.review.revision)).status,409);
     equal(persistedReview.body.tasks.find(task=>task.taskId==='skills').provenance.fixtureId,'fixture-skills');
     if (realReaderCheck) { equal(persistedReview.body.tasks.find(task=>task.taskId==='skills').provenance.reader,'pdfjs-dist@6.4.299'); console.log('PASS: real PDF parser → trusted fixture interpretation → persisted reader provenance; no live provider call.'); }
     console.log('PASS: tagged relay fixtures, persisted task failures/results, lease recovery/fencing, retry cap, optional shared review, corrections, immutable answers and ungated CSV export.');

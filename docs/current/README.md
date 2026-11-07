@@ -20,4 +20,4 @@
 | UI conventions | [Frontend design](guides/frontend-design.md) |
 | Host networking / terminals / portability | [Networking](guides/local-networking.md), [RMUX](guides/rmux.md), [Windows notes](guides/windows-compatibility.md) |
 
-These describe source, not a running deployment; dated checks/pending gates are in [status](status.md). Screening CSV/closure/notices, publication-time plan freeze and explicit zero-interview owner Offer are source-implemented with scoped checks; migration 007 and broader integration/manual UX remain pending. Further readiness/release and notification behavior remains in [plan/](../plan/README.md).
+These describe source, not a running deployment; dated checks/pending gates are in [status](status.md). Screening CSV/closure/notices, publication-time plan freeze, explicit zero-interview owner Offer and readiness/manual-release backend are source-implemented with scoped checks; migrations 007/008 and broader integration/manual UX remain pending. Release UI/list/filter and further notification behavior remain in [plan/](../plan/README.md).
