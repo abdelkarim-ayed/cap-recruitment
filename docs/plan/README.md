@@ -1,6 +1,6 @@
 # Planning index
 
-Latest checkpoint: 2026-11-07. R1/R2/R3a/b/SI and B1-P are locally merged; B1-F zero-interview owner Offer is source-implemented with scoped checks for the authorized local merge/removal. [Screening](../current/contracts/screening-api.md) records unapplied migration 007; [publication](../current/contracts/vacancy-api.md#publishclose) and [finalization](../current/contracts/interview-api.md#owner-offer-and-separate-hired) need no new migration. Integration/manual gates remain; no push, migration, provider/data/process operations or further-card approval.
+Latest checkpoint: 2026-11-07. R1/R2/R3a–d/SI/B1-P/F/R/J and T2a are locally merged. Authorized demo setup applied migrations 007/008, initially seeded the lifecycle dataset and launched API/frontend in shared RMUX `workspace`. Readiness and document hashes passed, not functional QA gates. [Task board](tasks.md) retains all integration/manual work; T2b launcher remains future work. No push, live-provider/key/spending work or further-card approval.
 
 Screening may happen before extraction/review finishes; either outcome freezes extraction/review without inventing completion. The interview plan may be empty, freezes at publication, and never replaces explicit owner Offer/Hired actions. See [product decisions](product-decisions.md) for the selected rules and [task board](tasks.md) for proposed decomposition, dependencies and remaining gates. Earlier mandatory reviewed-only screening/minimum-one-interview directions are superseded, not implemented contracts.
 

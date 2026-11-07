@@ -17,9 +17,9 @@
 | Interview authority, progression, inbox | [Interview contract](contracts/interview-api.md) |
 | Machine-readable references | [OpenAPI](contracts/openapi.json), [interview OpenAPI](contracts/interview-openapi.json); see status for gaps |
 | User demo journeys | [Demo guide](guides/demo-guide.md) |
-| Repeatable lifecycle scenario dataset | [Lifecycle fixtures](guides/lifecycle-demo.md) (source/offline only; execution pending) |
+| Repeatable lifecycle scenario dataset | [Lifecycle fixtures](guides/lifecycle-demo.md) (locally seeded; broader QA pending) |
 | Automated/manual verification | [Backend checks](guides/backend-test.md), [integration testing](guides/integration-testing.md) |
 | UI conventions | [Frontend design](guides/frontend-design.md) |
 | Host networking / terminals / portability | [Networking](guides/local-networking.md), [RMUX](guides/rmux.md), [Windows notes](guides/windows-compatibility.md) |
 
-These describe source, not a running deployment; dated checks/pending gates are in [status](status.md). Screening CSV/closure/notices, publication-time plan freeze, explicit zero-interview owner Offer, readiness/manual release with UI/list/filter, review no-op saves and review/vacancy/interview-plan/candidate/screening-import navigation guards are source-implemented with scoped checks; migrations 007/008 and broader integration/manual UX remain pending. Notification behavior remains in [plan/](../plan/README.md).
+These primarily describe source; dated operational checks/pending gates are in [status](status.md). Screening CSV/closure/notices, publication-time plan freeze, explicit zero-interview owner Offer, readiness/manual release with UI/list/filter, review no-op saves and review/vacancy/interview-plan/candidate/screening-import navigation guards are source-implemented. Local demo setup applied migrations 007/008, seeded lifecycle fixtures and launched API/web on 2026-11-07; broader integration/manual UX remains pending. Future notification behavior remains in [plan/](../plan/README.md).

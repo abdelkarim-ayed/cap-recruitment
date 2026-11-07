@@ -1,7 +1,7 @@
 # Interview pipeline, scheduling and inbox — implemented contract
 
 Migration 006; session cookies and trusted Origin on writes. Backend and integrated React UI, no interview calendar/email integration or event bus. [Current extraction](../jev-safety.md) does not alter these interview rules.
-The [screening slice](screening-api.md) adds shared individual/import closure and candidate notices, requiring unapplied migration 007. B1-P freezes/validates the saved plan at publication; B1-F enables explicit owner Offer from preselected when no interviews are configured. Neither needs a new migration. Broader candidate progress/effects and hide remain planned; screening reversal is not planned.
+The [screening slice](screening-api.md) adds shared individual/import closure and candidate notices, requiring migration 007 (applied in local demo setup 2026-11-07). B1-P freezes/validates the saved plan at publication; B1-F enables explicit owner Offer from preselected when no interviews are configured. Neither needs a new migration. Broader candidate progress/effects and hide remain planned; screening reversal is not planned.
 
 R1 typed actions/compatibility fields remain. Plan actions reflect publication-time freeze; workflow Offer availability reflects zero/nonzero interview rules below. See [action policies](action-policies.md).
 

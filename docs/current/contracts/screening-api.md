@@ -1,6 +1,6 @@
 # Screening export/import and shared decisions
 
-Source checkpoint: 2026-11-07. Implemented in code; **migration 007 has not been applied and PostgreSQL/HTTP/manual UX validation has not been run**. Do not treat the running application as upgraded. [OpenAPI extension](screening-openapi.json); [verification](../status.md) distinguishes isolated tests from integration evidence.
+Source checkpoint: 2026-11-07. Implemented in code; migrations 007/008 were applied and the local demo launched during authorized setup that date. **Screening workflow/HTTP/privacy/race/manual UX gates remain pending**; seed persistence and readiness are not those passes. [OpenAPI extension](screening-openapi.json); [verification](../status.md) distinguishes setup from integration evidence.
 
 ## Eligibility and commitment
 
@@ -10,7 +10,7 @@ Shared admin/recruiter screening, one vacancy per wizard. Only undecided applica
 
 Review PATCH also rejects writes after review completion; completing review invalidates the processing lease. Processing claim/start/pre-execution-check/save/finish and fixture binding reject closed applications. External calls admitted before a concurrent closure may still run/cost money; late writes are fenced. No live recovery/guard/default/runner changes; the [uncertain-interruption gap](../jev-safety.md#recovery-limitation) remains.
 
-Whole-application review readiness/manual release have a separate [B1-R/B1-J contract](processing-review-api.md#optional-shared-review), requiring unapplied migration 008. Source includes explicit release UI and factual list/filter presentation; these do not gate screening. Staff application/review detail and staff lists include `processingClosed` for release/completion/screening; candidate/interviewer projections do not gain this HR field or screening reasons. Retained task/aggregate states are original execution states, not proof a runner is still eligible.
+Whole-application review readiness/manual release have a separate [B1-R/B1-J contract](processing-review-api.md#optional-shared-review), requiring migration 008. Source includes explicit release UI and factual list/filter presentation; these do not gate screening. Staff application/review detail and staff lists include `processingClosed` for release/completion/screening; candidate/interviewer projections do not gain this HR field or screening reasons. Retained task/aggregate states are original execution states, not proof a runner is still eligible.
 
 ## Export and input
 

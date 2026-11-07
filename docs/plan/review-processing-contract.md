@@ -1,6 +1,6 @@
 # P0-S — optional review readiness and manual release
 
-Checkpoint: 2026-11-07. User selected release of **any unfinished work**, including active processing, rather than a stall timer, then approved bounded B1-R and B1-J checkpoints with fixture/disabled AI only. **Backend and UI/list/filter are source-implemented; migrations 007/008 and real integration/manual verification remain pending.** Implemented rules live in the [current contract](../current/contracts/processing-review-api.md#optional-shared-review); [status](../current/status.md) distinguishes checks from deployment. No live-provider smoke testing, API-key change or operational actions authorized.
+Checkpoint: 2026-11-07. User selected release of **any unfinished work**, including active processing, rather than a stall timer, then approved B1-R/B1-J with fixture/disabled AI only. **Backend/UI/list/filter are implemented; migrations 007/008 applied in subsequent authorized local demo setup. Real workflow integration/manual verification remains pending.** Implemented rules live in the [current contract](../current/contracts/processing-review-api.md#optional-shared-review); [status](../current/status.md) distinguishes setup from QA. No live-provider smoke or API-key change authorized.
 
 ## B1-J — source delivered; remainder separately scoped
 
@@ -16,9 +16,9 @@ B1-R maps explicit unavailable-source/document failures to ordinary terminal; ti
 
 ## Implementation and remaining verification gates
 
-1. **B1-R backend — source implemented:** additive schema source, typed classifications/readiness/release projection, release endpoint, transactional processing/review guards, API contract. No operational migration execution.
+1. **B1-R backend — source implemented:** additive schema, typed classifications/readiness/release projection, release endpoint, transactional processing/review guards, API contract. Migration 008 applied in local demo setup; not a Q-B1R pass.
 2. **B1-J — source implemented:** explicit confirmation, shared readiness list/export filtering, original-state-preserving presentation and local draft comparison/reapply. Real SQL/HTTP/manual checks remain Q-B1J.
 3. **Scoped offline checks — passed:** B1-R's 40 offline checks plus B1-J's 4 new projection/filter/export and 8 new DOM cases, with 11 selected existing DOM cases; details in status. Fake-transaction/model/SQL-capture checks are not PostgreSQL concurrency/filter-parity evidence.
 4. **Separately authorized integration/manual gate:** migration ordering, authenticated role/Origin/privacy checks, real PostgreSQL rollback/races/lease recovery and manual UX. No provider calls, browser automation or process operations implied.
 
-Preserve Q-B1J, Q-B1R, Q-SI, Q-B1P, Q-B1F and earlier Q-R* todos. These source checkpoints pass none of those integration/manual gates. No migration application, reset or re-fixturing is authorized.
+Preserve Q-B1J, Q-B1R, Q-SI, Q-B1P, Q-B1F and earlier Q-R* todos. Source and local setup pass none of those complete gates. The launch scope did not authorize further QA execution or implementation.

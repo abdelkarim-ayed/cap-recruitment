@@ -1,9 +1,9 @@
 # Manual demo — implemented workflows
 
-For the separate five-vacancy/25-application dataset, see [lifecycle fixtures](lifecycle-demo.md). Its seed/reset is source-implemented but not executed; migrations 007/008 and Q-T2A remain pending. Commands below are operator reference, not authorization to apply migrations, reseed or manage services.
+For the separate five-vacancy/25-application dataset, see [lifecycle fixtures](lifecycle-demo.md). Local setup applied migrations 007/008 and seeded it on 2026-11-07; Q-T2A and other functional/manual gates remain pending. API/frontend run in the shared [RMUX workspace](rmux.md). Commands below remain operator reference, not blanket authorization for future migrations, reseeds or process changes.
 
 ## Interview checkpoint — manual test
-Suggested RMUX tab names: `api`, `web`; `inbox-retention` runs notification cleanup only when explicitly launched. Discover actual listeners/tabs before starting or managing anything; these names are not a runtime observation. Routine checks use normal shell execution; see [RMUX](rmux.md). No automatic extraction worker is registered.
+Shared RMUX session: `workspace`, tabs `backend` and `frontend`; see [RMUX](rmux.md). Redis/PostgreSQL/Mailpit run in host-network containers. Discover current listeners/tabs before starting or managing anything. Routine checks use normal shell execution. No extraction or inbox-retention runner was launched for this setup.
 
 1. Sign in as vacancy owner, save a **draft**, open **Interview plan & results**, configure Technical/HR interviews and save. Return to the vacancy, review the saved plan and publish; publication locks it, including an empty plan. For an already-published empty-plan demo, create another draft rather than modifying frozen data. Do not reset/reseed existing records.
 2. Open application → **Selection & interviews** → Preselect. Schedule an interview with an existing staff interviewer (`demo.interviewer@example.test`), date, half-hour start, duration and link/location. Another planned interview can be booked ahead without overlap. Other HR may schedule, not edit the owner's draft plan/finalize owner decisions. Screening sends a generic candidate notice, not internal review/assessment data.

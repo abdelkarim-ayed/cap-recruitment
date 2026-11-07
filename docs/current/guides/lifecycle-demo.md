@@ -1,6 +1,6 @@
 # Lifecycle demo fixtures
 
-T2a is source-implemented with offline catalog/transaction-model checks only. **Not seeded or DB-verified.** Migrations 007/008 remain unapplied; applying them, seeding/resetting data and managing services require a separately approved execution checkpoint. No launcher or service startup is included.
+T2a is source-implemented. Authorized local setup on 2026-11-07 applied migrations 007/008 and successfully seeded five vacancies/25 applications; all 25 private document hashes were verified through storage. API/DB/Redis readiness and frontend/proxy HTTP checks passed. **This is setup evidence, not completion of Q-T2A or other QA gates:** reset/repeatability, authenticated workflows/privacy, races and manual UX remain pending. No launcher is implemented; services were launched explicitly in [RMUX](rmux.md).
 
 ## Dataset
 
