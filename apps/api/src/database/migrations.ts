@@ -116,4 +116,18 @@ export const applicationMigrations = [{
     );
     CREATE INDEX inbox_recipient ON inbox_notifications(recipient_id,created_at DESC,id);
     CREATE INDEX inbox_retention ON inbox_notifications(read_at) WHERE read_at IS NOT NULL;`,
+}, {
+  id: '007_screening_decisions',
+  sql: `ALTER TABLE applications ADD COLUMN screening_decision text CHECK(screening_decision IN ('preselected','rejected')),
+    ADD COLUMN screening_reason text CHECK(length(screening_reason)<=2000),
+    ADD COLUMN screening_by text REFERENCES "user"(id) ON DELETE SET NULL, ADD COLUMN screening_at timestamptz;
+    CREATE TABLE screening_notifications (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+      application_id uuid NOT NULL UNIQUE REFERENCES applications(id) ON DELETE RESTRICT,
+      recipient_id text NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      decision text NOT NULL CHECK(decision IN ('preselected','rejected')),
+      title text NOT NULL, body text NOT NULL,
+      created_at timestamptz NOT NULL DEFAULT now(), read_at timestamptz
+    );
+    CREATE INDEX screening_notifications_recipient ON screening_notifications(recipient_id,created_at DESC,id);`,
 }] as const;

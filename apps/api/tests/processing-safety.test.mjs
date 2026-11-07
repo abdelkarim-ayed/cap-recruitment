@@ -8,7 +8,7 @@ const bytes = Buffer.from('source');
 function setup(reader, executor, count = 1) {
   const saved = [];
   const tasks = Array.from({ length: count }, (_, i) => ({ task_id: `t${i}`, type: 'extractSkills', source_input_id: 'cv', fixture_key: null, args: { skills: ['SQL'], evidence: true } }));
-  const repository = { async claim() { return { id: 'app', token: 'token', tasks }; }, async start() { return true; }, async source() { return { id: 'doc', storage_ref: 'private', content_hash: createHash('sha256').update(bytes).digest('hex'), byte_count: bytes.length }; }, async save(_id, _token, _task, result) { saved.push(result); }, async finish() {} };
+  const repository = { async claim() { return { id: 'app', token: 'token', tasks }; }, async start() { return true; }, async assertActive() {}, async source() { return { id: 'doc', storage_ref: 'private', content_hash: createHash('sha256').update(bytes).digest('hex'), byte_count: bytes.length }; }, async save(_id, _token, _task, result) { saved.push(result); }, async finish() {} };
   return { saved, service: new ProcessingService(repository, { async read() { return bytes; } }, reader, executor) };
 }
 test('typed parser timeout is retryable but ordinary invalid PDF failure is not', async () => {

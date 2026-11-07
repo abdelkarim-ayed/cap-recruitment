@@ -36,6 +36,8 @@ export function configureApplication(app: INestApplication) {
         await setResponse(response, await auth.handler(webRequest));
       } catch (error) { next(error); }
     });
+  // Only the bounded bulk confirmation needs space for 1,000 optional reasons.
+  app.use('/api/vacancies/:id/screening/apply',express.json({limit:'10mb',inflate:false}));
   app.use(express.json({ limit: '256kb' }));
   app.use((error: { type?: string }, _request: Request, response: Response, next: NextFunction) => {
     if (error.type === 'entity.too.large') {

@@ -21,7 +21,7 @@ export const actionRoles = {
   'interview.schedule': hr, 'interview.reschedule': hr, 'interview.cancel': hr,
   'interview.requestRescheduling': staff, 'interview.submitFeedback': staff,
   'interview.application': staff, 'interview.document': staff,
-  'notification.list': staff, 'notification.read': staff, 'staff.access': staff,
+  'notification.list': roles, 'notification.read': roles, 'staff.access': staff,
 } as const satisfies Record<string, readonly Role[]>;
 export type Action = keyof typeof actionRoles;
 

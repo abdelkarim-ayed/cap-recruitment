@@ -12,7 +12,7 @@ test('coarse eligibility does not turn ownership or assignment into a role', () 
   equal(roleAllows('interviewer', 'application.read'), false);
   equal(roleAllows('interviewer', 'interview.application'), true);
   equal(roleAllows('candidate', 'review.read'), false);
-  equal(roleAllows('candidate', 'notification.list'), false);
+  equal(roleAllows('candidate', 'notification.list'), true);
 });
 test('candidate ownership and interviewer assignment remain resource-scoped', () => {
   equal(canReadApplication({ id:'candidate', role:'candidate' }, 'candidate', false), true);
@@ -31,8 +31,10 @@ test('vacancy owner/state rules preserve same-state command eligibility', () => 
   equal(published.publish.visible, false);
   equal(published.close.visible, true);
 });
-test('review behavior is current, not the planned completion/selection lock', () => {
+test('review is locked after completion or screening', () => {
   equal(reviewEditable(true).allowed, true);
+  equal(reviewEditable(true,'preselected','pending').allowed,false);
+  equal(reviewEditable(true,'received','completed').allowed,false);
   equal(reviewEditable(false).allowed, false);
   equal(editableInterviewPlan(true).allowed, false);
 });

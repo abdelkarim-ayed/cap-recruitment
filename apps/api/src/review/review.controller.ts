@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Header, Param, ParseUUIDPipe, Patch, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Header, Param, ParseUUIDPipe, Patch, Query, Req, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { RequireAction, type AuthenticatedRequest } from '../auth/access.js';
 import { ReviewService } from './review.service.js';
@@ -15,5 +15,10 @@ export class ReviewController {
   async export(@Param('id',new ParseUUIDPipe()) id: string,@Res() response: Response) {
     const csv = await this.service.export(id);
     response.set({ 'Content-Type': 'text/csv; charset=utf-8','Content-Disposition': `attachment; filename="vacancy-${id}.csv"`,'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff' }); response.send(csv);
+  }
+  @Get('vacancies/:id/screening-export') @RequireAction('review.export')
+  async screeningExport(@Param('id',new ParseUUIDPipe()) id:string,@Query() query:unknown,@Res() response:Response) {
+    const csv=await this.service.export(id,query);
+    response.set({'Content-Type':'text/csv; charset=utf-8','Content-Disposition':`attachment; filename="screening-${id}.csv"`,'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'}).send(csv);
   }
 }

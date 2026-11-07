@@ -8,6 +8,7 @@ import type { AuthenticatedRequest } from '../auth/access.js';
 import { availability, firstDenied, requirePolicy, rolePolicy } from '../auth/action-policy.js';
 import { reviewEditable } from './review.policy.js';
 import type { ReviewView } from '@recruitment/domain';
+import { screeningExportSchema } from '../applications/application-filters.js';
 
 const patchSchema = z.strictObject({ expectedRevision: z.number().int().positive(), status: z.enum(['pending','in_review','completed']).optional(), corrections: z.array(z.strictObject({ taskId: z.string().min(1).max(64), value: skillValueSchema.nullable(), remove: z.boolean().optional() })).max(100).optional() }).refine(value => value.status !== undefined || (value.corrections?.length ?? 0) > 0, 'Supply status or corrections.');
 function csvCell(value: unknown) {
@@ -38,8 +39,8 @@ export class ReviewService {
   private projection(view: Awaited<ReturnType<ReviewService['read']>>,actor:AuthenticatedRequest['actor']):ReviewView {
     const { application: row, tasks } = view;
     return { applicationId: row.id, answers: row.answers, formDefinition: row.vacancy_snapshot.formDefinition,
-      processingState: row.processing_state, review: { required:tasks.length>0,status: row.review_status, revision: row.review_revision, reviewedBy: row.reviewed_by, reviewedAt: row.reviewed_at, updatedAt:row.review_updated_at??null, editor:row.review_editor }, tasks,
-      actions:{edit:availability(firstDenied(rolePolicy(actor,'review.edit'),reviewEditable(tasks.length>0)))} };
+      processingState: row.processing_state, processingClosed:!['received','review_ready'].includes(row.stage)||row.review_status==='completed',review: { required:tasks.length>0,status: row.review_status, revision: row.review_revision, reviewedBy: row.reviewed_by, reviewedAt: row.reviewed_at, updatedAt:row.review_updated_at??null, editor:row.review_editor }, tasks,
+      actions:{edit:availability(firstDenied(rolePolicy(actor,'review.edit'),reviewEditable(tasks.length>0,row.stage,row.review_status)),true)} };
   }
   get(id: string,actor:AuthenticatedRequest['actor']) { return this.database.transaction(async client => this.projection(await this.read(client,id),actor)); }
   patch(id: string, actor: AuthenticatedRequest['actor'], raw: unknown) {
@@ -49,7 +50,7 @@ export class ReviewService {
     if (new Set(value.corrections?.map(c => c.taskId)).size !== (value.corrections?.length ?? 0)) throw new BadRequestException('Duplicate correction task.');
     return this.database.transaction(async client => {
       const view = await this.read(client,id,'FOR UPDATE');
-      requirePolicy(reviewEditable(view.tasks.length>0));
+      requirePolicy(reviewEditable(view.tasks.length>0,view.application.stage,view.application.review_status));
       if (view.application.review_revision !== value.expectedRevision) throw new ConflictException('Review changed; reload before retrying.');
       for (const correction of value.corrections ?? []) {
         const definition = (view.application.vacancy_snapshot as Vacancy).processingDefinition.tasks.find(task => task.id === correction.taskId);
@@ -61,10 +62,14 @@ export class ReviewService {
       }
       const status = value.status ?? ((value.corrections?.length ?? 0) ? 'in_review' : view.application.review_status);
       await client.query(`UPDATE applications SET review_status=$2,review_revision=review_revision+1,reviewed_by=$3,review_updated_at=now(),reviewed_at=CASE WHEN $2='completed' THEN now() ELSE NULL END WHERE id=$1`,[id,status,actor.id]);
+      if(status==='completed')await client.query('UPDATE applications SET processing_token=NULL,processing_lease_until=NULL,processing_next_at=NULL WHERE id=$1',[id]);
       return this.projection(await this.read(client,id),actor);
     });
   }
-  export(vacancyId: string) {
+  export(vacancyId: string,screeningQuery?:unknown) {
+    const parsed=screeningQuery===undefined?undefined:screeningExportSchema.safeParse(screeningQuery);
+    if(parsed&&!parsed.success)throw new BadRequestException('Invalid screening export filters.');
+    const filters=parsed?.success?parsed.data:undefined;
     return this.database.transaction(async client => {
       // Repeatable snapshot prevents mixing answers/review/results from different moments.
       await client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');
@@ -74,7 +79,12 @@ export class ReviewService {
       const definition: Vacancy['processingDefinition'] = vacancy.rows[0].processing_definition;
       const inputs = form.inputs.filter(input => input.type !== 'separator');
       const headers = ['application_id','candidate_name','candidate_email','submitted_at','review_status','reviewed_by','reviewed_at',...inputs.map(input => `answer.${input.name}`),...definition.tasks.flatMap(task => [`${task.outputKey}.original`,`${task.outputKey}.effective`,`${task.outputKey}.status`,`${task.outputKey}.reason`,`${task.outputKey}.evidence`,`${task.outputKey}.provenance`,`${task.outputKey}.has_correction`,`${task.outputKey}.corrected_by`,`${task.outputKey}.corrected_at`, ...normalizeSkills(task.args.skills).flatMap(skill => [`${task.outputKey}.skill.${encodeURIComponent(skill)}.original`, `${task.outputKey}.skill.${encodeURIComponent(skill)}.effective`])])];
-      const applications = await client.query('SELECT id FROM applications WHERE vacancy_id=$1 ORDER BY submitted_at,id LIMIT 1001',[vacancyId]);
+      if(filters)headers.push('processing_state','decision','reason');
+      const applications = filters?await client.query(`SELECT id FROM applications WHERE vacancy_id=$1 AND stage IN ('received','review_ready')
+        AND ($2::text IS NULL OR processing_state=$2) AND ($3::text IS NULL OR (jsonb_array_length(vacancy_snapshot->'processingDefinition'->'tasks')>0 AND review_status=$3))
+        AND ($4::timestamptz IS NULL OR submitted_at >= $4) AND ($5::timestamptz IS NULL OR submitted_at < $5)
+        ORDER BY submitted_at,id LIMIT 1001`,[vacancyId,filters.processing??null,filters.review??null,filters.from?`${filters.from}T00:00:00Z`:null,filters.before?`${filters.before}T00:00:00Z`:null])
+        :await client.query('SELECT id FROM applications WHERE vacancy_id=$1 ORDER BY submitted_at,id LIMIT 1001',[vacancyId]);
       if (applications.rows.length > 1000) throw new BadRequestException('Export capped at 1000 applications for this checkpoint.');
       let csv = csvRow(headers), bytes = Buffer.byteLength(csv);
       for (const { id } of applications.rows) {
@@ -83,7 +93,7 @@ export class ReviewService {
         const row = view.application;
         const line = csvRow([id,row.candidate_identity.name,row.candidate_identity.email,new Date(row.submitted_at).toISOString(),row.review_status,row.reviewed_by,row.reviewed_at ? new Date(row.reviewed_at).toISOString() : null,
           ...inputs.map(input => input.type === 'document' ? docs.rows.find(doc => doc.input_id === input.id)?.id ?? null : row.answers[input.id]),
-          ...view.tasks.flatMap(task => [task.result.status === 'completed' ? task.result.value : null,task.effectiveValue,task.status,task.result.reason ?? null,task.result.evidence ?? null,task.provenance,task.hasCorrection,task.correctedBy,task.correctedAt,...task.skillResults.flatMap(skill => [skill.original, skill.effective])])]);
+           ...view.tasks.flatMap(task => [task.result.status === 'completed' ? task.result.value : null,task.effectiveValue,task.status,task.result.reason ?? null,task.result.evidence ?? null,task.provenance,task.hasCorrection,task.correctedBy,task.correctedAt,...task.skillResults.flatMap(skill => [skill.original, skill.effective])]),...(filters?[row.processing_state,'','']:[])]);
         bytes += Buffer.byteLength(line); if (bytes > 10*1024*1024) throw new BadRequestException('Export exceeds 10 MiB checkpoint cap.');
         csv += line;
       }

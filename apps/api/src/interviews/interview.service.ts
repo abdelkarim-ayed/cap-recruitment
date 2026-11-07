@@ -8,6 +8,7 @@ import type { AuthenticatedRequest } from '../auth/access.js';
 import type { InterviewCause } from './interview-cause.js';
 import { staffInterviewNotifications, type StaffInterviewNotificationEvent } from './interview-notification.policy.js';
 import { actionRoles, roleAllows, type Action, type InterviewDetail, type InterviewPlanView, type InterviewResults, type InterviewView, type NotificationView, type Page, type WorkflowView } from '@recruitment/domain';
+import { commitScreening, undecided } from './screening-command.js';
 import { availability, firstDenied, requirePolicy, rolePolicy } from '../auth/action-policy.js';
 import { activeApplication, applicationNotFinal, assignedInterviewer, editableInterviewPlan, feedbackStarted, finalizationOwner, hireStage, interviewActions, interviewPlanOwner, offerStage, passedInterviewPlan, preselectable, rejectionAuthority, scheduledInterview, workflowActions } from './interview.policy.js';
 
@@ -192,6 +193,10 @@ export class InterviewService {
     staff(actor,'workflow.change');const value=parse(stageSchema,raw);
     await this.database.transaction(async client=>{
       const {row,vacancy}=await this.lockApplication(client,id);sameRevision(row.flow_revision,value.expectedRevision);
+      if (undecided(row.stage) && ['preselected','not_selected'].includes(value.stage)) {
+        await commitScreening(client,row,actor,value.stage==='preselected'?'preselected':'rejected',value.reason);
+        return;
+      }
       requirePolicy(applicationNotFinal(row.stage));
       if(value.stage==='preselected') { requirePolicy(preselectable(row.stage)); }
       else if(value.stage==='not_selected') {
@@ -230,14 +235,28 @@ export class InterviewService {
   }
   async inbox(actor:Actor,raw:unknown):Promise<Page<NotificationView>> {
     const q=parse(pageSchema,raw);
-    const where=`WHERE recipient_id=$1 AND ($2='all' OR read_at IS NULL)`;
-    const total=(await this.database.query(`SELECT count(*)::integer AS total FROM inbox_notifications ${where}`,[actor.id,q.read])).rows[0].total;
-    const items=(await this.database.query<NotificationView>(`SELECT n.id,n.kind,n.title,n.body,n.cause,n.created_at AS "createdAt",n.read_at AS "readAt",
-      CASE WHEN $5::boolean OR i.interviewer_id=$1 THEN i.id ELSE NULL END AS "interviewId" FROM inbox_notifications n JOIN interviews i ON i.id=n.interview_id WHERE n.recipient_id=$1 AND ($2='all' OR n.read_at IS NULL) ORDER BY n.created_at DESC,n.id LIMIT $3 OFFSET $4`,[actor.id,q.read,q.limit,q.offset,roleAllows(actor.role,'interview.readAll')])).rows;
-    return {items,total,limit:q.limit,offset:q.offset};
+    const args=[actor.id,q.read,roleAllows(actor.role,'interview.list'),roleAllows(actor.role,'interview.readAll')];
+    const notifications=`SELECT n.id,n.kind,n.title,n.body,n.cause,n.created_at,n.read_at,
+      CASE WHEN $4::boolean OR i.interviewer_id=$1 THEN i.id ELSE NULL END AS interview_id,NULL::uuid AS application_id
+      FROM inbox_notifications n JOIN interviews i ON i.id=n.interview_id
+      WHERE $3::boolean AND n.recipient_id=$1 AND ($2='all' OR n.read_at IS NULL)
+      UNION ALL SELECT id,'screening',title,body,jsonb_build_object('type','screening','decision',decision),created_at,read_at,NULL::uuid,application_id
+      FROM screening_notifications WHERE recipient_id=$1 AND ($2='all' OR read_at IS NULL)`;
+    const result=(await this.database.query(`WITH notifications AS (${notifications})
+      SELECT (SELECT count(*)::integer FROM notifications) AS total,
+      coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY "createdAt" DESC,id) FROM
+        (SELECT id,kind,title,body,cause,created_at AS "createdAt",read_at AS "readAt",interview_id AS "interviewId",application_id AS "applicationId"
+         FROM notifications ORDER BY created_at DESC,id LIMIT $5 OFFSET $6) page),'[]') AS items`,[...args,q.limit,q.offset])).rows[0];
+    return {items:result.items,total:result.total,limit:q.limit,offset:q.offset};
   }
   async markRead(id:string,actor:Actor) {
-    const row=(await this.database.query('UPDATE inbox_notifications SET read_at=coalesce(read_at,now()) WHERE id=$1 AND recipient_id=$2 RETURNING id,read_at AS "readAt"',[id,actor.id])).rows[0];
+    const row=await this.database.transaction(async client=>{
+      if(roleAllows(actor.role,'interview.list')) {
+        const staff=(await client.query('UPDATE inbox_notifications SET read_at=coalesce(read_at,now()) WHERE id=$1 AND recipient_id=$2 RETURNING id,read_at AS "readAt"',[id,actor.id])).rows[0];
+        if(staff)return staff;
+      }
+      return (await client.query('UPDATE screening_notifications SET read_at=coalesce(read_at,now()) WHERE id=$1 AND recipient_id=$2 RETURNING id,read_at AS "readAt"',[id,actor.id])).rows[0];
+    });
     if(!row)throw new NotFoundException('Notification not found.');return row;
   }
 }

@@ -45,7 +45,7 @@ export interface ApplicationView {
   id: string; vacancyId: string; candidateId: string; candidate: { name: string; email: string };
   vacancy: { id: string; title: string; description: string; location?: string; revision: number; formDefinition: FormDefinition; processingDefinition?: ProcessingDefinition };
   answers: Record<string, unknown>; documents: ApplicationDocument[]; stage: string; processingState: string; submittedAt: string;
-  review?: ReviewMetadata; actions?: ApplicationActions;
+  review?: ReviewMetadata; actions?: ApplicationActions; processingClosed?: boolean;
 }
 export interface ReviewTask {
   taskId: string; sourceInputId: string; outputKey: string; status: string; attempts: number; retryable: boolean;
@@ -57,9 +57,9 @@ export interface ReviewTask {
 }
 export interface ReviewView {
   applicationId: string; answers: Record<string, unknown>; formDefinition: FormDefinition;
-  processingState: string; review: ReviewMetadata; tasks: ReviewTask[]; actions: ReviewActions;
+  processingState: string; review: ReviewMetadata; tasks: ReviewTask[]; actions: ReviewActions; processingClosed?: boolean;
 }
 export interface NotificationView {
-  id: string; kind: string; title: string; body: string; cause: InterviewCause;
-  createdAt: string; readAt: string | null; interviewId: string | null;
+  id: string; kind: string; title: string; body: string; cause: InterviewCause | { type:'screening'; decision:'preselected'|'rejected' };
+  createdAt: string; readAt: string | null; interviewId: string | null; applicationId?: string | null;
 }

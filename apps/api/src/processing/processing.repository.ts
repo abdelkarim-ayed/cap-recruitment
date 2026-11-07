@@ -18,6 +18,7 @@ export class ProcessingRepository {
         const result = await client.query('SELECT *,processing_lease_until>now() AS active_lease FROM applications WHERE id=$1 FOR UPDATE', [fixture.applicationId]);
         const row = result.rows[0];
         if (!row || row.active_lease) throw new Error('Fixture binding requires an application without an active processing lease.');
+        if(!['received','review_ready'].includes(row.stage)||row.review_status==='completed')throw new Error('Processing is closed for this application.');
         await this.initialize(client, row.id, row.vacancy_snapshot);
         const update = await client.query('UPDATE application_tasks SET fixture_key=$3 WHERE application_id=$1 AND task_id=$2 AND (attempts=0 OR fixture_key=$3)', [row.id, fixture.taskId, fixture.fixtureKey]);
         if (!update.rowCount) throw new Error('Fixture task absent or already attempted.');
@@ -27,6 +28,7 @@ export class ProcessingRepository {
   async claim(id?: string) {
     return this.database.transaction(async client => {
       const result = await client.query(`SELECT * FROM applications WHERE ($1::uuid IS NULL OR id=$1) AND
+        stage IN ('received','review_ready') AND review_status<>'completed' AND
         (processing_state='pending' OR (processing_state='processing' AND processing_lease_until<now()) OR
         (processing_state='completed_with_errors' AND processing_next_at<=now())) ORDER BY submitted_at,id FOR UPDATE SKIP LOCKED LIMIT 1`, [id ?? null]);
       const row = result.rows[0]; if (!row) return undefined;
@@ -42,7 +44,7 @@ export class ProcessingRepository {
   }
   private async fenced<T>(id: string, token: string, operation: (client: PoolClient) => Promise<T>) {
     return this.database.transaction(async client => {
-      const current = await client.query('SELECT id FROM applications WHERE id=$1 AND processing_token=$2 AND processing_lease_until>now() FOR UPDATE', [id, token]);
+      const current = await client.query("SELECT id FROM applications WHERE id=$1 AND processing_token=$2 AND processing_lease_until>now() AND stage IN ('received','review_ready') AND review_status<>'completed' FOR UPDATE", [id, token]);
       if (!current.rowCount) throw new Error('Processing lease lost.');
       await client.query("UPDATE applications SET processing_lease_until=now()+interval '2 minutes' WHERE id=$1", [id]);
       return operation(client);
@@ -51,6 +53,7 @@ export class ProcessingRepository {
   start(id: string, token: string, taskId: string) {
     return this.fenced(id, token, async client => (await client.query("UPDATE application_tasks SET status='processing',attempts=attempts+1,updated_at=now() WHERE application_id=$1 AND task_id=$2 AND attempts<3 AND (status='pending' OR (status='failed' AND retryable=true)) RETURNING *", [id, taskId])).rows[0] as TaskRow | undefined);
   }
+  assertActive(id:string,token:string) { return this.fenced(id,token,async()=>{}); }
   save(id: string, token: string, taskId: string, value: ExecutionResult) {
     return this.fenced(id, token, async client => {
       await client.query(`UPDATE application_tasks SET status=$3,result=$4,provenance=$5,reason=$6,retryable=$7,updated_at=now() WHERE application_id=$1 AND task_id=$2`, [id,taskId,value.result.status,JSON.stringify(value.result),JSON.stringify(value.provenance),value.result.status === 'failed' ? value.result.reason : null,value.result.status === 'failed' && value.result.retryable]);

@@ -8,11 +8,11 @@ import { DOCUMENT_STORAGE, type DocumentStorage } from '../documents/document-st
 import type { AuthenticatedRequest } from '../auth/access.js';
 import { roleAllows, type ApplicationView, type ReviewMetadata } from '@recruitment/domain';
 import { applicationActions, canReadApplication } from './application.policy.js';
+import { applicationFilterShape } from './application-filters.js';
 
 type Actor = AuthenticatedRequest['actor'];
 const applicationListSchema=vacancyListSchema.pick({limit:true,offset:true}).extend({
-  processing: z.enum(['pending','not_requested','processing','completed','completed_with_errors']).optional(),
-  review: z.enum(['pending','in_review','completed']).optional(),
+  ...applicationFilterShape,
   sort: z.enum(['newest','oldest','candidate','position']).optional().default('newest'),
 });
 interface ApplicationRow {
@@ -28,7 +28,7 @@ function visible(row: ApplicationRow, actor: Actor):Omit<ApplicationView,'docume
     vacancy: { id: vacancy.id, title: vacancy.title, description: vacancy.description, ...(vacancy.location === undefined ? {} : { location: vacancy.location }), revision: vacancy.revision, formDefinition: vacancy.formDefinition,
       ...(roleAllows(actor.role,'review.read') ? { processingDefinition: vacancy.processingDefinition } : {}) },
     answers: row.answers, stage: actor.role==='candidate'?'received':row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(),
-    ...(roleAllows(actor.role,'review.read') ? { review: { required:vacancy.processingDefinition.tasks.length>0,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at?new Date(row.reviewed_at).toISOString():null }, actions:applicationActions(actor) } : {}) };
+    ...(roleAllows(actor.role,'review.read') ? { processingClosed:!['received','review_ready'].includes(row.stage)||row.review_status==='completed',review: { required:vacancy.processingDefinition.tasks.length>0,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at?new Date(row.reviewed_at).toISOString():null }, actions:applicationActions(actor) } : {}) };
 }
 @Injectable()
 export class ApplicationService {
@@ -98,15 +98,18 @@ export class ApplicationService {
     if (!roleAllows(actor.role,vacancyId?'application.listVacancy':'application.list')) throw new ForbiddenException('Staff access required.');
     const parsed = applicationListSchema.safeParse(query);
     if (!parsed.success) throw new BadRequestException('Invalid pagination.');
-    const { limit, offset,processing,review,sort } = parsed.data;
+    const { limit, offset,processing,review,sort,undecided,from,before } = parsed.data;
+    if(from&&before&&from>=before)throw new BadRequestException('Submitted before must be after submitted from.');
+    if((undecided||from||before)&&!roleAllows(actor.role,'workflow.read'))throw new ForbiddenException('Screening filters require staff access.');
     if(review&&!roleAllows(actor.role,'review.read'))throw new ForbiddenException('Review filters require staff access.');
     const order=sort==='candidate'?"lower(candidate_identity->>'name'),id":sort==='position'?'lower(title),id':sort==='oldest'?'submitted_at,id':'submitted_at DESC,id DESC';
     const result = await this.database.query(`WITH scoped AS (SELECT id,vacancy_id,candidate_id,candidate_identity,stage,processing_state,submitted_at,review_status,review_revision,reviewed_by,reviewed_at,vacancy_snapshot->>'title' AS title,jsonb_array_length(vacancy_snapshot->'processingDefinition'->'tasks')>0 AS review_required,
       EXISTS(SELECT 1 FROM extraction_corrections c WHERE c.application_id=applications.id) AS has_corrections FROM applications
       WHERE ($1::text IS NULL OR candidate_id=$1) AND ($2::uuid IS NULL OR vacancy_id=$2)),
-      visible AS (SELECT * FROM scoped WHERE ($5::text IS NULL OR processing_state=$5) AND ($6::text IS NULL OR (review_required AND review_status=$6))),
+       visible AS (SELECT * FROM scoped WHERE ($5::text IS NULL OR processing_state=$5) AND ($6::text IS NULL OR (review_required AND review_status=$6))
+         AND (NOT $7::boolean OR stage IN ('received','review_ready')) AND ($8::timestamptz IS NULL OR submitted_at >= $8) AND ($9::timestamptz IS NULL OR submitted_at < $9)),
       page AS (SELECT * FROM visible ORDER BY ${order} LIMIT $3 OFFSET $4)
-      SELECT (SELECT count(*)::integer FROM visible) AS total,coalesce((SELECT bool_or(review_required) FROM scoped),false) AS review_required,coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY ${order}) FROM page),'[]') AS items`, [actor.role === 'candidate' ? actor.id : null, vacancyId ?? null, limit, offset,processing??null,review??null]);
+       SELECT (SELECT count(*)::integer FROM visible) AS total,coalesce((SELECT bool_or(review_required) FROM scoped),false) AS review_required,coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY ${order}) FROM page),'[]') AS items`, [actor.role === 'candidate' ? actor.id : null, vacancyId ?? null, limit, offset,processing??null,review??null,undecided==='true',from?`${from}T00:00:00Z`:null,before?`${before}T00:00:00Z`:null]);
     return { items: result.rows[0].items.map((row: Record<string, any>) => ({ id: row.id, vacancyId: row.vacancy_id, vacancyTitle: row.title, candidateId: row.candidate_id, candidate: row.candidate_identity, stage: actor.role==='candidate'?'received':row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(), ...(actor.role === 'candidate' ? {} : { review: { required:row.review_required,hasCorrections:row.has_corrections,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at } }) })), total: result.rows[0].total, limit, offset,...(actor.role==='candidate'?{}:{reviewRequired:result.rows[0].review_required}) };
   }
   async download(applicationId: string, documentId: string, actor: Actor) {

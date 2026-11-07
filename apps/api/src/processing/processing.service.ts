@@ -41,6 +41,9 @@ export class ProcessingService {
         if (previous !== undefined && previous !== readText) throw new Error('Fixtures disagree on document text.');
         texts.set(key, readText);
         provenance = this.executor.describe?.(context) ?? provenance;
+        // Recheck after potentially slow document I/O, before admitting execution.
+        // Closure after this check can still race an external call; save is fenced.
+        await this.repository.assertActive(claim.id,claim.token);
         outcome = await bounded(signal => this.executor.execute(previous ?? readText, { ...context, signal }));
         provenance = outcome.provenance;
         outcome.result = taskResultSchema.parse(outcome.result);

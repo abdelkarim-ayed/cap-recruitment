@@ -1,5 +1,7 @@
 import { denied, permitted } from '../auth/action-policy.js';
 
-// Current workflow only: completion/selection do not yet lock review editing.
-export const reviewEditable = (required: boolean) => required
-  ? permitted : denied(400, 'Extraction review is not required for this application.');
+// Completion or a committed screening decision makes correction data read-only.
+export const reviewEditable = (required: boolean, stage = 'received', status = 'pending') => !required
+  ? denied(400, 'Extraction review is not required for this application.')
+  : !['received','review_ready'].includes(stage) || status === 'completed'
+    ? denied(409, 'Review is read-only after completion or screening.') : permitted;
