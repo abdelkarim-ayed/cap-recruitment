@@ -1,13 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormDefinition } from '@recruitment/domain/vacancies';
 import { validateSubmission } from '@recruitment/domain/applications';
 import { api, errorMessage, go } from './api';
 import { Notice } from './ui';
+import { useNavigationGuard } from './navigation-guard';
 
 export function CandidateForm({vacancy,preview=false}:{vacancy:{id:string;form:FormDefinition};preview?:boolean}) {
-  const [answers,setAnswers]=useState<Record<string,any>>({}),[files,setFiles]=useState<Record<string,File>>({}),[busy,setBusy]=useState(false),[error,setError]=useState('');
+  const [answers,setAnswers]=useState<Record<string,any>>({}),[files,setFiles]=useState<Record<string,File>>({}),[busy,setBusy]=useState(false),[error,setError]=useState(''),[submitted,setSubmitted]=useState('');
   const answer=(id:string,value:unknown)=>setAnswers(current=>{const next={...current};if(value===undefined)delete next[id];else next[id]=value;return next;});
-  return <section className="card"><h2>{preview?'Candidate form preview':'Your application'}</h2><p>{preview?'Preview only. No application will be submitted.':'Answers and documents are locked after submission. One application per account and vacancy.'}</p><Notice message={error}/><form onSubmit={async e=>{e.preventDefault();if(preview)return;setBusy(true);setError('');try{const checked=validateSubmission(vacancy.form,answers,Object.entries(files).map(([inputId,file])=>({inputId,filename:file.name,byteCount:file.size})));if(checked.issues.length)throw new Error(checked.issues.map(i=>`${i.path}: ${i.message}`).join('\n'));const body=new FormData();body.append('answers',JSON.stringify(checked.answers));Object.entries(files).forEach(([id,file])=>body.append(id,file));const result=await api(`vacancies/${vacancy.id}/applications`,{method:'POST',body});go(`/applications/${result.id}`);}catch(error){setError(errorMessage(error));}finally{setBusy(false);}}}>
+  const hasContent=Object.values(answers).some(value=>Array.isArray(value)?value.length>0:typeof value==='string'?value.length>0:value!==undefined)||Object.keys(files).length>0;
+  useNavigationGuard(!submitted&&hasContent,busy,'application',!preview);
+  // Redirect only after the clean guard has rendered; a successful submission
+  // is already recorded and must not open an unsaved-changes prompt.
+  useEffect(()=>{if(submitted)go(`/applications/${submitted}`);},[submitted]);
+  return <section className="card"><h2>{preview?'Candidate form preview':'Your application'}</h2><p>{preview?'Preview only. No application will be submitted.':'Answers and documents are locked after submission. One application per account and vacancy.'}</p><Notice message={error}/><form onSubmit={async e=>{e.preventDefault();if(preview)return;setBusy(true);setError('');try{const checked=validateSubmission(vacancy.form,answers,Object.entries(files).map(([inputId,file])=>({inputId,filename:file.name,byteCount:file.size})));if(checked.issues.length)throw new Error(checked.issues.map(i=>`${i.path}: ${i.message}`).join('\n'));const body=new FormData();body.append('answers',JSON.stringify(checked.answers));Object.entries(files).forEach(([id,file])=>body.append(id,file));const result=await api<{id:string}>(`vacancies/${vacancy.id}/applications`,{method:'POST',body});setSubmitted(result.id);}catch(error){setError(errorMessage(error));}finally{setBusy(false);}}}>
     <fieldset disabled={busy} className="candidate-fields">{vacancy.form.inputs.map(input=>{
       if(input.type==='separator')return <h3 className="form-section" key={input.id}>{input.label}</h3>;
       const label=<span>{input.label}{input.required&&<span aria-label="required"> *</span>}</span>;

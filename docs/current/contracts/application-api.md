@@ -53,7 +53,12 @@ Detail keys: id, vacancyId, candidateId, candidate `{name,email}`, vacancy `{id,
 
 400: invalid UUID/query/body/form answers/files. 401: no session. 403: denied role/untrusted Origin. 404: absent/foreign resource. 409: vacancy not published. 413: operational upload caps. 503 download: missing storage/integrity failure. Input validation includes issues with path/message; ordinary errors use Nest envelopes.
 
+## Answer navigation
+
+Candidate application answers and selected files register with the shared [navigation guard](editor-navigation.md): leaving asks Stay or Discard and leave, while a submission in progress blocks leaving until settled. Preview mode is unguarded. A successful submission redirects only after the form is no longer dirty; no automatic save, retry or persistent draft is added.
+
 ## Storage and verification
+
 LocalDocumentStorage implements DocumentStorage port at ignored `.local/documents/`, opaque generated keys, 0700 directory/0600 files, atomic rename and no-follow reads. Stored-file metadata is separate from application_document business ownership. DB failure rolls back rows; created objects are removed when rollback is confirmed. Ambiguous commit outcome retains files rather than risking deletion of committed data. **Process crash or failed cleanup may leave private orphan objects**: no automated reconciliation/backup/quota policy in this demo checkpoint. Do not deploy this as a production upload service without those policies and abuse controls.
 
 ```sh

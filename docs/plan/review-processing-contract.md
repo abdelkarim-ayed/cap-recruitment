@@ -5,7 +5,7 @@ Checkpoint: 2026-11-07. User selected release of **any unfinished work**, includ
 ## B1-J — source delivered; remainder separately scoped
 
 - Current release/detail/list/filter and draft-conflict behavior is specified in the current contract, not duplicated as future work here.
-- R3c source implements semantic review no-ops; R3d-a adds review-only and R3d-b vacancy/interview-plan Stay/discard navigation protection. Q-R3C/Q-R3DA/Q-R3DB retain real integration/native/manual evidence. Candidate-form and screening-import guards remain proposed R3d-c.
+- R3c source implements semantic review no-ops; R3d-a/b/c add review, vacancy, interview-plan, candidate-application and screening-import Stay/discard navigation protection. Q-R3C/Q-R3DA/Q-R3DB/Q-R3DC retain real integration/native/manual evidence.
 - Workload counters, new notifications, provider batching and attempt recovery are separate checkpoints, not authorized by B1-J.
 
 ## Attempt-boundary obstacle and checkpoint boundary

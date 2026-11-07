@@ -34,6 +34,8 @@ Written screening-rejection reasons are optional and may come from CSV. They are
 
 ## Preview, confirmation and conflict UX
 
+Staged import rows register with the shared [navigation guard](editor-navigation.md). Leaving the wizard or page while a preview is staged asks Stay or Discard and leave; Hide import and Close wizard use the same explicit choice. A successful apply clears staged rows before any refresh, so it does not prompt. Conflict and uncertain outcomes retain the rows and their guard; the guard never applies, retries or cancels a request.
+
 `POST /api/vacancies/:id/screening/preview`: authenticated multipart upload → `{rows:[{key,applicationId,email,decision,reason,state,issue,candidate,revision}]}`. State is `valid`, `invalid`, or `decided`. Candidate identity/revision is returned only after a vacancy-scoped record and matching email are resolved. Missing/foreign records share an unavailable result. Preview writes no application or notification data.
 
 Valid rows default included; invalid rows are crossed out in red, already-decided rows separately grey/double-crossed, both disabled with textual explanations. HR can include/exclude valid rows and switch proposed outcomes individually or for all included rows. Missing/excluded rows are unchanged. Cancellation has no business effects.

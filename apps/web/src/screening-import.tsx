@@ -2,10 +2,14 @@ import { useState } from 'react';
 import { api, post, errorMessage } from './api';
 import { screeningLimits, type ScreeningPreview, type ScreeningRow } from '@recruitment/domain';
 import { Notice } from './ui';
+import { useNavigationGuard, useOptionalNavigation } from './navigation-guard';
 
 type Row = ScreeningRow & { included:boolean };
 export function ScreeningImport({vacancyId,onClose,onApplied}:{vacancyId:string;onClose:()=>void;onApplied:()=>void}) {
   const [file,setFile]=useState<File|null>(null),[rows,setRows]=useState<Row[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState(''),[message,setMessage]=useState(''),[confirm,setConfirm]=useState(false),[uncertain,setUncertain]=useState(false);
+  const navigation=useOptionalNavigation();
+  useNavigationGuard(rows.length>0,busy,'import');
+  const close=()=>navigation?navigation.requestAction(onClose):onClose();
   const included=rows.filter(row=>row.included&&row.state==='valid');
   async function refresh(nextFile=file,review=false) {
     if(!nextFile)return;
@@ -44,7 +48,7 @@ export function ScreeningImport({vacancyId,onClose,onApplied}:{vacancyId:string;
   }
   const edit=(key:number,change:Partial<Row>)=>{setConfirm(false);setRows(current=>current.map(row=>row.key===key?{...row,...change}:row));};
   return <section className="card screening-wizard" aria-label="Screening import">
-    <div className="section-heading"><h2>Import screening decisions</h2><button disabled={busy} onClick={onClose}>Close wizard</button></div>
+    <div className="section-heading"><h2>Import screening decisions</h2><button disabled={busy} onClick={close}>Close wizard</button></div>
     <p>Upload one CSV with <code>application_id</code>, <code>candidate_email</code> and <code>decision</code> (preselected/rejected). Optional: <code>reason</code>. Other columns are ignored, never corrections.</p>
     <p className="small muted">Working files do not reserve applications. The first committed decision wins. Invalid rows cannot be repaired here; fix the CSV and upload again.</p>
     <Notice message={error}/><Notice message={message} success/>

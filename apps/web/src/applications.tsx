@@ -6,7 +6,7 @@ import type { ApplicationView, ReviewTask, ReviewView } from '@recruitment/domai
 import type { SkillValue } from '@recruitment/domain/vacancies';
 import { ScreeningImport } from './screening-import';
 import { readinessLabel, taskDraft, sameReviewDraft, type ReviewDraft, type SavedDraft } from './review-presentation';
-import { useNavigationGuard } from './navigation-guard';
+import { useNavigationGuard, useOptionalNavigation } from './navigation-guard';
 
 export function extractionLabel(state:string,closed=false) {
   if(closed&&['pending','processing'].includes(state))return 'Processing closed (unfinished)';
@@ -15,9 +15,11 @@ export function extractionLabel(state:string,closed=false) {
 
 export function ApplicationList({staff}:{staff:boolean}) {
   const vacancy=new URLSearchParams(location.hash.split('?')[1]||'').get('vacancy');
+  const navigation=useOptionalNavigation();
   const [page,setPage]=useState<any>(null),[offset,setOffset]=useState(0),[error,setError]=useState(''),[refresh,setRefresh]=useState(0),[busy,setBusy]=useState(false);
   const [processing,setProcessing]=useState(''),[review,setReview]=useState(''),[readiness,setReadiness]=useState(''),[sort,setSort]=useState('newest');
   const [wizard,setWizard]=useState(false),[undecided,setUndecided]=useState(staff),[from,setFrom]=useState(''),[before,setBefore]=useState('');
+  const closeWizard=()=>navigation?navigation.requestAction(()=>setWizard(false)):setWizard(false);
   const screeningQuery=`${undecided?'&undecided=true':''}${from?`&from=${encodeURIComponent(from)}`:''}${before?`&before=${encodeURIComponent(before)}`:''}`;
   const showExtraction=staff&&page?.reviewRequired!==false;
   useEffect(()=>{
@@ -31,7 +33,7 @@ export function ApplicationList({staff}:{staff:boolean}) {
       <button onClick={()=>setRefresh(v=>v+1)}>Refresh</button>
       {staff&&vacancy&&<><a className="button" href={`#/vacancies/${vacancy}/interviews`}>Interview results</a><button className="primary" disabled={busy} onClick={async()=>{setBusy(true);setError('');try{await download(`vacancies/${vacancy}/export`,`applications-${vacancy}.csv`);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}}>{busy?'Exporting…':'Export all CSV'}</button></>}
     </Heading><Notice message={error}/>
-    {staff&&vacancy&&<><div className="actions"><button onClick={()=>setWizard(value=>!value)}>{wizard?'Hide import':'Import decisions CSV'}</button><button disabled={busy} onClick={async()=>{setBusy(true);setError('');try{await download(`vacancies/${vacancy}/screening-export?${screeningQuery.slice(1)}${processing?`&processing=${processing}`:''}${review?`&review=${review}`:''}${readiness?`&readiness=${readiness}`:''}`,`screening-${vacancy}.csv`);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}}>Export undecided CSV</button></div><p className="small muted">Exports include evidence, not reservations. Agree work batches with colleagues; already-decided applications are excluded on import.</p>{wizard&&<ScreeningImport vacancyId={vacancy} onClose={()=>setWizard(false)} onApplied={()=>setRefresh(value=>value+1)}/>}</>}
+    {staff&&vacancy&&<><div className="actions"><button onClick={()=>wizard?closeWizard():setWizard(true)}>{wizard?'Hide import':'Import decisions CSV'}</button><button disabled={busy} onClick={async()=>{setBusy(true);setError('');try{await download(`vacancies/${vacancy}/screening-export?${screeningQuery.slice(1)}${processing?`&processing=${processing}`:''}${review?`&review=${review}`:''}${readiness?`&readiness=${readiness}`:''}`,`screening-${vacancy}.csv`);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}}>Export undecided CSV</button></div><p className="small muted">Exports include evidence, not reservations. Agree work batches with colleagues; already-decided applications are excluded on import.</p>{wizard&&<ScreeningImport vacancyId={vacancy} onClose={()=>setWizard(false)} onApplied={()=>setRefresh(value=>value+1)}/>}</>}
     {staff&&vacancy&&<p className="related-links"><a href={`#/vacancies/${vacancy}`}>Vacancy details</a><a href="#/applications">All applications</a></p>}
     <div className="table-controls">
       {staff&&<><label className="check"><input type="checkbox" checked={undecided} onChange={e=>{setUndecided(e.target.checked);setOffset(0);}}/>Undecided only</label><label>Submitted from (UTC)<input type="date" value={from} onChange={e=>{setFrom(e.target.value);setOffset(0);}}/></label><label>Submitted before (UTC)<input type="date" value={before} onChange={e=>{setBefore(e.target.value);setOffset(0);}}/></label></>}

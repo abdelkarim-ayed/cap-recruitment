@@ -5,20 +5,26 @@ export const navigateEvent='recruitment:navigate';
 const route=()=>window.location.hash.slice(1)||'/vacancies';
 const entryIndex=()=>Number.isSafeInteger(window.history.state?.[indexKey])?window.history.state[indexKey] as number:null;
 const markedState=(index:number)=>({...window.history.state,[indexKey]:index});
-export type EditorKind='review'|'vacancy'|'plan';
+export type EditorKind='review'|'vacancy'|'plan'|'application'|'import';
 type Guard={owner:symbol;kind:EditorKind;dirty:boolean;pending:boolean};
 type Destination={kind:'route';path:string;index?:number}|{kind:'action';run:()=>void|Promise<void>};
 interface Navigation { path:string; register:(guard:Guard)=>()=>void; requestAction:(run:()=>void|Promise<void>)=>void }
 const NavigationContext=createContext<Navigation|null>(null);
 export function useNavigation(){const navigation=useContext(NavigationContext);if(!navigation)throw new Error('Navigation boundary required.');return navigation;}
-export function useNavigationGuard(dirty:boolean,pending=false,kind:EditorKind='review'){
+export function useOptionalNavigation(){return useContext(NavigationContext);}
+export function useNavigationGuard(dirty:boolean,pending=false,kind:EditorKind='review',enabled=true){
   const register=useContext(NavigationContext)?.register,owner=useRef(Symbol('editor-draft'));
-  useLayoutEffect(()=>register?.({owner:owner.current,kind,dirty,pending}),[register,kind,dirty,pending]);
+  useLayoutEffect(()=>{
+    if(!enabled)return;
+    return register?.({owner:owner.current,kind,dirty,pending});
+  },[register,kind,dirty,pending,enabled]);
 }
 const guardCopy:Record<EditorKind,{pendingTitle:string;dirtyTitle:string;dirtyDescription:string}>={
   review:{pendingTitle:'Review save in progress',dirtyTitle:'Leave with unsaved corrections?',dirtyDescription:'Leaving discards your local correction drafts. Saved results stay unchanged. Nothing will be saved automatically.'},
   vacancy:{pendingTitle:'Vacancy update in progress',dirtyTitle:'Leave with an unsaved vacancy draft?',dirtyDescription:'Leaving discards your local vacancy edits. The saved draft stays unchanged. Nothing will be saved automatically.'},
-  plan:{pendingTitle:'Interview plan save in progress',dirtyTitle:'Leave with an unsaved interview plan?',dirtyDescription:'Leaving discards your local interview-plan edits. The saved plan stays unchanged. Nothing will be saved automatically.'}
+  plan:{pendingTitle:'Interview plan save in progress',dirtyTitle:'Leave with an unsaved interview plan?',dirtyDescription:'Leaving discards your local interview-plan edits. The saved plan stays unchanged. Nothing will be saved automatically.'},
+  application:{pendingTitle:'Application submission in progress',dirtyTitle:'Leave with an unsaved application?',dirtyDescription:'Leaving discards your answers and selected documents. Nothing will be submitted automatically.'},
+  import:{pendingTitle:'Screening check in progress',dirtyTitle:'Leave with unsaved screening decisions?',dirtyDescription:'Leaving discards this upload and its staged decisions. No decisions will be applied automatically.'}
 };
 
 // One small boundary for the existing hash router, not a permission/workflow
