@@ -3,7 +3,8 @@ import type { FormDefinition, ProcessingDefinition, SkillValue, Vacancy } from '
 
 export interface Person { id: string; name: string; email: string }
 export type ProcessingFailureCategory = 'ordinary_terminal' | 'operational' | 'uncertain' | 'unclassified';
-export interface ReviewReadiness { state: 'not_required' | 'waiting' | 'blocked' | 'ready' | 'released' | 'locked'; reason: string | null }
+export const reviewReadinessStates = ['not_required','waiting','blocked','ready','released','locked'] as const;
+export interface ReviewReadiness { state: typeof reviewReadinessStates[number]; reason: string | null }
 export interface Page<T> { items: T[]; total: number; limit: number; offset: number }
 export type StaffVacancy = Vacancy & { actions: VacancyActions };
 export interface InterviewPlanEntry { id: string; position: number; name: string; instructions: string }

@@ -78,6 +78,8 @@ B1-R backend checkpoint 2026-11-07 supersedes the readiness/manual-release obsta
 
 Tests/integration scripts import built `dist/`; rebuild affected packages before trusting a test run. No counted old tests are proof of current behavior after refactoring. Test contracts and invariants, not helper implementation details.
 
+B1-J checkpoint 2026-11-07 adds source release confirmation UI, shared SQL readiness list/export filtering and explicit local-draft refresh/reapply. SQL expression and detail policy preserve the same precedence/frozen-definition rules by source; actual PostgreSQL parity, pagination/export correctness and authenticated privacy are pending Q-B1J, not proved by SQL-capture mocks. Normal review UI no longer exposes revision numbers. Semantic review no-ops and broader navigation dirty guards remain R3c/d; no automatic merge, screening gate, counters, provider or operations work.
+
 ## Documentation consistency follow-ups
 
 Current prose was reconciled to the merged skills code. OpenAPI remains a static reference with known missing per-skill/live-provenance extensions; align using sample validated responses in a later contract checkpoint. Prose vs OpenAPI duplication is acceptable. Retire chronological "latest" handoffs; retain dated evidence in journal/Git and decisions in plan until shipped.

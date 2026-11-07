@@ -9,7 +9,8 @@ import type { AuthenticatedRequest } from '../auth/access.js';
 import { roleAllows, type ApplicationView, type ReviewMetadata } from '@recruitment/domain';
 import { applicationActions, canReadApplication } from './application.policy.js';
 import { applicationFilterShape } from './application-filters.js';
-import { processingClosed } from '../processing/processing-policy.js';
+import { processingClosed, type ProcessingBoundary } from '../processing/processing-policy.js';
+import { readinessView, reviewReadinessSql } from '../review/review-readiness.js';
 
 type Actor = AuthenticatedRequest['actor'];
 const applicationListSchema=vacancyListSchema.pick({limit:true,offset:true}).extend({
@@ -100,19 +101,20 @@ export class ApplicationService {
     if (!roleAllows(actor.role,vacancyId?'application.listVacancy':'application.list')) throw new ForbiddenException('Staff access required.');
     const parsed = applicationListSchema.safeParse(query);
     if (!parsed.success) throw new BadRequestException('Invalid pagination.');
-    const { limit, offset,processing,review,sort,undecided,from,before } = parsed.data;
+    const { limit, offset,processing,review,readiness,sort,undecided,from,before } = parsed.data;
     if(from&&before&&from>=before)throw new BadRequestException('Submitted before must be after submitted from.');
     if((undecided||from||before)&&!roleAllows(actor.role,'workflow.read'))throw new ForbiddenException('Screening filters require staff access.');
-    if(review&&!roleAllows(actor.role,'review.read'))throw new ForbiddenException('Review filters require staff access.');
+    if((review||readiness)&&!roleAllows(actor.role,'review.read'))throw new ForbiddenException('Review filters require staff access.');
     const order=sort==='candidate'?"lower(candidate_identity->>'name'),id":sort==='position'?'lower(title),id':sort==='oldest'?'submitted_at,id':'submitted_at DESC,id DESC';
-    const result = await this.database.query(`WITH scoped AS (SELECT id,vacancy_id,candidate_id,candidate_identity,stage,processing_state,submitted_at,review_status,review_revision,reviewed_by,reviewed_at,vacancy_snapshot->>'title' AS title,jsonb_array_length(vacancy_snapshot->'processingDefinition'->'tasks')>0 AS review_required,
+    const hr=roleAllows(actor.role,'review.read');
+    const result = await this.database.query(`WITH scoped AS (SELECT id,vacancy_id,candidate_id,candidate_identity,stage,processing_state,submitted_at,review_status,review_revision,reviewed_by,reviewed_at,processing_released_at,${hr?reviewReadinessSql:'NULL::text'} AS readiness,vacancy_snapshot->>'title' AS title,jsonb_array_length(vacancy_snapshot->'processingDefinition'->'tasks')>0 AS review_required,
       EXISTS(SELECT 1 FROM extraction_corrections c WHERE c.application_id=applications.id) AS has_corrections FROM applications
       WHERE ($1::text IS NULL OR candidate_id=$1) AND ($2::uuid IS NULL OR vacancy_id=$2)),
        visible AS (SELECT * FROM scoped WHERE ($5::text IS NULL OR processing_state=$5) AND ($6::text IS NULL OR (review_required AND review_status=$6))
-         AND (NOT $7::boolean OR stage IN ('received','review_ready')) AND ($8::timestamptz IS NULL OR submitted_at >= $8) AND ($9::timestamptz IS NULL OR submitted_at < $9)),
+          AND (NOT $7::boolean OR stage IN ('received','review_ready')) AND ($8::timestamptz IS NULL OR submitted_at >= $8) AND ($9::timestamptz IS NULL OR submitted_at < $9) AND ($10::text IS NULL OR readiness=$10)),
       page AS (SELECT * FROM visible ORDER BY ${order} LIMIT $3 OFFSET $4)
-       SELECT (SELECT count(*)::integer FROM visible) AS total,coalesce((SELECT bool_or(review_required) FROM scoped),false) AS review_required,coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY ${order}) FROM page),'[]') AS items`, [actor.role === 'candidate' ? actor.id : null, vacancyId ?? null, limit, offset,processing??null,review??null,undecided==='true',from?`${from}T00:00:00Z`:null,before?`${before}T00:00:00Z`:null]);
-    return { items: result.rows[0].items.map((row: Record<string, any>) => ({ id: row.id, vacancyId: row.vacancy_id, vacancyTitle: row.title, candidateId: row.candidate_id, candidate: row.candidate_identity, stage: actor.role==='candidate'?'received':row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(), ...(actor.role === 'candidate' ? {} : { review: { required:row.review_required,hasCorrections:row.has_corrections,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at } }) })), total: result.rows[0].total, limit, offset,...(actor.role==='candidate'?{}:{reviewRequired:result.rows[0].review_required}) };
+       SELECT (SELECT count(*)::integer FROM visible) AS total,coalesce((SELECT bool_or(review_required) FROM scoped),false) AS review_required,coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY ${order}) FROM page),'[]') AS items`, [actor.role === 'candidate' ? actor.id : null, vacancyId ?? null, limit, offset,processing??null,review??null,undecided==='true',from?`${from}T00:00:00Z`:null,before?`${before}T00:00:00Z`:null,readiness??null]);
+    return { items: result.rows[0].items.map((row: Record<string, any> & ProcessingBoundary) => ({ id: row.id, vacancyId: row.vacancy_id, vacancyTitle: row.title, candidateId: row.candidate_id, candidate: row.candidate_identity, stage: actor.role==='candidate'?'received':row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(), ...(hr ? { readiness:readinessView(row.readiness),processingClosed:processingClosed(row),review: { required:row.review_required,hasCorrections:row.has_corrections,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at } } : {}) })), total: result.rows[0].total, limit, offset,...(hr?{reviewRequired:result.rows[0].review_required}:{}) };
   }
   async download(applicationId: string, documentId: string, actor: Actor) {
     const owner = await this.database.query<ApplicationRow>('SELECT * FROM applications WHERE id=$1', [applicationId]);

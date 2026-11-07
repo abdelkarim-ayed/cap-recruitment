@@ -7,7 +7,7 @@ import { DatabaseService } from '../database/database.service.js';
 import type { AuthenticatedRequest } from '../auth/access.js';
 import { availability, firstDenied, requirePolicy, rolePolicy } from '../auth/action-policy.js';
 import { reviewEditable, reviewReleasable } from './review.policy.js';
-import { reviewReadiness, processingClosed } from './review-readiness.js';
+import { reviewReadiness, processingClosed, reviewReadinessSql } from './review-readiness.js';
 import type { ReviewView } from '@recruitment/domain';
 import { screeningExportSchema } from '../applications/application-filters.js';
 
@@ -105,11 +105,12 @@ export class ReviewService {
       const definition: Vacancy['processingDefinition'] = vacancy.rows[0].processing_definition;
       const inputs = form.inputs.filter(input => input.type !== 'separator');
       const headers = ['application_id','candidate_name','candidate_email','submitted_at','review_status','reviewed_by','reviewed_at',...inputs.map(input => `answer.${input.name}`),...definition.tasks.flatMap(task => [`${task.outputKey}.original`,`${task.outputKey}.effective`,`${task.outputKey}.status`,`${task.outputKey}.reason`,`${task.outputKey}.evidence`,`${task.outputKey}.provenance`,`${task.outputKey}.has_correction`,`${task.outputKey}.corrected_by`,`${task.outputKey}.corrected_at`, ...normalizeSkills(task.args.skills).flatMap(skill => [`${task.outputKey}.skill.${encodeURIComponent(skill)}.original`, `${task.outputKey}.skill.${encodeURIComponent(skill)}.effective`])])];
-      if(filters)headers.push('processing_state','decision','reason');
+    if(filters)headers.push('processing_state','review_readiness','decision','reason');
       const applications = filters?await client.query(`SELECT id FROM applications WHERE vacancy_id=$1 AND stage IN ('received','review_ready')
         AND ($2::text IS NULL OR processing_state=$2) AND ($3::text IS NULL OR (jsonb_array_length(vacancy_snapshot->'processingDefinition'->'tasks')>0 AND review_status=$3))
         AND ($4::timestamptz IS NULL OR submitted_at >= $4) AND ($5::timestamptz IS NULL OR submitted_at < $5)
-        ORDER BY submitted_at,id LIMIT 1001`,[vacancyId,filters.processing??null,filters.review??null,filters.from?`${filters.from}T00:00:00Z`:null,filters.before?`${filters.before}T00:00:00Z`:null])
+        AND ($6::text IS NULL OR (${reviewReadinessSql})=$6)
+        ORDER BY submitted_at,id LIMIT 1001`,[vacancyId,filters.processing??null,filters.review??null,filters.from?`${filters.from}T00:00:00Z`:null,filters.before?`${filters.before}T00:00:00Z`:null,filters.readiness??null])
         :await client.query('SELECT id FROM applications WHERE vacancy_id=$1 ORDER BY submitted_at,id LIMIT 1001',[vacancyId]);
       if (applications.rows.length > 1000) throw new BadRequestException('Export capped at 1000 applications for this checkpoint.');
       let csv = csvRow(headers), bytes = Buffer.byteLength(csv);
@@ -119,7 +120,7 @@ export class ReviewService {
         const row = view.application;
         const line = csvRow([id,row.candidate_identity.name,row.candidate_identity.email,new Date(row.submitted_at).toISOString(),row.review_status,row.reviewed_by,row.reviewed_at ? new Date(row.reviewed_at).toISOString() : null,
           ...inputs.map(input => input.type === 'document' ? docs.rows.find(doc => doc.input_id === input.id)?.id ?? null : row.answers[input.id]),
-           ...view.tasks.flatMap(task => [task.result.status === 'completed' ? task.result.value : null,task.effectiveValue,task.status,task.result.reason ?? null,task.result.evidence ?? null,task.provenance,task.hasCorrection,task.correctedBy,task.correctedAt,...task.skillResults.flatMap(skill => [skill.original, skill.effective])]),...(filters?[row.processing_state,'','']:[])]);
+          ...view.tasks.flatMap(task => [task.result.status === 'completed' ? task.result.value : null,task.effectiveValue,task.status,task.result.reason ?? null,task.result.evidence ?? null,task.provenance,task.hasCorrection,task.correctedBy,task.correctedAt,...task.skillResults.flatMap(skill => [skill.original, skill.effective])]),...(filters?[row.processing_state,reviewReadiness(row,view.tasks).state,'','']:[])]);
         bytes += Buffer.byteLength(line); if (bytes > 10*1024*1024) throw new BadRequestException('Export exceeds 10 MiB checkpoint cap.');
         csv += line;
       }

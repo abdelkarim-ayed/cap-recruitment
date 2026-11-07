@@ -1,14 +1,12 @@
 # P0-S — optional review readiness and manual release
 
-Checkpoint: 2026-11-07. User selected release of **any unfinished work**, including active processing, rather than a stall timer, then approved the bounded backend slice with fixture/disabled AI only. **B1-R backend is source-implemented; migration 008, B1-J UI/list/filter and real integration/manual verification remain pending.** Implemented rules now live in the [current contract](../current/contracts/processing-review-api.md#optional-shared-review); [status](../current/status.md) distinguishes checks from deployment. No live-provider smoke testing, API-key change or operational actions authorized.
+Checkpoint: 2026-11-07. User selected release of **any unfinished work**, including active processing, rather than a stall timer, then approved bounded B1-R and B1-J checkpoints with fixture/disabled AI only. **Backend and UI/list/filter are source-implemented; migrations 007/008 and real integration/manual verification remain pending.** Implemented rules live in the [current contract](../current/contracts/processing-review-api.md#optional-shared-review); [status](../current/status.md) distinguishes checks from deployment. No live-provider smoke testing, API-key change or operational actions authorized.
 
-## B1-J — proposed next checkpoint, needs approval
+## B1-J — source delivered; remainder separately scoped
 
-- Consume backend readiness/release/action availability in review detail. Keep answers/files viewable before readiness and screening actionable independently.
-- Add concise explicit release confirmation: permanently stop further processing, retain unavailable values, no automatic human completion or screening decision; admitted external work may still cost money.
-- Extend factual application list/filter/action projection. Distinguish pending, ordinary terminal failure, operationally blocked, released and screening-frozen review; do not relabel aggregate execution status as successful processing or “ready for preselection”.
-- Preserve unsaved review input on conflict for explicit refresh/reapplication; no automatic merge/retry. Coordinate R3c/d semantic no-op work separately around the final review lock boundary.
-- Keep staff-only readiness/release/failure fields out of candidate/interviewer projections. No workload counters, new notifications, provider batching or generic workflow/history engine.
+- Current release/detail/list/filter and draft-conflict behavior is specified in the current contract, not duplicated as future work here.
+- R3c/d still owns semantic review no-ops and broader dirty/navigation guards around the now-selected lock boundary.
+- Workload counters, new notifications, provider batching and attempt recovery are separate checkpoints, not authorized by B1-J.
 
 ## Attempt-boundary obstacle and checkpoint boundary
 
@@ -19,8 +17,8 @@ B1-R maps explicit unavailable-source/document failures to ordinary terminal; ti
 ## Implementation and remaining verification gates
 
 1. **B1-R backend — source implemented:** additive schema source, typed classifications/readiness/release projection, release endpoint, transactional processing/review guards, API contract. No operational migration execution.
-2. **B1-J:** consume the same facts in detail/list/actions and matching filters; concise release confirmation. Coordinate R3c/d no-op/conflict UX separately around the final lock boundary, not a legacy review path.
-3. **Scoped offline checks — passed:** 15 new readiness/service/repository/fixture tests plus 25 focused existing checks; details in status. Fake-transaction/model checks are not PostgreSQL concurrency evidence. B1-J needs its own projection/DOM checks, not a reused backend pass.
+2. **B1-J — source implemented:** explicit confirmation, shared readiness list/export filtering, original-state-preserving presentation and local draft comparison/reapply. Real SQL/HTTP/manual checks remain Q-B1J.
+3. **Scoped offline checks — passed:** B1-R's 40 offline checks plus B1-J's 4 new projection/filter/export and 8 new DOM cases, with 11 selected existing DOM cases; details in status. Fake-transaction/model/SQL-capture checks are not PostgreSQL concurrency/filter-parity evidence.
 4. **Separately authorized integration/manual gate:** migration ordering, authenticated role/Origin/privacy checks, real PostgreSQL rollback/races/lease recovery and manual UX. No provider calls, browser automation or process operations implied.
 
-Preserve Q-B1R, Q-SI, Q-B1P, Q-B1F and earlier Q-R* todos. This source checkpoint passes none of those integration/manual gates. No migration application, reset or re-fixturing is authorized.
+Preserve Q-B1J, Q-B1R, Q-SI, Q-B1P, Q-B1F and earlier Q-R* todos. These source checkpoints pass none of those integration/manual gates. No migration application, reset or re-fixturing is authorized.
