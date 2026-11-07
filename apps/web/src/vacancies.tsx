@@ -5,6 +5,7 @@ import { Badge, Heading, Notice, Empty, Loading, Pager } from './ui';
 import { FormEditor } from './form-editor';
 import { CandidateForm } from './candidate-form';
 import { roleAllows, type InterviewPlanView, type StaffVacancy } from '@recruitment/domain';
+import { useNavigationGuard } from './navigation-guard';
 
 export function VacancyList({staff,actorId}:{staff:boolean;actorId?:string}) {
   const [page,setPage]=useState<any>(null),[offset,setOffset]=useState(0),[error,setError]=useState(''),[reload,setReload]=useState(0);
@@ -22,9 +23,13 @@ function Editor({vacancy,actor}:{vacancy:StaffVacancy|null;actor:Actor}) {
   const [value,setValue]=useState<CreateVacancy>(vacancy??structuredClone(initial)),[current,setCurrent]=useState(vacancy),[busy,setBusy]=useState(false),[error,setError]=useState(''),[message,setMessage]=useState(''),[action,setAction]=useState<'published'|'closed'|null>(null);
   const canEdit=current?current.actions.edit.allowed:roleAllows(actor.role,'vacancy.create');
   const [preview,setPreview]=useState(false);
-  const [publicationPlan,setPublicationPlan]=useState<InterviewPlanView|null>(null);
-  const dirty=!current||JSON.stringify(value)!==JSON.stringify(current);
-  async function save(){setBusy(true);setError('');setMessage('');try{const checked=createVacancySchema.safeParse({title:value.title,description:value.description,...(value.location?.trim()?{location:value.location}:{}),formDefinition:value.formDefinition,processingDefinition:value.processingDefinition});if(!checked.success)throw new Error(checked.error.issues.map(i=>`${i.path.join('.')}: ${i.message}`).join('\n'));const record= current?await api<StaffVacancy>(`vacancies/${current.id}`,{method:'PATCH',body:JSON.stringify({...checked.data,expectedRevision:current.revision})}):await post<StaffVacancy>('vacancies',checked.data);setCurrent(record);setValue(record);setAction(null);setPublicationPlan(null);setMessage('Draft saved. Configure the interview plan before publishing; no interviews is also valid.');if(!current)go(`/vacancies/${record.id}`);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}
+  const [publicationPlan,setPublicationPlan]=useState<InterviewPlanView|null>(null),[createdId,setCreatedId]=useState('');
+  const dirty=current?JSON.stringify(value)!==JSON.stringify(current):JSON.stringify(value)!==JSON.stringify(initial);
+  useNavigationGuard(dirty,busy,'vacancy');
+  // Redirect only after the clean guard has rendered; the successful create is
+  // already acknowledged and must not open an unsaved-changes prompt.
+  useEffect(()=>{if(createdId)go(`/vacancies/${createdId}`);},[createdId]);
+  async function save(){setBusy(true);setError('');setMessage('');try{const checked=createVacancySchema.safeParse({title:value.title,description:value.description,...(value.location?.trim()?{location:value.location}:{}),formDefinition:value.formDefinition,processingDefinition:value.processingDefinition});if(!checked.success)throw new Error(checked.error.issues.map(i=>`${i.path.join('.')}: ${i.message}`).join('\n'));const record= current?await api<StaffVacancy>(`vacancies/${current.id}`,{method:'PATCH',body:JSON.stringify({...checked.data,expectedRevision:current.revision})}):await post<StaffVacancy>('vacancies',checked.data);setCurrent(record);setValue(record);setAction(null);setPublicationPlan(null);setMessage('Draft saved. Configure the interview plan before publishing; no interviews is also valid.');if(!current)setCreatedId(record.id);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}
   async function reviewPublication(){if(!current||dirty)return;setBusy(true);setError('');setAction(null);setPublicationPlan(null);try{const plan=await api<InterviewPlanView>(`vacancies/${current.id}/interview-pipeline`);setPublicationPlan(plan);setAction('published');}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}
   return <><Heading title={current?current.title:'Create a vacancy'} description="Job details and candidate form. Publication locks the form, extraction configuration and interview plan." status={current&&<Badge>{current.status}</Badge>}><a className="button" href="#/vacancies">← Vacancies</a>{current&&<><a className="button" href={`#/applications?vacancy=${current.id}`}>Applications</a><a className="button" href={`#/vacancies/${current.id}/interviews`}>Interview plan & results</a></>}</Heading><Notice message={error}/><Notice message={message} success/>
     {current&&current.ownerId!==actor.id&&<div className="notice">Only the owner can edit, publish or close this vacancy.</div>}

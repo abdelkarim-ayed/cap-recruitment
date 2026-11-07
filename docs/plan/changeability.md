@@ -14,7 +14,7 @@ Source audit baseline: `fd9fe9e`; updated through R2/R3a/b and R1 on 2026-11-03.
 | Medium | `ReviewService.read/patch/export` owns skill correction, original/effective projection and CSV expansion; `execution.ts` skill-specific port | Stable typed output descriptors and shared review/export projection, only after one additional template is designed |
 | Medium | `integrations/extraction/*` only used by its adapter wiring/tests; current workflow uses context reader/executor | Retire legacy production wiring after dependency inventory; retain meaningful fixture ports and tests, not parallel demo implementations |
 | Medium | RuntimeConfig vs `processing/settings.ts` vs `jev.config.ts`; retry/lease/durations/caps in SQL/UI | Typed configuration ownership; separate operational limits, business policy and immutable spending controls. No giant global constants file or admin settings feature |
-| R3a/b/c source implemented; integration pending | Draft vacancy PATCH, interview-plan PUT and review PATCH skip semantic no-ops after independent eligibility/revision checks | Q-R3A/Q-R3B/Q-R3C verify real regression later; R3d covers broader dirty/navigation guards; counters stay concurrency fences |
+| R3a/b/c source implemented; integration pending | Draft vacancy PATCH, interview-plan PUT and review PATCH skip semantic no-ops after independent eligibility/revision checks | Q-R3A/Q-R3B/Q-R3C verify real regression later; R3d-a/b cover review, vacancy and interview-plan navigation guards; counters stay concurrency fences |
 
 Paths under `apps/api/src/` unless specified. Current application/review services query DatabaseService directly; the earlier claim that controller→service→repository was consistently implemented was too broad. JSONB and repeated validation are not automatically defects. Backend/frontend validation both remain appropriate.
 
@@ -79,7 +79,7 @@ B1-R backend checkpoint 2026-11-07 supersedes the readiness/manual-release obsta
 
 Tests/integration scripts import built `dist/`; rebuild affected packages before trusting a test run. No counted old tests are proof of current behavior after refactoring. Test contracts and invariants, not helper implementation details.
 
-B1-J checkpoint 2026-11-07 adds source release confirmation UI, shared SQL readiness list/export filtering and explicit local-draft refresh/reapply. SQL expression and detail policy preserve the same precedence/frozen-definition rules by source; actual PostgreSQL parity, pagination/export correctness and authenticated privacy are pending Q-B1J, not proved by SQL-capture mocks. Normal review UI no longer exposes revision numbers. R3c now supplies semantic review no-ops as described above; broader navigation dirty guards remain R3d. No automatic merge, screening gate, counters, provider or operations work.
+B1-J checkpoint 2026-11-07 adds source release confirmation UI, shared SQL readiness list/export filtering and explicit local-draft refresh/reapply. SQL expression and detail policy preserve the same precedence/frozen-definition rules by source; actual PostgreSQL parity, pagination/export correctness and authenticated privacy are pending Q-B1J, not proved by SQL-capture mocks. Normal review UI no longer exposes revision numbers. R3c now supplies semantic review no-ops; R3d-a/b add review, vacancy and interview-plan navigation guards, leaving candidate/import guards for R3d-c. No automatic merge, screening gate, counters, provider or operations work.
 
 ## Documentation consistency follow-ups
 

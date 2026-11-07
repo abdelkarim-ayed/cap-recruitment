@@ -95,7 +95,7 @@ test('real /me envelope chooses HR navigation and vacancy-filtered application r
   window.location.hash='/applications?vacancy=vacancy-one';const calls=[];
   globalThis.fetch=async path=>{calls.push(path);if(path==='/api/me')return json({user:{id:'hr',role:'recruiter',email:'hr@example.test',name:'HR Fixture'}});return json({items:[],total:0,limit:20,offset:0});};
   render(React.createElement(App));await screen.findByText('Export all CSV');
-   ok(calls.includes('/api/vacancies/vacancy-one/applications?limit=20&offset=0&sort=newest&undecided=true'));ok(screen.getByText('HR Fixture'));
+   await waitFor(()=>ok(calls.includes('/api/vacancies/vacancy-one/applications?limit=20&offset=0&sort=newest&undecided=true')));ok(screen.getByText('HR Fixture'));
 });
 test('password login uses real identity envelope without OTP or client-selected role',async()=>{
   window.location.hash='/login';const calls=[];let loggedIn=false;

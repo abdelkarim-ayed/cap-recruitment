@@ -5,15 +5,21 @@ export const navigateEvent='recruitment:navigate';
 const route=()=>window.location.hash.slice(1)||'/vacancies';
 const entryIndex=()=>Number.isSafeInteger(window.history.state?.[indexKey])?window.history.state[indexKey] as number:null;
 const markedState=(index:number)=>({...window.history.state,[indexKey]:index});
-type Guard={owner:symbol;dirty:boolean;pending:boolean};
+export type EditorKind='review'|'vacancy'|'plan';
+type Guard={owner:symbol;kind:EditorKind;dirty:boolean;pending:boolean};
 type Destination={kind:'route';path:string;index?:number}|{kind:'action';run:()=>void|Promise<void>};
 interface Navigation { path:string; register:(guard:Guard)=>()=>void; requestAction:(run:()=>void|Promise<void>)=>void }
 const NavigationContext=createContext<Navigation|null>(null);
 export function useNavigation(){const navigation=useContext(NavigationContext);if(!navigation)throw new Error('Navigation boundary required.');return navigation;}
-export function useNavigationGuard(dirty:boolean,pending=false){
-  const register=useContext(NavigationContext)?.register,owner=useRef(Symbol('review-draft'));
-  useLayoutEffect(()=>register?.({owner:owner.current,dirty,pending}),[register,dirty,pending]);
+export function useNavigationGuard(dirty:boolean,pending=false,kind:EditorKind='review'){
+  const register=useContext(NavigationContext)?.register,owner=useRef(Symbol('editor-draft'));
+  useLayoutEffect(()=>register?.({owner:owner.current,kind,dirty,pending}),[register,kind,dirty,pending]);
 }
+const guardCopy:Record<EditorKind,{pendingTitle:string;dirtyTitle:string;dirtyDescription:string}>={
+  review:{pendingTitle:'Review save in progress',dirtyTitle:'Leave with unsaved corrections?',dirtyDescription:'Leaving discards your local correction drafts. Saved results stay unchanged. Nothing will be saved automatically.'},
+  vacancy:{pendingTitle:'Vacancy update in progress',dirtyTitle:'Leave with an unsaved vacancy draft?',dirtyDescription:'Leaving discards your local vacancy edits. The saved draft stays unchanged. Nothing will be saved automatically.'},
+  plan:{pendingTitle:'Interview plan save in progress',dirtyTitle:'Leave with an unsaved interview plan?',dirtyDescription:'Leaving discards your local interview-plan edits. The saved plan stays unchanged. Nothing will be saved automatically.'}
+};
 
 // One small boundary for the existing hash router, not a permission/workflow
 // engine. History markers contain only a position, never review or identity data.
@@ -109,5 +115,6 @@ export function NavigationBoundary({children}:{children:ReactNode}){
     else perform(next);
   }
   const value=useMemo(()=>({path,register,requestAction}),[path,register,requestAction]);
-  return <NavigationContext.Provider value={value}><div inert={open}>{children}</div>{open&&<section ref={dialog} className="card review-leave-dialog" role="alertdialog" aria-modal="true" aria-labelledby="review-leave-title" aria-describedby="review-leave-description"><h2 id="review-leave-title">{guard?.pending?'Review save in progress':guard?.dirty?'Leave with unsaved corrections?':'Leave this page?'}</h2><p id="review-leave-description">{guard?.pending?'Wait for the current request to finish. Leaving cannot cancel a server write.':guard?.dirty?'Leaving discards your local correction drafts. Saved results stay unchanged. Nothing will be saved automatically.':'The current request has finished. You can now leave, or stay to check the result.'}</p>{waitingHistory&&<p role="status">Restoring the current review before choosing…</p>}<div className="actions"><button ref={stay} disabled={leaving||waitingHistory} onClick={cancel}>Stay</button><button className="danger" disabled={!!guard?.pending||waitingHistory||leaving} onClick={confirm}>{leaving?'Leaving…':guard?.dirty?'Discard and leave':'Leave page'}</button></div></section>}</NavigationContext.Provider>;
+  const copy=guardCopy[guard?.kind??'review'];
+  return <NavigationContext.Provider value={value}><div inert={open}>{children}</div>{open&&<section ref={dialog} className="card review-leave-dialog" role="alertdialog" aria-modal="true" aria-labelledby="review-leave-title" aria-describedby="review-leave-description"><h2 id="review-leave-title">{guard?.pending?copy.pendingTitle:guard?.dirty?copy.dirtyTitle:'Leave this page?'}</h2><p id="review-leave-description">{guard?.pending?'Wait for the current request to finish. Leaving cannot cancel a server write.':guard?.dirty?copy.dirtyDescription:'The current request has finished. You can now leave, or stay to check the result.'}</p>{waitingHistory&&<p role="status">Restoring the current page before choosing…</p>}<div className="actions"><button ref={stay} disabled={leaving||waitingHistory} onClick={cancel}>Stay</button><button className="danger" disabled={!!guard?.pending||waitingHistory||leaving} onClick={confirm}>{leaving?'Leaving…':guard?.dirty?'Discard and leave':'Leave page'}</button></div></section>}</NavigationContext.Provider>;
 }

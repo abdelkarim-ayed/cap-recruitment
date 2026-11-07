@@ -11,6 +11,7 @@
 | Spending boundary and extraction wiring | [Jev safety](jev-safety.md) |
 | Identity and API index | [API](contracts/api.md), [candidate access](contracts/candidate-access.md) |
 | Authoring / publication | [Vacancy contract](contracts/vacancy-api.md) |
+| Unsaved-change navigation guards | [Editor navigation contract](contracts/editor-navigation.md) |
 | Immutable answers / private files | [Application contract](contracts/application-api.md) |
 | Processing, correction, CSV | [Processing/review contract](contracts/processing-review-api.md) |
 | Interview authority, progression, inbox | [Interview contract](contracts/interview-api.md) |
@@ -20,4 +21,4 @@
 | UI conventions | [Frontend design](guides/frontend-design.md) |
 | Host networking / terminals / portability | [Networking](guides/local-networking.md), [RMUX](guides/rmux.md), [Windows notes](guides/windows-compatibility.md) |
 
-These describe source, not a running deployment; dated checks/pending gates are in [status](status.md). Screening CSV/closure/notices, publication-time plan freeze, explicit zero-interview owner Offer, readiness/manual release with UI/list/filter and review no-op saves are source-implemented with scoped checks; migrations 007/008 and broader integration/manual UX remain pending. Broader dirty/navigation guards and notification behavior remain in [plan/](../plan/README.md).
+These describe source, not a running deployment; dated checks/pending gates are in [status](status.md). Screening CSV/closure/notices, publication-time plan freeze, explicit zero-interview owner Offer, readiness/manual release with UI/list/filter, review no-op saves and review/vacancy/interview-plan navigation guards are source-implemented with scoped checks; migrations 007/008 and broader integration/manual UX remain pending. Candidate-form and screening-import guards and notification behavior remain in [plan/](../plan/README.md).

@@ -44,6 +44,10 @@ R3b no-op semantics remain for editable drafts. Separate owner, expected intervi
 
 Compare the ordered saved names/instructions using the same schema normalization as the request: trim strings, default omitted instructions to empty, ignore object-key order and preserve interview order. Generated IDs/positions are not editable comparison fields. A current-identical plan, including an empty list, returns the existing projection with no DELETE/INSERT/UPDATE, preserving IDs, positions and revision. A real change retains the existing replace-all behavior/new IDs and increments `interview_revision` once; other counters, notifications and UI are unchanged. Regression is deferred as Q-R3B; see [status](../status.md).
 
+### Plan editor navigation
+
+The plan editor registers unsaved steps with the shared [navigation guard](editor-navigation.md) and shows `Unsaved changes`. Leaving asks Stay or Discard and leave. Pagination/Refresh preserve local steps instead of silently resetting them; a successful PUT response becomes the clean baseline, while stale/conflict responses retain local edits without retry. Backend owner/revision/freeze and no-op rules above remain authoritative.
+
 ## Owner Offer and separate Hired
 
 B1-F uses the existing stage endpoint/payload/revision. Authenticated HR eligibility, fresh vacancy ownership and application revision are separate checks under vacancy-share/application-update locks. Other HR/admin cannot override the owner; candidates/interviewers cannot finalize. Closing intake does not prevent ongoing finalization.

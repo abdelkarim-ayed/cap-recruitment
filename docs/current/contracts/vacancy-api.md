@@ -40,6 +40,10 @@ R1 adds `actions:{edit,publish,close}` to full staff responses only; each entry 
 - If supplied, `location` is a nonempty string; responses omit it when unset. `status` is `draft`, `published`, or `closed`; timestamps are ISO-8601 strings. Vacancy IDs are UUIDs; invalid path IDs return 400.
 - Strings are trimmed; title/location/labels max 200 characters, description max 20000. Unknown fields are rejected, including owner/status injection. Max 100 inputs/tasks; IDs/names/output keys match `^[a-z][a-z0-9_\-]{0,63}$` with reserved keys rejected. Input IDs, answer names, task IDs, and choice values must be unique.
 
+## Draft editor navigation
+
+Unsaved vacancy edits register with the shared [navigation guard](editor-navigation.md). Leaving asks Stay or Discard and leave; no save-all, automatic save or request cancellation is added. An untouched create form or unchanged saved draft does not warn, and a successful create redirects only after its record is clean. Existing save/publish/close authority and revision rules are unchanged.
+
 ## Supported input and task arguments
 Every answer/document input requires id, name, label, type, required, args. Separators use only id, label, type, args; no name/required/task.
 
