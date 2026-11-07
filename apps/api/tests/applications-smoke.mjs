@@ -166,6 +166,7 @@ try {
     equal((await patch(admin,{expectedRevision:review.body.review.revision,status:'in_review'})).status,409);
     const corrected=await patch(admin,{expectedRevision:released.body.review.revision,corrections:[{taskId:'extra',value:{skills:['Rust']}}]}); equal(corrected.status,200); equal(corrected.body.review.status,'in_review');
     const correctedTask=corrected.body.tasks.find(task=>task.taskId==='extra'); deepEqual(correctedTask.effectiveValue,{skills:['Rust']}); equal(correctedTask.result.status,'failed');
+    const unchanged=await patch(recruiter,{expectedRevision:corrected.body.review.revision,corrections:[{taskId:'extra',value:{skills:[' rust ','RUST'],unavailableSkills:[]}}]});equal(unchanged.status,200);deepEqual(unchanged.body,corrected.body,'Normalized no-op must retain application/task attribution and revision');
     ok(corrected.body.review.updatedAt);equal(corrected.body.review.editor.id,admin.id);equal(correctedTask.corrector.id,admin.id);
     const savedAgain=await json(`applications/${application.id}/review`,undefined,recruiter.cookie);deepEqual(savedAgain.body.tasks.find(task=>task.taskId==='extra').effectiveValue,{skills:['Rust']});
     const filtered=await json(`vacancies/${id}/applications?review=in_review&processing=completed_with_errors&sort=candidate&limit=1`,undefined,recruiter.cookie);equal(filtered.status,200);equal(filtered.body.total,1);equal(filtered.body.items[0].id,application.id);
@@ -177,7 +178,7 @@ try {
     csv=await fetch(`${base}/api/vacancies/${id}/export`,{headers:{Cookie:admin.cookie}}); exported=await csv.text(); ok(exported.includes('Rust')); ok(exported.includes('fixture-extra')); ok(exported.includes('failed'));
     const removed=await patch(recruiter,{expectedRevision:corrected.body.review.revision,corrections:[{taskId:'extra',value:null,remove:true}]}); equal(removed.status,200); equal(removed.body.tasks.find(task=>task.taskId==='extra').hasCorrection,false);
     const noCorrections=await json(`vacancies/${id}/applications`,undefined,recruiter.cookie);equal(noCorrections.body.items.find(item=>item.id===application.id).review.hasCorrections,false);
-    const edits = await Promise.all([patch(recruiter,{expectedRevision:removed.body.review.revision,status:'pending'}),patch(admin,{expectedRevision:removed.body.review.revision,status:'in_review'})]);
+    const edits = await Promise.all([patch(recruiter,{expectedRevision:removed.body.review.revision,corrections:[{taskId:'extra',value:null}]}),patch(admin,{expectedRevision:removed.body.review.revision,corrections:[{taskId:'extra',value:{skills:['rust'],unavailableSkills:[]}}]})]);
     deepEqual(edits.map(edit=>edit.status).sort(),[200,409]);
     const untrusted = await fetch(`${base}/api/applications/${application.id}/review`,{method:'PATCH',headers:{Cookie:admin.cookie,Origin:'https://untrusted.example','Content-Type':'application/json'},body:JSON.stringify({expectedRevision:1,status:'completed'})}); equal(untrusted.status,403);
     equal((await patch(admin,{expectedRevision:1,answers:{name:'spoof'}})).status,400);

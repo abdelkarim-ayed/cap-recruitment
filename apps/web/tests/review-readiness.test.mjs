@@ -54,6 +54,14 @@ test('per-skill draft reapplication preserves unknowns and requires a fresh expl
   fireEvent.click(screen.getByText('Refresh'));await screen.findByText('Reapply draft for skills');equal(screen.getByLabelText('Review rust').value,'true');equal(sent,undefined);
   fireEvent.click(screen.getByText('Reapply draft for skills'));equal(screen.getByLabelText('Review rust').value,'unknown');fireEvent.click(screen.getByText('Save correction'));await screen.findByText('Review saved.');deepEqual(sent,{expectedRevision:3,corrections:[{taskId:'skills',value:{skills:['sql'],unavailableSkills:['rust']}}]});
 });
+test('successful no-op response retains server metadata/counter and clears the submitted local draft',async()=>{
+  const current=view('ready',4),sent=[];current.review={...current.review,status:'in_review',editor:{name:'First HR',email:'first@example.test'},updatedAt:'2026-11-07T08:00:00Z'};
+  current.tasks[0]={...task(),hasCorrection:true,correction:{skills:['SQL']},effectiveValue:{skills:['SQL']}};
+  detail(()=>current,async(path,init)=>{sent.push(JSON.parse(init.body));return json(current);});
+  await screen.findByLabelText('Skills (comma separated)');fireEvent.change(screen.getByLabelText('Skills (comma separated)'),{target:{value:' sql '}});fireEvent.click(screen.getByText('Save correction'));await screen.findByText('Review saved.');
+  equal(screen.getByLabelText('Skills (comma separated)').value,'SQL');equal(screen.queryByText('Unsaved correction'),null);ok(screen.getByText(/First HR/));equal(screen.getByText('Mark review complete').disabled,false);
+  fireEvent.click(screen.getByText('Save correction'));await waitFor(()=>equal(sent.length,2));deepEqual(sent.map(body=>body.expectedRevision),[4,4]);
+});
 test('candidate and no-task detail have no release/review controls',async()=>{
   const calls=[];globalThis.fetch=async path=>{calls.push(path);return json({...record,actions:undefined});};
   render(React.createElement(ApplicationPage,{id:'app',staff:false}));await screen.findByText('Your application');equal(calls.length,1);equal(screen.queryByText('Release to review'),null);cleanup();

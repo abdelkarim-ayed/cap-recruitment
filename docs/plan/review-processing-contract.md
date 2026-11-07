@@ -5,7 +5,7 @@ Checkpoint: 2026-11-07. User selected release of **any unfinished work**, includ
 ## B1-J — source delivered; remainder separately scoped
 
 - Current release/detail/list/filter and draft-conflict behavior is specified in the current contract, not duplicated as future work here.
-- R3c/d still owns semantic review no-ops and broader dirty/navigation guards around the now-selected lock boundary.
+- R3c source implements semantic review no-ops around the selected lock boundary; Q-R3C retains real integration/manual evidence. Broader dirty/navigation guards remain R3d.
 - Workload counters, new notifications, provider batching and attempt recovery are separate checkpoints, not authorized by B1-J.
 
 ## Attempt-boundary obstacle and checkpoint boundary

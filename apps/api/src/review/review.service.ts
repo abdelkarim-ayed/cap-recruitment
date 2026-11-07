@@ -10,6 +10,7 @@ import { reviewEditable, reviewReleasable } from './review.policy.js';
 import { reviewReadiness, processingClosed, reviewReadinessSql } from './review-readiness.js';
 import type { ReviewView } from '@recruitment/domain';
 import { screeningExportSchema } from '../applications/application-filters.js';
+import { sameSkillCorrection } from './review-noop.js';
 
 const patchSchema = z.strictObject({ expectedRevision: z.number().int().positive(), status: z.enum(['pending','in_review','completed']).optional(), corrections: z.array(z.strictObject({ taskId: z.string().min(1).max(64), value: skillValueSchema.nullable(), remove: z.boolean().optional() })).max(100).optional() }).refine(value => value.status !== undefined || (value.corrections?.length ?? 0) > 0, 'Supply status or corrections.');
 const releaseSchema = z.strictObject({ expectedRevision: z.number().int().positive() });
@@ -78,15 +79,25 @@ export class ReviewService {
       const view = await this.read(client,id,'FOR UPDATE');
       requirePolicy(reviewEditable(view.tasks.length>0,view.application.stage,view.application.review_status,reviewReadiness(view.application,view.tasks)));
       if (view.application.review_revision !== value.expectedRevision) throw new ConflictException('Review changed; reload before retrying.');
+      // Validate the entire set before any write or unchanged return. A no-op
+      // never bypasses authority/readiness, stale revision or input validation.
+      const changes=[];
       for (const correction of value.corrections ?? []) {
         const definition = (view.application.vacancy_snapshot as Vacancy).processingDefinition.tasks.find(task => task.id === correction.taskId);
         if (!definition) throw new BadRequestException('Unknown correction task.');
         if (correction.value?.unavailableSkills && [...correction.value.skills, ...correction.value.unavailableSkills].some(skill => !normalizeSkills(definition.args.skills).includes(skill.toLowerCase()))) throw new BadRequestException('Unknown configured skill in correction.');
-        await client.query(`INSERT INTO application_tasks(application_id,task_id,source_input_id,output_key,args) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING`, [id,definition.id,definition.sourceInputId,definition.outputKey,JSON.stringify(definition.args)]);
-        if (correction.remove) await client.query('DELETE FROM extraction_corrections WHERE application_id=$1 AND task_id=$2',[id,correction.taskId]);
-        else await client.query(`INSERT INTO extraction_corrections(application_id,task_id,value,corrected_by) VALUES($1,$2,$3,$4) ON CONFLICT(application_id,task_id) DO UPDATE SET value=excluded.value,corrected_by=excluded.corrected_by,corrected_at=now()`, [id,correction.taskId,JSON.stringify(correction.value),actor.id]);
+        const current=view.tasks.find(task=>task.taskId===correction.taskId)!;
+        if(correction.remove ? current.hasCorrection : !current.hasCorrection||!sameSkillCorrection(current.correction,correction.value))changes.push({correction,definition});
       }
-      const status = value.status ?? ((value.corrections?.length ?? 0) ? 'in_review' : view.application.review_status);
+      const status = value.status ?? (changes.length ? 'in_review' : view.application.review_status);
+      if(!changes.length&&status===view.application.review_status)return this.projection(view,actor);
+      for(const {correction,definition} of changes){
+        // Removing a known override already has its FK task; no synthetic task
+        // initialization is needed for an absent removal or status-only save.
+        if(correction.remove){await client.query('DELETE FROM extraction_corrections WHERE application_id=$1 AND task_id=$2',[id,correction.taskId]);continue;}
+        await client.query(`INSERT INTO application_tasks(application_id,task_id,source_input_id,output_key,args) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING`, [id,definition.id,definition.sourceInputId,definition.outputKey,JSON.stringify(definition.args)]);
+        await client.query(`INSERT INTO extraction_corrections(application_id,task_id,value,corrected_by) VALUES($1,$2,$3,$4) ON CONFLICT(application_id,task_id) DO UPDATE SET value=excluded.value,corrected_by=excluded.corrected_by,corrected_at=now()`, [id,correction.taskId,JSON.stringify(correction.value),actor.id]);
+      }
       await client.query(`UPDATE applications SET review_status=$2,review_revision=review_revision+1,reviewed_by=$3,review_updated_at=now(),reviewed_at=CASE WHEN $2='completed' THEN now() ELSE NULL END WHERE id=$1`,[id,status,actor.id]);
       if(status==='completed')await client.query('UPDATE applications SET processing_token=NULL,processing_lease_until=NULL,processing_next_at=NULL WHERE id=$1',[id]);
       return this.projection(await this.read(client,id),actor);
