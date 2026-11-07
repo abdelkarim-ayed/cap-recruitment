@@ -6,6 +6,11 @@ export function readinessLabel(state: ReviewReadiness['state'], status?: string)
 }
 export interface ReviewDraft { skills: string; nullValue: boolean; skillFlags: Record<string,string> }
 export interface SavedDraft { value: ReviewDraft; active: boolean }
+export function sameReviewDraft(left:ReviewDraft,right:ReviewDraft){
+  return left.skills===right.skills&&left.nullValue===right.nullValue
+    &&Object.keys(left.skillFlags).length===Object.keys(right.skillFlags).length
+    &&Object.entries(left.skillFlags).every(([skill,flag])=>right.skillFlags[skill]===flag);
+}
 export function taskDraft(task: ReviewTask): ReviewDraft {
   return {skills:(task.effectiveValue?.skills??[]).join(', '),nullValue:task.hasCorrection&&task.correction===null,
     skillFlags:Object.fromEntries((task.skillResults??[]).map(row=>[row.skill,row.effective===null?'unknown':String(row.effective)]))};

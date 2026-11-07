@@ -22,7 +22,7 @@ One pnpm workspace, one Nest application, one PostgreSQL database; React/Vite fr
 | `packages/domain/src/screening.ts`, API `interviews/screening*`, web `screening-import.tsx` | Bounded CSV contract/parser; scoped preview and atomic apply; transaction-owned individual/bulk screening closure/notice; wizard with fresh confirmation and preserved conflicts |
 | `apps/api/src/integrations/` | Mail protocol adapters, mandatory JevGateway, legacy ExtractionProvider still wired but not the application executor |
 | Feature `*.policy.ts` files | Pure scoped ownership/assignment/state decisions, reused for transactional command checks and advisory availability; business rules remain with their feature |
-| `apps/web/src/` | Hash routing, form authoring/rendering, review/export and interview/workflow/inbox UI; action-bearing detail views typed, UI consumes server availability and shared coarse role map. Some list/dynamic editor models still use `any` |
+| `apps/web/src/` | Hash routing, form authoring/rendering, review/export and interview/workflow/inbox UI; action-bearing detail views typed, UI consumes server availability and shared coarse role map. `navigation-guard.tsx` keeps review drafts mounted until leave consent, integrates existing hash links/client redirects/sign-out and standard unload warnings; history stores only positions. Other editor dirty guards remain planned. Some list/dynamic editor models still use `any` |
 
 ## Persistence and guarantees
 

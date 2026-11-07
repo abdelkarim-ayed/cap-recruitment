@@ -19,5 +19,8 @@ export async function download(path: string, filename: string) {
   const link = document.createElement('a'); link.href = url; link.download = filename; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-export function go(path: string) { window.location.hash = path; }
+export function go(path: string) {
+  const event=new window.CustomEvent('recruitment:navigate',{detail:path,cancelable:true});
+  if(window.dispatchEvent(event))window.location.hash=path;
+}
 export function errorMessage(error: unknown) { return error instanceof Error ? error.message : 'Something went wrong. Please retry.'; }
