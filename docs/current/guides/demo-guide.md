@@ -1,5 +1,7 @@
 # Manual demo — implemented workflows
 
+For the separate five-vacancy/25-application dataset, see [lifecycle fixtures](lifecycle-demo.md). Its seed/reset is source-implemented but not executed; migrations 007/008 and Q-T2A remain pending. Commands below are operator reference, not authorization to apply migrations, reseed or manage services.
+
 ## Interview checkpoint — manual test
 Suggested RMUX tab names: `api`, `web`; `inbox-retention` runs notification cleanup only when explicitly launched. Discover actual listeners/tabs before starting or managing anything; these names are not a runtime observation. Routine checks use normal shell execution; see [RMUX](rmux.md). No automatic extraction worker is registered.
 
@@ -9,7 +11,7 @@ Suggested RMUX tab names: `api`, `web`; `inbox-retention` runs notification clea
 4. At/after scheduled start (not before), interviewer submits notes + optional score + Pass/Fail, then confirms. Pass is final feedback, not acceptance. Fail is **terminal**: application Not selected, all remaining unfinished interviews cancelled with explicit failure cause; no reopening or further scheduling. Use a fresh posting/application for another attempt. Do not submit Fail on manual data unless that terminal result is intended.
 5. Owner reviews interview results. With configured interviews, all must pass before explicitly recording Offer; with none, preselection enables that same owner confirmation directly. Hired is a separate confirmation after Offer, never automatic. Screening notices exist, but Offer/Hired/email effects remain unimplemented; candidate submission stays immutable and assessments private.
 6. Inbox defaults unread. Opening marks read; All retained messages shows read ones. Retention runner deletes seven days after first read, never unread or interview/application records. No chat or timed reminders.
-   Alternatively use the small **Mark as read** button without navigation. Inbox is also accessible from the topbar. Owners receive requests/feedback, not booking copies; candidates have no business inbox yet. Staff tables distinguish original extraction errors from Reviewed/HR corrections saved—an HR correction does not rerun or rewrite extraction. CSV selection import is not implemented.
+   Alternatively use the small **Mark as read** button without navigation. Inbox is also accessible from the topbar. Owners receive requests/feedback, not booking copies. Candidate screening notices and CSV selection import are source-implemented with migration/integration pending; broader candidate effects remain planned. Staff tables distinguish original extraction errors from Reviewed/HR corrections saved—an HR correction does not rerun or rewrite extraction.
 
 No seeded interview results are fabricated for this checkpoint. Native date/file/PDF UI requires user testing. Automated synthetic clock fixtures in interviews:check are not a runtime bypass. Details/known bounds: [interview contract](../contracts/interview-api.md).
 
@@ -76,7 +78,7 @@ New seed vacancy: **[DEMO] Backend developer — RenderCV**, containing fresh sc
 3. Use processing/review filters and sorting; counts/pagination reflect the full matching dataset. Export still includes **all** vacancy applications, not just filtered rows.
 4. Open a record → **Preview CV**. Authorized PDF bytes open beside review. Download remains available; non-PDFs are download-only. Native browser PDF viewing support varies.
 5. Save a skills correction: **latest saved value** appears prominently and is used in export. Original extraction/evidence stays unchanged under its expandable section. Refresh/relogin preserves the correction. Explicit null differs from empty skills.
-6. Current saved revision, last editor and save time are visible. Revision is a concurrency counter, **not historical versions**; no history arrows/browser in this checkpoint.
+6. Latest editor and save time are visible. Revision remains an internal concurrency counter, **not historical versions**; technical counters are not shown in normal review UI.
 7. Login demo.hr2 or admin and continue shared review. Completion is optional and never candidate approval/export gating. Test interviewer exclusion separately.
 
 ## Fresh vacancy → candidate → mock processing
@@ -94,4 +96,4 @@ For a vacancy with **no extraction tasks**, submit normally: no processing/revie
 Operator-local staff:provision creates/updates staff roles and revokes sessions. Optional STAFF_INITIAL_PASSWORD environment variable sets a password (don't put secrets in CLI arguments/history); without it use password reset to establish one. Verify email ownership before normal login. No public HR/admin signup or staff management UI. See [candidate access](../contracts/candidate-access.md).
 
 ## Verification
-Historical checks and limits are recorded in [status](../status.md); no fresh test run is claimed by this guide. DOM tests cover no-task controls, saved corrections and per-skill review; PostgreSQL processing checks cover no-task completion, privacy, conflicts and CSV. User manually validates native PDF viewer, appearance and spreadsheet CSV opening. Report sanitized errors, never credentials/real CV data. Planned notifications/import/readiness are not available in this demo yet.
+Historical checks and limits are recorded in [status](../status.md); no fresh test run is claimed by this guide. DOM tests cover no-task controls, saved corrections and per-skill review; historical PostgreSQL checks do not verify the latest migrations or lifecycle seed. User manually validates native PDF viewer, appearance and spreadsheet CSV opening. Report sanitized errors, never credentials/real CV data. Screening import/notices and readiness/release are source-implemented, not established as available in the running demo before migration/deployment/integration checks.

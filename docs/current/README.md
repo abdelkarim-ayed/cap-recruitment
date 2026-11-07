@@ -17,6 +17,7 @@
 | Interview authority, progression, inbox | [Interview contract](contracts/interview-api.md) |
 | Machine-readable references | [OpenAPI](contracts/openapi.json), [interview OpenAPI](contracts/interview-openapi.json); see status for gaps |
 | User demo journeys | [Demo guide](guides/demo-guide.md) |
+| Repeatable lifecycle scenario dataset | [Lifecycle fixtures](guides/lifecycle-demo.md) (source/offline only; execution pending) |
 | Automated/manual verification | [Backend checks](guides/backend-test.md), [integration testing](guides/integration-testing.md) |
 | UI conventions | [Frontend design](guides/frontend-design.md) |
 | Host networking / terminals / portability | [Networking](guides/local-networking.md), [RMUX](guides/rmux.md), [Windows notes](guides/windows-compatibility.md) |

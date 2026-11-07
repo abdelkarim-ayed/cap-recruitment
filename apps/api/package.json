@@ -22,6 +22,7 @@
     "inbox:cleanup": "node dist/interviews/cleanup-inbox.js",
     "demo:seed": "node dist/demo/seed.js",
     "demo:process": "node dist/demo/process.js",
+    "demo:lifecycle": "node dist/demo/lifecycle.js",
     "auth:check": "node tests/auth-smoke.mjs",
     "auth:mock-check": "node tests/auth-memory-smoke.mjs",
     "auth:password-check": "node tests/password-smoke.mjs",
