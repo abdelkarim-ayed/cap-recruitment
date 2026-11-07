@@ -7,6 +7,7 @@
 | Responsibility map and persistence | [Architecture](architecture.md) |
 | State dimensions, permissions, revisions | [Workflows](workflows.md) |
 | Existing action requirements and typed UI availability | [Action policies](contracts/action-policies.md) |
+| Undecided export, decision CSV, conflict UX and shared screening closure | [Screening contract](contracts/screening-api.md) (migration/integration pending) |
 | Spending boundary and extraction wiring | [Jev safety](jev-safety.md) |
 | Identity and API index | [API](contracts/api.md), [candidate access](contracts/candidate-access.md) |
 | Authoring / publication | [Vacancy contract](contracts/vacancy-api.md) |

@@ -19,8 +19,8 @@ Authentication uses password/cookie sessions and verified identity; ownership is
 - Candidate answers, original extracted suggestions and HR corrections are separate.
 - Frozen submission definitions retain input/task/source identities; later processing cannot edit candidate answers/files.
 - Processing completion is not candidate approval. Review completion is not preselection; current export is ungated.
-- Internal decisions/notes and public candidate information are distinct. Business-stage publication is currently absent.
+- Internal decisions/notes and candidate information are distinct. Own screening notices communicate generic outcomes, never internal reasons; full business-stage publication remains absent.
 - Closing intake does not end recruitment or archive applications.
 - Upload business restrictions differ from backend operational caps; fixtures never imply live AI quality.
 
-See [workflows](workflows.md) for implemented behavior and [planned decisions](../plan/product-decisions.md) for requested changes: screening freezes extraction/review without requiring their completion, publication freezes an optionally empty interview plan, and candidate updates/decision import remain future work. Reviewed-only screening and manual reversal proposals are superseded; none of the new rules is silently included in this baseline.
+See [screening](contracts/screening-api.md) for source-level CSV/shared closure/candidate screening notices and unapplied migration/verification limits. Publication-time interview freeze, zero-interview Offer, readiness/manual release and broader candidate progress/effects remain planned. No claims/assignment/debate states or hierarchy override; coordination can occur in approved team tools before an authorized HR commit.

@@ -19,6 +19,7 @@ One pnpm workspace, one Nest application, one PostgreSQL database; React/Vite fr
 | `apps/api/src/review/review.service.ts` | Shared review SQL, separate corrections, effective projection, CSV column naming/serialization and snapshot export |
 | `apps/api/src/interviews/interview.service.ts` | Request schemas, authority, locks/SQL, scheduling, progression, transactional notification persistence, inbox reads/writes and projections |
 | `apps/api/src/interviews/interview-cause.ts`, `interview-notification.policy.ts` | Command-cause types and pure typed staff notification intents: recipients, deduplication, content and deliberate no-effect decisions; no DB/network work |
+| `packages/domain/src/screening.ts`, API `interviews/screening*`, web `screening-import.tsx` | Bounded CSV contract/parser; scoped preview and atomic apply; transaction-owned individual/bulk screening closure/notice; wizard with fresh confirmation and preserved conflicts |
 | `apps/api/src/integrations/` | Mail protocol adapters, mandatory JevGateway, legacy ExtractionProvider still wired but not the application executor |
 | Feature `*.policy.ts` files | Pure scoped ownership/assignment/state decisions, reused for transactional command checks and advisory availability; business rules remain with their feature |
 | `apps/web/src/` | Hash routing, form authoring/rendering, review/export and interview/workflow/inbox UI; action-bearing detail views typed, UI consumes server availability and shared coarse role map. Some list/dynamic editor models still use `any` |
@@ -34,9 +35,9 @@ Current business stage orchestration remains in InterviewService; scoped policy 
 ## Transactions and external work
 
 - Vacancy edits/publish/close lock the vacancy row. Intake acquires a candidate/vacancy advisory lock and a vacancy share lock, then inserts frozen content/doc references. Storage compensation retains files on ambiguous commit.
-- Processing runs outside submission HTTP. Claims and saves use application-row locking and token/expiry fencing. Results invalidate completed review markers while retaining corrections. Source bytes/text reused in-memory within an invocation.
+- Processing runs outside submission HTTP; row locks/token/expiry plus stage/review eligibility fence closed work. Review completion/screening prevents late saves, without changing original results or claiming cancellation avoids external cost. Source bytes/text reused per invocation; uncertain live recovery remains unresolved.
 - Interview commands lock vacancy → application → interview, plus interviewer advisory locks for overlapping appointments. State, cancellations and notifications commit together. Commands supply typed causes and loaded context to the pure staff notification policy, then persist its intents through the same transaction client; SQL updates do not infer events. There is no event bus or automatic mail coupling.
-- CSV uses a repeatable-read transaction, caps at 1,000 applications/10 MiB. No batch export ledger/import exists.
+- CSV export uses repeatable read, 1,000 applications/10 MiB. Import locks vacancy then included applications in deterministic order, validates all before writing, and commits shared screening decisions/notices atomically. Additive migration 007 is not applied; no export ledger, reservation, vote or assignment store.
 - Retention CLI runs once or daily with `--watch`; no extraction poller, event bus, job queue, outbox or persistent parser cache exists.
 
 ## Existing seams worth retaining

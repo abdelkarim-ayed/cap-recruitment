@@ -1,7 +1,7 @@
 # Interview pipeline, scheduling and inbox — implemented contract
 
 Migration 006; session cookies and trusted Origin on writes. Backend and integrated React UI, no interview calendar/email integration or event bus. [Current extraction](../jev-safety.md) does not alter these interview rules.
-This is the implemented bounded contract. Candidate notifications/progress, explicit hide, publish-time interview-plan freeze, zero-interview owner finalization and screening locks are in [plan](../../plan/product-decisions.md). Screening reversal is not planned. Selected changes have not replaced the implemented rules below.
+The [screening slice](screening-api.md) adds shared individual/import closure and candidate screening notices, requiring unapplied migration 007. Broader candidate progress/effects, hide, publication-time plan freeze and zero-interview Offer remain planned. Screening reversal is not planned.
 
 R1 adds typed `actions` to interview-plan, workflow and interview projections. Existing `editable`, `isOwner`, `canAssess` and `canSchedule` fields remain compatible. Separate action eligibility, presentation visibility and mutation authority are described in [action policies](action-policies.md); current scheduling-time freeze/nonempty-offer/review behavior is unchanged.
 
@@ -10,9 +10,9 @@ R1 adds typed `actions` to interview-plan, workflow and interview projections. E
 - Each application/step has at most one instance: one existing staff interviewer, start/duration/timezone, link or location, status, final notes/optional integer score 0–10, Pass/Fail. Cancelled/completed records remain; no deletes, retries, reopening, panels or historical revisions.
 - All admin/recruiter staff can schedule/reschedule/cancel and preselect. Only assigned interviewer submits feedback or requests rescheduling; staff acting as interviewers follow the same assignment rule. Owner alone records Offer/Hired. Admin has no owner override.
 - Preselect can proceed regardless of extraction/review. Scheduling requires Preselected/Interview. Pass does not automatically advance/accept. Explicit final Fail sets Not selected and cancels **all other unfinished instances**, including already-started scheduled instances; no further feedback or scheduling. Submitted feedback is final. No reopening: use a new posting/application.
-- Manual Not selected is available to HR before interviewing and owner afterwards; requires a reason and cancels remaining instances. Offer requires every configured step to have completed with Pass; Hired requires Offer. Hired/Not selected are terminal. No stage changes from extraction completion.
+- Manual Not selected is shared HR through preselected, owner afterwards. Initial screening uses the shared closure command with optional internal text and one candidate notice; later recruitment rejection still requires reason/cancels remaining interviews. Offer requires a nonempty passed plan, Hired requires Offer. No stage changes from extraction completion.
 - Interviewer sees only their assigned interview records and application answers/documents for scheduled/completed assignments. Cancelled-only assignments grant no candidate document access. Reassignment removes prior interviewer access. Generic application/review/list endpoints remain interviewer-denied. No other interviewer notes exposed. Owner name/email visible for offline contact.
-- Candidate-facing stage remains Received; these new decisions/notes/schedules are internal, not published updates. Candidate communications remain external/deferred.
+- Generic candidate application stage remains Received; only own screening notices now communicate preselection/rejection. Notes/schedules/assessments and other candidate updates remain unpublished.
 
 ## API
 Base `/api`. GET/PUT success 200, POST success 201. All path IDs UUID. Bad request 400, no session 401, role/owner/Origin denial 403, missing/inaccessible resource 404, stale revision/terminal state/conflict 409. Read responses private/no-store. JSON bodies strict; unknown fields rejected. See [interview-openapi.json](interview-openapi.json), linked into [openapi.json](openapi.json).
@@ -33,7 +33,7 @@ Base `/api`. GET/PUT success 200, POST success 201. All path IDs UUID. Bad reque
 | POST `interviews/:id/feedback` | Assignee; `{expectedRevision,notes,score?:0..10\|null,outcome:pass\|fail}`. Start time must have arrived. Explicit UI confirmation before submission. |
 | GET `interviews/:id/application` | Scoped immutable application projection, no processing definitions/review metadata for interviewers. |
 | GET `interviews/:id/documents/:documentId` | Scoped attachment bytes through existing integrity-checked storage. Document must belong to interview application. |
-| GET `inbox` | Staff/interviewer own messages; read=unread\|all (default unread), limit/offset. Returns id/kind/title/body/cause/createdAt/readAt/interviewId (null after access revoked). |
+| GET `inbox` | Own messages; candidates only screening notices, staff also existing interview notices. read=unread\|all, limit/offset. Adds nullable applicationId for screening; interviewId remains null after revocation. |
 | POST `inbox/:id/read` | Own only; first read timestamp retained on repeat; `{id,readAt}`. No shell/secret/business-data links. |
 
 Interview detail includes application/vacancy/step IDs, names/instructions, candidate identity, applicationStage, interviewer/owner identity, revision/status, startsAt/durationMinutes/timezone/meeting, notes/score/outcome/submittedAt, cancellationCause/changeCause, schedulingIssue/issueAt and updatedAt.
@@ -64,7 +64,7 @@ Recipient/content rules live in the pure `apps/api/src/interviews/interview-noti
 | HR ended application | Assignee of each cancelled appointment; application-ended reason |
 | Interview failed | Assignee of each remaining cancelled appointment; failed interview name |
 | Rescheduling requested / feedback submitted | Creator and owner, deduplicated; request reason / interview name and Pass/Fail title |
-| Preselected / Offer / Hired | Explicitly no notification intents in the current policy; new candidate/owner effects remain planned |
+| Preselected / Offer / Hired | Staff interview policy still emits no intents. Shared screening command separately inserts the candidate preselection/rejection notice; other effects remain planned |
 
 Deduplication is within an appointment/event, not across all cancelled appointments. Actors are not excluded when they are also a required recipient. A feedback Fail notice and remaining-appointment cancellations retain distinct causes/content. No results from rerunning policy/integration/DOM tests are claimed for this refactor; see [status](../status.md) and deferred Q-R2A/Q-R2U on the [board](../../plan/tasks.md).
 
@@ -73,4 +73,4 @@ Deduplication is within an appointment/event, not across all cancelled appointme
 ## Verification / limits
 `pnpm --filter @recruitment/api interviews:check`: real OTP sessions/PostgreSQL/HTTP, owner pipeline freeze, time/assignment validation, overlap and concurrent failure races, private documents/reassignment, explicit causes, intake closure independence, terminal stages/Offer/Hired, inbox ownership/retention, API restart persistence. Synthetic test clock adjustment only, no runtime clock bypass. Frontend DOM tests cover schedules, frozen results, confirmation/final feedback, cancelled document omission and inbox actions; native UI remains manually tested.
 
-No bulk import, automated ranking, interview attachments, candidate publication, availability negotiation, retries or reopen. Scores are separate display values, not comparable standardized evaluations or automatic hiring thresholds. Cancelled steps cannot be replaced in this bounded model; owner may end that application and use a new posting. Agenda/needs-feedback is query-derived, not cron.
+Screening CSV is a separate source-implemented slice with migration/integration pending. No automated ranking, interview attachments, full candidate progress, availability negotiation, retries or reopening. Scores are display values, not standardized evaluations or automatic hiring thresholds. Cancelled steps cannot be replaced; agenda/needs-feedback is query-derived, not cron.

@@ -4,8 +4,10 @@ import { Badge, Heading, Notice, Loading, Empty, Pager, display } from './ui';
 import { PdfPreview } from './pdf-preview';
 import type { ApplicationView, ReviewTask, ReviewView } from '@recruitment/domain';
 import type { SkillValue } from '@recruitment/domain/vacancies';
+import { ScreeningImport } from './screening-import';
 
-export function extractionLabel(state:string) {
+export function extractionLabel(state:string,closed=false) {
+  if(closed&&['pending','processing'].includes(state))return 'Processing closed (unfinished)';
   return ({completed_with_errors:'Original extraction errors',failed:'Original extraction failed',completed:'Extracted',pending:'Extraction pending',processing:'Extracting',not_requested:'No extraction'} as Record<string,string>)[state]||state;
 }
 
@@ -13,20 +15,24 @@ export function ApplicationList({staff}:{staff:boolean}) {
   const vacancy=new URLSearchParams(location.hash.split('?')[1]||'').get('vacancy');
   const [page,setPage]=useState<any>(null),[offset,setOffset]=useState(0),[error,setError]=useState(''),[refresh,setRefresh]=useState(0),[busy,setBusy]=useState(false);
   const [processing,setProcessing]=useState(''),[review,setReview]=useState(''),[sort,setSort]=useState('newest');
+  const [wizard,setWizard]=useState(false),[undecided,setUndecided]=useState(staff),[from,setFrom]=useState(''),[before,setBefore]=useState('');
+  const screeningQuery=`${undecided?'&undecided=true':''}${from?`&from=${encodeURIComponent(from)}`:''}${before?`&before=${encodeURIComponent(before)}`:''}`;
   const showExtraction=staff&&page?.reviewRequired!==false;
   useEffect(()=>{
     let active=true;setError('');setPage(null);
-    const query=`limit=20&offset=${offset}&sort=${sort}${processing?`&processing=${processing}`:''}${staff&&review?`&review=${review}`:''}`;
+    const query=`limit=20&offset=${offset}&sort=${sort}${processing?`&processing=${processing}`:''}${staff&&review?`&review=${review}`:''}${staff?screeningQuery:''}`;
     api(`${staff&&vacancy?`vacancies/${vacancy}/`:''}applications?${query}`).then(v=>{if(active)setPage(v);}).catch(e=>{if(active)setError(errorMessage(e));});
     return()=>{active=false;};
-  },[staff,vacancy,offset,refresh,processing,review,sort]);
+  },[staff,vacancy,offset,refresh,processing,review,sort,screeningQuery]);
   return <>
     <Heading title={staff?'Applications':'My applications'}>
       <button onClick={()=>setRefresh(v=>v+1)}>Refresh</button>
       {staff&&vacancy&&<><a className="button" href={`#/vacancies/${vacancy}/interviews`}>Interview results</a><button className="primary" disabled={busy} onClick={async()=>{setBusy(true);setError('');try{await download(`vacancies/${vacancy}/export`,`applications-${vacancy}.csv`);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}}>{busy?'Exporting…':'Export all CSV'}</button></>}
     </Heading><Notice message={error}/>
+    {staff&&vacancy&&<><div className="actions"><button onClick={()=>setWizard(value=>!value)}>{wizard?'Hide import':'Import decisions CSV'}</button><button disabled={busy} onClick={async()=>{setBusy(true);setError('');try{await download(`vacancies/${vacancy}/screening-export?${screeningQuery.slice(1)}${processing?`&processing=${processing}`:''}${review?`&review=${review}`:''}`,`screening-${vacancy}.csv`);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}}>Export undecided CSV</button></div><p className="small muted">Exports include evidence, not reservations. Agree work batches with colleagues; already-decided applications are excluded on import.</p>{wizard&&<ScreeningImport vacancyId={vacancy} onClose={()=>setWizard(false)} onApplied={()=>setRefresh(value=>value+1)}/>}</>}
     {staff&&vacancy&&<p className="related-links"><a href={`#/vacancies/${vacancy}`}>Vacancy details</a><a href="#/applications">All applications</a></p>}
     <div className="table-controls">
+      {staff&&<><label className="check"><input type="checkbox" checked={undecided} onChange={e=>{setUndecided(e.target.checked);setOffset(0);}}/>Undecided only</label><label>Submitted from (UTC)<input type="date" value={from} onChange={e=>{setFrom(e.target.value);setOffset(0);}}/></label><label>Submitted before (UTC)<input type="date" value={before} onChange={e=>{setBefore(e.target.value);setOffset(0);}}/></label></>}
       {showExtraction&&<label>Original extraction<select aria-label="Processing status" value={processing} onChange={e=>{setProcessing(e.target.value);setOffset(0);}}><option value="">All extraction states</option>{['pending','not_requested','processing','completed','completed_with_errors'].map(v=><option key={v} value={v}>{extractionLabel(v)}</option>)}</select></label>}
       {staff&&showExtraction&&<label>Review status<select value={review} onChange={e=>{setReview(e.target.value);setOffset(0);}}><option value="">All review states</option>{['pending','in_review','completed'].map(v=><option key={v} value={v}>{v.replaceAll('_',' ')}</option>)}</select></label>}
       <label>Sort applications<select value={sort} onChange={e=>{setSort(e.target.value);setOffset(0);}}><option value="newest">Newest first</option><option value="oldest">Oldest first</option>{staff&&<option value="candidate">Candidate A–Z</option>}<option value="position">Position A–Z</option></select></label>
@@ -35,7 +41,7 @@ export function ApplicationList({staff}:{staff:boolean}) {
       {!page.items.length?<Empty>No applications match this view. <a href="#/vacancies">Browse vacancies</a></Empty>:<div className="table-scroll"><table><thead><tr>{staff&&<th>Candidate</th>}<th>Position</th><th>Submitted</th>{staff&&<th>Recruitment stage</th>}{showExtraction&&<th>Original extraction</th>}{staff&&showExtraction&&<th>HR review</th>}<th/></tr></thead>
         <tbody>{page.items.map((item:any)=><tr key={item.id}>
           {staff&&<td><a className="strong" href={`#/applications/${item.id}`}>{item.candidate.name||item.candidate.email}</a><small>{item.candidate.email}</small></td>}
-          <td><a href={`#/vacancies/${item.vacancyId}`}>{item.vacancyTitle}</a>{staff&&<small><a href={`#/applications?vacancy=${item.vacancyId}`}>Vacancy applications</a></small>}</td><td>{new Date(item.submittedAt).toLocaleDateString()}</td>{staff&&<td><Badge>{item.stage||'received'}</Badge></td>}{showExtraction&&<td>{item.processingState==='not_requested'?'—':<Badge>{extractionLabel(item.processingState)}</Badge>}</td>}{staff&&showExtraction&&<td>{item.review?.required===false?'—':<div className="status-stack"><Badge>{item.review?.status==='completed'?'Reviewed':item.review?.status??'pending'}</Badge>{item.review?.hasCorrections&&<Badge>HR corrections saved</Badge>}</div>}</td>}<td><a href={`#/applications/${item.id}`}>Open →</a>{staff&&<small><a href={`#/applications/${item.id}/interviews`}>Selection & interviews</a></small>}</td>
+          <td><a href={`#/vacancies/${item.vacancyId}`}>{item.vacancyTitle}</a>{staff&&<small><a href={`#/applications?vacancy=${item.vacancyId}`}>Vacancy applications</a></small>}</td><td>{new Date(item.submittedAt).toLocaleDateString()}</td>{staff&&<td><Badge>{item.stage||'received'}</Badge></td>}{showExtraction&&<td>{item.processingState==='not_requested'?'—':<Badge>{extractionLabel(item.processingState,!['received','review_ready'].includes(item.stage)||item.review?.status==='completed')}</Badge>}</td>}{staff&&showExtraction&&<td>{item.review?.required===false?'—':<div className="status-stack"><Badge>{item.review?.status==='completed'?'Reviewed':item.review?.status??'pending'}</Badge>{item.review?.hasCorrections&&<Badge>HR corrections saved</Badge>}</div>}</td>}<td><a href={`#/applications/${item.id}`}>Open →</a>{staff&&<small><a href={`#/applications/${item.id}/interviews`}>Selection & interviews</a></small>}</td>
         </tr>)}</tbody></table></div>}
       <Pager offset={offset} total={page.total} change={setOffset}/>
     </section>}
@@ -88,8 +94,8 @@ export function ApplicationPage({id,staff}:{id:string;staff:boolean}) {
         <section className="card"><div className="section-heading"><h2>Extraction review</h2><Badge>{review.review.status}</Badge></div>
            <div className="actions"><button disabled={busy||!review.actions.edit.allowed} onClick={()=>update({status:'in_review'})}>Mark in review</button><button className="primary" disabled={busy||!review.actions.edit.allowed} onClick={()=>update({status:'completed'})}>Mark review complete</button><button disabled={busy||!review.actions.edit.allowed} onClick={()=>update({status:'pending'})}>Reset to pending</button></div>
           {review.tasks.some((task:any)=>task.hasCorrection)&&<p className="review-summary">HR corrections are saved and used in export. Original extraction results remain unchanged.</p>}<small>Current saved revision {review.review.revision}{review.review.updatedAt?` · Saved ${new Date(review.review.updatedAt).toLocaleString()}`:''}{review.review.editor?` · ${review.review.editor.name||review.review.editor.email}`:''}</small>
-        </section>
-         <section className="card"><div className="section-heading"><h2>Extracted fields</h2></div>{review.tasks.map((task:any)=><TaskCard key={`${task.taskId}:${review.review.revision}`} task={task} busy={busy} onSave={correction=>update({corrections:[correction]})}/>)}
+         </section>
+          <section className="card"><div className="section-heading"><h2>Extracted fields</h2></div><Notice message={review.actions.edit.reason??''}/>{review.tasks.map((task:any)=><TaskCard key={`${task.taskId}:${review.review.revision}`} task={task} busy={busy||!review.actions.edit.allowed} onSave={correction=>update({corrections:[correction]})}/>)}
          </section>
        </>}{record.actions?.export.visible&&<div className="actions"><button disabled={busy||!record.actions.export.allowed} onClick={async()=>{setBusy(true);try{await download(`vacancies/${record.vacancyId}/export`,`applications-${record.vacancyId}.csv`);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}}>Export vacancy CSV</button></div>}</div>
     </div>

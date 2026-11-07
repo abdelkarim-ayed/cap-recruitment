@@ -1,6 +1,6 @@
 # Implemented workflows and vocabulary
 
-R1 centralizes existing role/resource requirements and adds advisory UI availability; see the [action inventory](contracts/action-policies.md). It does not change the implemented workflow below. Revision checks remain separate and authoritative under the existing locks.
+R1 centralizes action requirements; the 2026-11-07 [screening slice](contracts/screening-api.md) adds shared closure, CSV and candidate screening notices. Migration 007/integration remain pending; this describes source, not a running deployment. Revision checks remain separate under locks.
 
 ## Submission, processing and review are separate state dimensions
 
@@ -19,17 +19,17 @@ Submission with tasks starts `received + pending + pending`. Without tasks it st
 1. Owner configures form + source-linked `extractSkills` tasks, saves, publishes. Intake becomes immutable. Empty tasks allowed; publication needs at least one answer/document input, not an interview pipeline.
 2. Verified candidate submits once. Snapshot, answers and private file references persist transactionally; duplicate submission returns existing data. Close and submit serialize.
 3. Operator explicitly runs processing. Normal ports default disabled; trusted fixtures or approved guarded execution selected separately. Real PDF parsing is available; fixture interpretation remains labelled.
-4. Any HR can review/correct extraction. CSV includes all vacancy applications, original/effective values, errors and provenance; list filters do not constrain it.
-5. Any HR can preselect regardless of processing/review. HR schedules owner-defined interview steps; steps freeze at the first instance. All current pipeline steps are schedulable interviews, not arbitrary activities. Multiple steps may be scheduled ahead; no strict next-step-only rule exists.
+4. Any HR can review/correct before completion/screening; afterwards read-only. Diagnostic CSV includes all vacancy applications; separate screening export includes undecided records with optional evidence/date filters. Whole-application review-start readiness/manual release remains planned.
+5. Any HR can preselect/reject undecided applications regardless of processing/review, individually or through CSV. First committed screening outcome wins; either closes processing eligibility and freezes review without fabricating completion. HR schedules owner-defined interview steps; steps still freeze at first instance. Multiple interviews may be scheduled ahead.
 6. Assignee submits final notes, optional 0–10 score and Pass/Fail after the start. Fail sets Not selected and cancels every other unfinished instance. Pass does not accept or automatically advance the applicant. One instance per application/step; cancellation cannot be replaced.
-7. Owner may record Offer after every configured step passes; Hired requires Offer. Manual Not selected needs a reason: shared HR before interviewing, owner afterwards. Hired/Not selected terminal, no reversal.
-8. Candidate still sees a receipt and immutable submission, not internal progression. Staff/interviewers have an Inbox for interview events only.
+7. Owner may record Offer after a nonempty fully passed interview plan; Hired requires Offer. Screening rejection text is optional; later recruitment rejection still needs a reason (shared HR through preselected, owner afterwards). Hired/Not selected terminal, no reversal.
+8. Candidate application stage remains masked, but own generic screening notices appear in Inbox. Staff interview-event policy is unchanged; no internal reason/review data enters candidate notices.
 
 ## Current inbox behavior
 
-Assignment/change/cancellation → assignee (reassignment also informs old assignee with restricted link). Scheduling request/feedback → creator + owner, deduplicated. No notifications on preselection, review completion or Offer/Hired. Thus a candidate expecting a preselection notification encounters a missing feature in today's contract, not evidence of a delivery failure.
+Staff assignment/change/cancellation → assignee (reassignment also informs old assignee with restricted link); requests/feedback → creator + owner. New screening decisions produce one candidate notice through a separate application FK, including preselection. No other new candidate/owner effects, review-completion or Offer/Hired notices.
 
-Open or Mark as read sets first read time. Unread is default; read entries remain under All until cleanup deletes them seven days after first read. Desired explicit hide, candidate tray and workload counters are [planned](../plan/product-decisions.md#notifications-counters-and-email).
+Open or Mark as read sets first read time. Unread default; All shows retained entries. Existing cleanup deletes old read interview notices only; new screening notices have no expiry. Broader candidate progress/effects, explicit hide and workload counters remain [planned](../plan/product-decisions.md#notifications-counters-and-email).
 
 ## Revision counters, not historical versions
 
@@ -37,7 +37,7 @@ Open or Mark as read sets first read time. Unread is default; read entries remai
 | --- | --- |
 | Vacancy `revision` | Draft metadata/definitions and publish/close concurrency |
 | Vacancy `interview_revision` | Replacing ordered pipeline steps |
-| Application `review_revision` | Shared HR status/corrections; processing writes invalidate prior review completion |
+| Application `review_revision` | Shared HR status/corrections and new extraction results while open; completion/screening fences further writes |
 | Application `flow_revision` | Selection, scheduling and progression |
 | Interview `revision` | Schedule, rescheduling issue and final feedback |
 

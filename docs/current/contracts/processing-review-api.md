@@ -2,9 +2,9 @@
 
 Current skills starter: guarded batched Noul for normalised HR skills, >=0.8 detection; per-task compatible skills-list storage with per-skill `skillResults` projection (original/effective boolean or null). Corrections may add `unavailableSkills` for partial unknowns. Review UI uses per-skill selects; CSV appends URI-encoded skill original/effective columns while keeping prior columns. No quotes in this version, no live validation. See [Jev safety](../jev-safety.md); older fixture contracts below remain supported.
 
-Real PDF reader and selected guarded Noul skills executor are merged into main; defaults disabled, no automatic extraction polling or live-provider verification. JevGateway is mandatory. Returned live failures persist terminal; uncertain interrupted-live recovery is a [known gap](../jev-safety.md#recovery-limitation). Requested readiness/export changes are [planned](../../plan/product-decisions.md), not implemented below.
+Real PDF reader and guarded Noul skills executor are merged; defaults disabled, no automatic extraction polling/live verification. JevGateway mandatory. Returned live failures terminal; uncertain interrupted-live recovery remains a [known gap](../jev-safety.md#recovery-limitation). The [screening slice](screening-api.md) adds source-level closure and decision CSV; migration/integration pending. Whole-application readiness/manual release remain planned.
 
-Latest UX clarification: HR corrections do not change original task/processing failure status. Staff lists show `review.hasCorrections` independently, label original extraction errors explicitly and show review completion separately. Detail prioritizes saved HR correction while original result/error remains in its own evidence section. Explicit null counts as a saved correction, not a repaired successful extraction. CSV still includes original/effective values and original status; decision reimport remains deferred.
+HR corrections never rewrite original task/aggregate failure. Staff lists show `review.hasCorrections`; details separate saved corrections from original evidence. Explicit null is a correction, not successful extraction. CSV preserves original/effective/status; decision import never changes these fields.
 
 No-task policy (approved after UI feedback): applications whose frozen processing definition has no tasks start with review status completed automatically and `review.required=false`. This means not applicable, **not candidate approval or a human review**; no reviewer/completion timestamp is invented. Migration 005 completes existing no-task records without changing answers/files/stage. Review PATCH returns 400 for no-task applications. Staff detail/list hide irrelevant review controls; mixed tables show a dash. Staff list adds `reviewRequired` for the entire vacancy/account scope (before filters/pagination); review-status filters match extraction-bearing records only. Export stays available/all records. UI operator/demo instructions moved to demo-guide.md; actual mock output remains labelled.
 
@@ -49,8 +49,7 @@ processingState: pending/not_requested/processing/completed/completed_with_error
 
 ## Optional shared review
 
-R1 adds `actions.edit:{allowed,visible,reason}` to HR review responses and staff-only `actions:{review,workflow,export}` on application detail. Candidate/interviewer application projections omit these HR hints. This is the [existing-workflow refactor](action-policies.md), not delivery of the planned review-readiness/completion/selection locks; current review editing/export behavior below is unchanged.
-Admin/recruiter, including owner, can read/change review on any application. Candidate/interviewer cannot. No assigned-HR registry, exclusive claim, permissions override or selection rules.
+R1 action hints remain. SI now locks review after completion or screening and adds staff-only `processingClosed` to review/application detail; candidate/interviewer projections omit it and other HR metadata. Admin/recruiter share review while open; no exclusive claim/assignment/owner override. Review-start readiness/manual release is not delivered.
 
 `GET /api/applications/:id/review` returns applicationId, immutable answers/formDefinition, processingState, review metadata and configured task columns. Pending tasks appear even before command initialization. Each task includes original result/evidence/failure, provenance, attempts/retryability, separate correction/hasCorrection/actor/time and effectiveValue.
 
@@ -60,12 +59,12 @@ Admin/recruiter, including owner, can read/change review on any application. Can
 ```
 Statuses: pending/in_review/completed. Any admin/recruiter can continue another's work; metadata reviewedBy is the latest review editor, reviewedAt is completion time or null. Revision conflicts return 409, so colleagues do not silently overwrite each other.
 
-Corrections are supported for the current extractSkills task value only. `value:null` is an explicit reviewed null; `remove:true,value:null` removes the override. Original extraction/candidate answers/files stay unchanged. Correcting without an explicit status sets in_review; status completed records completion even with failed/unreviewed task fields. Later extraction writes invalidate completion and increment review revision; manual corrections survive. Status is a coordination marker, not evidence all values are correct. Current correction actor/time is retained, not full audit/version history.
+Corrections support extractSkills only. `value:null` is reviewed unknown; `remove:true,value:null` removes an override. Original extraction/answers/files unchanged. Corrections without status set in_review; completion can retain failed/unavailable fields and is not candidate approval. Completion or screening makes further PATCH read-only (409) and fences later extraction writes; original statuses/corrections remain. Actor/time is current metadata, not full history. Claim/start/pre-execution/save/finish/bind also check closure; external cancellation is not a cost guarantee.
 
 Staff application list/detail include review metadata; candidate responses exclude review/results/corrections/task args.
 
 ## Ungated CSV export
-`GET /api/vacancies/:id/export`, admin/recruiter only, attachment CSV/private-no-store. **Review completion is never required**: include pending, failed and unreviewed applications. No filtering/ranking/rejection, stage mutation or import.
+`GET /api/vacancies/:id/export` remains admin/recruiter diagnostic export-all, attachment/private-no-store, no review gate. Separate [screening export/import](screening-api.md) provides undecided/date/evidence filters and explicit human decisions, not ranking or extraction updates.
 
 Columns: candidate/application identity/time, review status/editor/time, answer columns by input name (answers read by stable ID), private business document UUIDs, and each task's original/effective value, status, failure reason, evidence, fixture/disabled provenance, hasCorrection and correction actor/time. Null/unavailable is a blank cell; successful empty skills is JSON `{"skills":[]}`. Status/provenance/correction flags prevent misleading equivalence. No public download links.
 

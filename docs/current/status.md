@@ -1,6 +1,6 @@
 # Implementation status
 
-Product baseline: local main merge `fd9fe9e` (skills implementation `9e5f7c8`), R2/R3a/b changes on 2026-11-02 and R1 existing-workflow action policies on 2026-11-03. This is an inventory, not a process/listener report.
+Product source baseline: skills `fd9fe9e`, R2/R3a/b, R1, and screening CSV checkpoint 2026-11-07. Migration 007 remains unapplied; running services were not restarted. This is a source inventory, not a deployment/process/listener report.
 
 ## Implemented
 
@@ -16,13 +16,14 @@ Product baseline: local main merge `fd9fe9e` (skills implementation `9e5f7c8`), 
 - R3a: current-identical normalized draft vacancy PATCH returns unchanged revision/time and full staff owner metadata. Owner/draft/stale checks remain authoritative; real changes increment once. No UI/interview/review or publish/close-policy changes.
 - R3b: current-identical normalized interview-plan PUT preserves IDs/positions and `interview_revision`, including empty plans. Separate owner/revision/scheduling-freeze checks remain authoritative; real edits still replace all rows/new IDs and increment the counter once. No UI, notification or publication-rule changes.
 - R1: shared static action-role map, feature-scoped existing ownership/assignment/state policies, additive typed action availability and UI consumption. Legacy fields/Origin/session/private projections and current workflow remain; [inventory/contracts](contracts/action-policies.md) distinguish authorization, visibility and future rules. Pure policy specifications/DOM fixtures are written/updated but not executed.
+- SI: one-CSV screening wizard/preview/atomic apply, mandatory ID/email, optional internal reason, ignored evidence columns, undecided evidence export/date filters. Shared individual/bulk command persists cause/actor/time, closes processing eligibility and locks review; candidate gets one transactional screening notice. First committed outcome wins; no reservations/assignment/debate states. [Current contract](contracts/screening-api.md) records exact scope and unapplied migration 007.
 
 ## Important current limits
 
-- Candidate view remains submission receipt (`received`); no candidate business notifications, published decisions or interview details.
+- Candidate application stage remains masked as `received`; Inbox now supports own screening notices only. No submission/appointment/Pass/Offer/Hired notices, full progress timeline, owner-finalization alerts, hide UI or backfill. Screening notices have no expiry; old interview-retention command unchanged.
 - `review_ready` is accepted vocabulary but has no workflow writer. Processing and review state are separate from recruitment stage.
 - Publication does not require interview steps. Steps freeze when the first interview instance exists, not when the vacancy publishes.
-- No bulk selection/import/reversal; no panels, retries or reopening. Closing a vacancy stops intake, not ongoing interviews.
+- CSV screening is source-implemented but not deployed/DB-integrated. No reversal, panels, retries or reopening. Closing a vacancy still stops intake, not ongoing interviews. Optional whole-application review readiness/manual release remains unimplemented; only completion/screening locks and processing fencing are delivered here.
 - Saving identical review data can still increase revision; draft vacancy/interview-plan no-op fixes are not a general revision framework. Counters remain concurrency controls, not history.
 - Live failures returned by the executor persist non-retryable, but interrupted execution recovery marks processing tasks retryable without knowing whether a paid attempt occurred. [Safety detail](jev-safety.md#recovery-limitation).
 - PDF only for real parsing (DOCX may be accepted as an upload, but cannot be parsed). No OCR, guaranteed complex-layout reading order, rectangles or extraction-quality measurements.
@@ -41,6 +42,8 @@ The docs-only reorganisation checks paths, links, JSON references and unchanged 
 2026-11-02 R3b checkpoint: API `tsc --noEmit -p apps/api/tsconfig.json`, whitespace checks, 152 local Markdown links/anchors and 341 OpenAPI references passed; the interview OpenAPI diff changes only the plan PUT description. Application/DB/DOM regression was not run; Q-R3B remains outstanding, not reported passed. No application execution, browser work, provider calls, database operations or process management performed.
 
 2026-11-03 R1 checkpoint: domain build, API/web typechecks, whitespace/test-source syntax checks, 166 local links/anchors and 366 OpenAPI references passed. OpenAPI changes are additive action response schemas only; endpoints, request schemas and existing fields are unchanged. Pure policy specifications and existing DOM fixtures were drafted/updated, not executed; no unit/HTTP/DB/DOM test run. Q-R1A/Q-R1U retain automated/manual regression work. No application startup, browser automation, provider calls, seed/data operations, spending changes or process restart/stop. Static checks do not establish behavioral/security parity.
+
+2026-11-07 SI: domain/API/web builds passed; 5 new CSV, 9 API fake-transaction/repository and 3 new DOM cases passed (17 isolated checks). Whitespace, 178 local links/anchors and 373 OpenAPI references passed. Web build reports non-fatal third-party Zod comment-annotation warnings. An initial DOM selector ambiguity was corrected before rerun. No real PostgreSQL concurrency/rollback, HTTP multipart/auth/privacy or manual/browser verification. No migration/seed/data/provider operations, startup or process management. Prior Q-R1/R2/R3 regression remains deferred; Q-SI tracks integration/deployment/UX work. No claim that a modelled transaction proves PostgreSQL behavior.
 
 ## Contract gaps
 

@@ -1,6 +1,6 @@
 # Action policies — existing workflow
 
-R1 checkpoint: 2026-11-03. This is an enumeration/refactor of enforced rules, not delivery of the different [planned workflow](../../plan/product-decisions.md). Application tests/manual UX remain deferred; static evidence is in [status](../status.md).
+R1 inventory, updated for the 2026-11-07 [screening slice](screening-api.md). Source rules below require unapplied migration 007 for screening operations; application integration/manual UX remains pending. Verification is in [status](../status.md).
 
 ## Ownership of checks
 
@@ -21,13 +21,13 @@ API paths below are relative to `/api`; source paths without a package prefix ar
 | `interviewPlan.read/edit` | HR reads; owner edits only before any interview instance exists. Published-but-unscheduled plans remain editable; no publication-time freeze yet. Separate `interview_revision`; R3b no-ops retained. |
 | `application.submit/list/listVacancy/read/download` | Candidate submits; candidates list/read only their own applications. HR has shared access; vacancy-wide lists are HR-only. Direct generic application/document routes still deny interviewer role at the route guard. |
 | `application.readAll`, `interview.application/document` | HR has shared application access. Through scoped interview routes, an interviewer needs current assignment to that interview plus at least one scheduled/completed assignment on the application for answers/files. Cancelled-only assignments grant no application access. Ownership/assignment is resolved from PostgreSQL, not UI flags. |
-| `review.read/edit/export` | Shared HR; no vacancy-owner restriction. Edit requires configured extraction tasks, but currently does **not** require finished processing or lock after review completion/selection. Export remains all vacancy applications, regardless of review/stage. |
-| `workflow.read/change` | HR shared. Preselect from received/unused-compatible review_ready without a processing/review gate. Rejection requires a reason: shared HR through preselected, owner afterwards. Hired/not_selected remain terminal. |
+| `review.read/edit/export` | Shared HR; no owner restriction. Edit requires tasks and undecided/not-completed review; selection/completion locks corrections. Whole-application readiness/manual release remains unimplemented. Diagnostic export-all unchanged; screening export excludes decided records with optional filters. |
+| `workflow.read/change` | Shared HR screening from received/compatible review_ready without readiness gate. Individual/import use one transaction-owned screening command with closure and candidate notice. Screening-rejection text optional; later recruitment rejection still requires reason, shared HR through preselected and owner afterwards. Hired/not_selected terminal; no screening undo. |
 | Workflow Offer/Hired policies | Owner only; Offer still requires interview stage and a **nonempty**, fully passed configured interview list. Zero-interview Offer remains blocked. Hired separately requires Offer. No automatic offer or owner override for another admin. |
 | `interview.list/read/readAll/directory` | HR reads all; interviewer only their assignments. Staff directory is HR-only. Metadata of an assigned cancelled interview remains readable, but does not itself grant documents. |
 | `interview.schedule/reschedule/cancel` | HR shared; application preselected/interview, appointment scheduled where applicable. Existing time, assignee-role, overlap, uniqueness and revision checks remain. Cancellation/rejection/Fail retain their distinct transactional effects. |
 | `interview.requestRescheduling/submitFeedback` | Only the assigned interviewer, including HR acting as interviewer. Scheduled/active application required. Feedback additionally requires appointment start reached; rescheduling requests do not. Submitted feedback remains final; Fail cancels remaining unfinished appointments. |
-| `notification.list/read` | Staff/interviewer, own recipient rows only. Read remains separate from navigation; existing read-retention and recipient-specific revoked links are unchanged. No candidate tray/hide/channel changes. |
+| `notification.list/read` | All signed-in roles; own recipient rows only. Candidates see only own screening notices, never staff interview rows even after role change. Staff interview link revocation/read retention unchanged. Screening messages retained; no hide/mail/full timeline changes. |
 | `staff.access` / `/me` | Staff access is admin/recruiter/interviewer; `/me` still returns the trusted actor for any valid signed-in role. Identity/provisioning and public health routes were not redesigned. |
 
 ## Additive availability responses
@@ -53,10 +53,10 @@ API paths below are relative to `/api`; source paths without a package prefix ar
 
 Existing `canAssess`, `canSchedule`, `editable`, `isOwner` fields remain with their previous meaning. In particular, legacy `canAssess` is not start-time aware and is not used as authority. The UI now consumes distinct rescheduling-request/feedback actions; a visible Offer button is disabled until the already-enforced interview requirements pass. Feedback availability is a server snapshot; refresh when its start time arrives. No new timer/push infrastructure.
 
-Candidate/public projections do not gain HR action reasons, review metadata or business-stage publication. Trusted cookie actors remain the only source of identity/role. UI navigation uses coarse shared role eligibility, never ownership or assignment cached in a token.
+Candidate/public application projections do not gain HR action reasons, review metadata, processingClosed or raw business stage. Candidates receive only generic own screening outcomes through Inbox. Trusted cookie actors remain the only identity/role source; UI eligibility never caches ownership/assignment in a token.
 
 ## Explicitly not delivered
 
-Publication-time interview freezing, zero-interview Offer, review completion/selection locks and processing closure, candidate notifications/timeline, bulk import and notification lifetime changes remain separate planned cards. R1 does not implement those decisions or change spending/provider controls.
+Publication-time interview freezing, zero-interview Offer, whole-application review readiness/manual release, broader candidate timeline/notification effects and hide/lifetime changes remain planned. SI implements only the screening/closure/import/notice slice above. Spending/provider controls remain unchanged.
 
 Q-R1A covers deferred policy/guard/HTTP/privacy/concurrency/DOM regression; Q-R1U covers later batched manual UX. Offline policy specifications and updated DOM fixture metadata are written, **not executed**. No new quality, runtime or security-test pass is claimed by this document.
