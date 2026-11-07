@@ -38,10 +38,11 @@ test('review is locked after completion or screening', () => {
   equal(reviewEditable(false).allowed, false);
   equal(editableInterviewPlan(true).allowed, false);
 });
-test('shared screening does not depend on review and owner has no zero-interview offer path yet', () => {
+test('shared screening is independent of review; empty-plan Offer requires preselection and owner', () => {
   const context={ownerId:'owner',stage:'received',total:0,passed:0};
   equal(workflowActions({id:'other',role:'recruiter'},context).preselect.allowed, true);
-  equal(workflowActions({id:'owner',role:'recruiter'},{...context,stage:'preselected'}).offer.allowed, false);
+  equal(workflowActions({id:'owner',role:'recruiter'},{...context,stage:'preselected'}).offer.allowed, true);
+  equal(workflowActions({id:'other',role:'admin'},{...context,stage:'preselected'}).offer.allowed, false);
   equal(workflowActions({id:'owner',role:'recruiter'},{...context,stage:'interview'}).offer.allowed, false);
 });
 test('offer requires the owner and every configured interview passed', () => {

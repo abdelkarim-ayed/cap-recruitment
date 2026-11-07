@@ -123,6 +123,19 @@ try {
   equal((await call(`interviews/${manual.body.id}`,hr)).body.cancellationCause.type,'hr_cancelled');
   equal((await call(`applications/${loser.id}/interviews`,hr)).body.stage,'interview');
   const results=await call(`vacancies/${id}/interview-results`,hr);equal(results.status,200);equal(results.body.total,4);equal(results.body.steps.length,2);
+  // Empty plan: preselection is not Offer, and Offer is not Hired.
+  const emptyId=await vacancy(owner);
+  equal((await call(`vacancies/${emptyId}/publish`,owner,{expectedRevision:1,expectedInterviewRevision:1})).status,200);
+  const emptyApplication=await submit(emptyId,candidate);
+  equal((await call(`applications/${emptyApplication.id}/stage`,hr,{expectedRevision:1,stage:'preselected'})).status,201);
+  equal((await call(`applications/${emptyApplication.id}/interviews`,owner)).body.stage,'preselected');
+  equal((await call(`applications/${emptyApplication.id}/stage`,admin,{expectedRevision:2,stage:'offer'})).status,403);
+  equal((await call(`applications/${emptyApplication.id}/stage`,owner,{expectedRevision:2,stage:'hired'})).status,409);
+  equal((await call(`applications/${emptyApplication.id}/stage`,owner,{expectedRevision:2,stage:'offer'})).status,201);
+  equal((await call(`applications/${emptyApplication.id}/interviews`,owner)).body.stage,'offer');
+  equal((await call(`applications/${emptyApplication.id}/stage`,owner,{expectedRevision:2,stage:'offer'})).status,409);
+  equal((await call(`applications/${emptyApplication.id}/stage`,owner,{expectedRevision:3,stage:'hired'})).status,201);
+  equal((await database.query('SELECT id FROM interviews WHERE application_id=$1',[emptyApplication.id])).rows.length,0);
   // Read retention is measured from first read, never creation; unread survives.
   const ids=(await call('inbox?read=all',owner)).body.items.map(n=>n.id);ok(ids.length>=3);
   await database.query("UPDATE inbox_notifications SET created_at=now()-interval '30 days',read_at=CASE WHEN id=$1 THEN now()-interval '8 days' WHEN id=$2 THEN now()-interval '6 days' ELSE NULL END WHERE id=ANY($3::uuid[])",[ids[0],ids[1],ids]);
@@ -130,7 +143,7 @@ try {
   await cleanupReadNotifications({query:text=>database.query(`${text} AND recipient_id=ANY($1::text[])`,[users])});equal((await database.query('SELECT id FROM inbox_notifications WHERE id=$1',[ids[0]])).rows.length,0);equal((await database.query('SELECT id FROM inbox_notifications WHERE id=$1',[ids[1]])).rows.length,1);equal((await database.query('SELECT id FROM inbox_notifications WHERE id=$1',[ids[2]])).rows.length,1);
   // Persisted state survives API restart.
   await app.close();await start();equal((await call(`applications/${a.id}/interviews`,owner)).body.stage,'not_selected');equal((await call(`applications/${b.id}/interviews`,owner)).body.stage,'hired');
-  console.log('PASS: real auth/PostgreSQL/HTTP interview pipeline, owner policy, half-hour scheduling/conflicts, assignment-scoped documents, terminal failure/cancellation causes, offer/hire, inbox privacy/retention and persistence. No AI or candidate messages.');
+  console.log('PASS: real auth/PostgreSQL/HTTP interview plans, owner policy, scheduling/conflicts, scoped documents, terminal failure/cancellation, zero/nonzero-interview Offer/Hired, inbox privacy/retention and persistence. No AI or email.');
 }finally {
   if(database&&!database.ended) {
     const interviews=(await database.query('SELECT id FROM interviews WHERE vacancy_id=ANY($1::uuid[])',[vacancies])).rows.map(r=>r.id);
@@ -139,6 +152,7 @@ try {
     await database.query('DELETE FROM interview_steps WHERE vacancy_id=ANY($1::uuid[])',[vacancies]);
     const documents=(await database.query('SELECT stored_file_id FROM application_documents WHERE application_id IN (SELECT id FROM applications WHERE vacancy_id=ANY($1::uuid[]))',[vacancies])).rows.map(r=>r.stored_file_id);
     await database.query('DELETE FROM application_documents WHERE stored_file_id=ANY($1::uuid[])',[documents]);await database.query('DELETE FROM stored_files WHERE id=ANY($1::uuid[])',[documents]);
+    await database.query('DELETE FROM screening_notifications WHERE application_id IN (SELECT id FROM applications WHERE vacancy_id=ANY($1::uuid[]))',[vacancies]);
     await database.query('DELETE FROM applications WHERE vacancy_id=ANY($1::uuid[])',[vacancies]);await database.query('DELETE FROM vacancies WHERE id=ANY($1::uuid[])',[vacancies]);
     await database.query('DELETE FROM "user" WHERE id=ANY($1::text[])',[users]);
     await database.query('DELETE FROM "rateLimit" WHERE key LIKE ANY($1::text[])',[peers.map(peer=>`%${peer}%`)]);

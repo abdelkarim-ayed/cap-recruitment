@@ -209,8 +209,8 @@ export class InterviewService {
         requirePolicy(finalizationOwner(actor.id,vacancy.owner_id));
         if(value.stage==='hired')requirePolicy(hireStage(row.stage));
         if(value.stage==='offer') {
-          requirePolicy(offerStage(row.stage));
           const check=(await client.query(`SELECT count(*)::integer AS total,count(*) FILTER(WHERE i.status='completed' AND i.outcome='pass')::integer AS passed FROM interview_steps s LEFT JOIN interviews i ON i.step_id=s.id AND i.application_id=$1 WHERE s.vacancy_id=$2`,[id,row.vacancy_id])).rows[0];
+          requirePolicy(offerStage(row.stage,check.total));
           requirePolicy(passedInterviewPlan(check.total,check.passed));
         }
       }

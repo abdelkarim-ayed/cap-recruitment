@@ -21,10 +21,10 @@ export const rejectionAuthority = (actorId: string, ownerId: string, stage: stri
   ? permitted : denied(403, 'Only the owner can end an application after interviews start.');
 export const finalizationOwner = (actorId: string, ownerId: string) => actorId === ownerId
   ? permitted : denied(403, 'Only the owner can record offer/hired.');
-export const offerStage = (stage: string) => stage === 'interview'
-  ? permitted : denied(409, 'Complete the interview pipeline before an offer.');
-export const passedInterviewPlan = (total: number, passed: number) => total > 0 && passed === total
-  ? permitted : denied(409, 'Every interview step must pass before an offer.');
+export const offerStage = (stage: string, total: number) => (total === 0 ? stage === 'preselected' : stage === 'interview')
+  ? permitted : denied(409, total === 0 ? 'Preselect the application before recording an offer.' : 'Complete the interview plan before an offer.');
+export const passedInterviewPlan = (total: number, passed: number) => total >= 0 && passed === total
+  ? permitted : denied(409, 'Every configured interview must pass before an offer.');
 export const hireStage = (stage: string) => stage === 'offer'
   ? permitted : denied(409, 'Record an offer before hiring.');
 
@@ -32,10 +32,11 @@ export function workflowActions(actor: ActorReference, context: { ownerId: strin
   const hr = rolePolicy(actor, 'workflow.change');
   const open = applicationNotFinal(context.stage);
   const owner = finalizationOwner(actor.id, context.ownerId);
+  const offerRelevant = context.total === 0 ? context.stage === 'preselected' : context.stage === 'interview';
   return {
     preselect: availability(firstDenied(hr, open, preselectable(context.stage))),
     reject: availability(firstDenied(hr, open, rejectionAuthority(actor.id, context.ownerId, context.stage))),
-    offer: availability(firstDenied(hr, open, owner, offerStage(context.stage), passedInterviewPlan(context.total, context.passed)),hr.allowed&&owner.allowed&&context.stage==='interview'),
+    offer: availability(firstDenied(hr, open, owner, offerStage(context.stage,context.total), passedInterviewPlan(context.total, context.passed)),hr.allowed&&owner.allowed&&offerRelevant),
     hire: availability(firstDenied(hr, open, owner, hireStage(context.stage)),hr.allowed&&owner.allowed&&context.stage==='offer'),
     schedule: availability(firstDenied(rolePolicy(actor, 'interview.schedule'), activeApplication(context.stage))),
   };
