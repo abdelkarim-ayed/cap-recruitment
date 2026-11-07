@@ -1,7 +1,8 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { isDeepStrictEqual } from 'node:util';
-import { createVacancySchema, patchVacancySchema, publicVacancy, vacancyActionSchema, vacancyListSchema, vacancyDefinitionsSchema, type PatchVacancy, type Vacancy } from '@recruitment/domain/vacancies';
-import { VacancyRepository } from './vacancy.repository.js';
+import { createVacancySchema, patchVacancySchema, publicVacancy, publishVacancySchema, vacancyActionSchema, vacancyListSchema, vacancyDefinitionsSchema, type PatchVacancy, type Vacancy } from '@recruitment/domain/vacancies';
+import { storedInterviewPlanSchema } from '@recruitment/domain';
+import { VacancyRepository, type PublicationPlan } from './vacancy.repository.js';
 import { requirePolicy } from '../auth/action-policy.js';
 import { editableDraft, publishableIntake, vacancyOwner, vacancyTransition } from './vacancy.policy.js';
 
@@ -43,23 +44,27 @@ export class VacancyService {
     });
   }
   async transition(id: string, actorId: string, target: 'published' | 'closed', body: unknown) {
-    const { expectedRevision } = parse(vacancyActionSchema, body);
-    return this.change(id, actorId, current => {
+    const publication = target === 'published' ? parse(publishVacancySchema, body) : undefined;
+    const { expectedRevision } = publication ?? parse(vacancyActionSchema, body);
+    return this.change(id, actorId, async (current, readPlan) => {
       if (current.status === target) return current;
       this.checkRevision(current, expectedRevision);
       requirePolicy(vacancyTransition(current.status,target));
       if (target === 'published') {
         parse(vacancyDefinitionsSchema, { formDefinition: current.formDefinition, processingDefinition: current.processingDefinition });
         requirePolicy(publishableIntake(current));
+        const plan = await readPlan();
+        if (plan.revision !== publication!.expectedInterviewRevision) throw new ConflictException('Interview plan changed; reload it before publishing.');
+        parse(storedInterviewPlanSchema, plan.entries);
       }
       return { ...current, status: target };
     });
   }
   private checkRevision(current: Vacancy, expected: number) { if (current.revision !== expected) throw new ConflictException('Vacancy changed; reload before retrying.'); }
-  private async change(id: string, actorId: string, operation: (current: Vacancy) => Vacancy) {
-    const result = await this.repository.change(id, current => {
+  private async change(id: string, actorId: string, operation: (current: Vacancy, readPlan: () => Promise<PublicationPlan>) => Vacancy | Promise<Vacancy>) {
+    const result = await this.repository.change(id, (current, readPlan) => {
       requirePolicy(vacancyOwner(actorId,current.ownerId));
-      return operation(current);
+      return operation(current, readPlan);
     });
     if (!result) throw new NotFoundException('Vacancy not found.');
     return result;

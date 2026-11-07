@@ -35,7 +35,7 @@ async function actor(role) {
 }
 async function vacancy(owner) {
   const created=await call('vacancies',owner,{title:'Interview fixture',description:'Synthetic only',formDefinition:{version:1,inputs:[{id:'cv',name:'cv',label:'CV',type:'document',required:true,args:{accept:['.pdf']}}]},processingDefinition:{version:1,tasks:[]}});equal(created.status,201);vacancies.push(created.body.id);
-  equal((await call(`vacancies/${created.body.id}/publish`,owner,{expectedRevision:1})).status,200);return created.body.id;
+  return created.body.id;
 }
 async function submit(vacancyId,candidate) {
   const form=new FormData();form.append('answers','{}');form.append('cv',new Blob(['%PDF-1.7\nSynthetic only']), 'fixture.pdf');
@@ -52,6 +52,9 @@ try {
   equal((await call(`vacancies/${id}/interview-pipeline`,admin,{expectedRevision:1,steps},'PUT')).status,403);
   const pipeline=await call(`vacancies/${id}/interview-pipeline`,owner,{expectedRevision:1,steps},'PUT');equal(pipeline.status,200);equal(pipeline.body.owner.email,owner.email);
   equal((await call(`vacancies/${id}/interview-pipeline`,owner,{expectedRevision:1,steps},'PUT')).status,409);
+  equal((await call(`vacancies/${id}/publish`,owner,{expectedRevision:1,expectedInterviewRevision:pipeline.body.revision})).status,200);
+  const frozen=await call(`vacancies/${id}/interview-pipeline`,owner);equal(frozen.body.frozen,true);equal(frozen.body.editable,false);
+  equal((await call(`vacancies/${id}/interview-pipeline`,owner,{expectedRevision:pipeline.body.revision,steps},'PUT')).status,409);
   const a=await submit(id,candidate),b=await submit(id,candidate2);
   equal((await call(`applications/${a.id}/stage`,interviewer,{expectedRevision:1,stage:'preselected'})).status,403);
   equal((await call(`applications/${a.id}/stage`,hr,{expectedRevision:1,stage:'preselected'},'POST','https://untrusted.example')).status,403);

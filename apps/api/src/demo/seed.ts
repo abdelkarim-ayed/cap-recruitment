@@ -9,6 +9,7 @@ import { DatabaseService } from '../database/database.service.js';
 import { VacancyService } from '../vacancies/vacancy.service.js';
 import { ApplicationService } from '../applications/application.service.js';
 import { ReviewService } from '../review/review.service.js';
+import { InterviewService } from '../interviews/interview.service.js';
 import { projectRoot } from '../configuration/environment.js';
 import type { Role } from '../auth/access.js';
 import type { CreateVacancy, Vacancy } from '@recruitment/domain/vacancies';
@@ -53,7 +54,10 @@ try{
     const title=alias==='published'?`${definition.title} — RenderCV`:'[DEMO] Operations coordinator — draft';
     const existing=await database.query('SELECT id FROM vacancies WHERE owner_id=$1 AND title=$2 ORDER BY created_at LIMIT 1',[actors.hr.id,title]);
     let job=existing.rows[0]?await vacancies.get(existing.rows[0].id) as Vacancy:await vacancies.create(actors.hr.id,{...definition,title});
-    if(alias==='published'&&job.status==='draft')job=await vacancies.transition(job.id,actors.hr.id,'published',{expectedRevision:job.revision});
+    if(alias==='published'&&job.status==='draft'){
+      const plan=await app.get(InterviewService).pipeline(job.id,actors.hr);
+      job=await vacancies.transition(job.id,actors.hr.id,'published',{expectedRevision:job.revision,expectedInterviewRevision:plan.revision});
+    }
     jobs[alias]=job;
   }
   const manifest:any={version:2,accounts:Object.values(actors).map(({email,name,role})=>({email,name,role})),vacancies:Object.fromEntries(Object.entries(jobs).map(([key,value])=>[key,{id:value.id,title:value.title}])),applications:{},sampleFiles:[]};

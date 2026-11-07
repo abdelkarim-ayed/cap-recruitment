@@ -18,7 +18,7 @@ API paths below are relative to `/api`; source paths without a package prefix ar
 | --- | --- |
 | `vacancy.read/create` | Admin/recruiter (shared HR); create makes the actor owner. Public vacancy routes remain separately allowlisted and published-only. |
 | `vacancy.edit/publish/close` | HR plus stored owner; edit draft only. Publish validates intake and a non-separator input, not an interview plan. Close stops intake only. Same-state owner publish/close stays idempotent even with an old revision. |
-| `interviewPlan.read/edit` | HR reads; owner edits only before any interview instance exists. Published-but-unscheduled plans remain editable; no publication-time freeze yet. Separate `interview_revision`; R3b no-ops retained. |
+| `interviewPlan.read/edit` | HR reads; owner edits drafts only, defensively denied if appointments exist. Publication freezes even empty/unscheduled plans; close does not reopen. Publish checks both counters under the same vacancy lock. Separate interview revision/draft no-ops retained. |
 | `application.submit/list/listVacancy/read/download` | Candidate submits; candidates list/read only their own applications. HR has shared access; vacancy-wide lists are HR-only. Direct generic application/document routes still deny interviewer role at the route guard. |
 | `application.readAll`, `interview.application/document` | HR has shared application access. Through scoped interview routes, an interviewer needs current assignment to that interview plus at least one scheduled/completed assignment on the application for answers/files. Cancelled-only assignments grant no application access. Ownership/assignment is resolved from PostgreSQL, not UI flags. |
 | `review.read/edit/export` | Shared HR; no owner restriction. Edit requires tasks and undecided/not-completed review; selection/completion locks corrections. Whole-application readiness/manual release remains unimplemented. Diagnostic export-all unchanged; screening export excludes decided records with optional filters. |
@@ -57,6 +57,6 @@ Candidate/public application projections do not gain HR action reasons, review m
 
 ## Explicitly not delivered
 
-Publication-time interview freezing, zero-interview Offer, whole-application review readiness/manual release, broader candidate timeline/notification effects and hide/lifetime changes remain planned. SI implements only the screening/closure/import/notice slice above. Spending/provider controls remain unchanged.
+Zero-interview Offer, whole-application review readiness/manual release, broader candidate timeline/notification effects and hide/lifetime remain planned. SI implements screening/closure/import/notices; B1-P adds publication validation/freeze only. Spending/provider controls unchanged.
 
 Q-R1A covers deferred policy/guard/HTTP/privacy/concurrency/DOM regression; Q-R1U covers later batched manual UX. Offline policy specifications and updated DOM fixture metadata are written, **not executed**. No new quality, runtime or security-test pass is claimed by this document.

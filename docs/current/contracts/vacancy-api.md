@@ -1,6 +1,6 @@
 # Vacancy API — implemented contract
 
-Current publication does not require an interview pipeline. Publish-time validation/freezing of a possibly empty interview plan is [planned](../../plan/product-decisions.md#publication-and-vacancy-lifecycle). Guarded Noul skills extraction is implemented with disabled defaults, not live-validated; see [Jev safety](../jev-safety.md).
+Publication validates and freezes the saved interview plan, including a valid empty plan. The 2026-11-07 B1-P checkpoint changes source/client contracts without a new migration; real PostgreSQL/HTTP/manual validation remains pending. Guarded extraction defaults/limits are unchanged; see [Jev safety](../jev-safety.md).
 
 Manual-feedback refinements: staff responses include `owner: {name,email}` alongside ownerId; public projections never include owner identity. List query adds `status=draft|published|closed` and `sort=newest|oldest|title` (default newest), applied before pagination with deterministic ID ties. Public lists remain published-only regardless of filter. Existing owner permissions unchanged.
 
@@ -96,9 +96,15 @@ R3a no-op comparison happens after owner, draft-state and expectedRevision check
 For definition changes, send both definitions as a replacement pair. Validation covers source references, compatible types and unique IDs/output keys; failure writes nothing. This does not imply live skill extraction exists.
 
 ## Publish/close
-- `POST /api/vacancies/:id/publish`, body `{"expectedRevision":1}`: validate draft, publish and lock the entire record. Return 200 with status published and incremented revision.
+- `POST /api/vacancies/:id/publish`, body `{"expectedRevision":1,"expectedInterviewRevision":1}`: validate draft form/task definitions and saved ordered interview plan; publish and freeze configuration. Both counters are required positive integers; old one-counter clients must update. Return 200 with status published and incremented vacancy revision; interview revision/IDs remain unchanged.
 - `POST /api/vacancies/:id/close`, body `{"expectedRevision":2}`: close a published vacancy without deleting it; remove it from public routes. Return 200 with status closed and incremented revision. Use actual last-read revision; new submissions require published state. Existing recruitment continues.
 - Owner-authorized same-state actions return the current record unchanged even with an old revision. A stale revision on a real transition or illegal transition returns 409. Draft cannot close; closed cannot reopen. Row locking prevents two stale concurrent edits from both succeeding.
+
+Publication and interview-plan PUT serialize on the same vacancy row `FOR UPDATE`. Publish reads the plan/revision through the repository on that transaction, never a separate service transaction. It checks vacancy revision, definition validity, intake and interview revision/content before writing. Plan entries: 0–10, trimmed nonblank name (max 100), instructions (max 4000), consecutive positions from zero. Empty tasks/interviews are valid; duplicate interview names remain allowed. No publish-time interviewer/appointment requirement. Invalid stored plan returns 400; stale plan returns 409 and does not publish.
+
+If publication wins, a later plan save is denied even if identical. If a real plan edit wins, an older publish confirmation conflicts; HR must review its updated saved version. The UI loads/shows the saved plan (including instructions or explicit empty plan) before confirmation and sends both counters. Unsaved form edits disable confirmation; a failed publication closes confirmation without automatic retry. Close still needs only expectedRevision, stops intake only, and cannot unfreeze a plan.
+
+Published/closed existing records freeze their current plan as-is; no backfill, row rewrite, migration/reset or seed run occurs. Draft plans with existing appointments remain defensively frozen. Source fixtures now configure planned interviews before publication; demo publication obtains the current plan revision without overwriting manual plan data. Internal `interview-pipeline`/`steps` names remain; product wording is Interview plan / Interviews. Appointment scheduling/reassignment/location/time permissions are unchanged.
 
 ## Public detail
 `GET /api/public/vacancies/:id`, **200**:

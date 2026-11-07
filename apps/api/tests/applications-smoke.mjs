@@ -67,7 +67,7 @@ async function submit(id, candidate, values = answers, files = [{ field: 'cv', n
 }
 async function vacancy(owner, value = definition) {
   const created = await json('vacancies', value, owner.cookie); equal(created.status, 201); vacancyIds.push(created.body.id);
-  equal((await json(`vacancies/${created.body.id}/publish`, { expectedRevision: 1 }, owner.cookie)).status, 200); return created.body.id;
+  equal((await json(`vacancies/${created.body.id}/publish`, { expectedRevision: 1, expectedInterviewRevision: 1 }, owner.cookie)).status, 200); return created.body.id;
 }
 try {
   await start();

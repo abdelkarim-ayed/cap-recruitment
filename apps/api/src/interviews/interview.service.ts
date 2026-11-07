@@ -9,6 +9,7 @@ import type { InterviewCause } from './interview-cause.js';
 import { staffInterviewNotifications, type StaffInterviewNotificationEvent } from './interview-notification.policy.js';
 import { actionRoles, roleAllows, type Action, type InterviewDetail, type InterviewPlanView, type InterviewResults, type InterviewView, type NotificationView, type Page, type WorkflowView } from '@recruitment/domain';
 import { commitScreening, undecided } from './screening-command.js';
+import { interviewPlanSaveSchema } from '@recruitment/domain';
 import { availability, firstDenied, requirePolicy, rolePolicy } from '../auth/action-policy.js';
 import { activeApplication, applicationNotFinal, assignedInterviewer, editableInterviewPlan, feedbackStarted, finalizationOwner, hireStage, interviewActions, interviewPlanOwner, offerStage, passedInterviewPlan, preselectable, rejectionAuthority, scheduledInterview, workflowActions } from './interview.policy.js';
 
@@ -20,7 +21,7 @@ const scheduleFields = {
   durationMinutes: z.union([z.literal(30),z.literal(60),z.literal(90),z.literal(120)]),
   timezone: z.string().min(1).max(100), meeting: z.string().trim().min(1).max(1000),
 };
-const pipelineSchema = z.strictObject({ expectedRevision: revision, steps: z.array(z.strictObject({ name:z.string().trim().min(1).max(100), instructions:z.string().trim().max(4000).default('') })).max(10) });
+const pipelineSchema = interviewPlanSaveSchema;
 const createSchema = z.strictObject({ stepId:z.uuid(), expectedRevision:revision, ...scheduleFields });
 const editSchema = z.strictObject({ expectedRevision:revision, ...scheduleFields });
 const feedbackSchema = z.strictObject({ expectedRevision:revision, notes:z.string().trim().min(1).max(10000), score:z.number().int().min(0).max(10).nullable().default(null), outcome:z.enum(['pass','fail']) });
@@ -88,8 +89,9 @@ export class InterviewService {
     staff(actor,'interviewPlan.read');return this.database.transaction(async client=>{
       const v=await this.vacancy(client,id);const steps=(await client.query('SELECT id,name,instructions,position FROM interview_steps WHERE vacancy_id=$1 ORDER BY position',[id])).rows;
       const exists=(await client.query('SELECT EXISTS(SELECT 1 FROM interviews WHERE vacancy_id=$1) AS frozen',[id])).rows[0].frozen;
-      return {vacancyId:id,revision:v.interview_revision,owner:person(v.owner_id,v.owner_name,v.owner_email),editable:v.owner_id===actor.id&&!exists,frozen:exists,steps,
-        actions:{edit:availability(firstDenied(interviewPlanOwner(actor.id,v.owner_id),editableInterviewPlan(exists)))}};
+      const frozen=v.status!=='draft'||exists;
+      return {vacancyId:id,revision:v.interview_revision,owner:person(v.owner_id,v.owner_name,v.owner_email),editable:v.owner_id===actor.id&&!frozen,frozen,steps,
+        actions:{edit:availability(firstDenied(interviewPlanOwner(actor.id,v.owner_id),editableInterviewPlan(frozen)))}};
     });
   }
   async savePipeline(id:string,actor:Actor,raw:unknown) {
@@ -97,7 +99,7 @@ export class InterviewService {
     await this.database.transaction(async client=>{
       const v=await this.vacancy(client,id,'FOR UPDATE');requirePolicy(interviewPlanOwner(actor.id,v.owner_id));
       sameRevision(v.interview_revision,value.expectedRevision);
-      requirePolicy(editableInterviewPlan((await client.query('SELECT id FROM interviews WHERE vacancy_id=$1 LIMIT 1',[id])).rows.length>0));
+      requirePolicy(editableInterviewPlan(v.status!=='draft'||(await client.query('SELECT id FROM interviews WHERE vacancy_id=$1 LIMIT 1',[id])).rows.length>0));
       const existing=await client.query<z.infer<typeof pipelineSchema>['steps'][number]>('SELECT name,instructions FROM interview_steps WHERE vacancy_id=$1 ORDER BY position',[id]);
       // Compare normalized editable content, not generated IDs; order still matters.
       const normalized=pipelineSchema.shape.steps.safeParse(existing.rows);

@@ -52,10 +52,10 @@ try {
   deepEqual(created.body.processingDefinition, definition.processingDefinition);
   equal((await request(`public/vacancies/${id}`)).status, 404);
   equal((await request(`vacancies/${id}`, undefined, other.cookie)).status, 200);
-  equal((await request(`vacancies/${id}/publish`, { expectedRevision: 1 }, other.cookie)).status, 403);
+  equal((await request(`vacancies/${id}/publish`, { expectedRevision: 1, expectedInterviewRevision: 1 }, other.cookie)).status, 403);
   const race = await Promise.all([request(`vacancies/${id}`, { expectedRevision: 1, title: 'First edit' }, owner.cookie, settings.webOrigin, 'PATCH'), request(`vacancies/${id}`, { expectedRevision: 1, title: 'Second edit' }, owner.cookie, settings.webOrigin, 'PATCH')]);
   deepEqual(race.map(value => value.status).sort(), [200, 409]);
-  equal((await request(`vacancies/${id}/publish`, { expectedRevision: 2 }, owner.cookie)).status, 200);
+  equal((await request(`vacancies/${id}/publish`, { expectedRevision: 2, expectedInterviewRevision: 1 }, owner.cookie)).status, 200);
   const publicDetail = await request(`public/vacancies/${id}`); equal(publicDetail.status, 200);
   deepEqual(Object.keys(publicDetail.body).sort(), ['description', 'form', 'id', 'title']); equal(JSON.stringify(publicDetail.body).includes('extractSkills'), false);
   equal((await request(`vacancies/${id}`, { expectedRevision: 3, title: 'Locked' }, owner.cookie, settings.webOrigin, 'PATCH')).status, 409);
@@ -73,7 +73,7 @@ try {
   equal((await request(`public/vacancies/${id}`)).status, 200);
   equal((await request(`vacancies/${id}/close`, { expectedRevision: 3 }, owner.cookie)).status, 200);
   equal((await request(`public/vacancies/${id}`)).status, 404);
-  equal((await request(`vacancies/${id}/publish`, { expectedRevision: 4 }, owner.cookie)).status, 409);
+  equal((await request(`vacancies/${id}/publish`, { expectedRevision: 4, expectedInterviewRevision: 1 }, owner.cookie)).status, 409);
   console.log('PASS: real vacancy persistence across API restart, OTP roles, owner checks, origin protection, validation, concurrent edits, publishing/locking, safe public projection, closing.');
 } finally {
   try {

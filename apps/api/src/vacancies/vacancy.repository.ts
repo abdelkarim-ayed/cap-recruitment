@@ -6,6 +6,7 @@ import { DatabaseService } from '../database/database.service.js';
 
 interface VacancyRow extends QueryResultRow {
   id: string; owner_id: string; status: Vacancy['status']; revision: number;
+  interview_revision: number;
   title: string; description: string; location: string | null;
   form_definition: FormDefinition; processing_definition: ProcessingDefinition;
   created_at: Date | string; updated_at: Date | string;
@@ -13,6 +14,10 @@ interface VacancyRow extends QueryResultRow {
 }
 type SummaryRow = Pick<VacancyRow, 'id' | 'owner_id' | 'owner_name' | 'owner_email' | 'status' | 'revision' | 'title' | 'location' | 'created_at' | 'updated_at'>;
 interface PageRow extends QueryResultRow { total: number; items: SummaryRow[] }
+export interface PublicationPlan {
+  revision: number;
+  entries: { position: number; name: string; instructions: string }[];
+}
 
 function record(row: VacancyRow): Vacancy {
   return { id: row.id, ownerId: row.owner_id, status: row.status, revision: row.revision, title: row.title, description: row.description,
@@ -42,12 +47,16 @@ export class VacancyRepository {
       ...(publicOnly ? {} : { ownerId: row.owner_id, owner:{name:row.owner_name??'',email:row.owner_email??''}, status: row.status, revision: row.revision, createdAt: new Date(row.created_at).toISOString(), updatedAt: new Date(row.updated_at).toISOString() }) }));
     return { items, total: result.rows[0].total, limit, offset };
   }
-  async change(id: string, operation: (current: Vacancy) => Vacancy) {
+  async change(id: string, operation: (current: Vacancy, readPlan: () => Promise<PublicationPlan>) => Vacancy | Promise<Vacancy>) {
     return this.database.transaction(async client => {
       const result = await client.query<VacancyRow>('SELECT v.*,u.name AS owner_name,u.email AS owner_email FROM vacancies v JOIN "user" u ON u.id=v.owner_id WHERE v.id=$1 FOR UPDATE OF v', [id]);
       if (!result.rows[0]) return undefined;
       const current = record(result.rows[0]);
-      const next = operation(current);
+      // Read only when publication needs it, using the same locked transaction.
+      const next = await operation(current, async () => ({
+        revision: result.rows[0].interview_revision,
+        entries: (await client.query<PublicationPlan['entries'][number]>('SELECT position,name,instructions FROM interview_steps WHERE vacancy_id=$1 ORDER BY position', [id])).rows,
+      }));
       if (next === current) return current;
       return this.save(client, next);
     });

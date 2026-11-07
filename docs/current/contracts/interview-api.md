@@ -1,12 +1,12 @@
 # Interview pipeline, scheduling and inbox — implemented contract
 
 Migration 006; session cookies and trusted Origin on writes. Backend and integrated React UI, no interview calendar/email integration or event bus. [Current extraction](../jev-safety.md) does not alter these interview rules.
-The [screening slice](screening-api.md) adds shared individual/import closure and candidate screening notices, requiring unapplied migration 007. Broader candidate progress/effects, hide, publication-time plan freeze and zero-interview Offer remain planned. Screening reversal is not planned.
+The [screening slice](screening-api.md) adds shared individual/import closure and candidate notices, requiring unapplied migration 007. B1-P now freezes/validates the saved plan at publication, no new migration. Broader candidate progress/effects, hide and zero-interview Offer remain planned. Screening reversal is not planned.
 
-R1 adds typed `actions` to interview-plan, workflow and interview projections. Existing `editable`, `isOwner`, `canAssess` and `canSchedule` fields remain compatible. Separate action eligibility, presentation visibility and mutation authority are described in [action policies](action-policies.md); current scheduling-time freeze/nonempty-offer/review behavior is unchanged.
+R1 typed actions/compatibility fields remain. Plan `frozen`/`editable` and actions now reflect publication-time freeze, including published vacancies without appointments. Nonempty-offer behavior remains until B1-F. See [action policies](action-policies.md).
 
 ## Model and policy
-- Owner edits an ordered vacancy-level pipeline (0–10 steps, name/instructions), independently of frozen candidate intake. Pipeline becomes immutable once any interview instance exists. Closed vacancies can retain ongoing recruitment; closing intake does not cancel interviews.
+- Owner edits a draft vacancy-level interview plan (0–10 interviews, name/instructions). Publication freezes it, even empty and before appointments. Appointment arrangements remain editable under separate rules; closing intake does not cancel interviews or reopen plan editing. No publish-time assignee requirement.
 - Each application/step has at most one instance: one existing staff interviewer, start/duration/timezone, link or location, status, final notes/optional integer score 0–10, Pass/Fail. Cancelled/completed records remain; no deletes, retries, reopening, panels or historical revisions.
 - All admin/recruiter staff can schedule/reschedule/cancel and preselect. Only assigned interviewer submits feedback or requests rescheduling; staff acting as interviewers follow the same assignment rule. Owner alone records Offer/Hired. Admin has no owner override.
 - Preselect can proceed regardless of extraction/review. Scheduling requires Preselected/Interview. Pass does not automatically advance/accept. Explicit final Fail sets Not selected and cancels **all other unfinished instances**, including already-started scheduled instances; no further feedback or scheduling. Submitted feedback is final. No reopening: use a new posting/application.
@@ -40,7 +40,7 @@ Interview detail includes application/vacancy/step IDs, names/instructions, cand
 
 ## Interview-plan saves
 
-R3b changes owner PUT behavior only for an unchanged editable plan. The existing role/owner check, expected `interview_revision` check and scheduling-freeze check remain separate and precede comparison under the vacancy row lock. Even identical stale or frozen requests return 409; admin has no owner override. Publication itself still does not freeze this list.
+R3b no-op semantics remain for editable drafts. Separate owner, expected interview_revision and editability checks precede comparison under the vacancy lock. B1-P editability now requires draft status and no appointments; even identical published/closed requests return 409. No admin override. Publication validates the same saved content with both vacancy/interview counters under the same lock; see [publication contract](vacancy-api.md#publishclose).
 
 Compare the ordered saved names/instructions using the same schema normalization as the request: trim strings, default omitted instructions to empty, ignore object-key order and preserve interview order. Generated IDs/positions are not editable comparison fields. A current-identical plan, including an empty list, returns the existing projection with no DELETE/INSERT/UPDATE, preserving IDs, positions and revision. A real change retains the existing replace-all behavior/new IDs and increments `interview_revision` once; other counters, notifications and UI are unchanged. Regression is deferred as Q-R3B; see [status](../status.md).
 

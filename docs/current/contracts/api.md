@@ -180,7 +180,7 @@ Application submission/list/detail/private downloads are implemented in [`applic
 
 Interviews/decisions: bounded pipeline/agenda/assignment/final notes/score/Pass-Fail, preselection and owner decisions are implemented; see [interview contract](interview-api.md). No fixed interview-number application stages.
 
-Unimplemented: candidate business publication, bulk decision import, continuous extraction scheduling, extended task catalog, selected-recipient business email/calendar and analytics. Selected directions and open contracts are in [plan](../../plan/README.md).
+Source-level additions: [screening CSV/closure/notices](screening-api.md) (migration 007 pending) and [publication-time interview-plan validation/freeze](vacancy-api.md#publishclose). Unimplemented: full candidate progress/effects, continuous extraction scheduling, extended task catalog, business email/calendar and analytics. Source implementation is not deployment/integration evidence; further directions are in [plan](../../plan/README.md).
 
 Module names describe business boundaries, not microservices. Shared migrations/interfaces have one owner; independent work can follow a written endpoint contract.
 

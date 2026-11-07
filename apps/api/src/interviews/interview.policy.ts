@@ -2,9 +2,9 @@ import { roleAllows, type ActorReference, type InterviewActions, type WorkflowAc
 import { availability, denied, firstDenied, permitted, rolePolicy } from '../auth/action-policy.js';
 
 export const interviewPlanOwner = (actorId: string, ownerId: string) => actorId === ownerId
-  ? permitted : denied(403, 'Only the vacancy owner can edit interview steps.');
+  ? permitted : denied(403, 'Only the vacancy owner can edit the interview plan.');
 export const editableInterviewPlan = (frozen: boolean) => frozen
-  ? denied(409, 'Interview steps are frozen once scheduling starts.') : permitted;
+  ? denied(409, 'The interview plan is frozen after publication or scheduling.') : permitted;
 export const activeApplication = (stage: string) => ['preselected', 'interview'].includes(stage)
   ? permitted : denied(409, 'Application is not available for interviews.');
 export const scheduledInterview = (status: string) => status === 'scheduled'

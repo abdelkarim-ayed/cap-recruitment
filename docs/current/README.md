@@ -20,4 +20,4 @@
 | UI conventions | [Frontend design](guides/frontend-design.md) |
 | Host networking / terminals / portability | [Networking](guides/local-networking.md), [RMUX](guides/rmux.md), [Windows notes](guides/windows-compatibility.md) |
 
-These documents describe implemented code: the merged skills baseline `fd9fe9e` plus subsequent checkpoints recorded in [status](status.md). R2/R3a/b/R1 have static-check evidence only; behavioral tests are explicitly deferred there. New publication gates, candidate/owner notification effects, readiness behavior and import rules belong to [plan/](../plan/README.md), not to the implementation inventory.
+These describe source, not a running deployment; dated checks and pending gates are in [status](status.md). Screening CSV/closure/notices and publication-time interview-plan freeze are source-implemented, with isolated checks only; migration 007 and broader integration/manual UX remain pending. Further readiness/release, zero-interview finalization and broader notification behavior remains in [plan/](../plan/README.md).

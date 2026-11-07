@@ -3,8 +3,8 @@
 ## Interview checkpoint — manual test
 Suggested RMUX tab names: `api`, `web`; `inbox-retention` runs notification cleanup only when explicitly launched. Discover actual listeners/tabs before starting or managing anything; these names are not a runtime observation. Routine checks use normal shell execution; see [RMUX](rmux.md). No automatic extraction worker is registered.
 
-1. Sign in as vacancy owner, open vacancy → **Interview pipeline & results**. Add ordered Technical/HR steps and save. Owner contact appears beneath the heading. Steps can be configured for an already-published vacancy independently of the locked intake form, but freeze after the first appointment.
-2. Open application → **Selection & interviews** → Preselect. Schedule a step with an existing staff interviewer (`demo.interviewer@example.test`), date, half-hour start, duration and link/location. A second step can be booked ahead with a non-overlapping slot. Another recruiter may schedule but cannot edit pipeline/finalize owner decisions.
+1. Sign in as vacancy owner, save a **draft**, open **Interview plan & results**, configure Technical/HR interviews and save. Return to the vacancy, review the saved plan and publish; publication locks it, including an empty plan. For an already-published empty-plan demo, create another draft rather than modifying frozen data. Do not reset/reseed existing records.
+2. Open application → **Selection & interviews** → Preselect. Schedule an interview with an existing staff interviewer (`demo.interviewer@example.test`), date, half-hour start, duration and link/location. Another planned interview can be booked ahead without overlap. Other HR may schedule, not edit the owner's draft plan/finalize owner decisions. Screening sends a generic candidate notice, not internal review/assessment data.
 3. Sign in as interviewer → **My interviews** / **Inbox**. Assigned appointment exposes its application/CV only. Request rescheduling; owner/creator get an inbox message. HR reschedules/reassigns; old assignee loses candidate access. Agenda is grouped by date; week navigation and Needs feedback show past pending appointments.
 4. At/after scheduled start (not before), interviewer submits notes + optional score + Pass/Fail, then confirms. Pass is final feedback, not acceptance. Fail is **terminal**: application Not selected, all remaining unfinished interviews cancelled with explicit failure cause; no reopening or further scheduling. Use a fresh posting/application for another attempt. Do not submit Fail on manual data unless that terminal result is intended.
 5. Owner sees per-step result/score table. Once every step passes, owner records Offer, then Hired. No email or candidate-visible business status is sent/published. Candidate still sees immutable submission, not internal assessment.
@@ -80,7 +80,7 @@ New seed vacancy: **[DEMO] Backend developer — RenderCV**, containing fresh sc
 7. Login demo.hr2 or admin and continue shared review. Completion is optional and never candidate approval/export gating. Test interviewer exclusion separately.
 
 ## Fresh vacancy → candidate → mock processing
-1. As recruiter, create/edit a vacancy, configure questions and document extraction, preview, save, publish. Published definitions lock; unsaved changes disable publishing.
+1. As recruiter, create/edit a draft, configure questions/extraction and its optionally empty interview plan, then review/publish. Publication locks all configuration; unsaved form changes disable publishing. Appointment arrangements remain separately editable.
 2. Login candidate, fill/upload a RenderCV PDF and submit. Answers/files are immutable; duplicates return existing submission unchanged. For another run use another candidate/vacancy, not a reset.
 3. Login recruiter and open the new application. Copy its UUID from the URL (`#/applications/UUID`); operator commands now live only in this guide. Run:
 ```sh

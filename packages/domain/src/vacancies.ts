@@ -73,6 +73,7 @@ export const patchVacancySchema = z.strictObject({
   }
 });
 export const vacancyActionSchema = z.strictObject({ expectedRevision: z.number().int().positive().max(2147483647) });
+export const publishVacancySchema = vacancyActionSchema.extend({ expectedInterviewRevision: z.number().int().positive().max(2147483647) });
 export const vacancyListSchema = z.strictObject({
   limit: z.string().regex(/^\d+$/).transform(Number).pipe(z.number().int().min(1).max(100)).optional().default(20),
   offset: z.string().regex(/^\d+$/).transform(Number).pipe(z.number().int().min(0).max(2147483647)).optional().default(0),
