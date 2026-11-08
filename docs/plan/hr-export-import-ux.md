@@ -6,7 +6,7 @@
 
 - UX-ID: globally required email identity should be explicit in authoring/intake. Current application identity freezes signed-in account name/email; CSV matches application ID plus frozen email, never name or an arbitrary editable form answer.
 - UX-NAV: interview sidebar item was not visible to the user; source has eligible-staff agenda navigation. Reproduction/role/discoverability work remains, not a new permission grant.
-- UX-DENSITY: misplaced buttons, stacked/redundant pills, technical HR wording and opportunities for accessible icons. Reduce clutter without hiding unavailable values, separate HR corrections or truthful demo provenance.
+- UX-DENSITY: misplaced buttons, stacked/redundant pills, technical HR wording and opportunities for accessible icons. Further progression feedback reports unintuitive layout/perspective across preselection/interview/Offer pages, programmer-oriented messages and repeated out-of-place demo disclaimers. Treat this as a coherent HR journey/action/copy overhaul, not cosmetic badge changes only. Prefer one concise contextual demo indicator with details on demand; reduce repetition without hiding unavailable values, separate HR corrections or truthful fixture provenance. User did not check inboxes.
 - UX-EXPORT: the current decision export is too close to a diagnostic table dump. Make it usable in Excel, Notion or external human/AI-assisted screening, with pertinent effective information and no internal IDs/timestamps/protocol metadata beyond the required application key.
 - UX-IMPORT: clearer visual status/outcome grouping, meaningful explanations, duplicate resolution/exclusion and application links opening a new tab. Exact supplied CSV is retained below.
 
