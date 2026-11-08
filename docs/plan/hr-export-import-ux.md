@@ -61,7 +61,7 @@ Pure existing parser/issue functions were run on this text, without DB/HTTP/prov
 | 6 | No local issue | `.tes` is syntactically valid, but differs from seeded `.test`; server compares frozen email and should reject a mismatch |
 | 7 | Decision must be preselected or rejected | Once corrected to `rejected`, server should show Already decided if the application remains in its seeded preselected state |
 
-The user reported correct detection but unsatisfactory visual interaction, and an unclear decision error around a column/value they believed valid. Do not call that a reproduced server bug: exact shown file contains `refused`, and parser also replaces the decision with empty text when row width differs from the header. Keep this example for parser diagnostics and DOM/manual acceptance cases. No successful apply, race test or current DB state was observed here.
+The user reported correct detection but unsatisfactory visual interaction, and an unclear decision error around a column/value they believed valid. **Subsequent clarification:** the pasted `refused` file was an earlier test; the later error was seen after using the correct decision literal, and the pasted example had not been updated. Do not explain away that later report as `refused` misuse. The exact corrected input/error pair is not retained, so the later issue remains unresolved/unreproduced. Row-width mismatch is a separate source diagnostic possibility (parser replaces decision with empty text), not an established cause of the user's later error. Keep the original sample as the earlier reproduction for diagnostics and DOM/manual acceptance cases. No successful apply, race test or current DB state was observed here.
 
 ## Source review of requested backend edge cases
 
