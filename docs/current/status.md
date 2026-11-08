@@ -76,6 +76,8 @@ The docs-only reorganisation checks paths, links, JSON references and unchanged 
 
 ## Manual QA report
 
+2026-11-08 candidate screening inbox follow-up: user reports the candidate preselection-notice scenario works; marking read hides it under the default Unread filter, and including read messages shows it again. Expected read filtering, not deletion. Positive user-reported evidence for this candidate screening/read-visibility path only; staff interview notifications, role-isolation/race/retention checks and full Q-R2/Q-SI gates remain pending. No new independent agent checks or runtime changes.
+
 2026-11-08 user manual report: inspected different seeded lifecycle states, but did not test transitions. Reported missing/unclear global email identity in form authoring, no visible interview sidebar entry and visual noise (button placement, stacked pills, technical wording/icon opportunities); recorded as UX-ID/UX-NAV/UX-DENSITY on the [board](../plan/tasks.md), not implemented fixes. No exact count/document/date check or transition pass inferred. [Transition map](guides/transition-map.md) is source-derived test guidance only; Q-T2A remains partial and all workflow/reset/race/auth/native gates remain pending.
 
 ## Contract gaps
