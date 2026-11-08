@@ -19,6 +19,7 @@
 | User demo journeys | [Demo guide](guides/demo-guide.md) |
 | Repeatable lifecycle scenario dataset | [Lifecycle fixtures](guides/lifecycle-demo.md) (locally seeded; broader QA pending) |
 | Automated/manual verification | [Backend checks](guides/backend-test.md), [integration testing](guides/integration-testing.md) |
+| Manual transition coverage | [Transition map](guides/transition-map.md) (source expectations, not executed passes) |
 | UI conventions | [Frontend design](guides/frontend-design.md) |
 | Host networking / terminals / portability | [Networking](guides/local-networking.md), [RMUX](guides/rmux.md), [Windows notes](guides/windows-compatibility.md) |
 

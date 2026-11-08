@@ -87,6 +87,10 @@ Delivered slices: R3a backend [draft vacancy PATCH](../current/contracts/vacancy
 
 **[selected 2026-11-07; review, vacancy, plan, candidate and import slices source implemented]** Unsaved-editor leave warnings for review, vacancy drafts, interview plans, candidate applications and screening imports offer Stay or Discard and leave, not a new Save all and leave flow. Current save/submit/apply controls remain explicit; no automatic merge/save/retry/apply. In-app leaving waits for a pending write to settle, without claiming it was cancelled. Reload/tab-close prompts and native-history behavior remain browser-controlled/manual QA. No further entry form is currently unguarded; future editors require their own scoped decision, not blanket authorization from this selection.
 
+## QA-driven UX follow-ups
+
+2026-11-08 manual seeded-state feedback is tracked separately as UX-ID (explicit globally required email identity in forms), UX-NAV (reported missing interview sidebar entry) and UX-DENSITY (button/pill/wording/icon hierarchy) on the [task board](tasks.md). These are requested follow-ups, not implementation approval or completed QA. Existing authenticated/frozen email remains authoritative for CSV matching; navigation source already includes eligible-staff interview access, so its reported absence needs reproduction. Keep fixture provenance truthful while reducing technical clutter. The user inspected states, not transitions.
+
 ## Local mail capture and viewer (later)
 
 Selected simple layout: `mail-outbox/<email-address>/<timestamp>.email`, UTF-8 plain text with `Metadata-Name: value` header lines, a `---` separator, then body. Include recipient, subject and capture timestamp; no HTML/read-state lifecycle. Keep the address recognizable as a safe single directory component. UUID filenames are unnecessary; exclusive creation and advancing to an available timestamp prevents simultaneous capture overwrites. Viewer lists addresses and messages. Current capture still stores only the latest message per hashed address; history/layout change is future work, not implemented by this decision. Recruitment mail remains independent of notifications.
