@@ -1,6 +1,6 @@
 # Planning index
 
-Latest checkpoint: 2026-11-07. R1/R2/R3a–d/SI/B1-P/F/R/J and T2a are locally merged. Authorized demo setup applied migrations 007/008, initially seeded the lifecycle dataset and launched API/frontend in shared RMUX `workspace`. Readiness and document hashes passed, not functional QA gates. [Task board](tasks.md) retains all integration/manual work; T2b launcher remains future work. No push, live-provider/key/spending work or further-card approval.
+Latest planning checkpoint: 2026-11-09. Earlier QA reports/UX requests are locally merged; the [intent-led UI/UX briefing](ui-ux-overhaul.md) consolidates the user's general principles and HR page examples for the next session. No UI implementation in this checkpoint. Source baseline includes R1/R2/R3a–d/SI/B1-P/F/R/J and T2a; local setup applied migrations 007/008 and launched API/frontend in RMUX on 2026-11-07. [Task board](tasks.md) separates reported manual paths from pending full gates. No push/live-provider/key/spending work or blanket next-card approval.
 
 Screening may happen before extraction/review finishes; either outcome freezes extraction/review without inventing completion. The interview plan may be empty, freezes at publication, and never replaces explicit owner Offer/Hired actions. See [product decisions](product-decisions.md) for the selected rules and [task board](tasks.md) for proposed decomposition, dependencies and remaining gates. Earlier mandatory reviewed-only screening/minimum-one-interview directions are superseded, not implemented contracts.
 
@@ -8,6 +8,7 @@ Screening may happen before extraction/review finishes; either outcome freezes e
 | --- | --- |
 | Which directions did the user choose, and what remains open? | [Product decisions](product-decisions.md) |
 | What should happen next / later? | [Task board](tasks.md) |
+| What UI/UX vision should the next session implement? | [Intent-led overhaul briefing](ui-ux-overhaul.md), then select a bounded slice on the board |
 | Why refactor / what might break? | [Changeability and obstacles](changeability.md) |
 | How might extraction/review/evidence evolve? | [Extraction design](extraction-design.md) |
 | What is implemented for screening CSV and what remains? | [Current contract](../current/contracts/screening-api.md), [remaining work](screening-import-contract.md) |
