@@ -15,6 +15,7 @@ Backend contract consumed by React ([demo guide](../guides/demo-guide.md)). [Pro
 - Candidate submits using a verified account/session (current UI: email/password plus one-time verification), and reads/downloads only their own applications. Legacy OTP remains a regression API path. Foreign application/document returns 404.
 - All admin/recruiter staff may read all applications and download their documents, not only vacancy owners. Interviewers use the assigned-interview routes described above, not these generic routes. Staff cannot submit as a candidate.
 - Answers/files are locked for everyone. No application PATCH/DELETE endpoint. Staff coordination/advancement policies are separate checkpoints.
+- Submitted choice answers display labels from the frozen form (readable multiple-choice lists, explicit missing/empty choices), not raw stored option keys. This is presentation only: answers are unchanged and extraction outputs keep their own task-defined type/CSV shape.
 - Cookie-authenticated POST requires trusted Origin as in [`api.md`](api.md). Responses containing candidate data use private/no-store; document bytes have no public URL.
 
 ## Candidate public status

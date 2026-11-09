@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { api, download, errorMessage } from './api';
 import { Badge, Heading, Notice, Loading, Empty, Pager } from './ui';
 import { PdfPreview } from './pdf-preview';
-import type { ApplicationView, ReviewTask, ReviewView } from '@recruitment/domain';
+import type { ApplicationView, ReviewTask, ReviewView, StaffVacancy } from '@recruitment/domain';
 import type { SkillValue } from '@recruitment/domain/vacancies';
 import { ScreeningImport } from './screening-import';
 import { readinessLabel, taskDraft, sameReviewDraft, type ReviewDraft, type SavedDraft } from './review-presentation';
@@ -12,6 +12,7 @@ import { IntentDialog } from './intent-dialog';
 import { IconButton } from './icons';
 import { applicationFilters, useListFilters } from './list-memory';
 import { candidateStatus } from './candidate-status';
+import { recruitmentStatusLabels } from './status-labels';
 
 export function extractionLabel(state:string,closed=false) {
   if(closed&&['pending','processing'].includes(state))return 'Processing closed (unfinished)';
@@ -22,12 +23,13 @@ export function ApplicationList({staff,memoryScope}:{staff:boolean;memoryScope?:
   const vacancy=new URLSearchParams(location.hash.split('?')[1]||'').get('vacancy');
   const navigation=useOptionalNavigation();
   const [page,setPage]=useState<any>(null),[error,setError]=useState(''),[refresh,setRefresh]=useState(0),[busy,setBusy]=useState(false);
+  const [vacancyTitle,setVacancyTitle]=useState(''),[scopeError,setScopeError]=useState('');
   const [{offset,sort,work,recruitmentStatus,undecided,from,before},setFilters]=useListFilters(memoryScope,staff&&vacancy?`applications:${vacancy}`:'applications',applicationFilters);
   const setOffset=(offset:number)=>setFilters({offset}),setSort=(sort:string)=>setFilters({sort}),setWork=(work:string)=>setFilters({work}),setRecruitmentStatus=(recruitmentStatus:string)=>setFilters({recruitmentStatus});
   const setUndecided=(undecided:boolean)=>setFilters({undecided}),setFrom=(from:string)=>setFilters({from}),setBefore=(before:string)=>setFilters({before});
   const [workSupported,setWorkSupported]=useState(false);
   const workLabels:Record<string,string>={processing:'Processing',for_review:'For review',for_screening:'For screening',interviewing:'Interviews',awaiting_offer:'Awaiting offer',offer_recorded:'Offer recorded',hired:'Hired',not_selected:'Not selected',other:'Other'};
-  const statusLabels:Record<string,string>={received:'Received',review_ready:'Received',preselected:'Preselected',interview:'Interviewing',offer:'Offer recorded',hired:'Hired',not_selected:'Not selected'};
+  const statusLabels=recruitmentStatusLabels;
   const [wizard,setWizard]=useState(false);
   const closeWizard=()=>navigation?navigation.requestAction(()=>setWizard(false)):setWizard(false);
   const screeningQuery=`${undecided?'&undecided=true':''}${from?`&from=${encodeURIComponent(from)}`:''}${before?`&before=${encodeURIComponent(before)}`:''}${work?`&work=${work}`:''}${recruitmentStatus?`&recruitmentStatus=${recruitmentStatus}`:''}`;
@@ -37,12 +39,18 @@ export function ApplicationList({staff,memoryScope}:{staff:boolean;memoryScope?:
     api(`${staff&&vacancy?`vacancies/${vacancy}/`:''}applications?${query}`).then(v=>{if(active){if(offset>0&&offset>=v.total){setOffset(Math.max(0,Math.floor((v.total-1)/20)*20));return;}setPage(v);setWorkSupported(v.workFiltersSupported===true);}}).catch(e=>{if(active)setError(errorMessage(e));});
     return()=>{active=false;};
   },[staff,vacancy,offset,refresh,sort,screeningQuery]);
+  useEffect(()=>{
+    if(!staff||!vacancy)return;let active=true;setVacancyTitle('');setScopeError('');
+    api<StaffVacancy>(`vacancies/${vacancy}`).then(value=>{if(active)setVacancyTitle(value.title);}).catch(error=>{if(active)setScopeError(errorMessage(error));});
+    return()=>{active=false;};
+  },[staff,vacancy,refresh]);
   return <div className="application-index">
-    <Heading title={staff?'Applications':'My applications'}>
+    {staff&&vacancy&&<a className="application-back-link" href={`#/vacancies/${vacancy}`}>← Vacancy</a>}
+    <Heading title={staff?(vacancy?'Vacancy applications':'Applications'):'My applications'} description={staff&&vacancy?vacancyTitle:undefined}>
       <IconButton icon="refresh" label="Refresh applications" onClick={()=>setRefresh(v=>v+1)}/>
-    </Heading><Notice message={error}/>
+    </Heading><Notice message={error}/><Notice message={scopeError?`Vacancy title unavailable: ${scopeError}`:''}/>{(error||scopeError)&&<button onClick={()=>setRefresh(value=>value+1)}>Retry applications</button>}
     {staff&&vacancy&&<details className="application-file-tools"><summary>Decision files</summary><p className="muted">Export undecided applications or import proposed screening decisions. Nothing is reserved by downloading a file.</p><div className="actions"><button onClick={()=>wizard?closeWizard():setWizard(true)}>{wizard?'Hide import':'Import decisions CSV'}</button><button disabled={busy} onClick={async()=>{setBusy(true);setError('');try{await download(`vacancies/${vacancy}/screening-export?${screeningQuery.slice(1)}`,`screening-${vacancy}.csv`);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}}>Export undecided CSV</button><button disabled={busy} onClick={async()=>{setBusy(true);setError('');try{await download(`vacancies/${vacancy}/export`,`applications-${vacancy}.csv`);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}}>Diagnostic CSV · all applications</button></div>{wizard&&<ScreeningImport vacancyId={vacancy} onClose={()=>setWizard(false)} onApplied={()=>setRefresh(value=>value+1)}/>}</details>}
-    {staff&&vacancy&&<p className="related-links"><a href={`#/vacancies/${vacancy}`}>Vacancy details</a><a href="#/applications">All applications</a></p>}
+    {staff&&vacancy&&<p className="related-links"><a href="#/applications">All applications</a></p>}
     {staff&&<div className="table-controls intent-filters"><label>Work to do<select disabled={!workSupported} value={work} onChange={e=>{setWork(e.target.value);setOffset(0);}}><option value="">All work</option>{Object.entries(workLabels).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label><label>Recruitment status<select disabled={!workSupported} value={recruitmentStatus} onChange={e=>{setRecruitmentStatus(e.target.value);setOffset(0);}}><option value="">All statuses</option>{Object.entries(statusLabels).filter(([value])=>value!=='review_ready').map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label></div>}
     <details className="application-list-filters"><summary>Dates and sorting</summary><div className="table-controls">
       {staff&&<><label className="check"><input type="checkbox" checked={undecided} onChange={e=>{setUndecided(e.target.checked);setOffset(0);}}/>Undecided only</label><label>Submitted from (UTC)<input type="date" value={from} onChange={e=>{setFrom(e.target.value);setOffset(0);}}/></label><label>Submitted before (UTC)<input type="date" value={before} onChange={e=>{setBefore(e.target.value);setOffset(0);}}/></label></>}

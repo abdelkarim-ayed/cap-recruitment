@@ -93,6 +93,9 @@ export function NavigationBoundary({children}:{children:ReactNode}){
       if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
       const anchor=(event.target as HTMLElement|null)?.closest?.('a[href]');
       if(!(anchor instanceof window.HTMLAnchorElement)||anchor.hasAttribute('download')||anchor.target&&anchor.target!=='_self')return;
+      // Inbox owns its read-before-open click and calls go() after that succeeds.
+      // Modifier/context-menu navigation still uses the anchor's native URL.
+      if(anchor.hasAttribute('data-notification-link'))return;
       const url=new URL(anchor.href,window.location.href);
       if(url.origin!==window.location.origin||url.pathname!==window.location.pathname||url.search!==window.location.search||!url.hash.startsWith('#/'))return;
       event.preventDefault();request({kind:'route',path:url.hash.slice(1)});

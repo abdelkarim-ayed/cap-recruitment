@@ -15,7 +15,7 @@ export function Login({onLogin}:{onLogin:(actor:Actor)=>void}) {
   }
   const needsCode=mode==='verify'||(mode==='reset'&&sent);
   const title=mode==='login'?'Welcome back':mode==='signup'?'Create candidate account':mode==='verify'?'Verify your email':'Set a new password';
-  return <div className="auth-wrap"><section className="card auth-card"><span className="eyebrow">SECURE WORKSPACE</span><h1>{title}</h1><p>{mode==='signup'?'Create an account to apply.':mode==='login'?'Sign in with your email and password.':`Enter the code sent to ${email||'your email address'}.`}</p><Notice message={error}/><Notice message={message} success/>
+  return <div className="auth-wrap"><section className="card auth-card"><span className="eyebrow">SECURE WORKSPACE</span><h1>{title}</h1><p>{mode==='signup'?'Create an account to apply.':mode==='login'?'Sign in with your email and password.':!sent?`Enter your email to receive ${mode==='reset'?'a password reset':'a verification'} code.`:`Enter the code sent to ${email||'your email address'}.`}</p><Notice message={error}/><Notice message={message} success/>
     <form onSubmit={async event=>{event.preventDefault();setBusy(true);setError('');setMessage('');try{
       if(mode==='login'){await post('auth/sign-in/email',{email,password});await signedIn();}
        else if(mode==='signup'){await post('auth/sign-up/email',{email,password,name});setMode('verify');setPassword('');setSent(true);setMessage('Check your email for a verification code. Already registered? Sign in or reset your password.');}

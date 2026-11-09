@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes } from 'react';
 
 const paths={
+  inbox:'M3 5h18v14H3V5 M3 6l9 7 9-7',
   check:'m5 12 4 4L19 6',close:'m6 6 12 12 M18 6 6 18',
   previous:'m15 18-6-6 6-6',next:'m9 18 6-6-6-6',up:'m6 15 6-6 6 6',down:'m6 9 6 6 6-6',
   refresh:'M20 7v5h-5 M4 17v-5h5 M6 7a7 7 0 0 1 12-1l2 2 M4 16l2 2a7 7 0 0 0 12-1',

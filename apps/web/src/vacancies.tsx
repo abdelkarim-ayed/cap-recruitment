@@ -10,6 +10,7 @@ import { VacancyInformation, VacancyOwner, VacancyStatus, vacancyStatusLabels } 
 import { VacancyConfirmation } from './vacancy-confirmation';
 import { IntentDialog } from './intent-dialog';
 import { useListFilters, vacancyFilters } from './list-memory';
+import { formError, formIssues } from './form-feedback';
 
 export function VacancyList({staff,actorId,candidate=false,memoryScope}:{staff:boolean;actorId?:string;candidate?:boolean;memoryScope?:string}) {
   const [page,setPage]=useState<any>(null),[error,setError]=useState(''),[reload,setReload]=useState(0);
@@ -71,7 +72,7 @@ function StaffVacancyPage({vacancy,actor}:{vacancy:StaffVacancy|null;actor:Actor
   // Redirect only after the clean guard has rendered; the successful create is
   // already acknowledged and must not open an unsaved-changes prompt.
   useEffect(()=>{if(createdId)go(`/vacancies/${createdId}`);},[createdId]);
-  async function save(){if(!canEdit)return;setBusy(true);setError('');setMessage('');try{const checked=createVacancySchema.safeParse({title:value.title,description:value.description,...(value.location?.trim()?{location:value.location}:{}),formDefinition:value.formDefinition,processingDefinition:value.processingDefinition});if(!checked.success)throw new Error(checked.error.issues.map(i=>`${i.path.join('.')}: ${i.message}`).join('\n'));const record= current?await api<StaffVacancy>(`vacancies/${current.id}`,{method:'PATCH',body:JSON.stringify({...checked.data,expectedRevision:current.revision})}):await post<StaffVacancy>('vacancies',checked.data);setCurrent(record);setValue(record);setAction(null);setPublicationPlan(null);setMessage('Draft saved.');if(!current)setCreatedId(record.id);}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}
+  async function save(){if(!canEdit)return;setBusy(true);setError('');setMessage('');try{const checked=createVacancySchema.safeParse({title:value.title,description:value.description,...(value.location?.trim()?{location:value.location}:{}),formDefinition:value.formDefinition,processingDefinition:value.processingDefinition});if(!checked.success)throw new Error(formIssues(checked.error.issues,value.formDefinition,value.processingDefinition));const record= current?await api<StaffVacancy>(`vacancies/${current.id}`,{method:'PATCH',body:JSON.stringify({...checked.data,expectedRevision:current.revision})}):await post<StaffVacancy>('vacancies',checked.data);setCurrent(record);setValue(record);setAction(null);setPublicationPlan(null);setMessage('Draft saved.');if(!current)setCreatedId(record.id);}catch(e){setError(formError(e,value.formDefinition,value.processingDefinition));}finally{setBusy(false);}}
   async function reviewPublication(){if(!current||!canEdit||dirty||busy||!current.actions.publish.allowed)return;setBusy(true);setError('');setAction(null);setPublicationPlan(null);try{const plan=await api<InterviewPlanView>(`vacancies/${current.id}/interview-pipeline`);setPublicationPlan(plan);setAction('published');}catch(e){setError(errorMessage(e));}finally{setBusy(false);}}
   function cancelAction(){if(!busy){setAction(null);setPublicationPlan(null);}}
   async function confirmAction(){

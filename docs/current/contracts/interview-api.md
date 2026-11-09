@@ -54,6 +54,8 @@ Compare the ordered saved names/instructions using the same schema normalization
 
 The plan editor registers unsaved steps with the shared [navigation guard](editor-navigation.md) and shows `Unsaved changes`. Leaving asks Stay or Discard and leave. Pagination/Refresh preserve local steps instead of silently resetting them; a successful PUT response becomes the clean baseline, while stale/conflict responses retain local edits without retry. Backend owner/revision/freeze and no-op rules above remain authoritative.
 
+The route identifies the vacancy and renders editing controls only for an allowed draft owner; other HR and published/closed vacancies read plan names/instructions as text. Ordinary drafts omit candidate results, while published/closed vacancies show the results matrix and Applications navigation. Candidate names open submitted application information; View recruitment is a separate destination. Owner contact is secondary. Failed/unknown plan saves require explicit refresh; refreshed saved steps can be compared with retained local edits or explicitly discarded. If the plan becomes read-only, retained local steps remain inspectable, not writable. No plan/appointment authority or wire contract change.
+
 ## Owner Offer and separate Hired
 
 B1-F uses the existing stage endpoint/payload/revision. Authenticated HR eligibility, fresh vacancy ownership and application revision are separate checks under vacancy-share/application-update locks. Other HR/admin cannot override the owner; candidates/interviewers cannot finalize. Closing intake does not prevent ongoing finalization.

@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
 import { IconButton } from './icons';
+import { statusLabel } from './status-labels';
 export function Badge({ children }: { children: ReactNode }) {
   const tone=typeof children!=='string'?'neutral':['completed','published','pass','hired','Hired','Reviewed','HR corrections saved','Extracted','Application received'].includes(children)?'green':['failed','fail','not_selected','Not selected','completed_with_errors','closed','cancelled'].includes(children)?'red':['pending','draft','fixture','Mock extraction','Mock only','Unread','Original extraction errors','Original extraction failed','Extraction pending'].includes(children)?'amber':['processing','in_review','scheduled','preselected','Preselected','interview','Interviewing','offer','Offer recorded','Extracting'].includes(children)?'blue':'neutral';
-  return <span className={`badge badge-${tone}`}>{typeof children === 'string' ? children.replaceAll('_', ' ') : children}</span>;
+  return <span className={`badge badge-${tone}`}>{typeof children === 'string' ? statusLabel(children) : children}</span>;
 }
 export function Notice({ message, success = false }: { message: string; success?: boolean }) { return message ? <div className={`notice ${success ? 'success' : 'error'}`} role={success ? 'status' : 'alert'}>{message}</div> : null; }
 export function Heading({ title, description, status, children }: { title: string; description?: string; status?:ReactNode; children?: ReactNode }) { return <header className="page-heading"><div><h1>{title}</h1>{description && <p>{description}</p>}{status&&<div className="status-row">{status}</div>}</div><div className="actions">{children}</div></header>; }

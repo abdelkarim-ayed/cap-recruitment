@@ -1,0 +1,3 @@
+export const recruitmentStatusLabels:Record<string,string>={received:'Received',review_ready:'Received',preselected:'Preselected',interview:'Interviewing',offer:'Offer recorded',hired:'Hired',not_selected:'Not selected'};
+const labels:Record<string,string>={...recruitmentStatusLabels,draft:'Draft',published:'Published',closed:'Closed',pending:'Pending',in_review:'In review',processing:'Processing',completed:'Completed',scheduled:'Scheduled',cancelled:'Cancelled',pass:'Pass',fail:'Fail'};
+export const statusLabel=(value:string)=>Object.hasOwn(labels,value)?labels[value]:value.replaceAll('_',' ');

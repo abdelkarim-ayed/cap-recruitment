@@ -1,6 +1,6 @@
 import type { ApplicationView } from '@recruitment/domain';
 import type { FormDefinition } from '@recruitment/domain/vacancies';
-import { display } from './ui';
+import { answerLabel } from './answer-presentation';
 
 type AnswerInput=Exclude<FormDefinition['inputs'][number],{type:'separator'|'document'}>;
 export function submittedAnswerGroups(inputs:FormDefinition['inputs']){
@@ -22,7 +22,7 @@ export function ApplicationInformation({record,onPreview,onDownload}:{
     <h3>Submitted answers</h3>
     {!groups.length?<p className="muted">No answer fields in this application form.</p>:groups.map(group=><div className="application-answer-group" key={group.key}>
       {group.label&&<h4>{group.label}</h4>}
-      <dl className="application-answers">{group.inputs.map(input=><div key={input.id}><dt>{input.label}</dt><dd>{display(record.answers[input.id])}</dd></div>)}</dl>
+      <dl className="application-answers">{group.inputs.map(input=><div key={input.id}><dt>{input.label}</dt><dd>{answerLabel(input,record.answers[input.id])}</dd></div>)}</dl>
     </div>)}
     <h3>Documents</h3>
     {!record.documents.length?<p className="muted">No documents submitted.</p>:<ul className="application-documents">{record.documents.map(document=>{
@@ -41,6 +41,6 @@ export function ApplicationInformation({record,onPreview,onDownload}:{
 // Presentation only: the server's workflow availability and the destination
 // workflow still own all eligibility, ownership and transition checks.
 export function applicationJourney(stage:string){
-  if(['received','review_ready'].includes(stage))return {heading:'Screening',link:'Screening decision'};
+  if(['received','review_ready'].includes(stage))return {heading:'Screening',link:'View screening'};
   return {heading:'Recruitment',link:['preselected','interview'].includes(stage)?'Interviews & next steps':'View recruitment progress'};
 }
