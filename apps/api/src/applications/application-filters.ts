@@ -2,6 +2,8 @@ import { z } from 'zod';
 import { reviewReadinessStates } from '@recruitment/domain';
 
 export const applicationFilterShape = {
+  work:z.enum(['processing','for_review','for_screening','interviewing','awaiting_offer','offer_recorded','hired','not_selected','other']).optional(),
+  recruitmentStatus:z.enum(['received','preselected','interview','offer','hired','not_selected']).optional(),
   processing:z.enum(['pending','not_requested','processing','completed','completed_with_errors']).optional(),
   review:z.enum(['pending','in_review','completed']).optional(),
   readiness:z.enum(reviewReadinessStates).optional(),

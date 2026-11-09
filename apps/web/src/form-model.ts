@@ -1,6 +1,7 @@
 import type { FormDefinition, ProcessingDefinition } from '@recruitment/domain/vacancies';
 export type Input = FormDefinition['inputs'][number];
 export const inputTypes = ['text','long_text','number','yes_no','single_choice','multiple_choice','document','separator'] as const;
+export const inputLabels:Record<Input['type'],string>={text:'Short answer',long_text:'Long answer',number:'Number',yes_no:'Yes / No',single_choice:'Single choice',multiple_choice:'Multiple choice',document:'File upload',separator:'Section heading'};
 export function makeInput(type: Input['type'], id: string): Input {
   if(type==='separator') return {id,type,label:'New section',args:{}};
   const base={id,name:id,label:'New question',required:false};

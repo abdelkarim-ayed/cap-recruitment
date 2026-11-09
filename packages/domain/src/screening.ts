@@ -3,10 +3,12 @@ import { z } from 'zod';
 export type ScreeningDecision = 'preselected' | 'rejected';
 export interface ScreeningInput {
   key: number; applicationId: string; email: string; decision: string; reason: string;
+  parseIssues?: string[];
 }
 export interface ScreeningRow extends ScreeningInput {
   state: 'valid' | 'invalid' | 'decided'; issue: string | null;
   candidate: { name: string; email: string } | null; revision: number | null;
+  issues?: string[]; duplicateKeys?: number[];
 }
 export interface ScreeningPreview { rows: ScreeningRow[] }
 export interface ScreeningSelection {
@@ -58,22 +60,27 @@ export function parseScreeningCsv(source: string): ScreeningInput[] {
   return records.map((values, i) => ({
     key: i + 2, applicationId: values[index('application_id')]?.trim().toLowerCase() ?? '',
     email: values[index('candidate_email')]?.trim().toLowerCase() ?? '',
-    decision: values.length === headers.length ? values[index('decision')]?.trim() ?? '' : '',
+    decision: values[index('decision')]?.trim() ?? '',
     reason: values[index('reason')]?.trim() ?? '',
+    ...(values.length===headers.length?{}:{parseIssues:[`Record has ${values.length} columns; the header has ${headers.length}. Fix the CSV row width.`]}),
   }));
 }
 
+export function screeningRowIssues(row:ScreeningInput):string[]{
+  const issues=[...(row.parseIssues??[])];
+  if(!z.uuid().safeParse(row.applicationId).success)issues.push('Application ID must be a valid UUID.');
+  if(!z.email().max(320).safeParse(row.email).success)issues.push('A valid candidate account email is required.');
+  if(!['preselected','rejected'].includes(row.decision))issues.push('Decision must be exactly preselected or rejected.');
+  if(row.reason.length>2000)issues.push('Internal reason exceeds 2,000 characters.');
+  return issues;
+}
+// Duplicates are proposals to resolve explicitly, not intrinsically invalid input.
+// Apply still refuses any duplicate IDs in the final included set.
 export function screeningIssues(rows: ScreeningInput[]): Map<number, string> {
-  const counts = new Map<string, number>();
-  for (const row of rows) counts.set(row.applicationId, (counts.get(row.applicationId) ?? 0) + 1);
   const issues = new Map<number, string>();
   for (const row of rows) {
-    const issue = !z.uuid().safeParse(row.applicationId).success ? 'Invalid application ID.'
-      : !z.email().max(320).safeParse(row.email).success ? 'A valid candidate email is required.'
-      : !['preselected', 'rejected'].includes(row.decision) ? 'Decision must be preselected or rejected.'
-      : row.reason.length > 2000 ? 'Reason exceeds 2,000 characters.'
-      : counts.get(row.applicationId)! > 1 ? 'Duplicate application ID; repair the source file.' : null;
-    if (issue) issues.set(row.key, issue);
+    const found=screeningRowIssues(row);
+    if (found.length) issues.set(row.key, found.join(' '));
   }
   return issues;
 }

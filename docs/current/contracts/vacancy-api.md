@@ -2,7 +2,7 @@
 
 Publication validates and freezes the saved interview plan, including a valid empty plan. The 2026-11-07 B1-P checkpoint changes source/client contracts without a new migration; real PostgreSQL/HTTP/manual validation remains pending. Guarded extraction defaults/limits are unchanged; see [Jev safety](../jev-safety.md).
 
-Manual-feedback refinements: staff responses include `owner: {name,email}` alongside ownerId; public projections never include owner identity. List query adds `status=draft|published|closed` and `sort=newest|oldest|title` (default newest), applied before pagination with deterministic ID ties. Public lists remain published-only regardless of filter. Existing owner permissions unchanged.
+Staff responses include `owner: {name,email}` alongside ownerId; public projections never include owner identity. Lists support `status=draft|published|closed` and `sort=newest|oldest|title` (default newest); staff lists also accept `owner=me|<user ID>`. All filters apply before count/pagination with deterministic ID ties. Public lists remain published-only and reject the staff-only owner query. Existing owner permissions are unchanged.
 
 R1 adds `actions:{edit,publish,close}` to full staff responses only; each entry has `{allowed,visible,reason}`. Public/list projections are unchanged. Availability is advisory and does not bypass owner/state/revision/request checks; see [action policies](action-policies.md).
 
@@ -43,6 +43,16 @@ R1 adds `actions:{edit,publish,close}` to full staff responses only; each entry 
 ## Draft editor navigation
 
 Unsaved vacancy edits register with the shared [navigation guard](editor-navigation.md). Leaving asks Stay or Discard and leave; no save-all, automatic save or request cancellation is added. An untouched create form or unchanged saved draft does not warn, and a successful create redirects only after its record is clean. Existing save/publish/close authority and revision rules are unchanged.
+
+### Staff inspection versus editing — UX-DENSITY-b
+
+Source-implemented in the UI worktree, 2026-11-09; native/manual review pending. The existing vacancy route opens the editor only for a draft owner whose server action metadata allows editing. Other authorized HR inspect draft/published/closed vacancies as job information, read-only form requirements and configured automated document checks—not a disabled editor. Owner metadata is quiet text; routine revisions and ownership-policy lectures are absent. A new-vacancy route still opens the creation form for eligible HR.
+
+Drafts retain a distinct interview-plan configuration/read link; application/result links are hidden in that context without deleting or changing their routes. Published/closed inspection groups Applications and Interview plan & results under Recruitment. Only an owner with the existing published-close availability sees Close vacancy; closed vacancies cannot be edited or reopened. No extra plan fetch is needed just to inspect a vacancy. Staff/public resource state is keyed by identity/role/projection and resource ID, so switching those waits for a fresh fetch rather than reusing a previous staff surface.
+
+Publication still loads the saved plan and confirms its separate revision alongside the vacancy revision. Publish/close confirmations use native modal dialogs: labelled visible consequences, cancel-first focus, Escape/cancel while idle, native background inertness/focus containment, and focus restoration to the trigger or entity header after a transition. Pending writes disable confirmation/cancel and stay guarded. A shared leave warning temporarily suspends the native modal presentation so the top layer cannot obscure the guard; it neither cancels the request nor discards confirmation state. Stale/failed publication closes confirmation without retry, preserves draft edits, and requires another saved-plan review before another publication attempt. Close still sends only the vacancy revision and stops intake, not ongoing recruitment.
+
+Candidate entry, form authoring and list preferences have their own current contracts; inspection must preserve the [durable design baseline](../guides/frontend-design.md#vacancy-inspection-and-editing--ux-density-b), not revert to disabled editing or repeated permission explanations. Native/manual verification remains pending.
 
 ## Supported input and task arguments
 Every answer/document input requires id, name, label, type, required, args. Separators use only id, label, type, args; no name/required/task.
@@ -130,7 +140,11 @@ Published/closed existing records freeze their current plan as-is; no backfill, 
 No ownerId, processingDefinition, internal notes, or backend metadata. Projection is allowlisted. Only published vacancies appear publicly; a draft/closed/unknown UUID returns 404.
 
 ## Lists and errors
-- `GET /api/vacancies?limit=20&offset=0`: staff summaries, not every full definition.
+
+- Candidate-specific browsing is separate from public/staff routes: authenticated `GET /api/candidate/vacancies` accepts existing limit/offset/sort plus `notApplied=true|false`. Candidate role is checked in both route metadata and service; published-only exclusion uses `NOT EXISTS` for the trusted session candidate, before count and pagination in the same statement. Its projection is id/title/location only, private/no-store. The UI exposes Not applied yet only to signed-in candidates. Existing public list and owner authority remain unchanged; no candidate-supplied identity or cross-candidate application details are exposed.
+- `GET /api/vacancies?limit=20&offset=0`: staff summaries, not every full definition. Optional `owner=me` resolves the trusted session ID; a named owner ID is only a list predicate, never a permission/assignment change. Owner and status compose in one SQL statement before total/page. Unknown or no-longer-owning IDs return an empty matching set, not broader results.
+- `GET /api/vacancies/owners`: HR-only, private/no-store `{items:[{id,name,email}]}` for users who actually own vacancies, ordered by name/email/ID across the dataset, independent of list page/status. No general user directory or new public/candidate owner projection. Both staff list and owner options enforce the existing vacancy.read role; public/candidate routes reject owner query input.
+- Staff UI offers All owners / Owned by me / named owner. My drafts sets `owner=me&status=draft`; All vacancies clears owner/status but preserves sort. Changes reset the page and persist in account/role-scoped tab-session memory. If owner options fail, All owners/Owned by me remain available and a remembered named-owner filter is not silently discarded. Filters do not enable editing another owner's draft.
 - `GET /api/public/vacancies?limit=20&offset=0`: published job summaries, no backend configuration.
 - limit defaults to 20 (integer 1–100); offset defaults to 0 (integer 0–2147483647). Unknown query parameters are rejected. Order: newest createdAt first, descending ID tie-break. Total/page use one database statement; an offset beyond the end returns an empty page with the full visible total.
 - Public list example (**200**):
@@ -157,5 +171,7 @@ No ownerId, processingDefinition, internal notes, or backend metadata. Projectio
 ```
 - Lists omit `description` and form/task definitions. No results returns `items: []` and `total: 0`; `total` counts records visible to that caller.
 - 400 invalid field/task configuration; 401 signed out; 403 management role required; 404 missing/nonpublic record; 409 stale revision/locked state/invalid transition.
+
+Owner/draft filtering and current UI: builds/static and focused offline predicate/role/normalization checks only; authenticated SQL/list-count/isolation and native filter-memory checks remain pending. No schema/data/provider change.
 
 Validation errors return 400 with statusCode/error/message plus issues with path/message. UUID/transition errors use Nest envelopes. General JSON body limit is 256 KiB. No vacancy delete/cloning, arbitrary rules, task execution or staff-management API. Applications/uploads have a separate contract; richer presets remain TODO.

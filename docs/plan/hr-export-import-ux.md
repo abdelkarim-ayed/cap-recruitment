@@ -1,6 +1,6 @@
-# HR decision export and interactive import — feedback and proposed scope
+# HR decision export and interactive import — feedback and source decisions
 
-2026-11-08 user feedback. **Planning/source review only; no implementation authorized.** The user has limited manual-QA time and prioritizes usable decision files/wizard, later separately scoped Jev testing and presentation work. Trust in remaining backend behavior is not an executed concurrency/access/transition pass. Broader Q-* gates remain deferred/pending.
+Earlier feedback and exact synthetic reproduction below are retained as context. The user subsequently approved the bounded compact export/grouped import and form-authoring refinements, now **source-implemented** in the UI worktree. [Current contract](../current/contracts/screening-api.md) supersedes proposal details and former parser behavior below; [form/email presentation](../current/guides/frontend-design.md#decision-files-and-form-authoring). Builds and focused offline checks pass, not authenticated/native/SQL/race gates. No provider work follows from this slice; broader Q-* gates remain pending.
 
 ## Collected requests
 
@@ -11,9 +11,9 @@
 - UX-EXPORT: the current decision export is too close to a diagnostic table dump. Make it usable in Excel, Notion or external human/AI-assisted screening, with pertinent effective information and no internal IDs/timestamps/protocol metadata beyond the required application key.
 - UX-IMPORT: clearer visual status/outcome grouping, meaningful explanations, duplicate resolution/exclusion and application links opening a new tab. Exact supplied CSV is retained below.
 
-## UX-EXPORT — requested direction, schema still needs a bounded design
+## UX-EXPORT — original requested direction
 
-Keep the existing detailed diagnostic export distinct. Change the HR decision export toward a compact, predictable schema; do not describe this as shipped:
+The earlier proposals below informed the now source-implemented compact decision file; use the current contract for exact columns and limits. Detailed diagnostic export remains distinct:
 
 | Content | Requested/proposed presentation |
 | --- | --- |
@@ -29,7 +29,7 @@ Keep the existing detailed diagnostic export distinct. Change the HR decision ex
 
 Examples are proposals, not final column names or a new generic export framework. Compact content must still support truthful partial failure/unknown handling and distinguish effective corrections without forcing HR to reconstruct internals.
 
-## UX-IMPORT — recommended interactive approach (not yet selected in full)
+## UX-IMPORT — original interactive proposal
 
 - Outcome and row eligibility are different axes. Proposed visual language: green Preselect, red Reject, amber unresolved duplicate/conflict, muted grey Already decided/Excluded; invalid rows use an icon/text and optionally strike-through. Do not use colour alone or make grey already-decided rows look editable. Maintain keyboard access and readable contrast.
 - Group duplicate application IDs, show all source CSV row numbers/proposals, and let HR **keep one or exclude all**. Contradictory decisions require an explicit choice. Identical duplicates may be collapsed only with a clear displayed count/retained proposal and explicit consent; never silently merge or last-row-wins. Re-evaluate the chosen row through server scope/email/state validation before enabling it.
@@ -51,7 +51,7 @@ b6d34da3-bc65-4358-8456-05ac592d6020,lifecycle.empty@example.test,preselected
 8c540073-668e-4630-8e90-25ffdc4c45cf,lifecycle.screened-pending@example.test,refused
 ```
 
-Pure existing parser/issue functions were run on this text, without DB/HTTP/provider calls. CSV record numbering includes the header:
+Before the refinement, pure parser/issue functions were run on this text, without DB/HTTP/provider calls. The following are **former behavior**, not current preview results. CSV record numbering includes the header:
 
 | Record | Local parser result | Further source-level implication, not a live preview result |
 | --- | --- | --- |

@@ -11,4 +11,4 @@ dist/
 coverage/
 *.tsbuildinfo
 /uploads/
-/.local/
+/.local

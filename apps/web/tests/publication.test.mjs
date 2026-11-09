@@ -2,6 +2,10 @@ import { test,afterEach } from 'node:test';
 import { equal,deepEqual,ok } from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 const dom=new JSDOM('<!doctype html><html><body></body></html>',{url:'http://localhost:5173/'});
+// JSDOM has no native dialog top layer. This stubs lifecycle only; native
+// background inertness, Escape/focus containment remain manual browser gates.
+dom.window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};
+dom.window.HTMLDialogElement.prototype.close=function(){this.open=false;};
 for(const key of ['window','document','HTMLElement','HTMLInputElement','Event','MouseEvent','File','FileList','location','sessionStorage'])globalThis[key]=dom.window[key];
 Object.defineProperty(globalThis,'navigator',{value:dom.window.navigator,configurable:true});globalThis.IS_REACT_ACT_ENVIRONMENT=true;
 const React=await import('react');
