@@ -1,10 +1,10 @@
 # P0-S — optional review readiness and manual release
 
-Checkpoint: 2026-11-07. User selected release of **any unfinished work**, including active processing, rather than a stall timer, then approved B1-R/B1-J with fixture/disabled AI only. **Backend/UI/list/filter are implemented; migrations 007/008 applied in subsequent authorized local demo setup. Real workflow integration/manual verification remains pending.** Implemented rules live in the [current contract](../current/contracts/processing-review-api.md#optional-shared-review); [status](../current/status.md) distinguishes setup from QA. No live-provider smoke or API-key change authorized.
+Backend/UI/list/filter are implemented and locally merged; release targets **any unfinished work**, including active processing, not a stall timer. Migrations 007/008 are applied locally. The user reported release → corrections → completion → read-only review working; this is partial manual evidence, not a full integration/privacy/race gate pass. Implemented rules live in the [current contract](../current/contracts/processing-review-api.md#optional-shared-review); [status](../current/status.md) separates offline/setup/manual evidence. Fixtures/disabled AI only; no live-provider smoke or API-key change authorized.
 
 ## B1-J — source delivered; remainder separately scoped
 
-- Current release/detail/list/filter and draft-conflict behavior is specified in the current contract, not duplicated as future work here.
+- Release/detail/list/filter and draft-conflict behavior is specified in the current contract, not future work here. The UI overhaul adds source-PDF per-field review, separate completion/release confirmations and independent Work to do / Recruitment status; it removes manual review-status buttons, not explicit correction saves.
 - R3c source implements semantic review no-ops; R3d-a/b/c add review, vacancy, interview-plan, candidate-application and screening-import Stay/discard navigation protection. Q-R3C/Q-R3DA/Q-R3DB/Q-R3DC retain real integration/native/manual evidence.
 - Workload counters, new notifications, provider batching and attempt recovery are separate checkpoints, not authorized by B1-J.
 

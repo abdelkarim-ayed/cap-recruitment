@@ -11,7 +11,7 @@ Read by question; do not reload the whole documentation tree.
 | Next checkpoints / deferred work | [Task board](plan/tasks.md) |
 | Refactor evidence and unresolved obstacles | [Changeability review](plan/changeability.md) |
 | Extraction design discussion | [Tasks and evidence](plan/extraction-design.md) |
-| UI style and interaction decisions to preserve | [Durable frontend baseline](current/guides/frontend-design.md) |
+| Implemented frontend product/interaction/style decisions to preserve | [Durable frontend baseline](current/guides/frontend-design.md) |
 | Jev safety / opt-in execution | [Mandatory safeguards](current/jev-safety.md); load project `typesafe-ai` skill before Jev work |
 | Report-support history | [Journal](journal.md): selective context, not the current specification |
 

@@ -1,13 +1,14 @@
 # Screening import — selected direction and remaining work
 
-Updated after the implemented slice and 2026-11-08 feedback. The [current contract](../current/contracts/screening-api.md) remains authoritative for shipped source; migration 007 applied in local setup, PostgreSQL workflow/HTTP/manual validation remains outstanding. [UX-EXPORT/UX-IMPORT follow-up](hr-export-import-ux.md) requests compact decision-file presentation and a more interactive visual wizard, not delivered behavior or implementation authorization.
+SI and the compact export/grouped visual wizard are implemented and locally merged. The [current contract](../current/contracts/screening-api.md) owns exact behavior; [earlier feedback](hr-export-import-ux.md) is diagnostic context, not a competing unimplemented proposal. Migration 007 is applied locally. Builds/focused offline/DOM and partial manual-path evidence exist; real SQL/HTTP/round-trip/privacy/race verification remains incomplete.
 
 ## Selected and implemented slice
 
 - One decision CSV first; JSON/two-outcome-file uploads deferred.
 - Application ID **and email mandatory**; ID is the key, frozen email is an assertion. Other exported columns, including name/evidence, are ignored, never extraction corrections.
 - Optional per-row internal rejection reason from CSV. No mandatory batch explanation, no automatic disclosure to candidates. Structured screening outcome/actor/time retained separately.
-- Current slice: invalid rows excluded with reasons and no wizard repair. Already-decided rows are ineligible; visual clarity was reported unsatisfactory. Valid proposals can switch individually or in bulk and be excluded before confirmation. Proposed follow-up would permit explicit duplicate-group keep-one/exclude-all after server revalidation; identity repair/general CSV editing is not selected, and duplicate rows are currently all invalidated.
+- Invalid/mismatched rows are separately barred with multiple issues/structural errors distinguished; already-decided/excluded entries are grey. Valid duplicates group into one application row with CSV record numbers, trusted application link, email and one decision. Agreement is prefilled, conflict requires selection and differing reasons require a source outcome/reason pair. Individual/bulk outcome switching and exclusion stay local until final confirmation; no identity repair, last-row-wins or general CSV editor. The old all-duplicates-invalid behavior is superseded.
+- Compact undecided decision export includes identity/date/answers/review/authorized links and effective per-skill Yes/No/Unknown, preserving explicit HR unknown and fixture provenance. Diagnostic export-all remains separate; no current extraction-template/schema change.
 - First committed screening outcome wins. Preview/open/export is not a reservation. Atomic confirmation of the included set; conflicts preserve unaffected choices and require explicit reconfirmation. No undo or silent partial success.
 - Current scope/identity/eligibility/workflow revision is checked. New review/extraction evidence alone does not block screening; the earlier strict-evidence-baseline proposal is superseded.
 - Shared screening operation closes processing/fences late writes and freezes review for both individual and imported decisions. No completed-review fabrication; no new provider work. One transactional candidate screening notice, not actor copies.
@@ -20,7 +21,7 @@ Examples are operating options, not field research: teams can divide vacancies/d
 ## Remaining gates / scope boundaries
 
 - Q-SI: real migration/SQL/FK/transaction race/rollback validation; authenticated HTTP role/Origin/multipart/candidate-privacy checks; updated regression for changed review locks; manual export/edit/import/conflict/role-switch walkthrough. Isolated model/DOM checks are not these results.
-- P0-S/B1-R remainder: whole-application readiness, manual release, failure categorization. This checkpoint implements screening/completion closure only, not the full readiness/release journey.
+- P0-S/B1-R/J readiness, manual release, failure categorization and confirmation/list/export/draft UI are implemented. The user reported release/correction/completion/locked-review working; real integration/privacy/race remainder stays Q-B1R/J. Durable interrupted-live attempt recovery is B4-S, not solved by screening/release.
 - Notification remainder: submission/appointment/Pass/Offer/Hired and owner-finalization effects, broader candidate progress, explicit hide/lifetime, and historical-feed design. Screening notices alone are implemented; old interview retention unchanged.
-- B1-P publication freeze and B1-F explicit zero-interview owner Offer are source-implemented. Import still uses undecided eligibility, never a review-ready gate. Broader readiness/notification changes are not implied delivered.
+- B1-P publication freeze and B1-F explicit zero-interview owner Offer are implemented, with partial user-reported progression/owner-only evidence in status. Import uses undecided eligibility, never a review-ready gate. Broader notifications remain unimplemented.
 - Search/export tracking, regex, second file layout/JSON, causal receipts, claims/assignment and supervisor-only approval remain unimplemented. Further cards are not authorized by this checkpoint.

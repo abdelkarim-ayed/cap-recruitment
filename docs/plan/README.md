@@ -1,6 +1,6 @@
 # Planning index
 
-Latest planning checkpoint: 2026-11-09. Earlier QA reports/UX requests are locally merged; the [intent-led UI/UX briefing](ui-ux-overhaul.md) consolidates the user's general principles and HR page examples for the next session. No UI implementation in this checkpoint. Source baseline includes R1/R2/R3a–d/SI/B1-P/F/R/J and T2a; local setup applied migrations 007/008 and launched API/frontend in RMUX on 2026-11-07. [Task board](tasks.md) separates reported manual paths from pending full gates. No push/live-provider/key/spending work or blanket next-card approval.
+Planning baseline: 2026-11-09. R1/R2/R3a–d/SI/B1-P/F/R/J, T2a and the recruitment UI overhaul/consistency pass are locally merged into main. The [current frontend baseline](../current/guides/frontend-design.md) records implemented interaction/product/style choices; [UI follow-ups](ui-ux-overhaul.md) contain only remaining work and verification. Local setup applied migrations 007/008; dated build/offline/manual evidence is in [status](../current/status.md). The [task board](tasks.md) distinguishes completed implementation from pending QA. No push, live-provider work or blanket next-card approval.
 
 Screening may happen before extraction/review finishes; either outcome freezes extraction/review without inventing completion. The interview plan may be empty, freezes at publication, and never replaces explicit owner Offer/Hired actions. See [product decisions](product-decisions.md) for the selected rules and [task board](tasks.md) for proposed decomposition, dependencies and remaining gates. Earlier mandatory reviewed-only screening/minimum-one-interview directions are superseded, not implemented contracts.
 
@@ -8,7 +8,7 @@ Screening may happen before extraction/review finishes; either outcome freezes e
 | --- | --- |
 | Which directions did the user choose, and what remains open? | [Product decisions](product-decisions.md) |
 | What should happen next / later? | [Task board](tasks.md) |
-| What UI/UX vision should the next session implement? | [Intent-led overhaul briefing](ui-ux-overhaul.md), then select a bounded slice on the board |
+| What UI behavior must be preserved, and what remains? | [Current frontend baseline](../current/guides/frontend-design.md), then [bounded follow-ups](ui-ux-overhaul.md) |
 | Why refactor / what might break? | [Changeability and obstacles](changeability.md) |
 | How might extraction/review/evidence evolve? | [Extraction design](extraction-design.md) |
 | What is implemented for screening CSV and what remains? | [Current contract](../current/contracts/screening-api.md), [remaining work](screening-import-contract.md) |

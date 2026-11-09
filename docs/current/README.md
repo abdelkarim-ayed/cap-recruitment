@@ -7,7 +7,7 @@
 | Responsibility map and persistence | [Architecture](architecture.md) |
 | State dimensions, permissions, revisions | [Workflows](workflows.md) |
 | Existing action requirements and typed UI availability | [Action policies](contracts/action-policies.md) |
-| Undecided export, decision CSV, conflict UX and shared screening closure | [Screening contract](contracts/screening-api.md) (migration/integration pending) |
+| Undecided export, decision CSV, conflict UX and shared screening closure | [Screening contract](contracts/screening-api.md) (migration applied locally; broader QA pending) |
 | Spending boundary and extraction wiring | [Jev safety](jev-safety.md) |
 | Identity and API index | [API](contracts/api.md), [candidate access](contracts/candidate-access.md) |
 | Authoring / publication | [Vacancy contract](contracts/vacancy-api.md) |
@@ -21,7 +21,7 @@
 | Repeatable lifecycle scenario dataset | [Lifecycle fixtures](guides/lifecycle-demo.md) (locally seeded; broader QA pending) |
 | Automated/manual verification | [Backend checks](guides/backend-test.md), [integration testing](guides/integration-testing.md) |
 | Manual transition coverage | [Transition map](guides/transition-map.md) (source expectations, not executed passes) |
-| Durable UI style/interaction baseline (read before UI changes) | [Frontend design](guides/frontend-design.md) |
+| Implemented frontend product/interaction/style baseline (read before UI changes) | [Frontend design](guides/frontend-design.md) |
 | Host networking / terminals / portability | [Networking](guides/local-networking.md), [RMUX](guides/rmux.md), [Windows notes](guides/windows-compatibility.md) |
 
-These primarily describe source; dated operational checks/pending gates are in [status](status.md). Screening CSV/closure/notices, publication-time plan freeze, explicit zero-interview owner Offer, readiness/manual release with UI/list/filter, review no-op saves and review/vacancy/interview-plan/candidate/screening-import navigation guards are source-implemented. Local demo setup applied migrations 007/008, seeded lifecycle fixtures and launched API/web on 2026-11-07; broader integration/manual UX remains pending. Future notification behavior remains in [plan/](../plan/README.md).
+These describe implemented source; dated operational checks/pending gates are in [status](status.md). Screening/closure/notices, publication/finalization, readiness/manual release, no-op saves/navigation guards, T2a and the selected UI overhaul/consistency pass are locally merged. Preserve the frontend baseline rather than old proposal layouts. Local demo setup applied migrations 007/008 and seeded lifecycle fixtures; builds/offline checks and partial manual paths do not complete broader integration/native/privacy/race QA. Future notification/extraction behavior remains in [plan/](../plan/README.md).

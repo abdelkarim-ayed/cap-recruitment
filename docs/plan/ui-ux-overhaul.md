@@ -1,6 +1,6 @@
 # UI/UX follow-ups and implementation boundaries
 
-The implemented overhaul's decisions live in the **[durable frontend design baseline](../current/guides/frontend-design.md)**. Read it before changing existing screens; it replaces the earlier competing examples/proposals as current guidance. Keep API rules in [current contracts](../current/README.md), verification on the [task board](tasks.md), and dated evidence in [status](../current/status.md). Do not append a chronological implementation diary to the style guide or reopen settled choices as unspecified design.
+The overhaul and consistency pass are **implemented and locally merged into main**. Their decisions live in the **[durable frontend design baseline](../current/guides/frontend-design.md)**. Read it before changing existing screens; it replaces earlier competing examples/proposals. Keep API rules in [current contracts](../current/README.md), remaining verification on the [task board](tasks.md), and dated evidence in [status](../current/status.md). Pending QA does not make implemented UI a future design task. Do not append an implementation diary to the guide or reopen settled choices as unspecified design.
 
 ## Implemented decisions to preserve
 
@@ -17,7 +17,7 @@ The implemented overhaul's decisions live in the **[durable frontend design base
 
 ## Remaining bounded work
 
-- **Consistency feedback/manual review:** the approved source-review slice addresses plan inspect/edit separation, scope headings, topbar-only Inbox, navigation/status labels, readable submitted choices, validation/retry copy and grouped import ambiguity. Review remaining labels/icons/contacts/spacing/ownership/read-state cues in actual use; preserve useful failures/unknowns/fixture provenance. Examples guide scanability, not a mechanical checklist or permission to rewrite every surface.
+- **User review of implemented consistency:** plan inspect/edit separation, scope headings, topbar-only Inbox, human labels/validation/retry and grouped import are done. Review their actual layout/accessibility and report concrete remaining defects; no blanket second cleanup pass. Preserve useful failures/unknowns/fixture provenance.
 - **UX-NAV reproduction:** the reported missing interview sidebar item still needs actor/session/discoverability confirmation; source already has eligible-staff navigation. Do not invent a new permission or candidate appointment projection.
 - **Manual UX and regression catch-up:** narrow/responsive layouts, native dialog focus/inertness/Escape, dirty/pending/conflict navigation, account isolation, local-time/DST boundaries, real list/count parity and decision CSV round trips. Older DOM fixtures need adaptation. Source/build evidence is not a passed native/authenticated/race gate.
 - **Separate product work, not incidental polish:** broader candidate appointment/timeline/notification effects, Inbox counts/hide/retention, background polling and AI quotations/evidence/template expansion remain separately scoped. No new provider execution or fabricated past events.
@@ -28,4 +28,4 @@ Choose a bounded approved slice on the [board](tasks.md). Inspect entity, actor,
 
 Retain React/Vite/hash routing/local components; no framework/platform migration is selected. No browser automation/screenshots, data reset, live-provider/spending changes or worker/retention runner follows from UI work. Prefer scoped builds/static/offline checks during churn; native UI is checked manually by the user.
 
-Keep the UI work in its existing separate worktree. **Local commits are authorized; do not merge to main or push until the user explicitly authorizes that step.** Preserve unfamiliar changes and leave preview services alive; rediscover RMUX/listeners before managing agent-launched services.
+The completed UI branch has been merged without squash; no push was authorized. Its worktree is retained for the running preview, not unfinished implementation. Future UI source changes use a separate worktree and need their own scope/merge approval. Preserve unfamiliar changes and leave preview services alive; rediscover RMUX/listeners before managing agent-launched services.

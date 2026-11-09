@@ -46,7 +46,7 @@ Unsaved vacancy edits register with the shared [navigation guard](editor-navigat
 
 ### Staff inspection versus editing — UX-DENSITY-b
 
-Source-implemented in the UI worktree, 2026-11-09; native/manual review pending. The existing vacancy route opens the editor only for a draft owner whose server action metadata allows editing. Other authorized HR inspect draft/published/closed vacancies as job information, read-only form requirements and configured automated document checks—not a disabled editor. Owner metadata is quiet text; routine revisions and ownership-policy lectures are absent. A new-vacancy route still opens the creation form for eligible HR.
+The vacancy route opens the editor only for a draft owner whose server action metadata allows editing. Other authorized HR inspect draft/published/closed vacancies as job information, read-only form requirements and configured automated document checks—not a disabled editor. Owner metadata is quiet text; routine revisions and ownership-policy lectures are absent. A new-vacancy route opens the creation form for eligible HR. This is implemented in main; native/manual review remains pending.
 
 Drafts retain a distinct interview-plan configuration/read link; application/result links are hidden in that context without deleting or changing their routes. Published/closed inspection groups Applications and Interview plan & results under Recruitment. Only an owner with the existing published-close availability sees Close vacancy; closed vacancies cannot be edited or reopened. No extra plan fetch is needed just to inspect a vacancy. Staff/public resource state is keyed by identity/role/projection and resource ID, so switching those waits for a fresh fetch rather than reusing a previous staff surface.
 
