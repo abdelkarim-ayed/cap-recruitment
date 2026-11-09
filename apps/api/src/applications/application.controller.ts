@@ -21,6 +21,9 @@ export class ApplicationsController {
   }
   @Get('applications') @RequireAction('application.list') @Header('Cache-Control', 'private, no-store')
   list(@Req() request: AuthenticatedRequest, @Query() query: unknown) { return this.service.list(request.actor, query); }
+  @Get('applications/for-vacancy/:vacancyId') @RequireAction('application.submit')
+  @Header('Cache-Control', 'private, no-store')
+  forVacancy(@Param('vacancyId',new ParseUUIDPipe()) vacancyId:string,@Req() request:AuthenticatedRequest){return this.service.ownForVacancy(vacancyId,request.actor);}
   @Get('vacancies/:id/applications') @RequireAction('application.listVacancy')
   @Header('Cache-Control', 'private, no-store')
   listVacancy(@Param('id', new ParseUUIDPipe()) id: string, @Req() request: AuthenticatedRequest, @Query() query: unknown) { return this.service.list(request.actor, query, id); }

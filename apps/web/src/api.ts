@@ -7,7 +7,7 @@ export async function api<T = any>(path: string, init: RequestInit = {}): Promis
     const details = body.issues?.map((issue: {path: string; message: string}) => `${issue.path}: ${issue.message}`).join('\n');
     const message = details || (Array.isArray(body.message) ? body.message.join(', ') : body.message) || `Request failed (${response.status}).`;
     const retryAfter=response.headers.get('X-Retry-After')||response.headers.get('Retry-After');
-    throw Object.assign(new Error(response.status === 401 && !path.startsWith('auth/') ? 'Please sign in again to continue.' : response.status===429?`${message} ${retryAfter?`Try again in ${retryAfter} seconds.`:'Wait a minute before retrying.'}`:message),{status:response.status,conflicts:body.conflicts});
+    throw Object.assign(new Error(response.status === 401 && !path.startsWith('auth/') ? 'Please sign in again to continue.' : response.status===429?`${message} ${retryAfter?`Try again in ${retryAfter} seconds.`:'Wait a minute before retrying.'}`:message),{status:response.status,conflicts:body.conflicts,issues:body.issues});
   }
   return body;
 }

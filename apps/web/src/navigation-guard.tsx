@@ -5,10 +5,10 @@ export const navigateEvent='recruitment:navigate';
 const route=()=>window.location.hash.slice(1)||'/vacancies';
 const entryIndex=()=>Number.isSafeInteger(window.history.state?.[indexKey])?window.history.state[indexKey] as number:null;
 const markedState=(index:number)=>({...window.history.state,[indexKey]:index});
-export type EditorKind='review'|'vacancy'|'plan'|'application'|'import';
+export type EditorKind='review'|'vacancy'|'plan'|'application'|'import'|'recruitment'|'appointment';
 type Guard={owner:symbol;kind:EditorKind;dirty:boolean;pending:boolean};
-type Destination={kind:'route';path:string;index?:number}|{kind:'action';run:()=>void|Promise<void>};
-interface Navigation { path:string; register:(guard:Guard)=>()=>void; requestAction:(run:()=>void|Promise<void>)=>void }
+type Destination={kind:'route';path:string;index?:number;replace?:boolean}|{kind:'action';run:()=>void|Promise<void>};
+interface Navigation { path:string; confirmingLeave:boolean; register:(guard:Guard)=>()=>void; requestAction:(run:()=>void|Promise<void>)=>void; replacePath:(path:string)=>void }
 const NavigationContext=createContext<Navigation|null>(null);
 export function useNavigation(){const navigation=useContext(NavigationContext);if(!navigation)throw new Error('Navigation boundary required.');return navigation;}
 export function useOptionalNavigation(){return useContext(NavigationContext);}
@@ -24,7 +24,9 @@ const guardCopy:Record<EditorKind,{pendingTitle:string;dirtyTitle:string;dirtyDe
   vacancy:{pendingTitle:'Vacancy update in progress',dirtyTitle:'Leave with an unsaved vacancy draft?',dirtyDescription:'Leaving discards your local vacancy edits. The saved draft stays unchanged. Nothing will be saved automatically.'},
   plan:{pendingTitle:'Interview plan save in progress',dirtyTitle:'Leave with an unsaved interview plan?',dirtyDescription:'Leaving discards your local interview-plan edits. The saved plan stays unchanged. Nothing will be saved automatically.'},
   application:{pendingTitle:'Application submission in progress',dirtyTitle:'Leave with an unsaved application?',dirtyDescription:'Leaving discards your answers and selected documents. Nothing will be submitted automatically.'},
-  import:{pendingTitle:'Screening check in progress',dirtyTitle:'Leave with unsaved screening decisions?',dirtyDescription:'Leaving discards this upload and its staged decisions. No decisions will be applied automatically.'}
+  import:{pendingTitle:'Screening check in progress',dirtyTitle:'Leave with unsaved screening decisions?',dirtyDescription:'Leaving discards this upload and its staged decisions. No decisions will be applied automatically.'},
+  recruitment:{pendingTitle:'Recruitment update in progress',dirtyTitle:'Leave with an unconfirmed recruitment action?',dirtyDescription:'Leaving discards your local decision, reason or interview arrangements. Nothing will be saved automatically.'},
+  appointment:{pendingTitle:'Appointment update in progress',dirtyTitle:'Leave with unsaved appointment changes?',dirtyDescription:'Leaving discards your local assessment, reason or arrangements. Nothing will be submitted automatically.'}
 };
 
 // One small boundary for the existing hash router, not a permission/workflow
@@ -45,12 +47,16 @@ export function NavigationBoundary({children}:{children:ReactNode}){
     const index=current.current.index+1;window.history.pushState({[indexKey]:index},'',`#${nextPath}`);commit(nextPath,index);
   },[commit]);
   const perform=useCallback((next:Destination)=>{
-    if(next.kind==='route'){push(next.path);queue(null);return;}
+    if(next.kind==='route'){
+      if(next.replace){window.history.replaceState(markedState(current.current.index),'',`#${next.path}`);commit(next.path,current.current.index);}
+      else push(next.path);
+      queue(null);return;
+    }
     executing.current=true;setLeaving(true);
     // Sign-out handles its own API error. Only the explicitly approved action's
     // redirect may bypass this guard; no save/cancel/retry request is generated.
     void Promise.resolve().then(next.run).finally(()=>{executing.current=false;setLeaving(false);queue(null);});
-  },[push,queue]);
+  },[push,queue,commit]);
   const request=useCallback((next:Destination)=>{
     if(next.kind==='route'&&next.path===current.current.path)return;
     if(executing.current){if(next.kind==='route')push(next.path);return;}
@@ -59,6 +65,7 @@ export function NavigationBoundary({children}:{children:ReactNode}){
     if(active?.dirty||active?.pending)queue(next);else perform(next);
   },[perform,push,queue]);
   const requestAction=useCallback((run:()=>void|Promise<void>)=>request({kind:'action',run}),[request]);
+  const replacePath=useCallback((path:string)=>request({kind:'route',path,replace:true}),[request]);
   useEffect(()=>{
     if(entryIndex()===null)window.history.replaceState(markedState(current.current.index),'',window.location.href);
     const changed=()=>{
@@ -86,6 +93,9 @@ export function NavigationBoundary({children}:{children:ReactNode}){
       if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
       const anchor=(event.target as HTMLElement|null)?.closest?.('a[href]');
       if(!(anchor instanceof window.HTMLAnchorElement)||anchor.hasAttribute('download')||anchor.target&&anchor.target!=='_self')return;
+      // Inbox owns its read-before-open click and calls go() after that succeeds.
+      // Modifier/context-menu navigation still uses the anchor's native URL.
+      if(anchor.hasAttribute('data-notification-link'))return;
       const url=new URL(anchor.href,window.location.href);
       if(url.origin!==window.location.origin||url.pathname!==window.location.pathname||url.search!==window.location.search||!url.hash.startsWith('#/'))return;
       event.preventDefault();request({kind:'route',path:url.hash.slice(1)});
@@ -120,7 +130,7 @@ export function NavigationBoundary({children}:{children:ReactNode}){
     if(next.kind==='route'&&next.index!==undefined){approved.current={path:next.path,index:next.index};setLeaving(true);window.history.go(next.index-current.current.index);}
     else perform(next);
   }
-  const value=useMemo(()=>({path,register,requestAction}),[path,register,requestAction]);
+  const value=useMemo(()=>({path,confirmingLeave:open,register,requestAction,replacePath}),[path,open,register,requestAction,replacePath]);
   const copy=guardCopy[guard?.kind??'review'];
   return <NavigationContext.Provider value={value}><div inert={open}>{children}</div>{open&&<section ref={dialog} className="card review-leave-dialog" role="alertdialog" aria-modal="true" aria-labelledby="review-leave-title" aria-describedby="review-leave-description"><h2 id="review-leave-title">{guard?.pending?copy.pendingTitle:guard?.dirty?copy.dirtyTitle:'Leave this page?'}</h2><p id="review-leave-description">{guard?.pending?'Wait for the current request to finish. Leaving cannot cancel a server write.':guard?.dirty?copy.dirtyDescription:'The current request has finished. You can now leave, or stay to check the result.'}</p>{waitingHistory&&<p role="status">Restoring the current page before choosing…</p>}<div className="actions"><button ref={stay} disabled={leaving||waitingHistory} onClick={cancel}>Stay</button><button className="danger" disabled={!!guard?.pending||waitingHistory||leaving} onClick={confirm}>{leaving?'Leaving…':guard?.dirty?'Discard and leave':'Leave page'}</button></div></section>}</NavigationContext.Provider>;
 }

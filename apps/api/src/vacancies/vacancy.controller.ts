@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, ParseUUIDPipe, Patch, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Get, Header, HttpCode, Param, ParseUUIDPipe, Patch, Post, Query, Req } from '@nestjs/common';
 import { Public, RequireAction, type AuthenticatedRequest } from '../auth/access.js';
 import { VacancyService } from './vacancy.service.js';
 import { withVacancyActions } from './vacancy.policy.js';
@@ -9,7 +9,10 @@ export class VacanciesController {
   constructor(private readonly service: VacancyService) {}
   @Post() @RequireAction('vacancy.create')
   async create(@Req() request: AuthenticatedRequest, @Body() body: unknown) { return withVacancyActions(await this.service.create(request.actor.id, body),request.actor.id); }
-  @Get() list(@Query() query: unknown) { return this.service.list(false, query); }
+  @Get() @Header('Cache-Control','private, no-store')
+  list(@Req() request:AuthenticatedRequest,@Query() query: unknown) { return this.service.listStaff(request.actor, query); }
+  @Get('owners') @Header('Cache-Control','private, no-store')
+  owners(@Req() request:AuthenticatedRequest){return this.service.owners(request.actor);}
   @Get(':id') async get(@Param('id', new ParseUUIDPipe()) id: string,@Req() request:AuthenticatedRequest) { return withVacancyActions(await this.service.get(id),request.actor.id); }
   @Patch(':id') @RequireAction('vacancy.edit')
   async patch(@Param('id', new ParseUUIDPipe()) id: string, @Req() request: AuthenticatedRequest, @Body() body: unknown) { return withVacancyActions(await this.service.patch(id, request.actor.id, body),request.actor.id); }
@@ -24,4 +27,11 @@ export class PublicVacanciesController {
   constructor(private readonly service: VacancyService) {}
   @Get() list(@Query() query: unknown) { return this.service.list(true, query); }
   @Get(':id') get(@Param('id', new ParseUUIDPipe()) id: string) { return this.service.get(id, true); }
+}
+@Controller('candidate/vacancies')
+@RequireAction('application.submit')
+export class CandidateVacanciesController {
+  constructor(private readonly service:VacancyService){}
+  @Get() @Header('Cache-Control','private, no-store')
+  list(@Req() request:AuthenticatedRequest,@Query() query:unknown){return this.service.listForCandidate(request.actor,query);}
 }

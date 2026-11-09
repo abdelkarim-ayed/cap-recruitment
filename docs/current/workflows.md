@@ -23,7 +23,7 @@ Submission with tasks starts `received + pending + pending`. Without tasks it st
 5. Any HR can preselect/reject undecided applications regardless of processing/review, individually or through CSV. First committed screening outcome wins; either closes processing and freezes review without fabricating completion. HR schedules the owner-defined interviews frozen at publication; multiple appointments may be scheduled ahead. Appointment logistics remain separately editable.
 6. Assignee submits final notes, optional 0–10 score and Pass/Fail after the start. Fail sets Not selected and cancels every other unfinished instance. Pass does not accept or automatically advance the applicant. One instance per application/step; cancellation cannot be replaced.
 7. Owner explicitly records Offer after all configured interviews pass, or directly from preselected with zero configured interviews. Neither preselection nor Pass automatically offers; Hired separately requires Offer. Screening rejection text optional; later rejection still needs a reason (shared HR through preselected, owner afterwards). Hired/Not selected terminal, no reversal.
-8. Candidate application stage remains masked, but own generic screening notices appear in Inbox. Staff interview-event policy is unchanged; no internal reason/review data enters candidate notices.
+8. Candidates see [allowlisted public progression/outcomes](contracts/application-api.md#candidate-public-status) in their own applications and generic screening notices in Inbox. Internal review stages remain masked; no internal reason/review/assessment data is published. Staff interview-event policy is unchanged.
 
 ## Current inbox behavior
 

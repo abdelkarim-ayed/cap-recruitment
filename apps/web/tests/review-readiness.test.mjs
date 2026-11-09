@@ -17,7 +17,7 @@ function view(state='waiting',revision=1){const editable=['ready','released'].in
 function detail(server,mutate){globalThis.fetch=async(path,init)=>{if(init?.method)return mutate(path,init);return json(path.endsWith('/review')?server():record);};render(React.createElement(ApplicationPage,{id:'app',staff:true}));}
 test('waiting evidence is viewable and screening-linked; release requires confirmation and can cancel',async()=>{
   let posts=0;let current=view();detail(()=>current,async(path,init)=>{posts++;ok(path.endsWith('/review/release'));deepEqual(JSON.parse(init.body),{expectedRevision:1});current=view('released',2);return json(current);});
-  await screen.findByText('Waiting for processing');ok(screen.getByText('Immutable answer'));ok(screen.getByText('Selection & interviews'));equal(screen.getByText('Save correction').disabled,true);
+  await screen.findByText('Waiting for processing');ok(screen.getByText('Immutable answer'));ok(screen.getByRole('link',{name:'Screening decision'}));equal(screen.getByText('Save correction').disabled,true);
   fireEvent.click(screen.getByText('Release to review'));await screen.findByRole('dialog');equal(posts,0);fireEvent.click(screen.getByText('Cancel'));equal(screen.queryByRole('dialog'),null);equal(posts,0);
   fireEvent.click(screen.getByText('Release to review'));ok(screen.getByText(/may still incur cost/));fireEvent.click(screen.getByText('Confirm release'));
   await screen.findByText('Released to review');equal(posts,1);equal(screen.getByText('Save correction').disabled,false);equal(screen.queryByText('Release to review'),null);ok(screen.getAllByText('Processing closed (unfinished)').length>0);equal(screen.queryByText('Current saved revision 2'),null);

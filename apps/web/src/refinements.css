@@ -1,8 +1,219 @@
 .badge-green{background:#ecf8ef;border-color:#cae7d3;color:#24683e}.badge-red{background:#fff1f0;border-color:#f0d0cc;color:#a23636}.badge-amber{background:#fff8e7;border-color:#ecdcae;color:#855f10}.badge-blue{background:#edf3ff;border-color:#ccdafa;color:#2456b5}
-.screening-invalid{background:#fff1f0}.screening-invalid .screening-identity{text-decoration:line-through;text-decoration-color:#a23636}.screening-decided{background:#f1f3f5;color:#596575}.screening-decided .screening-identity{text-decoration:line-through;text-decoration-style:double}.screening-wizard small{overflow-wrap:anywhere}.screening-wizard .confirm{margin-top:20px;padding:16px;border:1px solid #ccdafa}
+.screening-wizard small{overflow-wrap:anywhere}
+.import-steps{list-style:none;padding:0;display:flex;gap:8px;margin:16px 0 22px;flex-wrap:wrap}.import-steps li{padding:8px 14px;border-radius:6px;background:#f2f4f7;color:#637087;font-size:13px}.import-steps li[aria-current="step"]{background:#eaf1ff;color:#2456b5;font-weight:600}
+.import-help{font-size:13px;color:#596575;margin-bottom:18px}.import-help summary{cursor:pointer}.import-upload{max-width:560px}
+.import-summary{display:flex;align-items:center;gap:12px 22px;flex-wrap:wrap;margin:22px 0 16px;padding:14px 0;border-block:1px solid #e2e7ef;font-size:13px}.import-summary>span{display:inline-flex;align-items:center;gap:5px}
+.outcome-preselected{color:#216548}.outcome-rejected{color:#a73542}.outcome-undecided{color:#805c24}.import-selection-tools,.import-bulk-decisions{margin-bottom:14px;flex-wrap:wrap}
+.import-table{min-width:1040px}.import-table th{white-space:nowrap}.import-table td{vertical-align:top}.import-table td:nth-child(2){width:110px}.import-table td:nth-child(3){min-width:200px}.import-table td:nth-child(4){min-width:180px}.import-table td:nth-child(5){min-width:195px}.import-table td:nth-child(6){min-width:240px;max-width:410px}
+.import-table select{max-width:100%;font-size:13px}.import-table small{display:block;margin-top:5px}.import-table .import-application-id{font-size:11px;color:#6c7789}.import-state,.import-outcome{display:flex;align-items:center;gap:5px;font-size:12px}.import-outcome{margin-top:8px}.import-state{font-weight:600}.import-state .ui-icon,.import-outcome .ui-icon{width:15px;height:15px}
+.import-preselected{background:#f7fcf9}.import-rejected{background:#fff9f9}.import-unresolved{background:#fffbef}.import-invalid{background:#fff3f2}.import-parse{background:#fff7ee}.import-excluded,.import-decided{background:#f1f3f5;color:#637087}
+.import-invalid .screening-identity,.import-invalid .import-email,.import-invalid .import-application-id{text-decoration:line-through;text-decoration-color:#aa4d53}.import-parse .screening-identity,.import-parse .import-email{text-decoration:line-through;text-decoration-style:dotted}.import-excluded .screening-identity{text-decoration:line-through}.import-decided .screening-identity{color:#637087}
+.import-issues{margin:8px 0 0;padding-left:18px;font-size:12px}.import-retained{font-size:12px;margin:10px 0}.import-table details{font-size:12px;margin-top:8px}.import-table details summary{cursor:pointer}.import-footer{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:20px}.import-footer p{max-width:680px;margin:0}
+.account-email-field{padding:16px 18px;border:1px solid #dce4ef;border-radius:8px;background:#f8faff;margin:18px 0 24px}.account-email-field label{margin:0}.account-email-field input{max-width:560px;background:#f0f3f7;color:#43516a}.account-email-field p{margin:8px 0 0}.field-type{font-size:12px;color:#596575;font-weight:400}.field-advanced{padding:12px 0;margin:10px 0;border-top:1px solid #e2e7ef;font-size:13px}.field-advanced>summary{cursor:pointer;color:#596575}.field-advanced label{margin-top:12px}.form-builder .task-panel h3{margin-top:0}.form-builder .task-panel p{font-size:13px;color:#596575}
+.form-builder .choice-row{grid-template-columns:minmax(160px,1fr) minmax(130px,1fr) auto;align-items:center}.form-builder .choice-row .field-advanced{border:0;margin:0;padding:0}.form-builder .choice-row label{margin:8px 0}
+@media(max-width:680px){.form-builder .choice-row{grid-template-columns:minmax(0,1fr) auto}.form-builder .choice-row .field-advanced{grid-column:1;grid-row:2}.form-builder .choice-row>.icon-button{grid-column:2;grid-row:1}.import-summary{gap:10px}.import-steps{gap:5px}}
 .table-controls{display:flex;gap:16px;flex-wrap:wrap;margin:0 0 20px}.table-controls label{min-width:180px}.owner-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}
 .saved-value{border:1px solid #c9dfed;background:#f2f8fc;border-radius:7px;padding:16px;margin-bottom:20px}.saved-value h4{font-size:14px;margin:6px 0}.saved-value pre{margin-bottom:8px}.original-result{border-top:1px solid #e4eaf2;margin-top:20px;padding-top:8px}.original-result summary{padding-left:0}.review-workspace{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:start}.review-workspace.with-preview{grid-template-columns:minmax(320px,.95fr) minmax(0,1.2fr)}.pdf-preview{position:sticky;top:16px}.pdf-frame{width:100%;height:75vh;min-height:480px;border:1px solid #e1e6ef;border-radius:6px;background:#edf1f7}.review-workspace.with-preview .extraction-card .two{grid-template-columns:1fr}.document-actions{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.extraction-card .correction-form{margin-top:8px}.saved-state{font-weight:600;color:#31526c}
 @media(max-width:1100px){.review-workspace.with-preview{grid-template-columns:1fr}.pdf-preview{position:static}.pdf-frame{height:65vh}.table-controls label{flex:1;min-width:150px}}
 .effective-skills{font-size:15px;font-weight:500;overflow-wrap:anywhere}.processing-details{font-size:12px;color:#53627a;display:flex;flex-wrap:wrap;gap:8px 24px;margin:16px 0 0}.processing-details dt{font-weight:600}.processing-details dd{margin:0;overflow-wrap:anywhere}
 .review-draft{border:1px solid #d7deea;border-radius:6px;padding:12px;margin:12px 0;background:#f8fafc}.review-draft pre{white-space:pre-wrap;overflow-wrap:anywhere}
 .review-leave-dialog{position:fixed;z-index:100;top:25vh;left:50%;transform:translateX(-50%);width:min(520px,calc(100% - 32px));box-shadow:0 16px 80px #17243b55;border:2px solid #d7deea}
+
+/* Vacancy index: entity links, quiet metadata, one state signal per row.
+   Scoped deliberately; later intent-led slices can adopt the vocabulary. */
+.vacancy-index .page-heading{margin-bottom:28px}
+.vacancy-index .page-heading h1{letter-spacing:-.035em;font-weight:650}
+.vacancy-index .page-heading p{color:#596575;max-width:48ch}
+.vacancy-index .page-heading .primary{background:#24334d;border-color:#24334d;border-radius:8px}
+.vacancy-index .page-heading .primary:hover{background:#17243b}
+.vacancy-list-controls{gap:12px 24px;margin-bottom:24px}
+.vacancy-list-controls label{min-width:170px;font-size:12px;font-weight:500;color:#596575}
+.vacancy-list-controls select{border-radius:8px;background-color:#fff;color:#24334d;font-size:14px}
+.vacancy-list-controls .vacancy-unapplied-filter{align-self:flex-end;min-height:40px;min-width:0;font-size:14px}
+.vacancy-filter-shortcuts{display:flex;align-self:flex-end;gap:8px;flex-wrap:wrap}.vacancy-filter-shortcuts button{min-height:40px}.vacancy-filter-shortcuts button[aria-pressed="true"]{background:#edf3ff;border-color:#9ebbec;color:#2456b5}
+.inbox-shortcut[aria-current="page"]{background:#edf3ff;border-color:#9ebbec;color:#2456b5}
+.notification-read-state{font-size:12px;color:#637087}.is-unread .notification-read-state{color:#2456b5;font-weight:600}.inbox-message.is-unread h2{font-weight:650}.inbox-message.is-read h2{font-weight:500}.inbox-message h2 .ui-icon{color:#637087}.inbox-message .actions a{display:inline-flex;align-items:center;min-height:40px;margin-right:8px}.inbox-message .actions a[aria-disabled="true"]{opacity:.5;cursor:wait}.inbox-list .pager{margin-top:20px}
+.plan-owner{display:flex;align-items:baseline;gap:8px 24px;flex-wrap:wrap;font-size:13px;color:#596575;margin-bottom:24px}.plan-owner p{margin:0}.plan-owner summary{cursor:pointer}.interview-plan-page>.page-heading{margin-bottom:8px}.plan-outline{padding-left:22px;margin:0}.plan-outline>li+li{margin-top:20px}.plan-outline h3{font-size:15px;margin:0 0 8px}.plan-outline p{font-size:13px;margin:0;color:#596575;max-width:76ch}.plan-step-editor{position:relative;padding:0 52px 18px 0;margin-bottom:18px;border-bottom:1px solid #e2e7ef}.plan-step-editor>.icon-button{position:absolute;right:0;top:30px}.interview-plan-page .actions{flex-wrap:wrap}.plan-comparison{margin-top:20px;padding-top:16px;border-top:1px solid #e2e7ef;font-size:13px}.plan-comparison summary{cursor:pointer;margin-bottom:14px}.plan-results td{vertical-align:top}.plan-results small{display:block;margin-top:8px}
+.vacancy-list-surface{background:#fff;border:1px solid #e2e7ef;border-radius:10px;overflow:hidden}
+.vacancy-list-table{width:100%;table-layout:fixed;margin:0}
+.vacancy-list-table th{background:#fff;color:#596575;font-size:12px;font-weight:500;text-transform:none;letter-spacing:normal;padding:14px 24px;border-bottom:1px solid #e2e7ef}
+.vacancy-list-table th:first-child{width:55%}
+.vacancy-list-table th.vacancy-list-status-column{width:120px}
+.vacancy-list-table td{padding:16px 24px;vertical-align:middle;border-bottom:1px solid #edf0f4;overflow-wrap:anywhere}
+.vacancy-list-table tbody tr:last-child td{border-bottom:0}
+.vacancy-list-table tbody tr:hover,.vacancy-list-table tbody tr:focus-within{background:#f8fafc}
+.vacancy-title-link{display:inline-flex;align-items:center;min-height:44px;max-width:100%;padding:6px 0;font-size:15px;font-weight:600;line-height:1.4;color:#17243b;text-decoration:none;text-underline-offset:4px}
+.vacancy-title-link:hover,.vacancy-title-link:focus-visible{color:#2456b5;text-decoration:underline}
+.vacancy-list-owner{margin:0;font-size:12px;line-height:1.5;color:#596575}
+.vacancy-list-location{color:#596575;font-size:13px}
+.vacancy-list-status{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#596575}
+.vacancy-list-table td:has(.vacancy-list-status){white-space:nowrap;overflow-wrap:normal}
+.vacancy-list-status{white-space:nowrap;overflow-wrap:normal}
+.vacancy-list-status::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+.vacancy-list-status[data-state="draft"]{color:#855f10}
+.vacancy-list-status[data-state="published"]{color:#24683e}
+.vacancy-list-surface .pager{margin:0;padding:16px 24px;border-top:1px solid #e2e7ef;color:#596575}
+.vacancy-list-surface .pager button{border-radius:8px;background:transparent}
+@media(max-width:680px){
+  .vacancy-list-controls label{min-width:0;flex:1 1 140px}
+  .vacancy-list-table th,.vacancy-list-table td{padding-left:12px;padding-right:12px}
+  .vacancy-list-table th:first-child{width:48%}
+  .vacancy-list-table th.vacancy-list-status-column{width:96px}
+  .vacancy-title-link{font-size:14px}
+  .vacancy-list-status{gap:5px;font-size:12px}
+  .vacancy-list-surface .pager{padding:14px 12px;gap:12px;flex-wrap:wrap}
+}
+
+/* Vacancy inspection has its own reading hierarchy, never a disabled editor. */
+.vacancy-back-link{display:inline-block;margin:0 0 18px;color:#596575;text-underline-offset:4px}
+.vacancy-back-link:hover{color:#2456b5}
+.vacancy-detail .page-heading{margin-bottom:8px}
+.vacancy-detail .page-heading h1{letter-spacing:-.025em}
+.vacancy-detail .page-heading p{color:#596575}
+.vacancy-owner{margin:0 0 28px;color:#596575;font-size:13px}
+.vacancy-detail-status{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#596575}
+.vacancy-detail-status::before{content:'';width:6px;height:6px;flex:none;border-radius:50%;background:currentColor}
+.vacancy-detail-status[data-state="draft"]{color:#855f10}
+.vacancy-detail-status[data-state="published"]{color:#24683e}
+.vacancy-section{padding:24px 0;border-top:1px solid #dfe5ed}
+.vacancy-section h2{font-size:18px;margin:0 0 14px}
+.vacancy-section .section-heading h2{margin:0}
+.vacancy-description{max-width:76ch;overflow-wrap:anywhere;margin:0}
+.vacancy-form-outline{list-style:none;padding:0;margin:0;max-width:76ch}
+.vacancy-form-outline>li+li{margin-top:20px}
+.vacancy-form-outline h3{margin:28px 0 8px;font-size:15px}
+.vacancy-field-label{font-weight:600;overflow-wrap:anywhere}
+.vacancy-field-meta{font-size:13px;color:#596575;margin:4px 0 0;overflow-wrap:anywhere}
+.vacancy-choice-outline{padding-left:20px;margin:8px 0 0;font-size:13px;color:#596575}
+.vacancy-related-nav{display:flex;flex-wrap:wrap;gap:12px 24px}
+.vacancy-related-nav a{display:inline-block;padding:8px 0;background:transparent;color:#2456b5;border-radius:0;font-weight:500;text-underline-offset:4px}
+.vacancy-related-nav a:hover{text-decoration:underline;background:transparent}
+.vacancy-confirmation{width:min(560px,calc(100% - 32px));max-height:calc(100dvh - 48px);box-sizing:border-box;overflow:auto;padding:28px;border:1px solid #d7deea;border-radius:12px;color:#17243b;background:#fff;box-shadow:0 24px 80px #17243b33}
+.vacancy-confirmation::backdrop{background:#17243b66}
+.vacancy-confirmation h2{margin-top:0;font-size:21px}
+.vacancy-confirmation .actions{justify-content:flex-end;margin-top:24px;flex-wrap:wrap}
+.vacancy-confirmation ol{padding-left:22px;overflow-wrap:anywhere}
+@media(max-width:680px){
+  .vacancy-confirmation{padding:20px}
+  .vacancy-section .section-heading{gap:12px}
+}
+
+/* Application inspection: submitted information first; review and recruitment
+   remain distinct intents. Existing correction controls retain their behavior. */
+.application-back-link{display:inline-block;margin-bottom:18px;color:#596575;text-underline-offset:4px}
+.application-back-link:hover{color:#2456b5}
+.application-detail>.page-heading{margin-bottom:8px}
+.application-detail>.page-heading h1{letter-spacing:-.025em}
+.application-vacancy{margin:0 0 8px;font-size:15px}
+.application-vacancy a{color:#53627a;text-underline-offset:4px}
+.application-vacancy a:hover{color:#2456b5}
+.application-metadata{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 24px;font-size:12px;color:#596575;margin-bottom:28px}
+.application-metadata p{margin:0}
+.application-contact summary{padding:4px 0;cursor:pointer;font-size:12px;font-weight:400;color:#596575}
+.application-contact span{display:block;overflow-wrap:anywhere;padding-top:4px}
+.application-section{padding:24px 0;border-top:1px solid #dfe5ed;min-width:0}
+.application-section h2{font-size:18px;margin:0 0 18px}
+.application-section h3{font-size:15px;margin:24px 0 12px}
+.application-section .section-heading h2{margin:0}
+.application-answer-group{max-width:76ch;margin:0 0 24px}
+.application-answer-group+.application-answer-group{border-top:1px solid #e5eaf0;padding-top:20px}
+.application-answer-group h4{font-size:14px;margin:0 0 16px;color:#43516a}
+.application-answers{display:grid;gap:18px;margin:0}
+.application-answers>div{min-width:0}
+.application-answers dt{font-size:12px;color:#596575;font-weight:500;margin-bottom:5px}
+.application-answers dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.6}
+.application-documents{list-style:none;padding:0;margin:0}
+.application-documents>li{padding:16px 0;display:flex;align-items:center;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;border-bottom:1px solid #edf0f4}
+.application-documents>li:last-child{border-bottom:0}
+.application-document-name{font-weight:500;overflow-wrap:anywhere}
+.application-document-meta{margin:4px 0 0;font-size:12px;color:#596575}
+.application-documents .document-actions{margin:0}
+.application-documents button{font-size:12px;border-radius:8px}
+.application-information-layout.with-preview{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,1fr);gap:24px;align-items:start}
+.application-information-layout .pdf-preview{margin-top:24px}
+.application-result-metadata{display:flex;flex-wrap:wrap;gap:16px 36px;margin:0 0 18px}
+.application-result-metadata dt{font-size:12px;color:#596575;margin-bottom:5px}
+.application-result-metadata dd{margin:0;font-size:14px}
+.application-review-actions{flex-wrap:wrap;margin:16px 0}
+.application-review-fields{margin-top:20px}
+.application-detail .application-review-fields h3{margin:0;font-size:15px}
+.application-journey-link{display:inline-flex;align-items:center;gap:8px;min-height:44px;text-underline-offset:4px;font-weight:500}
+@media(max-width:1100px){.application-information-layout.with-preview{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:680px){
+  .application-documents>li{align-items:flex-start}
+  .application-documents .document-actions{flex-wrap:wrap;max-width:100%}
+  .application-documents button{white-space:normal;overflow-wrap:anywhere;text-align:left}
+}
+
+/* Workflow pages inspect current state; each mutation has its own intent modal. */
+.workflow-page .page-heading{margin-bottom:8px}
+.workflow-page .page-heading h1{letter-spacing:-.025em}
+.workflow-owner{font-size:13px;color:#596575;margin:12px 0 28px}
+.workflow-section{padding:24px 0;border-top:1px solid #dfe5ed}
+.workflow-section h2{font-size:18px;margin:0 0 16px}
+.workflow-section .section-heading h2{margin:0}
+.workflow-section .actions{flex-wrap:wrap}
+.workflow-plan{list-style:none;padding:0;margin:16px 0 0}
+.workflow-plan li{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #edf0f4;overflow-wrap:anywhere}
+.workflow-plan li:last-child{border-bottom:0}
+.workflow-plan .muted{font-size:12px;flex-shrink:0}
+.workflow-screening-choice{margin:20px 0;padding:16px;border:1px solid #dfe5ed;border-radius:8px}
+.workflow-screening-choice legend{padding:0 6px;font-size:13px;font-weight:500;color:#596575}
+.workflow-screening-choice .check{min-height:44px;font-size:14px}
+.intent-dialog textarea{margin-top:4px}
+.intent-dialog fieldset:disabled{opacity:.7}
+
+/* Review-batch polish: five scanning columns, secondary facts on demand. */
+.application-index .page-heading h1{letter-spacing:-.025em}
+.application-list-table{min-width:660px}
+.application-list-table th{font-size:12px;font-weight:500;color:#596575;background:#fff;padding:16px 20px}
+.application-list-table td{padding:16px 20px;vertical-align:top;overflow-wrap:anywhere}
+.application-list-table tbody tr:hover,.application-list-table tbody tr:focus-within{background:#f8fafc}
+.application-list-table .list-state{display:block;font-size:13px;line-height:1.5;text-transform:capitalize;max-width:24ch}
+.list-secondary{margin-top:8px;font-size:12px;color:#596575}
+.list-secondary summary{padding:2px 0;font-size:12px;font-weight:400}
+.list-secondary dl{margin:12px 0;max-width:26ch}
+.list-secondary dt{font-weight:500;margin-top:10px}.list-secondary dd{margin:2px 0}
+.application-list-filters,.application-file-tools{border-top:1px solid #dfe5ed;margin:16px 0;padding:10px 0}
+.application-list-filters>summary,.application-file-tools>summary{font-size:13px;font-weight:500;padding:8px 0;color:#43516a;cursor:pointer}
+.application-list-filters .table-controls{margin:16px 0;gap:16px 24px}
+.application-file-tools .actions{flex-wrap:wrap;margin:16px 0}
+.application-list-filters input[type=date]{min-width:160px}
+.application-review-fields .extraction-card{padding:20px 0;border:0;border-top:1px solid #e2e7ef;border-radius:0;background:transparent}
+.application-review-fields .saved-value{border:0;border-left:2px solid #d8e2ed;border-radius:0;background:#f8fafc;margin:16px 0}
+.application-review-fields .saved-value dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px 24px;margin:12px 0}
+.application-review-fields .saved-value dl dt{font-size:13px;font-weight:500}.application-review-fields .saved-value dl dd{margin:4px 0;font-size:13px;color:#596575}
+.intent-dialog:has(.application-review-fields){width:min(820px,calc(100% - 32px))}
+.review-command-bar{position:sticky;bottom:0;background:#fff;border-top:1px solid #dfe5ed;padding:16px 0;flex-wrap:wrap}
+.appointment-detail .page-heading{margin-bottom:12px}.appointment-detail .page-heading h1{letter-spacing:-.025em}
+.appointment-time{font-size:21px;font-weight:600;letter-spacing:-.02em;margin:16px 0}
+.appointment-time span{font-size:14px;font-weight:400;letter-spacing:normal;color:#596575}
+.appointment-identity{margin:8px 0;font-size:14px}
+.appointment-contacts{color:#596575;font-size:12px;margin:12px 0 24px}
+.appointment-contacts summary,.appointment-other summary,.appointment-application>summary{cursor:pointer;padding:10px 0;font-size:13px;font-weight:500}
+.appointment-detail .actions{flex-wrap:wrap}.appointment-other{margin-top:24px;font-size:13px}
+.appointment-application{border-top:1px solid #dfe5ed;padding:12px 0}
+.intent-dialog label{margin:12px 0}.intent-dialog .saved-value h4{margin:6px 0}
+.ui-icon{width:18px;height:18px;flex:none;vertical-align:middle}
+.icon-button{width:40px;min-width:40px;height:40px;padding:9px;border-radius:8px}
+.icon-button{box-sizing:border-box;flex:0 0 40px;overflow:visible}
+.icon-button.icon-refresh{width:46px;min-width:46px;flex-basis:46px;padding:10px}
+.agenda-controls{align-items:flex-end;gap:16px 28px}
+.agenda-controls>label{flex:0 1 260px;min-width:200px}
+.agenda-week-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:40px}
+.agenda-week-controls>button{height:40px;box-sizing:border-box}
+.agenda-week-range{font-size:14px;white-space:nowrap;color:#43516a;margin-left:10px;line-height:40px}
+.agenda-controls>.agenda-feedback-filter{flex:0 0 auto;min-width:0;min-height:40px;margin:0;font-size:14px}
+.agenda-view-note{margin:0 0 18px;color:#596575;font-size:13px}
+.agenda-feedback-state{font-size:12px;color:#805c24;white-space:nowrap}
+@media(max-width:680px){.agenda-controls>label{flex-basis:100%}.agenda-week-range{white-space:normal;margin-left:4px}.agenda-week-controls{gap:6px}}
+.attention-cue{display:inline-flex;align-items:center;gap:6px;color:#99551b;font-size:12px;max-width:100%}
+.attention-cue .ui-icon{width:15px;height:15px}
+.review-document-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,1fr);gap:24px;align-items:start}
+.intent-dialog:has(.review-document-layout){width:min(1240px,calc(100% - 32px))}
+.review-document-panel{position:sticky;top:0;min-width:0}
+.review-document-panel .pdf-preview{position:static;padding:14px;margin-top:14px}
+.review-document-panel .pdf-frame{height:65vh;min-height:320px}
+.agenda-time{font-size:18px;font-weight:600;margin:0 0 8px}.agenda-time span{font-size:13px;font-weight:400;color:#596575}
+@media(max-width:900px){.review-document-layout{grid-template-columns:minmax(0,1fr)}.review-document-panel{position:static}}
+@media(max-width:680px){.appointment-time span{display:block;margin-top:6px}.application-list-table td,.application-list-table th{padding:12px}.application-index .table-scroll{max-width:100%}}

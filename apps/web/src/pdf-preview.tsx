@@ -4,9 +4,9 @@ import { Notice, Loading } from './ui';
 
 // Reuse authorized, integrity-checked attachment endpoint; no untrusted inline HTML.
 export function PdfPreview({applicationId,document,documentBase,onClose}:{applicationId:string;document:{id:string;filename:string};documentBase?:string;onClose:()=>void}) {
-  const [url,setUrl]=useState(''),[error,setError]=useState('');
+  const [url,setUrl]=useState(''),[error,setError]=useState(''),[retry,setRetry]=useState(0);
   useEffect(()=>{
-    let active=true,objectUrl='';const controller=new AbortController();
+    let active=true,objectUrl='';const controller=new AbortController();setUrl('');setError('');
     (async()=>{
       try{
         const response=await fetch(`/api/${documentBase??`applications/${applicationId}/documents`}/${document.id}`,{credentials:'include',signal:controller.signal});
@@ -17,6 +17,6 @@ export function PdfPreview({applicationId,document,documentBase,onClose}:{applic
       }catch(e){if(active)setError(errorMessage(e));}
     })();
     return()=>{active=false;controller.abort();if(objectUrl)URL.revokeObjectURL(objectUrl);};
-  },[applicationId,document.id,documentBase]);
-  return <section className="card pdf-preview" aria-label="Document preview"><div className="section-heading"><div><h2>CV preview</h2><p>{document.filename}</p></div><button onClick={onClose}>Close preview</button></div><Notice message={error}/>{url?<iframe title={`PDF: ${document.filename}`} src={url} className="pdf-frame"/>:!error&&<Loading/>}</section>;
+  },[applicationId,document.id,documentBase,retry]);
+  return <section className="card pdf-preview" aria-label="Document preview"><div className="section-heading"><div><h2>Document preview</h2><p>{document.filename}</p></div><button onClick={onClose}>Close preview</button></div><Notice message={error}/>{error&&<button onClick={()=>setRetry(value=>value+1)}>Retry preview</button>}{url?<iframe title={`PDF: ${document.filename}`} src={url} className="pdf-frame"/>:!error&&<Loading/>}</section>;
 }

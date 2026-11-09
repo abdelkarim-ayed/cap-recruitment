@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import type { FormDefinition } from '@recruitment/domain/vacancies';
 import { validateSubmission } from '@recruitment/domain/applications';
-import { api, errorMessage, go } from './api';
+import { api, go } from './api';
 import { Notice } from './ui';
 import { useNavigationGuard } from './navigation-guard';
+import { formError, formIssues } from './form-feedback';
 
-export function CandidateForm({vacancy,preview=false}:{vacancy:{id:string;form:FormDefinition};preview?:boolean}) {
+export function CandidateForm({vacancy,preview=false,accountEmail}:{vacancy:{id:string;form:FormDefinition};preview?:boolean;accountEmail?:string}) {
   const [answers,setAnswers]=useState<Record<string,any>>({}),[files,setFiles]=useState<Record<string,File>>({}),[busy,setBusy]=useState(false),[error,setError]=useState(''),[submitted,setSubmitted]=useState('');
   const answer=(id:string,value:unknown)=>setAnswers(current=>{const next={...current};if(value===undefined)delete next[id];else next[id]=value;return next;});
   const hasContent=Object.values(answers).some(value=>Array.isArray(value)?value.length>0:typeof value==='string'?value.length>0:value!==undefined)||Object.keys(files).length>0;
@@ -13,8 +14,8 @@ export function CandidateForm({vacancy,preview=false}:{vacancy:{id:string;form:F
   // Redirect only after the clean guard has rendered; a successful submission
   // is already recorded and must not open an unsaved-changes prompt.
   useEffect(()=>{if(submitted)go(`/applications/${submitted}`);},[submitted]);
-  return <section className="card"><h2>{preview?'Candidate form preview':'Your application'}</h2><p>{preview?'Preview only. No application will be submitted.':'Answers and documents are locked after submission. One application per account and vacancy.'}</p><Notice message={error}/><form onSubmit={async e=>{e.preventDefault();if(preview)return;setBusy(true);setError('');try{const checked=validateSubmission(vacancy.form,answers,Object.entries(files).map(([inputId,file])=>({inputId,filename:file.name,byteCount:file.size})));if(checked.issues.length)throw new Error(checked.issues.map(i=>`${i.path}: ${i.message}`).join('\n'));const body=new FormData();body.append('answers',JSON.stringify(checked.answers));Object.entries(files).forEach(([id,file])=>body.append(id,file));const result=await api<{id:string}>(`vacancies/${vacancy.id}/applications`,{method:'POST',body});setSubmitted(result.id);}catch(error){setError(errorMessage(error));}finally{setBusy(false);}}}>
-    <fieldset disabled={busy} className="candidate-fields">{vacancy.form.inputs.map(input=>{
+  return <section className="card"><h2>{preview?'Candidate form preview':'Your application'}</h2><p>{preview?'Preview only. No application will be submitted.':'Answers and documents are locked after submission. One application per account and vacancy.'}</p><Notice message={error}/><form onSubmit={async e=>{e.preventDefault();if(preview)return;setBusy(true);setError('');try{const checked=validateSubmission(vacancy.form,answers,Object.entries(files).map(([inputId,file])=>({inputId,filename:file.name,byteCount:file.size})));if(checked.issues.length)throw new Error(formIssues(checked.issues,vacancy.form));const body=new FormData();body.append('answers',JSON.stringify(checked.answers));Object.entries(files).forEach(([id,file])=>body.append(id,file));const result=await api<{id:string}>(`vacancies/${vacancy.id}/applications`,{method:'POST',body});setSubmitted(result.id);}catch(error){setError(formError(error,vacancy.form));}finally{setBusy(false);}}}>
+    <fieldset disabled={busy} className="candidate-fields"><div className="account-email-field"><label>Account email <span aria-label="required">*</span><input type="email" readOnly value={preview?'candidate@example.test':accountEmail??''} placeholder="Your verified account email"/></label><p className="small muted">{preview?'Example address. The candidate’s verified account email is included automatically.':'Included automatically from your signed-in account. This is not an editable application answer.'}</p></div>{vacancy.form.inputs.map(input=>{
       if(input.type==='separator')return <h3 className="form-section" key={input.id}>{input.label}</h3>;
       const label=<span>{input.label}{input.required&&<span aria-label="required"> *</span>}</span>;
       if(input.type==='multiple_choice')return <fieldset key={input.id} className="choices"><legend>{label}</legend>{input.args.choices.map(choice=><label className="check" key={choice.value}><input type="checkbox" checked={(answers[input.id]??[]).includes(choice.value)} onChange={e=>answer(input.id,e.target.checked?[...(answers[input.id]??[]),choice.value]:(answers[input.id]??[]).filter((v:string)=>v!==choice.value))}/>{choice.label}</label>)}</fieldset>;

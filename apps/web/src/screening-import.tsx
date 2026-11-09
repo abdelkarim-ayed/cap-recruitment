@@ -1,72 +1,115 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { api, post, errorMessage } from './api';
 import { screeningLimits, type ScreeningPreview, type ScreeningRow } from '@recruitment/domain';
 import { Notice } from './ui';
+import { Icon } from './icons';
+import { IntentDialog } from './intent-dialog';
 import { useNavigationGuard, useOptionalNavigation } from './navigation-guard';
+import { chooseDecision, importGroups, initialChoice, resolvedChoice, retainedRow, retainProposal, type ImportChoice } from './screening-import-model';
 
-type Row = ScreeningRow & { included:boolean };
+const outcome=(value:string)=>value==='preselected'?'Preselect':value==='rejected'?'Not selected':value||'Missing decision';
+type StagedRow=ScreeningRow&{needsRecheck?:boolean};
 export function ScreeningImport({vacancyId,onClose,onApplied}:{vacancyId:string;onClose:()=>void;onApplied:()=>void}) {
-  const [file,setFile]=useState<File|null>(null),[rows,setRows]=useState<Row[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState(''),[message,setMessage]=useState(''),[confirm,setConfirm]=useState(false),[uncertain,setUncertain]=useState(false);
-  const navigation=useOptionalNavigation();
+  const [file,setFile]=useState<File|null>(null),[rows,setRows]=useState<StagedRow[]>([]),[choices,setChoices]=useState<Record<string,ImportChoice>>({});
+  const [busy,setBusy]=useState(false),[error,setError]=useState(''),[fileError,setFileError]=useState(''),[message,setMessage]=useState('');
+  const [confirm,setConfirm]=useState(false),[uncertain,setUncertain]=useState(false),[needsRefresh,setNeedsRefresh]=useState(false);
+  const header=useRef<HTMLDivElement>(null),writing=useRef(false),navigation=useOptionalNavigation();
   useNavigationGuard(rows.length>0,busy,'import');
   const close=()=>navigation?navigation.requestAction(onClose):onClose();
-  const included=rows.filter(row=>row.included&&row.state==='valid');
+  const groups=importGroups(rows),choiceFor=(key:string)=>choices[key];
+  const included=groups.flatMap(group=>{
+    const choice=choiceFor(group.key),row=choice&&retainedRow(group,choice);
+    return row&&choice.included&&resolvedChoice(group,choice)?[{...row,decision:choice.decision,reason:choice.reasonOverride??row.reason}]:[];
+  });
+  const edit=(key:string,change:Partial<ImportChoice>)=>{setConfirm(false);setChoices(current=>({...current,[key]:{...current[key],...change}}));};
   async function refresh(nextFile=file,review=false) {
-    if(!nextFile)return;
-    setBusy(true);setError('');setMessage('');setConfirm(false);
+    if(!nextFile||writing.current)return;
+    writing.current=true;setBusy(true);setError('');setMessage('');setConfirm(false);setNeedsRefresh(true);
     try {
-      if(nextFile.size>screeningLimits.bytes)throw new Error('CSV exceeds 10 MiB.');
+      if(nextFile.size>screeningLimits.bytes)throw new Error('CSV exceeds 10 MiB. Split it into smaller files.');
       const data=new FormData();data.append('file',nextFile);
       const preview=await api<ScreeningPreview>(`vacancies/${vacancyId}/screening/preview`,{method:'POST',body:data});
-      const previous=new Map((nextFile===file?rows:[]).map(row=>[row.key,row]));
-      const updated=preview.rows.map(row=>{
-        const old=previous.get(row.key);
-        return {...row,decision:old?.decision??row.decision,included:row.state==='valid'&&(old?old.included:true)};
+      const sameFile=nextFile===file,updatedGroups=importGroups(preview.rows),updatedChoices:Record<string,ImportChoice>={};
+      for(const group of updatedGroups){
+        const old=sameFile?choices[group.key]:undefined;
+        const retained=old&&retainedRow(group,old);
+        updatedChoices[group.key]=old&&retained?{...old}:old?{...initialChoice(group),included:false}:initialChoice(group);
+      }
+      const changed=sameFile&&included.some(old=>{
+        const row=preview.rows.find(row=>row.key===old.key);
+        return !row||row.state!=='valid'||row.revision!==old.revision;
       });
-      const changed=nextFile===file&&included.some(old=>{const row=updated.find(item=>item.key===old.key);return !row||row.state!=='valid'||row.revision!==old.revision;});
-      setRows(updated);setFile(nextFile);setUncertain(false);
-      if(review&&!changed&&updated.some(row=>row.included))setConfirm(true);
-      setMessage(changed?'Some applications changed or were decided. Review the marked rows and confirm the remaining selection.':'Current application eligibility checked. No decisions applied.');
-    } catch(e) {setError(errorMessage(e));} finally {setBusy(false);}
+      setRows(preview.rows);setChoices(updatedChoices);setFile(nextFile);setUncertain(false);setNeedsRefresh(false);
+      if(review&&!changed&&updatedGroups.some(group=>updatedChoices[group.key].included&&resolvedChoice(group,updatedChoices[group.key])))setConfirm(true);
+      setMessage(changed?'Some applications changed or were decided. Review the marked rows, then check and confirm the remaining selection.':'Eligibility checked. No decisions applied by this preview.');
+    }catch(e){
+      if((e as {status?:number}).status===400||nextFile.size>screeningLimits.bytes)setFileError(errorMessage(e));
+      else setError(errorMessage(e));
+    }finally{writing.current=false;setBusy(false);}
   }
   async function apply() {
-    setBusy(true);setError('');setMessage('');
+    if(writing.current||!confirm||uncertain||needsRefresh||!included.length)return;
+    writing.current=true;setBusy(true);setError('');setMessage('');
     try {
       const result=await post<{applied:number}>(`vacancies/${vacancyId}/screening/apply`,{rows:included.map(row=>({applicationId:row.applicationId,email:row.email,decision:row.decision,reason:row.reason||undefined,expectedRevision:row.revision}))});
       if(!Number.isInteger(result.applied)||result.applied!==included.length)throw new Error('Confirmation response unavailable.');
-      setRows([]);setFile(null);setConfirm(false);setMessage(`${result.applied} screening decisions recorded.`);onApplied();
-    } catch(e) {
+      setRows([]);setChoices({});setFile(null);setConfirm(false);setMessage(`${result.applied} screening decisions recorded.`);onApplied();
+    }catch(e){
       const failure=e as {status?:number;conflicts?:{applicationId:string;state:'invalid'|'decided';issue:string}[]};
-      setConfirm(false);
+      setConfirm(false);setNeedsRefresh(true);
       if(failure.status===409&&failure.conflicts){
         const conflicts=new Map(failure.conflicts.map(row=>[row.applicationId,row]));
-        setRows(current=>current.map(row=>{const conflict=conflicts.get(row.applicationId);return conflict?{...row,...conflict,included:false}:row;}));
+        setRows(current=>current.map(row=>{const conflict=conflicts.get(row.applicationId);return conflict?{...row,...conflict,issues:[conflict.issue],needsRecheck:conflict.state==='invalid'}:row;}));
+        setChoices(current=>Object.fromEntries(Object.entries(current).map(([key,choice])=>[key,conflicts.has(key.replace('application:',''))?{...choice,included:false}:choice])));
         setError(errorMessage(e));
-      } else if(!failure.status||failure.status>=500){setUncertain(true);setError('Confirmation unavailable; the outcome is uncertain. Refresh to check recorded outcomes before continuing. Do not resubmit automatically.');}
+      }else if(!failure.status||failure.status>=500){setUncertain(true);setError('Confirmation unavailable; the outcome is uncertain. Refresh eligibility to inspect current outcomes before continuing. No automatic retry was made.');}
       else setError(errorMessage(e));
-    } finally {setBusy(false);}
+    }finally{writing.current=false;setBusy(false);}
   }
-  const edit=(key:number,change:Partial<Row>)=>{setConfirm(false);setRows(current=>current.map(row=>row.key===key?{...row,...change}:row));};
+  const locked=busy||uncertain;
+  const invalid=rows.filter(row=>row.state==='invalid'),decided=rows.filter(row=>row.state==='decided');
+  const preselected=included.filter(row=>row.decision==='preselected').length;
   return <section className="card screening-wizard" aria-label="Screening import">
-    <div className="section-heading"><h2>Import screening decisions</h2><button disabled={busy} onClick={close}>Close wizard</button></div>
-    <p>Upload one CSV with <code>application_id</code>, <code>candidate_email</code> and <code>decision</code> (preselected/rejected). Optional: <code>reason</code>. Other columns are ignored, never corrections.</p>
-    <p className="small muted">Working files do not reserve applications. The first committed decision wins. Invalid rows cannot be repaired here; fix the CSV and upload again.</p>
+    <div ref={header} tabIndex={-1} className="section-heading"><h2>Import screening decisions</h2><button disabled={busy} onClick={close}>Close wizard</button></div>
+    <ol className="import-steps" aria-label="Import steps"><li aria-current={!rows.length?'step':undefined}>1 · Upload</li><li aria-current={rows.length&&!confirm?'step':undefined}>2 · Review selection</li><li aria-current={confirm?'step':undefined}>3 · Confirm</li></ol>
+    <p>CSV columns: <code>application_id</code>, <code>candidate_email</code>, <code>decision</code> (<code>preselected</code> or <code>rejected</code>), and optional <code>reason</code>. Other columns are ignored.</p>
+    <details className="import-help"><summary>File rules and exclusions</summary><p>UTF-8 comma CSV, up to 1,000 records / 10 MiB. Correct IDs/emails and malformed content in the CSV, not here. Duplicate proposals appear once per application: matching outcomes are prefilled, conflicting outcomes require a choice. Differing internal reasons require a source proposal. Nothing is applied until the final wizard confirmation. Already-decided applications cannot be changed.</p></details>
     <Notice message={error}/><Notice message={message} success/>
-    <label>Decision CSV<input aria-label="Decision CSV" type="file" accept=".csv,text/csv" disabled={busy||uncertain} onChange={e=>{const next=e.target.files?.[0];if(next){setRows([]);setFile(null);void refresh(next);}}}/></label>
+    <label className="import-upload">Decision CSV<input aria-label="Decision CSV" type="file" accept=".csv,text/csv" disabled={locked} onChange={e=>{
+      const next=e.target.files?.[0];e.target.value='';if(!next)return;
+      const upload=()=>void refresh(next);
+      if(rows.length&&navigation)navigation.requestAction(upload);else upload();
+    }}/></label>
     {rows.length>0&&<>
-      <div className="actions"><button disabled={busy} onClick={()=>void refresh()}>Refresh eligibility</button>
-        <button disabled={busy||uncertain} onClick={()=>{setConfirm(false);setRows(current=>current.map(row=>({...row,included:row.state==='valid'})));}}>Include all valid</button>
-        <button disabled={busy||uncertain} onClick={()=>{setConfirm(false);setRows(current=>current.map(row=>({...row,included:false})));}}>Exclude all</button>
-        {(['preselected','rejected'] as const).map(decision=><button key={decision} disabled={busy||uncertain||!included.length} onClick={()=>{setConfirm(false);setRows(current=>current.map(row=>row.included&&row.state==='valid'?{...row,decision}:row));}}>Set included to {decision}</button>)}
-      </div>
-      <p aria-live="polite">Included: {included.length} ({included.filter(row=>row.decision==='preselected').length} preselected, {included.filter(row=>row.decision==='rejected').length} rejected). Invalid: {rows.filter(row=>row.state==='invalid').length}. Already decided: {rows.filter(row=>row.state==='decided').length}. Excluded valid: {rows.filter(row=>row.state==='valid'&&!row.included).length}.</p>
-      <div className="table-scroll"><table><thead><tr><th>Include</th><th>CSV record</th><th>Candidate</th><th>Proposal</th><th>Status / reason</th></tr></thead><tbody>{rows.map(row=><tr key={row.key} className={`screening-${row.state}`}>
-        <td><input type="checkbox" aria-label={`Include record ${row.key}`} checked={row.included} disabled={busy||uncertain||row.state!=='valid'} onChange={()=>edit(row.key,{included:!row.included})}/></td>
-        <td>{row.key}<small>{row.applicationId}</small></td><td><span className="screening-identity">{row.candidate?.name||row.email}</span><small>{row.email}</small></td>
-        <td>{row.state==='valid'?<select aria-label={`Decision for record ${row.key}`} value={row.decision} disabled={busy||uncertain} onChange={e=>edit(row.key,{decision:e.target.value})}><option value="preselected">Preselect</option><option value="rejected">Reject</option></select>:row.decision}</td>
-        <td>{row.state==='invalid'?'Invalid input':row.state==='decided'?'Already decided':'Valid'}{row.issue&&<small>{row.issue}</small>}{row.reason&&<small>Internal reason: {row.reason}</small>}</td>
-      </tr>)}</tbody></table></div>
-      {!confirm?<button className="primary" disabled={busy||uncertain||!included.length} onClick={()=>void refresh(file,true)}>Review confirmation</button>:<section className="confirm" aria-label="Confirm screening decisions"><h3>Record {included.length} final screening decisions?</h3><p>Excluded and invalid rows remain unchanged. Screening cannot be undone. Extraction and review become read-only; unfinished work is not marked complete. Internal reasons are not sent to candidates.</p><button className="primary" disabled={busy} onClick={()=>void apply()}>Confirm decisions</button><button disabled={busy} onClick={()=>setConfirm(false)}>Back to selection</button></section>}
+      <div className="import-summary" aria-live="polite"><span><strong>{included.length}</strong> applications included</span><span className="outcome-preselected"><Icon name="check"/>{preselected} preselect</span><span className="outcome-rejected"><Icon name="close"/>{included.length-preselected} not selected</span><span>{invalid.length} invalid records</span><span>{decided.length} already-decided records</span></div>
+      <div className="actions import-selection-tools"><button disabled={busy} onClick={()=>void refresh()}>Refresh eligibility</button><button disabled={locked} onClick={()=>{setConfirm(false);setChoices(current=>Object.fromEntries(groups.map(group=>{const choice=current[group.key]??initialChoice(group);return [group.key,{...choice,included:resolvedChoice(group,choice)}];})));}}>Include all resolved</button><button disabled={locked} onClick={()=>{setConfirm(false);setChoices(current=>Object.fromEntries(Object.entries(current).map(([key,choice])=>[key,{...choice,included:false}])));}}>Exclude all</button></div>
+      <div className="actions import-bulk-decisions"><span className="small muted">Set included to:</span>{(['preselected','rejected'] as const).map(decision=><button key={decision} className={`compact outcome-${decision}`} disabled={locked||!included.length} onClick={()=>{setConfirm(false);setChoices(current=>Object.fromEntries(groups.map(group=>{const choice=current[group.key]??initialChoice(group);return [group.key,choice.included?chooseDecision(group,choice,decision):choice];})));}}><Icon name={decision==='preselected'?'check':'close'}/>{outcome(decision)}</button>)}</div>
+      {needsRefresh&&<p className="notice">Refresh eligibility before confirming. Your remaining choices are retained.</p>}
+      <div className="table-scroll"><table className="import-table"><thead><tr><th scope="col">Include</th><th scope="col">CSV records</th><th scope="col">Application</th><th scope="col">Account email</th><th scope="col">Screening decision</th><th scope="col">Status / exclusions</th></tr></thead><tbody>{groups.map(group=>{
+        const row=group.rows[0],choice=choiceFor(group.key)??initialChoice(group),retained=retainedRow(group,choice),valid=row.state==='valid',resolved=resolvedChoice(group,choice);
+        const needsRecheck=(row as StagedRow).needsRecheck;
+        const state=row.state==='decided'?'decided':needsRecheck?'unresolved':!valid?(row.parseIssues?.length?'parse':'invalid'):!resolved?'unresolved':!choice.included?'excluded':choice.decision;
+        const conflicting=group.rows.some(item=>item.decision!==row.decision);
+        const reason=choice.reasonOverride??retained?.reason;
+        return <tr key={group.key} className={`import-row import-${state}`}>
+          <td><input type="checkbox" aria-label={`Include records ${group.rows.map(row=>row.key).join(', ')}`} checked={valid&&resolved&&choice.included} disabled={locked||!valid||!resolved} onChange={()=>edit(group.key,{included:!choice.included})}/></td>
+          <td>{group.rows.map(row=>row.key).join(', ')}{group.duplicate&&<small>Duplicate proposals</small>}</td>
+          <td>{row.candidate?<a className="screening-identity" href={`#/applications/${row.applicationId}`} target="_blank" rel="noopener noreferrer">{row.candidate.name||row.candidate.email} ↗</a>:<span className="screening-identity">Unverified application</span>}<small className="import-application-id">{row.applicationId||'Missing application ID'}</small></td>
+          <td className="import-email">{row.email||'Missing email'}</td>
+          <td>{valid?<select className={`outcome-${choice.decision||'undecided'}`} aria-label={`Decision for records ${group.rows.map(row=>row.key).join(', ')}`} value={choice.decision} disabled={locked} onChange={e=>edit(group.key,chooseDecision(group,choice,e.target.value))}><option value="">Select screening decision</option><option value="preselected">Preselect</option><option value="rejected">Not selected</option></select>:<span>{outcome(row.decision)}</span>}</td>
+          <td><strong className="import-state"><Icon name={!valid||!resolved?'alert':!choice.included?'close':'check'}/>{row.state==='decided'?'Already decided':needsRecheck?'Changed · refresh eligibility':!valid?(row.parseIssues?.length?'CSV row error':'Invalid identity or proposal'):!resolved?(choice.decision?'Choose a source reason':'Choose screening decision'):!choice.included?'Excluded':'Ready for confirmation'}</strong>
+            {!valid&&<ul className="import-issues">{(row.issues?.length?row.issues:row.issue?[row.issue]:[]).map((issue,index)=><li key={index}>{issue}</li>)}</ul>}
+            {row.state==='decided'&&<small>{row.issue}</small>}
+            {valid&&group.duplicate&&<><small>{conflicting?'Conflicting CSV outcomes; your selection is the single proposal for this application.':'Matching outcomes prefilled; final confirmation is still required.'}</small>{(!retained||new Set(group.rows.map(row=>row.reason)).size>1)&&<label className="import-retained">Source proposal and internal reason<select aria-label={`Retain source for records ${group.rows.map(row=>row.key).join(', ')}`} disabled={locked} value={choice.keepKey??''} onChange={e=>edit(group.key,retainProposal(group,Number(e.target.value)))}><option value="">Choose source proposal…</option>{group.rows.map(row=><option key={row.key} value={row.key}>Record {row.key} · {outcome(row.decision)}{row.reason?` · ${row.reason.slice(0,100)}${row.reason.length>100?'…':''}`:''}</option>)}</select></label>}<button type="button" className="compact" disabled={locked} onClick={()=>edit(group.key,{included:false})}>Exclude application</button></>}
+            {choice.reasonOverride!==undefined&&<small>Outcome changed from the source proposal; its original reason is not carried over.</small>}
+            {reason&&<small>Internal reason: {reason}</small>}
+            {valid&&group.duplicate&&<details><summary>Original proposals</summary><ul>{group.rows.map(row=><li key={row.key}>Record {row.key}: {outcome(row.decision)}{row.reason?` · ${row.reason}`:''}</li>)}</ul></details>}
+          </td>
+        </tr>;
+      })}</tbody></table></div>
+      <div className="import-footer"><p className="small muted">{rows.length} source records. Only included applications will be committed; excluded, invalid and already-decided entries stay unchanged.</p><button className="primary" disabled={busy||uncertain||needsRefresh||!included.length} onClick={()=>void refresh(file,true)}>Review confirmation</button></div>
     </>}
+    {confirm&&<IntentDialog title={`Record ${included.length} final screening decisions?`} description={`${preselected} preselect · ${included.length-preselected} not selected. This cannot be undone. It locks automated results and review, including unfinished work, and sends the candidate a generic notification. Internal reasons stay private.`} busy={busy} confirmDisabled={needsRefresh||uncertain||!included.length} confirmLabel="Confirm decisions" onConfirm={()=>void apply()} onCancel={()=>setConfirm(false)} fallbackFocus={header}><p>One decision per application is included. Other duplicate proposals and excluded/invalid records will not be applied.</p></IntentDialog>}
+    {fileError&&<IntentDialog title="Could not read the decision file" description={fileError} busy={busy} cancelLabel="Close" onCancel={()=>setFileError('')} fallbackFocus={header}><p>Fix the CSV and upload it again. Any previous staged selection is retained; no decisions were applied by this upload.</p></IntentDialog>}
   </section>;
 }

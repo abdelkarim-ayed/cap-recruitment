@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { z } from 'zod';
-import { parseScreeningCsv, screeningIssues, screeningLimits, type ScreeningInput, type ScreeningPreview, type ScreeningRow } from '@recruitment/domain';
+import { parseScreeningCsv, screeningRowIssues, screeningLimits, type ScreeningInput, type ScreeningPreview, type ScreeningRow } from '@recruitment/domain';
 import { DatabaseService } from '../database/database.service.js';
 import type { AuthenticatedRequest } from '../auth/access.js';
 import { requirePolicy, rolePolicy } from '../auth/action-policy.js';
@@ -22,20 +22,24 @@ export class ScreeningService {
     requirePolicy(rolePolicy(actor,'workflow.change'));
     let input:ScreeningInput[];
     try { input=parseScreeningCsv(csv); } catch(error) { throw new BadRequestException(error instanceof Error?error.message:'Invalid CSV.'); }
-    const issues=screeningIssues(input);
+    const duplicateKeys=new Map<string,number[]>();
+    for(const row of input)duplicateKeys.set(row.applicationId,[...(duplicateKeys.get(row.applicationId)??[]),row.key]);
     return this.database.transaction(async client=>{
       if(!(await client.query('SELECT id FROM vacancies WHERE id=$1',[vacancyId])).rowCount)throw new NotFoundException('Vacancy not found.');
-      const ids=input.filter(row=>!issues.has(row.key)).map(row=>row.applicationId);
+      const ids=[...new Set(input.filter(row=>z.uuid().safeParse(row.applicationId).success&&z.email().max(320).safeParse(row.email).success).map(row=>row.applicationId))];
       const records=ids.length?(await client.query<RecordRow>('SELECT id,stage,flow_revision,candidate_id,candidate_identity FROM applications WHERE vacancy_id=$1 AND id=ANY($2::uuid[])',[vacancyId,ids])).rows:[];
       const byId=new Map(records.map(row=>[row.id,row]));
       return {rows:input.map((row):ScreeningRow=>{
-        const base={...row,candidate:null,revision:null};
-        if(issues.has(row.key))return {...base,state:'invalid',issue:issues.get(row.key)!};
+        const issues=screeningRowIssues(row),keys=duplicateKeys.get(row.applicationId)!;
+        const base={...row,candidate:null,revision:null,duplicateKeys:keys.length>1?keys:[],issues};
         const record=byId.get(row.applicationId);
-        if(!record)return {...base,state:'invalid',issue:'Application unavailable in this vacancy.'};
-        if(record.candidate_identity.email.trim().toLowerCase()!==row.email)return {...base,state:'invalid',issue:'Email does not match this application.'};
-        return {...row,candidate:record.candidate_identity,revision:record.flow_revision,
-          state:undecided(record.stage)?'valid':'decided',issue:undecided(record.stage)?null:'Screening decision already recorded.'};
+        const validIdentity=z.uuid().safeParse(row.applicationId).success&&z.email().max(320).safeParse(row.email).success;
+        const matched=record&&record.candidate_identity.email.trim().toLowerCase()===row.email;
+        if(validIdentity&&!matched)issues.push(record?'Account email does not match this submitted application. Fix the CSV; identity cannot be changed here.':'Application unavailable in this vacancy.');
+        if(!matched)return {...base,state:'invalid',issue:issues.join(' ')};
+        const resolved={...base,candidate:record.candidate_identity,revision:record.flow_revision};
+        if(!undecided(record.stage))return {...resolved,state:'decided',issue:'Screening decision already recorded. This import cannot change it.'};
+        return {...resolved,state:issues.length?'invalid':'valid',issue:issues.length?issues.join(' '):null};
       })};
     });
   }

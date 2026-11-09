@@ -27,7 +27,7 @@ const editSchema = z.strictObject({ expectedRevision:revision, ...scheduleFields
 const feedbackSchema = z.strictObject({ expectedRevision:revision, notes:z.string().trim().min(1).max(10000), score:z.number().int().min(0).max(10).nullable().default(null), outcome:z.enum(['pass','fail']) });
 const reasonSchema = z.strictObject({ expectedRevision:revision, reason:z.string().trim().min(1).max(2000) });
 const stageSchema = z.strictObject({ expectedRevision:revision, stage:z.enum(['preselected','not_selected','offer','hired']), reason:z.string().trim().min(1).max(2000).optional() });
-const listSchema = z.strictObject({ from:z.iso.datetime({offset:true}), to:z.iso.datetime({offset:true}), view:z.enum(['agenda','feedback','cancelled']).default('agenda'), limit:z.coerce.number().int().min(1).max(100).default(50), offset:z.coerce.number().int().min(0).max(100000).default(0) });
+const listSchema = z.strictObject({ from:z.iso.datetime({offset:true}), to:z.iso.datetime({offset:true}), view:z.enum(['upcoming','past','cancelled','agenda','feedback']).default('agenda'), awaitingFeedback:z.enum(['true','false']).default('false'), limit:z.coerce.number().int().min(1).max(100).default(50), offset:z.coerce.number().int().min(0).max(100000).default(0) });
 const pageSchema = z.strictObject({ limit:z.coerce.number().int().min(1).max(100).default(20), offset:z.coerce.number().int().min(0).max(100000).default(0), read:z.enum(['unread','all']).default('unread') });
 function parse<T>(schema:z.ZodType<T>, raw:unknown):T { const result=schema.safeParse(raw);if(!result.success)throw new BadRequestException('Invalid interview request.');return result.data; }
 function staff(actor:Actor,action:Action) { requirePolicy(rolePolicy(actor,action)); }
@@ -221,12 +221,17 @@ export class InterviewService {
   async agenda(actor:Actor,raw:unknown):Promise<Page<InterviewView>> {
     const query=parse(listSchema,raw);const from=new Date(query.from),to=new Date(query.to);
     if(to<=from||to.getTime()-from.getTime()>93*86400000)throw new BadRequestException('Choose a range of at most 93 days.');
-    const condition=query.view==='feedback'?"i.status='scheduled' AND i.starts_at<=now()":query.view==='cancelled'?"i.status='cancelled'":"i.status<>'cancelled'";
+    if(query.awaitingFeedback==='true'&&query.view!=='past')throw new BadRequestException('Awaiting feedback is a Past filter.');
+    const conditions={upcoming:"i.status='scheduled' AND i.starts_at>now()",past:`i.status<>'cancelled' AND i.starts_at<=now()${query.awaitingFeedback==='true'?" AND i.status='scheduled'":''}`,cancelled:"i.status='cancelled'",agenda:"i.status<>'cancelled'",feedback:"i.status='scheduled' AND i.starts_at<=now()"};
+    const condition=conditions[query.view],order=query.view==='past'?'starts_at DESC,id DESC':'starts_at,id';
     const args=[roleAllows(actor.role,'interview.readAll'),actor.id,query.from,query.to];
     const where=`WHERE ($1::boolean OR i.interviewer_id=$2) AND i.starts_at>=$3 AND i.starts_at<$4 AND ${condition}`;
-    const total=(await this.database.query(`SELECT count(*)::integer AS total FROM interviews i ${where}`,args)).rows[0].total;
-    const items=(await this.database.query(`${this.select} ${where} ORDER BY i.starts_at,i.id LIMIT $5 OFFSET $6`,[...args,query.limit,query.offset])).rows.map(row=>this.projection(row,actor));
-    return {items,total,limit:query.limit,offset:query.offset};
+    // One statement gives totals/items the same visibility snapshot and time boundary.
+    const result=await this.database.query(`WITH visible AS (${this.select} ${where}),
+      page AS (SELECT * FROM visible ORDER BY ${order} LIMIT $5 OFFSET $6)
+      SELECT (SELECT count(*)::integer FROM visible) AS total,
+      coalesce((SELECT jsonb_agg(to_jsonb(page) ORDER BY ${order}) FROM page),'[]'::jsonb) AS items`,[...args,query.limit,query.offset]);
+    return {items:result.rows[0].items.map((row:any)=>this.projection(row,actor)),total:result.rows[0].total,limit:query.limit,offset:query.offset};
   }
   async results(id:string,actor:Actor,raw:unknown):Promise<InterviewResults> {
     staff(actor,'interviewPlan.read');const q=parse(pageSchema.omit({read:true}),raw);const pipeline=await this.pipeline(id,actor);
