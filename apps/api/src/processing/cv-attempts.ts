@@ -1,6 +1,7 @@
 import type { CvChoiceResponse } from './cv-response.js';
 import { validateCvResponse } from './cv-response.js';
-import { assertPreparedCvRequest, CvResponseMemoryCache, type CvExecutionMode, type PreparedCvRequest } from './cv-memory-cache.js';
+import { assertPreparedCvRequest, type CvExecutionMode, type PreparedCvRequest } from './cv-memory-cache.js';
+import type { CvResponseCache } from './cv-file-cache.js';
 import { JevGatewayFailure } from '../integrations/jev/jev-failure.js';
 import { ProcessingFailure } from './processing-failure.js';
 
@@ -31,22 +32,28 @@ export class CvProviderAttemptFailure extends ProcessingFailure {
     super(code==='budget'?'Jev spending allowance blocked extraction; automatic work stopped.':category==='uncertain'?'CV provider completion is uncertain; automatic retry is blocked.':'CV provider attempt failed; automatic work stopped and original fields are unavailable.',retryable,category);
   }
 }
+// Complete, validated bytes are already durably cached. Leave this task under
+// its lease so expired-lease recovery can replay locally, never resend to Jev.
+export class CvCachedResponsePending extends Error {
+  constructor() { super('Validated CV response cached; database acknowledgement pending. Local-only recovery required.'); }
+}
 
 /** Whole-request coordination only; not a scheduler, question worker or live
  * activation switch. Repository fences and durable guards are mandatory even
  * when the response cache was lost on restart. No retries inside execute().
  */
 export class CvAttemptCoordinator {
-  constructor(private readonly store: CvAttemptStore, private readonly client: CvPreparedDecisionClient, private readonly cache: CvResponseMemoryCache) {}
-  async execute(owner: CvAttemptOwner, mode: CvExecutionMode, prepared: PreparedCvRequest, signal?: AbortSignal): Promise<CvAttemptResult> {
+  constructor(private readonly store: CvAttemptStore, private readonly client: CvPreparedDecisionClient, private readonly cache: CvResponseCache) {}
+  async execute(owner: CvAttemptOwner, mode: CvExecutionMode, prepared: PreparedCvRequest, signal?: AbortSignal, cacheOnly = false): Promise<CvAttemptResult> {
     assertPreparedCvRequest(prepared);
     await this.store.assertActive(owner);
     if (signal?.aborted) throw new ProcessingFailure('CV extraction cancelled before send.', false, 'operational');
-    const hit = this.cache.get(mode, prepared);
+    const hit = await this.cache.get(mode, prepared);
     if (hit) {
       await this.store.assertActive(owner);
-      return { response: hit.response, requestHash: prepared.hash, attemptId: hit.attemptId, cacheHit: true, mode };
+      return { response: validateCvResponse(prepared.request, hit.response), requestHash: prepared.hash, attemptId: hit.attemptId, cacheHit: true, mode };
     }
+    if (cacheOnly) throw new ProcessingFailure('Saved Jev response is unavailable or invalid; local recovery cannot call the provider. Release to manual review.', false, 'operational');
     const reserved = await this.store.reserve(owner, mode, prepared.hash);
     if (!reserved.acquired) throw new ProcessingFailure(`CV request blocked (${reserved.reason}).`, false, reserved.reason === 'uncertain' ? 'uncertain' : 'operational');
     const { ticket } = reserved;
@@ -73,8 +80,14 @@ export class CvAttemptCoordinator {
       await this.settle(ticket, 'terminal');
       throw new CvInvalidResponseFailure(raw);
     }
-    await this.settle(ticket, 'succeeded');
-    this.cache.set(mode, prepared, response, ticket.attemptId);
+    try { await this.cache.set(mode, prepared, response, ticket.attemptId); }
+    catch {
+      await this.settle(ticket, 'succeeded');
+      throw new ProcessingFailure('Validated response received but private cache write failed; automatic provider retry is blocked.', false, 'operational');
+    }
+    // Cache first: a database outage after receipt must not discard a known
+    // complete response. An unconfirmed settlement grants LOCAL replay only.
+    try { await this.settle(ticket, 'succeeded'); } catch { throw new CvCachedResponsePending(); }
     await this.store.assertActive(owner);
     return { response, requestHash: prepared.hash, attemptId: ticket.attemptId, cacheHit: false, mode };
   }

@@ -51,16 +51,16 @@ export class CvParserMemoryCache {
 // Invoked only after private source access/integrity checks by the processing
 // service. This wrapper has no document-ID lookup or authorization shortcut.
 export class CvCachedMarkdownReader implements CvMarkdownReader {
-  constructor(private readonly reader: CvMarkdownReader, private readonly cache: CvParserMemoryCache) {}
+  constructor(private readonly reader: CvMarkdownReader, private readonly cache: { get(sourceHash: string, parser: ParsedCvDocument['parser']): ParsedCvDocument | undefined | Promise<ParsedCvDocument | undefined>; set(document: ParsedCvDocument): boolean | Promise<boolean> }) {}
   async read(bytes: Buffer, signal?: AbortSignal): Promise<ParsedCvDocument> {
     signal?.throwIfAborted();
     const sourceHash = createHash('sha256').update(bytes).digest('hex');
-    const hit = this.cache.get(sourceHash, CV_PARSER);
+    const hit = await this.cache.get(sourceHash, CV_PARSER);
     if (hit) return hit;
     const parsed = await this.reader.read(bytes, signal);
     if (parsed.sourceHash !== sourceHash || JSON.stringify(parsed.parser) !== JSON.stringify(CV_PARSER)) throw new Error('Parser source/provenance mismatch.');
     signal?.throwIfAborted();
-    this.cache.set(parsed);
+    await this.cache.set(parsed);
     return parsed;
   }
 }
