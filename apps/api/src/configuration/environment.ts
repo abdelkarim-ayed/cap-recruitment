@@ -2,7 +2,10 @@ import { config } from 'dotenv';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 
-export const projectRoot = fileURLToPath(new URL('../../../../', import.meta.url));
+export const sourceRoot = fileURLToPath(new URL('../../../../', import.meta.url));
+// Bounded worktree launches may reuse the existing private runtime directory
+// without copying/printing environment secrets or changing infrastructure.
+export const projectRoot = process.env.RECRUITMENT_RUNTIME_ROOT ?? sourceRoot;
 config({ path: join(projectRoot, '.env'), quiet: true });
 
 export function databaseUrl() {

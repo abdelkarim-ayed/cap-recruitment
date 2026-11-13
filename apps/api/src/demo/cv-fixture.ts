@@ -4,7 +4,7 @@ import { buildCvRequest, type CvExtractorArgs } from '@recruitment/domain';
 // Zero usage is simulated fixture metadata, never a billed observation.
 export const demoCvQuestions: CvExtractorArgs = { questions: [
   { id: 'Education', type: 'education_level', expected_within_months: 6 },
-  { id: 'Certification', type: 'certification', certification: { name: 'AWS Certified Cloud Practitioner', aliases: ['CLF-C02'] } },
+  { id: 'Certification', type: 'certification', certification: { name: 'AWS Certified Developer – Associate', aliases: ['DVA-C02'] } },
   { id: 'Experience', type: 'experience_years', scope: 'software development' },
   { id: 'Coverage', type: 'skill_coverage', skills: ['SQL','TypeScript','Python'] },
   { id: 'SQL', type: 'skill_evidence', skill: { name: 'SQL', aliases: ['T-SQL'] } },

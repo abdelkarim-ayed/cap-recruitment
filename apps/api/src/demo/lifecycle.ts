@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { lifecycleCatalog, lifecycleMode, lifecycleSafety } from './lifecycle-catalog.js';
+import { offlineProfiles, profilePdf } from './offline-profiles.js';
 
 const mode = lifecycleMode(process.argv.slice(2));
 const catalog = lifecycleCatalog();
@@ -13,9 +14,9 @@ if (mode === 'plan') {
   // import AppModule/ProcessingModule: this tool has no gateway/Redis/mail client.
   const { projectRoot } = await import('../configuration/environment.js');
   lifecycleSafety(process.env);
-  const [{Module},{NestFactory},{DatabaseModule},{DatabaseService},{DocumentsModule},{DOCUMENT_STORAGE},{seedLifecycle},{hashPassword},{samplePdf}] = await Promise.all([
+  const [{Module},{NestFactory},{DatabaseModule},{DatabaseService},{DocumentsModule},{DOCUMENT_STORAGE},{seedLifecycle},{hashPassword}] = await Promise.all([
     import('@nestjs/common'),import('@nestjs/core'),import('../database/database.module.js'),import('../database/database.service.js'),
-    import('../documents/documents.module.js'),import('../documents/document-storage.js'),import('./lifecycle-store.js'),import('better-auth/crypto'),import('./sample-pdf.js'),
+    import('../documents/documents.module.js'),import('../documents/document-storage.js'),import('./lifecycle-store.js'),import('better-auth/crypto'),
   ]);
   class LifecycleModule {}
   Module({imports:[DatabaseModule,DocumentsModule]})(LifecycleModule);
@@ -30,7 +31,8 @@ if (mode === 'plan') {
       const directory = join(projectRoot,'.local','demo','lifecycle');
       try {
         await mkdir(directory,{recursive:true,mode:0o700});
-        for (const application of catalog.applications) await writeFile(join(directory,`${application.scenario.key}-cv.pdf`),samplePdf(application.lines),{mode:0o600});
+        for (const application of catalog.applications) await writeFile(join(directory,`${application.scenario.key}-cv.pdf`),await profilePdf(application.profile),{mode:0o600});
+        for (const profile of offlineProfiles) await writeFile(join(directory,`${profile.id}.pdf`),await profilePdf(profile),{mode:0o600});
         await writeFile(join(directory,'manifest.json'),JSON.stringify({namespace:catalog.namespace,baseline:catalog.baseline,provenance:'Declared synthetic snapshots; no workflow commands, parsing or AI execution.',accounts:catalog.actors.map(({id,name,email,role})=>({id,name,email,role})),vacancies:catalog.jobs.map(job=>({key:job.key,id:job.vacancy.id,title:job.vacancy.title,owner:job.owner.email,status:job.vacancy.status})),applications:catalog.applications.map(application=>({key:application.scenario.key,id:application.id,vacancyId:application.job.vacancy.id,candidate:application.candidate.email,stage:application.stage,purpose:application.scenario.purpose,submittedAt:application.submittedAt,url:`/#/applications/${application.id}`,sample:`${application.scenario.key}-cv.pdf`}))},null,2)+'\n',{mode:0o600});
       } catch {
         throw new Error('Lifecycle DB transaction committed, but local manifest/sample export failed. Do not assume rollback; inspect output directory before another operation.');
