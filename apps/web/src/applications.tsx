@@ -70,11 +70,8 @@ function TaskCard({task,field,title,editing=false,onDocument,onSave,busy,draft,o
   const current=draft?.active?draft.value:fieldDraft(field);
   const paused=!!draft&&!draft.active;
   const readOnly=busy||closed||paused;
-  const raw=task.result.value?.rawResponse;
-  const rawAnswer=raw&&typeof raw==='object'&&'answers' in raw&&raw.answers&&typeof raw.answers==='object'?(raw.answers as Record<string,unknown>)[field.questionId]:undefined;
   return <article className="extraction-card">
     <div className="section-heading"><h3>{title}</h3>{editing&&onDocument&&<IconButton icon="eye" label={`Show source document for ${title}`} onClick={onDocument}/>} {task.provenance?.mode==='fixture'&&<span className="small fixture-label">Fixture result</span>}{task.provenance?.mode==='live'&&<span className="small muted">{task.provenance.provider==='typesafe'?'Jev result':'Automated result'}</span>}</div>
-    <p className="small muted">{field.question.instructions}</p>
     <div className="saved-value" aria-label={`Latest saved value for ${field.columnKey}`}>
       <span className="eyebrow">LATEST SAVED VALUE</span>
       <h4>{field.hasCorrection?'Saved HR correction':task.result.status==='completed'?'Original extraction (no correction)':'Unavailable — extraction has not succeeded'}</h4>
@@ -87,10 +84,9 @@ function TaskCard({task,field,title,editing=false,onDocument,onSave,busy,draft,o
       <div className="actions"><button disabled={readOnly}>Save correction</button>{field.hasCorrection&&<button type="button" disabled={readOnly} onClick={()=>onSave({taskId:task.taskId,questionId:field.questionId,value:null,remove:true})}>Use original</button>}</div>
     </form>}
     <details className="original-result"><summary>Original extraction and evidence · {extractionLabel(task.status,processingClosed)}</summary>
-      <p>{cvValueLabel(field.configuration,field.original)}</p>{rawAnswer!==undefined&&<pre>{JSON.stringify(rawAnswer,null,2)}</pre>}
+      <p>{cvValueLabel(field.configuration,field.original)}</p>
       {task.result.reason&&<p className="notice">{task.result.reason}</p>}
       {task.provenance?.fixtureId&&<small className="fixture-label">Fixture: {task.provenance.fixtureId}</small>}
-       <dl className="processing-details"><div><dt>Source field</dt><dd>{task.sourceInputId}</dd></div><div><dt>Output column</dt><dd>{field.columnKey}</dd></div><div><dt>Extractor attempts</dt><dd>{task.attempts}/3</dd></div>{task.provenance?.model&&<div><dt>Model</dt><dd>{task.provenance.model}</dd></div>}</dl>{task.provenance?.diagnostics!==undefined&&<details><summary>Parser warnings and diagnostics</summary><pre>{JSON.stringify(task.provenance.diagnostics,null,2)}</pre></details>}
     </details>
   </article>;
 }
@@ -105,6 +101,7 @@ function ApplicationDetail({id,staff}:{id:string;staff:boolean}) {
   const [reviewSaving,setReviewSaving]=useState(false);
   const [reviewEditor,setReviewEditor]=useState(false),[completeReview,setCompleteReview]=useState(false);
   const [reviewDocument,setReviewDocument]=useState('');
+  const [viewTab,setViewTab]=useState<'application'|'review'>('application');
   const focusTarget=useRef<HTMLDivElement>(null),navigation=useOptionalNavigation();
   const closeReview=()=>{if(reviewSaving)return;const close=()=>{setReviewEditor(false);setCompleteReview(false);};if(Object.keys(drafts).length&&navigation)navigation.requestAction(()=>{setDrafts({});close();});else if(!Object.keys(drafts).length)close();};
   useNavigationGuard(Object.keys(drafts).length>0,reviewSaving);
@@ -124,28 +121,32 @@ function ApplicationDetail({id,staff}:{id:string;staff:boolean}) {
     <p className="application-vacancy"><a href={`#/vacancies/${record.vacancyId}`}>{record.vacancy.title}</a></p>
     <div className="application-metadata"><p>Submitted <time dateTime={record.submittedAt}>{new Date(record.submittedAt).toLocaleString()}</time></p><details className="application-contact"><summary>Contact email</summary><span>{record.candidate.email}</span></details></div>
     <Notice message={message} success/>
-    <div className={`application-information-layout ${preview?'with-preview':''}`}>
+    {showReview&&review&&<nav className="application-view-tabs" aria-label="Application views">
+      <button className={viewTab==='application'?'active':''} onClick={()=>setViewTab('application')}>Application</button>
+      <button className={viewTab==='review'?'active':''} onClick={()=>setViewTab('review')}>Review results</button>
+    </nav>}
+    {viewTab==='application'&&<div className={`application-information-layout ${preview?'with-preview':''}`}>
       <ApplicationInformation record={record} onPreview={setPreview} onDownload={async doc=>{try{await download(`applications/${id}/documents/${doc.id}`,doc.filename);}catch(e){setError(errorMessage(e));}}}/>
       {preview&&!reviewEditor&&<PdfPreview key={preview.id} applicationId={id} document={preview} onClose={()=>setPreview(null)}/>}
-    </div>
-    {showReview&&review&&<>
-      <section className="application-section" aria-labelledby="application-results-heading">
-        <h2 id="application-results-heading">Automated results</h2>
-        <dl className="application-result-metadata"><div><dt>Original processing</dt><dd>{extractionLabel(review.processingState??record.processingState,review.processingClosed)}</dd></div>{review.readiness&&<div><dt>Review availability</dt><dd>{readinessLabel(review.readiness.state,review.review.status)}</dd></div>}</dl>
-        {review.release&&<p className="small muted">Released {new Date(review.release.at).toLocaleString()}{review.release.actor?` · ${review.release.actor.name||review.release.actor.email}`:''}. Unfinished extraction remains unavailable.</p>}
-        {review.actions.release?.allowed&&<button disabled={busy||needsRefresh} onClick={()=>setConfirmRelease(true)}>Continue with manual review</button>}
-        <div className="application-review-fields">{!reviewEditor&&taskCards(false)}</div>
-      </section>
-      <section className="application-section" aria-labelledby="application-review-heading">
-        <div className="section-heading"><h2 id="application-review-heading">Human review</h2><Badge>{review.review.status}</Badge></div>
-        <p className="small muted">Review supports screening; it is not required to preselect or reject.</p>
-        {(review.actions.edit.allowed||Object.keys(drafts).length>0)&&<button disabled={busy} className="primary" onClick={()=>setReviewEditor(true)}>{Object.keys(drafts).length?'Resume review':'Review application'}</button>}
-        {Object.keys(drafts).length>0&&<p className="small muted">Save or discard unsaved corrections before completing review.</p>}
-        {review.tasks.some((task:any)=>task.hasCorrection)&&<p className="review-summary">HR corrections are saved and used in export. Original extraction results remain unchanged.</p>}
-        <small>{review.review.updatedAt?`Saved ${new Date(review.review.updatedAt).toLocaleString()}`:''}{review.review.editor?` · ${review.review.editor.name||review.review.editor.email}`:''}</small>
-        {!review.actions.edit.allowed&&<p className="muted">{review.readiness?readinessLabel(review.readiness.state,review.review.status):'Review is not available.'}</p>}
-      </section>
-    </>}
+    </div>}
+    {showReview&&review&&viewTab==='review'&&<>
+        <section className="application-section" aria-labelledby="application-results-heading">
+          <h2 id="application-results-heading">Automated results</h2>
+          <dl className="application-result-metadata"><div><dt>Original processing</dt><dd>{extractionLabel(review.processingState??record.processingState,review.processingClosed)}</dd></div>{review.readiness&&<div><dt>Review availability</dt><dd>{readinessLabel(review.readiness.state,review.review.status)}</dd></div>}</dl>
+          {review.release&&<p className="small muted">Released {new Date(review.release.at).toLocaleString()}{review.release.actor?` · ${review.release.actor.name||review.release.actor.email}`:''}. Unfinished extraction remains unavailable.</p>}
+          {review.actions.release?.allowed&&<button disabled={busy||needsRefresh} onClick={()=>setConfirmRelease(true)}>Continue with manual review</button>}
+          <div className="application-review-fields">{!reviewEditor&&taskCards(false)}</div>
+        </section>
+        <section className="application-section" aria-labelledby="application-review-heading">
+          <div className="section-heading"><h2 id="application-review-heading">Human review</h2><Badge>{review.review.status}</Badge></div>
+          <p className="small muted">Review supports screening; it is not required to preselect or reject.</p>
+          {(review.actions.edit.allowed||Object.keys(drafts).length>0)&&<button disabled={busy} className="primary" onClick={()=>setReviewEditor(true)}>{Object.keys(drafts).length?'Resume review':'Review application'}</button>}
+          {Object.keys(drafts).length>0&&<p className="small muted">Save or discard unsaved corrections before completing review.</p>}
+          {review.tasks.some((task:any)=>task.hasCorrection)&&<p className="review-summary">HR corrections are saved and used in export. Original extraction results remain unchanged.</p>}
+          <small>{review.review.updatedAt?`Saved ${new Date(review.review.updatedAt).toLocaleString()}`:''}{review.review.editor?` · ${review.review.editor.name||review.review.editor.email}`:''}</small>
+          {!review.actions.edit.allowed&&<p className="muted">{review.readiness?readinessLabel(review.readiness.state,review.review.status):'Review is not available.'}</p>}
+        </section>
+      </>}
     {reviewEditor&&review&&<IntentDialog title={completeReview?'Complete human review?':'Human review'} description={completeReview?'Completing review locks corrections. Missing or unavailable evidence stays unknown. This does not preselect or reject the application.':'Compare saved information with the original evidence. Save corrections individually; completion is a separate action.'} busy={reviewSaving} fallbackFocus={focusTarget} onCancel={closeReview} onConfirm={completeReview?()=>void update({status:'completed'}):undefined} confirmLabel="Complete review" confirmDisabled={needsRefresh||!review.actions.edit.allowed||Object.keys(drafts).length>0}>
       <Notice message={error}/><Notice message={message} success/>
       <button disabled={busy} onClick={refreshView}>Refresh saved review</button>
