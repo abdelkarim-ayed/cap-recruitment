@@ -7,21 +7,36 @@ Suggested kanban states: **Needs design/decision → Ready for approval → In p
 **Status convention:** “Done (implementation)” means the selected source changes are merged; it does not close their Q-* checks. Pending QA is verification work, not an instruction to reimplement the feature. Recorded earlier test passes are not a fresh full-suite pass after later changes.
 
 **Extraction update, 2026-11-13:** portable transfer remains complete and unchanged.
-Approved bounded worktree `feat/cv-extractor-integration` is locally merged to main
-(source `82698b8`, transfer checkpoint `a35a521`), not deployed/live-validated.
-[Checkpoint notes](research/cv-extraction-implementation.md) distinguish earlier
-offline foundation checks from the later **untested/unbuilt** integration after
-the user's explicit stop-testing instruction. Native dependency pinned locally;
-migrations 009/010 unapplied. No data/provider/service operation or push.
+CV source `82698b8` and transfer `a35a521` remain merged on main. Separately
+committed fixes on `feat/cv-offline-demo` now include private file caches, real Jev
+background processing for the explicitly approved new synthetic cohort, local
+cache-only DB recovery, singleton rotation and sentence-style authoring. Built/
+running; not merged/pushed. 009/010 + reserved reset were already applied, no new
+migration needed. [Launch README](../../LAUNCH.md) owns exact scope/PID/commands.
+No tests, agent paid calls/key loading or spending reset.
 Earlier main/backlog QA statuses below remain open, not implicit passes.
 
-**Demo/merge request:** user selected local main merge first, with launch
-discussion potentially in another session. [Demo launch handoff](cv-demo-launch.md)
-records source/build/schema/data/service blockers and the smallest proposed
-fixture-only path. No tests/builds/data/service/provider execution authorized by
-that merge. Mail capture + `mail:latest` exist; T1 viewer and T2b launcher do not.
+**Scope:** user corrected the offline-answer misunderstanding and explicitly
+approved real Jev for new synthetic submissions, unchanged controls and a restart/
+user key reload. No old queue drain, tests or agent paid diagnostics. Mail capture + `mail:latest` exist; T1
+viewer/full T2b service launcher do not. `demo:setup` is a bounded prerequisite
+slice, never a destructive normal server startup.
 
 ## Board and acceptance gates
+
+**CV demo slice: source committed, builds/startup observed; manual live acceptance
+pending.** Real runner is enabled for the fixed new synthetic cohort, starts
+key-empty and makes no claims until user key loading. One earlier seeded fixture
+completion is not live evidence. No agent authenticated workflow/provider test;
+all earlier Q-* remain pending. No merge/push.
+
+**Deadline/user GUI follow-up:** sentence-style CV authoring and automatic new
+field IDs implemented in this worktree; web build/typecheck pass, user review
+pending (no tests/browser). Root [launch README](../../LAUNCH.md) added. Jev health
+request was **research only**, no route/call: published authenticated model listing
+exists, no dedicated health documented or explicit billing guarantee found.
+The subsequent explicit user approval enabled only the bounded new-submission
+live scope; unknown-send restrictions remain. No merge/push until instructed.
 
 | ID / state | Work and dependency | Acceptance / meaningful checks |
 | --- | --- | --- |
@@ -62,15 +77,15 @@ that merge. Mail capture + `mail:latest` exist; T1 viewer and T2b launcher do no
 | B3a — initial slice implemented in SI | Full-evidence undecided CSV with processing/review/UTC date filters; diagnostic export preserved | Original/effective/provenance retained, caps/formula guarding. Broader factual projection/search/tracking/regex remain deferred; integration Q-SI |
 | B3b / B3c / B3d — one-CSV slice implemented in SI | Server preview; shared transaction-owned screening apply; include/exclude/individual/bulk-switch wizard | Mandatory ID/email; extra columns ignored; optional internal reason. Invalid rows not repaired in wizard; decided/conflict states distinct; no silent partial success. No JSON/two-file layout, claims, reversal or causal-receipt ledger; integration Q-SI |
 | R4a — proposed after dependency inventory | Retire unused legacy extraction wiring; clarify local config/constants ownership | Active ports/fixture provenance and frozen definitions retained; no limits/default changes or live calls; relevant builds/typechecks/offline processing checks |
-| R4b — concrete families selected; result/field contract pending | Minimal typed descriptors/effective review-export projection for [five-family CV extractor](extraction-design.md), replacing the old “pick a second template” dependency | Map versioned source/task/question/output identities, result/correction schemas and legacy skills compatibility before implementation; no generic registry/workflow rewrite |
-| B4-S / B4-R — safety first, unattended live runner blocked | **S:** durable attempt-before-send/unknown recovery plus same-request cross-worker/cache coordination; **R:** bounded backend async CV-extractor lifecycle after S/plan review | No automatic second paid attempt, cache-miss send duplication or queue retry after uncertainty. Preserve application closure fences, disabled defaults and stop-on-guard-block/non-overlap/shutdown. Offline runner work is distinct from paid/live activation, which needs separate consent |
-| B5 — locally merged source, unverified | PDF → Markdown → five Choice families → persistence → HR correction → effective CSV; one CV task per file field, frozen publication date, aliases/wording preview, memory caches and send guard | Final integration untested/unbuilt by instruction; not a launch/quality/live pass. 009/010 unapplied; no thresholds/ranking/validity/quotes or further corpus prerequisite |
+| R4b — implemented by merged CV source | Typed five-family descriptors, stable task/question/output identities, machine/correction/effective projections and CSV; legacy definitions fail explicitly rather than being silently converted | Do not schedule this again. Current source/contract own behavior; remaining regression/privacy/manual evidence belongs to Q-* |
+| B4-S / B4-R — source implemented; approved live cohort active, verification pending | Durable attempt guards, cache-before-DB response receipt, local-only interrupted-save replay; submit wake/5s scan and serial real Jev for the approved new synthetic cohort | No second paid attempt on ambiguity/cache loss; preserve closure fences/defaults and unchanged limits. API starts key-empty, user loads key; no historical queue drain. Builds/readiness are not live/recovery/race acceptance |
+| B5 — base merged; offline follow-up running unmerged | PDF → Markdown → five families → persistence → independent corrections/CSV; file caches replace memory; post-submit wake/5s scans in explicit offline mode | Builds/setup and one seeded pending fixture completion observed; 009/010 applied. No tests/authenticated workflow/privacy/race/live-quality pass; no ranking/decisions |
 | B5-T — portable transfer complete and checkpointed | [Archive/manifest](../../research/cv-extraction-lab/README.md): 63 PDFs, all 13 families, source/resources/licenses, native Markdown/provenance and 20 recorded pairs preserved in `a35a521` | Original checksums/provenance retained; no copied environments/caches/credentials. Hash checks are not parser/model/platform acceptance |
-| B5-I — source locally merged (`82698b8`) | Typed exact port, native parser, caches/attempt guards, publication/snapshot/review/CSV/UI, source demo fixtures and RAM-only key control | Earlier 12-domain/29-API checks are not a final pass. User stopped further tests/builds; legacy fixture/static-schema alignment and real integration unverified. Defaults disabled, fixture-only automatic runner; no DB/data run, services, paid calls or push |
+| B5-I — base merged (`82698b8`); offline runtime in `feat/cv-offline-demo` | Native reader, file caches/send guards, frozen date, review/CSV/UI and declared profile fixtures; empty-start local key control | Bounded builds/setup/RMUX launch approved/completed, tests still forbidden. Earlier foundation checks are not current acceptance; old fixtures/static-schema and privacy/race/manual remain. No paid calls/key access/push |
 | T1 — planned, not demo-delivered | Address-directory/timestamp.email UTF-8 history with metadata/body separator, then tiny operator-local viewer; no read lifecycle. Existing latest-per-recipient capture + CLI are not this viewer | Scope separately if essential for the demo; no automatic mail-driver switch. Safe address component, collision-safe history, no overwrite/code leak/public auth bypass; retain latest-reader compatibility |
 | T2a — source implemented; initially seeded | [Repeatable lifecycle dataset](../current/guides/lifecycle-demo.md): five vacancies/25 scenarios, stable scoped IDs, relative event times, private synthetic PDFs, declared fixture extraction/review/interview/notice snapshots and manifest. Explicit reset also includes new submissions when both candidate/vacancy are lifecycle-demo owned; old demo retained | 13 new catalog/CLI/transaction-model plus 20 existing checks passed offline. Local initial PostgreSQL seed and 25 private object hashes verified after migrations 007/008; full Q-T2A not passed. Passwords/unrelated data/counters preserved; active/leased or attempted non-fixture/unknown executor history refuses reset |
 | Q-T2A — partially evidenced; remainder pending | Initial migrations/seed/counts/private object hashes and readiness completed in authorized setup; still scope preserve/rerun/reset, historical/future dates, bounded storage reuse, rollback/unknown commit, unowned submission refusal and unrelated-record preservation | Authenticated role/private-document projections and manual lifecycle traversal remain pending. Declared fixtures do not establish command/notification/race/provider behavior; all previous Q-* gates stay pending. No live provider or automatic migration/reset |
-| T2b — next demo discussion, not implemented | [Bounded launch handoff](cv-demo-launch.md): build/current-schema fixture dataset/service prerequisites before one authenticated fixture → correction → CSV demonstration; launcher remains separate approval | Rediscover services; no automatic migrations/reset/worker drain, credential/counter changes or process stops. Honor no-tests instruction; agree build/data/process scope before execution |
+| T2b — setup slice implemented, full service launcher deferred | `demo:setup seed|reset` runs migrations + scoped lifecycle setup; API/web explicitly launched in RMUX. [Handoff](cv-demo-launch.md) | Never reset on normal API startup; no worker/provider/Redis/key initialization in setup. No passwords/spending/ledger reset; no automatic service orchestration delivered |
 | T3 — later, decision needed | Storage global quota/accounting, then possible monitoring | Approved values/concurrent reservation strategy, backend enforcement, typed errors and rollback/orphan accounting |
 | UX0 — done (implementation), locally merged | [Durable frontend baseline](../current/guides/frontend-design.md) owns the delivered overhaul/consistency decisions; selected implementation rows below are done, not a second design backlog. UX-NAV/Q-UX remain explicitly open | Q-UX and the earlier Q-* gates retain actual verification gaps. Do not restore superseded layouts or infer a framework rewrite/new product scope |
 | UX-ID / UX-FORM — done (implementation) | Fixed read-only account email, human question/skill-check wording and technical settings in secondary disclosures across builder/preview/intake | Server identity/immutable answers/stable keys retained; no custom email answer, silent deletion or new extraction template. Builds/static/focused checks recorded; native/identity remainder Q-UX |
@@ -135,6 +150,35 @@ Earlier R1/R2/R3a/b merges were allowed without their full application regressio
 
 ## Backlog / deferred decisions
 
+### Non-QA implementation remainder
+
+Inventory only, not authorization to execute every card. Keep deadline-critical
+CV work separate from the larger product backlog:
+
+| Scope | Actual unfinished work (not merely testing) |
+| --- | --- |
+| Genuine existing source bug | INTERVIEW-TIME: recheck future appointment time after waiting for the interviewer lock, before writing; separate from the deferred race verification |
+| Mail/demo convenience | T1 timestamped mail history + viewer; full T2b service launcher. Latest-recipient mail CLI and explicit migration/seed setup already exist |
+| Broader product work | Remaining candidate/owner appointment/Pass/Offer/Hired/submission notifications, Inbox hide/retention semantics, unread/workload counts. Recipient policies/definitions still need bounded decisions; existing screening notices are delivered |
+| Later hardening/refactoring | Storage quota/accounting/orphan reconciliation and bounded cache disk retention; retire proven-unused extraction wiring. Not prerequisites to the focused CV demo |
+
+The previously listed CV live integration and local cached-response persistence
+recovery are **now source-implemented and separately committed** in the current
+branch; no migration/cache replacement required. The real new-submission cohort
+is running key-empty until user loading. Do not relist those as missing features;
+their paid/manual/recovery/privacy/race acceptance remains unperformed, not passed.
+
+Release hygiene also includes aligning stale static OpenAPI/older documentation
+with the new contract. This is documentation/source alignment, not an instruction
+to run the forbidden tests. Archive/participant/OAuth/calendar/other optional
+directions below remain deferred, not hidden mandatory demo implementation.
+
+Cache clarification: runtime files already map parser identity (PDF **bytes**
+hash + parser version/options) and exact fully hydrated **request** hash to values.
+No filenames/application IDs are cache keys. A response cannot safely use only
+PDF hash, because questions, aliases, date or model may differ. No DB migration
+or cache replacement is needed merely to add local persistence replay.
+
 - Export-tracking schema (batch ledger vs per-application markers vs other), reviewer assignment/claims, safe regex/search scope.
 - [Screening implementation/remainder](screening-import-contract.md): one-CSV ID/email/outcome/reason, grouped wizard and atomic first-committed apply are done. Only broader formats/receipts/assignments and Q-SI/Q-UX remain; strict evidence freshness was not selected.
 - Vacancy archive/fill/close semantics and handling pending work. Decision reversal/undo is explicitly dropped; retain flexible selection preview before final commit.
@@ -142,7 +186,12 @@ Earlier R1/R2/R3a/b merges were allowed without their full application regressio
 - Recruitment email vs external HR bulk-mail tooling/export; keep MailSender decoupled and identity mail functioning. Viewer T1 is later in the near-term todo list, not dropped indefinitely.
 - Future semantic form presets/catalog: phone, portfolio, availability, supporting documents; singleton standard-field chips vs repeatable custom fields and any newly scoped selected-input refinements. Generic editor/preview and UX-ID fixed-email presentation already exist; frozen account email/CSV assertion stays authoritative.
 - Candidate withdrawal/resubmission/corrections, public communication copy, guest invitations, admin override, saved drafts, clone/repost, descriptive edits to published jobs.
-- The five CV-extractor families, publication-date freeze, shared-CV question request and parser/request caches are selected under B5, not indefinite research backlog or implemented source. Later: language/management families, highlighting/quotes/geometry, suggestions/graph, advanced segmentation/retrieval, OCR/DOCX, validity checks/rolling dates, provider alternatives and further evaluation. No arbitrary prompts/DAG or gateway-control changes implied.
+- Five CV families, publication-date freeze, shared-CV question request and parser/
+  request caches are source-implemented (file-cache follow-up in the current
+  unmerged worktree). Do not reimplement them from old research text. Later:
+  language/management families, highlighting/quotes/geometry, suggestions/graph,
+  retrieval, OCR/DOCX, validity/rolling dates, alternatives/evaluation. No arbitrary
+  prompts/DAG or gateway-control changes implied.
 - Production mail, OAuth (Google desired; LinkedIn optional), staff-management UI, quotas/scan/orphan reconciliation/backups, portability/hosting, availability/calendar sync, reminders/chat, SQL analytics, hired-person export, staff attachments/reference documents.
 - Interview retries/reopening remain unimplemented; no selection undo feature planned. Prefer rescheduling to standalone cancellation in the bounded UI.
 - Candidate entry/application-first links, requested list filters, fixed email and selected enterprise UI cleanup are done above, not deferred. Remaining: UX-NAV reproduction, unread/workload counts, broader candidate communication, any newly scoped fixture/CV improvements and Q-UX. Fixture labels remain truthful; T2a already provides synthetic lifecycle PDFs.

@@ -13,7 +13,14 @@ rmux attach-session -t workspace
 
 On 2026-11-07 the authorized demo launch created `workspace:backend` and `workspace:frontend`, both in `/home/ubuntu/code`. `home` is left untouched. These names are the launch observation, not proof the services are still running later. Redis/PostgreSQL/Mailpit run in existing host-network Podman containers with volumes preserved; they are not extraction workers.
 
-The backend command is `NODE_ENV=development MAIL_DRIVER=file EXTRACTION_DRIVER=disabled PROCESSING_READER=disabled PROCESSING_EXECUTOR=disabled pnpm --filter @recruitment/api start`. The frontend command is `pnpm --filter @recruitment/web exec vite --host 127.0.0.1`. No processing/retention runner is launched. Keep the services alive after the task.
+**2026-11-13 corrected launch:** `backend` / `frontend` run from
+`/home/ubuntu/cv-offline-demo`, not main. Backend uses real native reader/Jev
+executor/runner with explicit synthetic consent and fixed new-submission cutoff,
+starts key-empty; user loads the key. **[Launch README](../../../LAUNCH.md)** owns
+the exact restart command/boundary/PID; reuse its cutoff on restart, no old queue
+drain. Stable credential socket doubles as singleton guard before worker hooks.
+Frontend: `pnpm --dir apps/web exec vite --host 127.0.0.1`.
+No retention/Mailpit launch. Keep services alive; rediscover before management.
 
 ## Agent workflow
 

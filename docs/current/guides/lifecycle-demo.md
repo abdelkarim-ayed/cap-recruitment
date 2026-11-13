@@ -2,11 +2,13 @@
 
 T2a is source-implemented. Authorized local setup on 2026-11-07 applied migrations 007/008 and successfully seeded five vacancies/25 applications; all 25 private document hashes were verified through storage. API/DB/Redis readiness and frontend/proxy HTTP checks passed. **This is setup evidence, not completion of Q-T2A or other QA gates:** reset/repeatability, authenticated workflows/privacy, races and manual UX remain pending. No launcher is implemented; services were launched explicitly in [RMUX](rmux.md).
 
-**CV source cutover, 2026-11-13:** the commands now require migrations through
-010 and version-2 CV fixtures. The earlier local skills dataset has not been
-converted/recreated, and 009/010 have not been applied. Final source is unbuilt/
-untested by instruction. This is not currently a ready-to-launch recipe; use the
-[bounded launch handoff](../../plan/cv-demo-launch.md) for separate approvals.
+**2026-11-13 offline cutover:** authorized `demo:setup reset` applied 009/010 and
+recreated the reserved dataset with version-2 CV fixtures and unchanged transferred
+PDFs. Source fixes in `feat/cv-offline-demo` are separately committed/built/running,
+not merged/pushed. The current new-synthetic-submission cohort uses **real Jev**
+after user key loading; historical seed snapshots remain declared fixtures.
+No tests; authenticated/manual/privacy/race gates remain pending. See the
+[launch handoff](../../plan/cv-demo-launch.md) for current worktree/process details.
 
 ## Dataset
 
@@ -14,15 +16,24 @@ untested by instruction. This is not currently a ready-to-launch recipe; use the
 
 | Vacancy | Scenarios |
 | --- | --- |
-| `draft` | Untouched draft authoring; owned by `lifecycle.hr@example.test` |
-| `review` | Pending, ready, successful empty, ordinary terminal failure, operational/uncertain blocked, explicitly released, separately corrected, completed review, preselected while pending, screening rejected |
-| `interviews` | Preselected/unscheduled, upcoming, feedback due, rescheduling requested, cancelled-only, partial pass, all passed, failed with remaining cancellation, Offer, Hired |
-| `no-tasks` | Received, zero-interview Offer, zero-interview Hired; owned by the second recruiter |
-| `closed` | Preselected; closed intake still permits owner finalization |
+| `draft` — Data Analyst | Untouched draft authoring; owned by `lifecycle.hr@example.test` |
+| `review` — Backend Engineer | Pending, ready, zero programming coverage, ordinary terminal failure, operational/uncertain blocked, released, corrected, reviewed, screened-pending, rejected |
+| `interviews` — Senior Software Engineer | Preselected/unscheduled, upcoming, feedback due, reschedule, cancelled, partial/all pass, failed with cancellation, Offer, Hired |
+| `no-tasks` — Finance Operations Analyst | Received, zero-interview Offer/Hired; owned by the second recruiter |
+| `closed` — Financial Accountant | Preselected; closed intake still permits owner finalization |
 
 Staff logins are `lifecycle.hr`, `lifecycle.hr2`, `lifecycle.admin`, `lifecycle.interviewer`, `lifecycle.interviewer2`, all at `example.test`. Each application has its own candidate login `lifecycle.<scenario-key>@example.test` (keys are listed by `plan` and the manifest). `lifecycle.candidate@example.test` is initially empty for manual intake. Initial password: **`DemoRecruitment!2026`**, synthetic/development only. Existing passwords, accounts and sessions are not reset. The admin has no owner override. The second interviewer handles the second configured interview.
 
-Each application has an attached text-only synthetic PDF, using five varied fictional profile patterns. Results, notices and interview assessments are **declared synthetic snapshots**, not outputs from executed transitions, interviews, parsing or AI. Machine results retain `mode:fixture`, a fixture ID and `method:declared-lifecycle-snapshot`; HR corrections are separate. The updated source fixture schema covers five-family Choice responses, a frozen declared publication date, simulated zero usage and independent category/null-count corrections. These are not extraction-quality or paid-attempt evidence. No genuine in-flight external request is simulated.
+Each application has an unchanged transferred synthetic PDF from four profiles:
+Daniel Mercer (backend), Amélie Hartmann (data), Grace Ellington (nursing), Ronan
+Keating (accounting). Destination-authored declared answers reflect these source
+claims; they are not archived Jev observations or validated ground truth. The
+nursing zero-coverage scenario still has a bachelor's degree. Snapshot results,
+notices and interview assessments are **declared**, not executed history.
+Machine snapshots retain `mode:fixture`, fixture ID and
+`method:declared-lifecycle-snapshot`; HR corrections stay separate. Zero usage and
+confidence=1 are simulated metadata, not quality/billing evidence. Pending work
+may subsequently run through the explicitly enabled offline native-reader worker.
 
 ## Commands and prerequisites
 
@@ -48,12 +59,54 @@ NODE_ENV=development PROCESSING_READER=disabled PROCESSING_EXECUTOR=disabled pnp
 - Reset refuses owner/account/identity/document collisions, submissions by unrelated candidates inside a demo vacancy, active/expired leases or processing state, and attempted non-fixture/unknown executor history. Move/preserve unrelated submissions through a separately agreed operation; do not widen reset filters.
 - Durable live request history also refuses fixture reset. The request-attempt ledger is never cleared with disposable recruitment data.
 - One transaction/advisory lock covers ownership checks and DB replacement. Vacancy/application row locks protect the reset boundary; do not use it as a concurrent business-workflow runner. No runtime clock or auth bypass is added.
-- Canonical private PDFs are hash-checked and reused under exact IDs rather than reuploaded on every reset. Extra manual demo-submission objects are retired in the transaction, then unlinked only after a fresh lookup confirms committed removal. Other stored files are untouched. Newly uploaded bytes after a failed transaction are removed only when a fresh lookup proves they were not committed. Failed/uncertain cleanup or a lost reset COMMIT acknowledgement can retain a private orphan; no broad storage reconciliation is attempted.
+- Objects retired by reset are unlinked only after a fresh lookup confirms
+  committed removal. Newly uploaded bytes after a failed transaction are removed
+  only when a fresh lookup proves they were not committed. Failed/uncertain cleanup
+  or a lost COMMIT acknowledgement can retain a private orphan; no broad storage
+  reconciliation is attempted.
+- In the updated reset, canonical and extra dataset objects are retired only when
+  no longer referenced, then new immutable objects are inserted. This permits the
+  authorized replacement of old generic PDFs with transferred profiles without
+  overwriting stored bytes. Other objects remain outside the reset scope.
 
 After successful initialization/reset, `.local/demo/lifecycle/manifest.json` lists baseline, accounts, IDs, links, scenario purpose and initial stage. Adjacent PDFs are available for manual uploads. The manifest records **initial declared snapshots**, not current UI state. An ordinary preserving seed leaves it unchanged. If DB commit succeeds but manifest export fails, the command explicitly reports that distinction; do not assume rollback.
 
-For new manual submissions, use the existing explicit fixture-only `demo:process` helper described in the [demo guide](demo-guide.md#fresh-vacancy--candidate--mock-processing). Nothing auto-processes newly submitted applications.
+## Setup command and optional offline processing
+
+After building domain/API, `demo:setup seed|reset` applies auth/application
+migrations and invokes the scoped seed/reset above; normal API restarts never do.
+From the active worktree, using the existing private runtime directory:
+
+```sh
+RECRUITMENT_RUNTIME_ROOT=/home/ubuntu/code NODE_ENV=development MAIL_DRIVER=file PROCESSING_READER=disabled PROCESSING_EXECUTOR=disabled PROCESSING_RUNNER=disabled pnpm --filter @recruitment/api demo:setup seed
+```
+
+Use `reset` only with explicit disposable-data scope and no active worker. It
+does not touch Redis, passwords, credentials, volumes or `cv_request_attempts`.
+It can stop after an earlier migration commits; failure is not whole-command
+rollback. Existing guards are not bypassed to satisfy a broad cleanup request.
+
+The launch uses `PROCESSING_RUNNER=offline-demo PROCESSING_READER=pdf
+PROCESSING_EXECUTOR=disabled` with `NODE_ENV=development`. New submissions return
+without awaiting extraction; post-commit wake + 5s DB scan processes one application
+at a time. Supplied files `.local/demo/lifecycle/precv-001.pdf`, `precv-002.pdf`,
+`precv-004.pdf`, `precv-005.pdf` have declared profile answers for known terms/scopes
+and Oct–Dec 2026 publication dates. Other files/configurations become explicitly
+unavailable, not invented answers or live fallbacks. Refresh HR detail for results.
+The earlier `demo:process` remains an explicit synthetic helper, not the automatic
+profile mode, and requires the runner disabled.
 
 ## Verification boundary
 
-Q-T2A remains pending: real PostgreSQL/FK/transaction/file persistence and reset repeatability, unrelated-data preservation, authenticated projections/role isolation, then user-manual lifecycle/native UX. Seed snapshots are navigation aids, not DB/HTTP/security/race evidence or a substitute for Q-R*/Q-SI/Q-B1*. T2b (demo launcher/prerequisite orchestration) remains future work with separate process-operation approval.
+Q-T2A remains pending beyond observed setup/reset and one seeded pending worker
+completion: repeatability/rollback, unrelated-data preservation, authenticated
+projections/isolation and manual UX. No tests were run. The setup command is a
+bounded T2b prerequisite slice, not a service launcher or mail viewer; keep all
+Q-R*/Q-SI/Q-B1* and live-recovery/privacy gates pending.
+
+The offline configuration above is optional, **not the current live worker**.
+User clarified that synthetic PDFs must pass through genuine Jev. Current
+`PROCESSING_RUNNER=jev` is scoped to new synthetic submissions after the fixed
+boundary in [LAUNCH.md](../../../LAUNCH.md), starts key-empty and uses native
+parsing/real responses. Historical fixture snapshots are not reprocessed or
+relabelled as live evidence. No further reseed was needed for that correction.

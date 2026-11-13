@@ -2,7 +2,17 @@
 
 Company-specific recruitment application built with React/Vite, NestJS/TypeScript and PostgreSQL.
 
-Includes configurable vacancies and application forms, private documents, HR corrections and CSV export, interview scheduling, internal evaluations/decisions and a staff inbox. Real PDF preparation and guarded skills extraction are implemented with disabled defaults; extraction is fixture-tested, not live-validated. Candidate-facing recruitment updates remain planned.
+Configurable vacancies/forms, private CV documents, five-family structured CV
+extraction, independent HR corrections/effective CSV, interview scheduling, human
+recruitment decisions and a staff inbox. Native PDF preparation and guarded Jev
+transport are implemented with disabled defaults. The explicitly enabled current
+worker uses real Jev for new synthetic submissions once its RAM key is loaded;
+seeded historical examples retain declared fixture provenance. No agent live
+validation or quality claim; candidate screening
+notices/public status exist, broader recruitment notifications remain planned.
+
+**[Demo launch and key rotation → LAUNCH.md](LAUNCH.md)** — current worktree/RMUX,
+accounts/PDFs, setup commands, worker architecture and real-provider boundaries.
 
 ## Local development
 
@@ -14,14 +24,16 @@ Create `.env` from `.env.example` if it does not already exist, and set `BETTER_
 pnpm install --frozen-lockfile
 pnpm infra:up
 pnpm build
-pnpm --filter @recruitment/api auth:migrate
-pnpm --filter @recruitment/api db:migrate
+pnpm --dir apps/api run auth:migrate
+pnpm --dir apps/api run db:migrate
 pnpm dev
 ```
 
 Open **http://localhost:5173**. For synthetic accounts and sample documents, follow the [demo guide](docs/current/guides/demo-guide.md).
 
-Checks: `pnpm test` and `pnpm typecheck`. Infrastructure connectivity: `pnpm infra:check`. Stop infrastructure without deleting its volumes: `pnpm infra:stop`.
+No tests are run for the current time-bounded handoff. Builds are not a regression
+or live-provider pass; pending checks remain in the status/plan. Stop infrastructure
+without deleting its volumes only when authorized: `pnpm infra:stop`.
 
 ## Documentation
 

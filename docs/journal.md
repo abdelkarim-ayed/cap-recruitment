@@ -1,5 +1,26 @@
 # Significant checkpoints (report-support notes)
 
+## 2026-11-13 — CV demo launch and real-worker correction
+
+User superseded memory caching with files and approved build/setup/RMUX work,
+explicitly no tests. Assistant initially interpreted fixtures as canned answers;
+user clarified synthetic PDFs must use real Jev, then explicitly approved new
+synthetic submissions only and a backend restart/user key reload, unchanged
+gateway controls. Separate fixes committed on `feat/cv-offline-demo`: sentence UI
+`4e78d53`, root singleton control/rotation `8737c2a`, private caches/response receipt
+`ade7596`, setup/transferred PDFs `9030c8c`, real worker/local-only recovery
+`0586394`. No merge/push. No archived provider observations used as runtime cache.
+
+Domain/API/web builds passed, 009/010 applied, five reserved vacancies/25 scenarios
+recreated with passwords/spending/ledger preserved. Existing host-network DB/Redis
+containers started; API/web run in named RMUX windows. Readiness and one seeded
+pending native-parse/declared-answer completion observed, not real-provider
+evidence. Later real worker boot/readiness observed, with fixed cohort boundary
+and empty-start singleton socket; user owns key loading/manual live submissions.
+No agent credential access, paid probe, tests or live/recovery/privacy/race/quality
+acceptance. [Launch handoff](plan/cv-demo-launch.md) owns current operation;
+mail viewer/full service launcher remain deferred. Earlier Q-* gates stay open.
+
 ## 2026-11-13 — CV source and RAM-only credentials, local merge only
 
 User approved bounded five-family CV integration and local key rotation, then

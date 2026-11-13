@@ -2,7 +2,15 @@
 
 Planning baseline: 2026-11-09. R1/R2/R3a–d/SI/B1-P/F/R/J, T2a and the recruitment UI overhaul/consistency pass are locally merged into main. The [current frontend baseline](../current/guides/frontend-design.md) records implemented interaction/product/style choices; [UI follow-ups](ui-ux-overhaul.md) contain only remaining work and verification. Local setup applied migrations 007/008; dated build/offline/manual evidence is in [status](../current/status.md). The [task board](tasks.md) distinguishes completed implementation from pending QA. No push, live-provider work or blanket next-card approval.
 
-2026-11-13 extraction handoff: [portable lab archive/manifest](../../research/cv-extraction-lab/README.md) is copied and verified, originals preserved, uncommitted. The [five-family extractor](extraction-design.md) and [integration map](research/cv-extraction-lab.md) remain selected **future platform behavior**; main still uses the Noul skills starter. The next new session plans result/persistence/export and safe backend async integration, not more transfer, idle UI work or automatic backlog execution. No install/DB/provider/process/implementation/commit/push occurred in transfer.
+2026-11-13: transfer `a35a521` and CV source `82698b8` are locally merged on main
+(`c77aebe`). Five-family definitions/results/review/export are implemented, not
+future work. Separately committed `feat/cv-offline-demo` fixes add file caches,
+scoped real Jev scheduling/local cache-only persistence recovery, singleton key
+control, setup and sentence-style authoring. Builds/setup/readiness observed;
+no tests or agent paid calls. User approved the new synthetic cohort, unchanged
+limits and restart; user loads the empty-start key. No old queue drain, merge or
+push. [Launch README](../../LAUNCH.md)/[handoff](cv-demo-launch.md) own runtime
+boundaries; see the [actual remainder](tasks.md#non-qa-implementation-remainder).
 
 Screening may happen before extraction/review finishes; either outcome freezes extraction/review without inventing completion. The interview plan may be empty, freezes at publication, and never replaces explicit owner Offer/Hired actions. See [product decisions](product-decisions.md) for the selected rules and [task board](tasks.md) for proposed decomposition, dependencies and remaining gates. Earlier mandatory reviewed-only screening/minimum-one-interview directions are superseded, not implemented contracts.
 

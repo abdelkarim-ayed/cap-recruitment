@@ -7,31 +7,74 @@ the separately checkpointed transfer/plans `a35a521`; no push. Local demo setup
 applied 007/008 and seeded the old lifecycle fixtures on 2026-11-07. Dated evidence
 below is not current runtime activation or complete functional QA.
 
-**2026-11-13 local main merge:** `feat/cv-extractor-integration` replaces the skills
-workflow in source with the five-family CV feature across definitions,
-publication/snapshots, guarded processing, per-field review/CSV, form-builder
-wording preview and source demo fixtures. **Committed/locally merged, not deployed,
-and untested/unbuilt after the user's explicit stop-testing instruction.**
-Migrations 009/010 are unapplied, normal/automatic live execution stays disabled,
-and no service operation was performed. Earlier foundation checks below predate
-this vertical integration; old test/smoke/view fixtures and static OpenAPI need
-new-contract alignment, not a claimed pass. See [source contract](contracts/processing-review-api.md)
-and [checkpoint boundaries](../plan/research/cv-extraction-implementation.md).
+## 2026-11-13 — CV demo launch and real-worker correction
 
-Additional explicitly approved source-only follow-up: empty-start, RAM-only Jev
-credential loading/rotation through a hidden-input/stdin local CLI and Unix IPC /
-Windows named pipe; no key environment/file fallback, key-returning route or
-spending reset. No actual key was accessed/changed and no service was started or
-restarted. No tests/builds; Windows transport/ACL behavior is unverified. See
-[local key control](guides/jev-key-control.md).
+Deadline follow-up: sentence-style CV authoring replaces argument forms/prominent
+Jev debug previews, with optional keywords/ongoing qualifications and hidden
+technical wording. New target-derived IDs/source-derived prefixes are generated
+without renaming saved/imported identities. Web typecheck/build passed (same
+dependency annotation warnings), no tests/browser inspection; user GUI review
+pending. Vite serves the source update. Root
+`LAUNCH.md` now documents build/setup/accounts/PDFs/rotation/modes and scheduling.
+UI fix committed separately as `4e78d53`; no merge/push or presentation edit.
 
-Merge/readiness checkpoint: only known planning-document conflicts were resolved,
-retaining the selected implementation/memory-cache direction; original main edits
-and all research bytes are preserved in the transfer checkpoint. No tests/builds
-or hooks running them were executed for the merge. Read-only discovery found one
-RMUX window and no listeners on 3000/5173/58025; not a health/workflow test. Mail
-viewer T1 and launcher T2b are not implemented. Next session starts at the
-[demo launch handoff](../plan/cv-demo-launch.md), not a readiness claim.
+Health research only: public TypeSafe docs/OpenAPI list authenticated
+`GET /v1/models`, no dedicated health endpoint. It returns accessible model
+metadata, not inference/token usage; reviewed docs make no explicit billing
+guarantee. No credential-bearing call, paid probe or `/health/jev` implementation.
+This does not establish that the user's key can access Jev inference.
+
+The assistant initially misread fixtures as canned answers; user clarified that
+synthetic **PDFs**, not answers, were intended. The user then explicitly approved
+real execution for new synthetic submissions only, unchanged hard controls, and a
+backend restart/key reload; no tests or agent paid diagnostics. Current backend
+**164375** runs `PROCESSING_RUNNER=jev`, real executor/native reader and fixed
+`PROCESSING_LIVE_SINCE=2026-11-13T06:10:10.423Z`. It starts empty and leaves work
+unclaimed until the user loads a key. Historical pending/failed records are not
+drained, successful tasks/closed applications remain excluded.
+
+The root now acquires the **same stable credential socket** used for rotation,
+before workers initialize; a duplicate/occupied/stale socket refuses startup.
+CLI defaults to the single backend, no PID required (`--pid` checks an expected
+backend; `--worker-pid` selects a separate explicit CLI worker). Direct absolute
+Node invocation avoids the absent main build/recursive targeting failure. The
+earlier operational status check reached old PID 126651 empty; no agent key access.
+
+Private hash-addressed caches remain at the shared runtime's `.local/cv-cache`.
+Validated responses cache before DB settlement. Expired interrupted work with
+durable send history can replay **locally only** to complete persistence; missing
+cache never falls back to another paid send. No new migration/reseed was needed
+for this correction. Safe unsent retries retain 12h/max-three policy; uncertainty/
+budget/config/known provider failures stop. No live end-to-end/recovery/race pass.
+
+Separate commits: `8737c2a` singleton/rotation, `ade7596` filesystem cache/receipt
+ordering, `9030c8c` explicit setup/synthetic PDFs, `0586394` real worker/local replay.
+Main remains `c77aebe`; changes stay on `feat/cv-offline-demo`, not merged/pushed.
+
+Observed: offline frozen dependency install reused local store; domain/API/web
+builds passed (web had harmless dependency annotation warnings). Existing
+PostgreSQL/Redis host-network containers started with volumes intact. `demo:setup
+reset` applied 009/010, recreated five reserved vacancies/25 scenarios, preserved
+passwords/other records/spending/ledger. Auth tooling reported its existing
+`rateLimit.lastRequest` int8/number warning, not a failed migration. Updated PDFs
+are unchanged transferred bytes, with destination-authored declared responses.
+
+API/web run in `workspace:backend` / `frontend` from the new worktree, reusing
+`/home/ubuntu/code` private runtime data. Direct/proxy readiness returned ready.
+The **initial offline boot's** seeded pending application completed one native parse/fixture
+task; Markdown and fixture-response cache files were written. No authenticated
+submission, UI/review/export walkthrough, replay/restart/race/privacy verification
+or test suite was performed. Earlier Q-* remain pending; old smoke/view fixtures
+and static OpenAPI still need alignment. This is not quality/live acceptance.
+
+Backend key holder starts empty, control socket active; PID/rotation command are
+printed at startup. No key was read/loaded by the agent, no provider/spending/reset
+operation. Windows transport/ACL behavior and actual rotation remain unverified.
+Mail stays file-captured; T1 viewer and full T2b launcher are not implemented.
+`demo:setup` is a bounded prerequisite/data slice, not automatic destructive startup.
+See [launch handoff](../plan/cv-demo-launch.md), [source contract](contracts/processing-review-api.md)
+and [key control](guides/jev-key-control.md). Retained prior worktrees unchanged;
+leave services alive. Fixes committed separately; no merge/push.
 
 ## Implemented
 
@@ -39,8 +82,8 @@ viewer T1 and launcher T2b are not implemented. Next session starts at the
 - Better Auth email/password, candidate signup and one-time verification, reset codes, provisioned staff. Legacy OTP endpoints remain regression paths, not the UI login.
 - Owner-managed vacancy drafts, generic input/task editor, publish/close, frozen published intake and allowlisted public projections.
 - Immutable candidate submissions, identity/definition snapshots, duplicate prevention, bounded uploads, authorized downloads and native PDF preview.
-- Explicit processing CLI and disabled-by-default trusted-fixture background runner, application leases, one task per configured extractor and private native Markdown preparation. No unattended live runner.
-- CV extractor: transferred five-family Choice wording, first-publication UTC date, complete raw/typed results, memory caches/durable send guards and independent question correction/CSV fields. RAM-only local key control starts empty. Replaces the thresholded Noul starter in source; no final build/runtime/live validation.
+- Explicit processing CLI and disabled-by-default fixture/offline/scoped real Jev background modes, DB leases, bounded wake hints/5s scans, one request per extractor and private native Markdown preparation. Only the approved new synthetic cohort is enabled.
+- CV extractor: transferred five-family wording, frozen publication UTC date, complete raw/typed results, private file caches/durable send guards and independent question correction/CSV fields. RAM-only local key control starts empty. Source builds/offline startup are observed; no full workflow/regression/live validation.
 - Shared HR extraction review; no-task records automatically marked not applicable/completed. Diagnostic CSV exports all vacancy applications; compact undecided screening export has its own factual filters and effective-value projection.
 - Vacancy interview steps, HR scheduling, one responsible assignee per application/step, final assessment, terminal Fail, owner Offer/Hired, internal inbox and read-retention command.
 - R2: pure typed existing staff notification policy, separate command-cause types and unchanged transactional persistence. Recipient/content ownership moved out of InterviewService; no candidate effects, schema/API/UI changes or runtime acceptance claim.
@@ -56,7 +99,7 @@ viewer T1 and launcher T2b are not implemented. Next session starts at the
 - R3d-a: review navigation guard at the hash-router boundary, extended to other editors by R3d-b/c below. Dirty/pending review drafts retain the page for Stay/Discard; sign-out, managed Back/Forward and client redirects are guarded, and standard `beforeunload` warns on reload/close. Returning to the exact saved value clears its local draft. No save-all, automatic merge/save/retry, request cancellation or persistent draft storage.
 - R3d-b: same shared guard now covers unsaved vacancy drafts and interview-plan steps; untouched/unchanged editors do not warn, a successful create redirects only after clean, and plan pagination/Refresh preserve local steps. Successful vacancy/plan responses become the clean baseline; conflicts keep local edits without retry. Same no-save-all/backend/persistence limits as R3d-a; native/manual behavior remains Q-R3DB.
 - R3d-c: shared guard also covers non-empty candidate answers/selected documents and staged screening-import rows. Preview mode is unguarded. Hide import and Close wizard require the same explicit choice when staged decisions exist; a successful apply clears rows before refresh, while conflicts/uncertain outcomes keep the guard. Successful submission redirects only after the form is clean. No automatic save/apply/retry, request cancellation, server draft storage or backend change; native/manual behavior remains Q-R3DC.
-- T2a: separate [lifecycle fixture catalog/seed/reset](guides/lifecycle-demo.md), five vacancies/25 declared scenarios, stable scoped IDs, seed-relative timestamps, private synthetic PDFs, manifest and fixture provenance. Reset includes manual submissions only when both candidate and vacancy are reserved lifecycle-demo identities. Canonical PDFs are reused; extra demo-submission objects are retired after verified commit. Unrelated data/passwords/counters remain outside reset; active/leased/non-fixture or unknown executor history refuses it. Initial seed and 25 private PDF hashes verified locally; reset/repeatability, full Q-T2A and T2b launcher remain pending.
+- T2a: [lifecycle catalog/seed/reset/setup](guides/lifecycle-demo.md), five vacancies/25 declared scenarios, scoped IDs/dates, transferred synthetic PDFs and fixture provenance. Reset includes manual submissions only when both candidate and vacancy are reserved identities; retires now-unreferenced dataset objects after verified commit. Passwords/unrelated data/spending/ledger preserved, active/leased/non-fixture history refuses reset. Observed setup is not full Q-T2A; service launcher remains pending.
 - UI inspection/authoring: title-first vacancy lists, quiet ownership, staff owner/status shortcuts; readable vacancy/interview-plan inspection versus authorized draft editing; named vacancy scope; information-first application pages and human saved-choice labels. Fixed account email and secondary technical form settings preserve server identity/stable keys.
 - Focused guarded dialogs for screening, later rejection, owner Offer/Hired, booking, appointment changes/feedback and human review. Review keeps source PDF beside per-field corrections, separate completion and release confirmations, conflict refresh/reapply and immutable originals/results. No new backend authority or automatic progression.
 - Independent Work to do / Recruitment status with shared server-side list/count/undecided-export filtering; candidate allowlisted public outcomes; safe summary → checked `/apply` with existing-submission navigation and server-side Not applied yet filtering.
