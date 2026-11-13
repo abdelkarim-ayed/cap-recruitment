@@ -1,0 +1,20 @@
+{
+  "reference_date": "2026-11-12",
+  "questions": [
+    {
+      "id": "education_overall",
+      "type": "education_level"
+    },
+    {
+      "id": "education_engineering",
+      "type": "education_level",
+      "scope": "engineering",
+      "expected_within_months": 6
+    },
+    {
+      "id": "maintenance_experience",
+      "type": "experience_years",
+      "scope": ["building maintenance", "industrial maintenance"]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+- Impression: Recruitment-adjacent — senior; credential-first.
+- Tone: pragmatic, hands-on. (~4-5 lines)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: a couple of tools mentioned in context, not a full list.
+- Creds: nothing concrete noted yet.
+- Extra: has volunteer time mentioned vaguely.
+- Timeline: timeline unclear / partially known.
+- Notes: leave room to reshape sections to fit an unknown template.

@@ -1,0 +1,8 @@
+- Impression: Design/product-adjacent — mid; story-first.
+- Tone: jumps between roles without tying them together. (~6-8 lines)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: leans practical/problem-solving over terminology.
+- Creds: little formal shown; practical history carries more weight.
+- Extra: keeps social/portfolio in mind for later.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: community-adjacent, details TBD.

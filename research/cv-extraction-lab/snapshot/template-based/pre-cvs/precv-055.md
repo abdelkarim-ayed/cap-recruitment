@@ -1,0 +1,8 @@
+- Impression: Process/plant — lead/specialist; project-first.
+- Tone: quietly detail-oriented. (~max 10)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: unclear; might only become obvious from details.
+- Creds: possibly some training/certs — unconfirmed.
+- Extra: hints at weekend projects.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: open to adding portfolio/links later if relevant.

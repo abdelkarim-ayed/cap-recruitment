@@ -1,0 +1,18 @@
+{
+  "parser": "pdf-inspector",
+  "parser_version": "1.25.2",
+  "method": "process_pdf; native text only; no OCR",
+  "source_pdf": "template-based/outputs/jsume/precv-052-jsume.pdf",
+  "pdf_sha256": "224dcd2451dbd5c0b1e9afb896339174cb680dad3e1ea21892f36d97b43d3700",
+  "markdown_path": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-052-jsume.md",
+  "markdown_sha256": "f8991fc3bf05822342ed000c31cf87b67476a9c872cf8e209e7829cd52ded46e",
+  "markdown_bytes": 1354,
+  "pdf_type": "text_based",
+  "page_count": 1,
+  "pages_needing_ocr": [],
+  "has_encoding_issues": true,
+  "pages_with_columns": [
+    1
+  ],
+  "pages_with_tables": []
+}

@@ -1,0 +1,39 @@
+{
+  "model": "jev-1.14.0",
+  "state": {
+    "cv": "$cv",
+    "reference_date": "2026-11-12"
+  },
+  "questions": {
+    "secondary_skills": {
+      "type": "choice",
+      "instructions": "How many of these supplied items are mentioned or unambiguously described in the CV: Excel; SQL (also accept: T-SQL; Transact-SQL); Power BI? Count each item once. A generic category or related activity does not establish a specific product or skill. This is document coverage, not proficiency.",
+      "criteria": {
+        "0": "Exactly 0 supplied items are evidenced.",
+        "1": "Exactly 1 supplied items are evidenced.",
+        "2": "Exactly 2 supplied items are evidenced.",
+        "3": "Exactly 3 supplied items are evidenced."
+      }
+    },
+    "sql_evidence": {
+      "type": "choice",
+      "instructions": "What is the strongest explicit evidence for SQL (also accept: T-SQL; Transact-SQL) in the CV? Classify evidence context, not proficiency. A list-only mention is not a concrete application; do not infer professional use from nearby employment history.",
+      "criteria": {
+        "not_mentioned": "No identifiable reference.",
+        "stated_or_studied": "Listed, claimed or studied, without a concrete application example.",
+        "applied": "Applied in a personal/coursework project, practical training, volunteering or other nonprofessional activity.",
+        "used_professionally": "Explicitly applied in professional work."
+      }
+    },
+    "excel_evidence": {
+      "type": "choice",
+      "instructions": "What is the strongest explicit evidence for Excel in the CV? Classify evidence context, not proficiency. A list-only mention is not a concrete application; do not infer professional use from nearby employment history.",
+      "criteria": {
+        "not_mentioned": "No identifiable reference.",
+        "stated_or_studied": "Listed, claimed or studied, without a concrete application example.",
+        "applied": "Applied in a personal/coursework project, practical training, volunteering or other nonprofessional activity.",
+        "used_professionally": "Explicitly applied in professional work."
+      }
+    }
+  }
+}

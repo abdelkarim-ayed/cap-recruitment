@@ -1,0 +1,18 @@
+{
+  "parser": "pdf-inspector",
+  "parser_version": "1.25.2",
+  "method": "process_pdf; native text only; no OCR",
+  "source_pdf": "template-based/outputs/cobalt-cv/precv-032-cobalt-cv.pdf",
+  "pdf_sha256": "9af1de3702d290377d0640dc2667a2d93abf2e8ccd1455dc597b2c48cc6a1ece",
+  "markdown_path": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-032-cobalt-cv.md",
+  "markdown_sha256": "79b1afe352ad45a2a5db7893969ec915362c35f9a83db859bbe51e5273164772",
+  "markdown_bytes": 1478,
+  "pdf_type": "text_based",
+  "page_count": 1,
+  "pages_needing_ocr": [],
+  "has_encoding_issues": false,
+  "pages_with_columns": [
+    1
+  ],
+  "pages_with_tables": []
+}

@@ -1,0 +1,73 @@
+contacts:
+  name: Inés Pereyra
+  title: Estrategia editorial y contenidos de marca
+  email: ines.pereyra.cv@example.net
+  address: "Buenos Aires, Argentina"
+  location: Argentina
+  linkedin:
+    url: https://www.linkedin.com/in/ines-pereyra-contenidos/
+    displayText: ines-pereyra-contenidos
+  github:
+    url: https://github.com/ines-pereyra-contenidos/
+    displayText: ines-pereyra-contenidos
+  website:
+    url: https://ines-pereyra-contenidos.example.net/
+    displayText: ines-pereyra-contenidos.example.net
+
+position: Estrategia editorial y contenidos de marca
+tagline: "Trabajo con contenidos de marca desde hace años: entrevistas, textos para campañas y materiales que tienen que sonar a la organización, no a una plantilla. Últimamente me interesa más ordenar la voz editorial y ayudar a otros equipos a usarla bien."
+objective: "Busco un equipo donde combinar trabajo editorial y acompañamiento a otros redactores."
+
+jobs:
+  - position: Responsable de contenidos
+    company:
+      name: Estudio Marea
+      link: https://estudio-marea.example.net/
+    product:
+      name: Contenidos editoriales y campañas
+      link: https://estudio-marea.example.net/
+    description:
+      - Define calendarios editoriales y revisa textos para clientes de cultura, consumo y servicios.
+      - Entrevista a equipos internos y convierte información técnica en piezas claras para clientes.
+      - Acompaña a dos redactores y coordina revisiones con diseño y marketing.
+      - Preparó una guía breve de tono y ejemplos que el equipo utiliza en campañas nuevas.
+    from: "2021"
+    to: "Present"
+    tags: [Edición, Entrevistas, Estrategia editorial]
+    location: Buenos Aires
+  - position: Redactora de marca
+    company:
+      name: Casa Litoral
+      link: https://casa-litoral.example.net/
+    product:
+      name: Comunicación de marca
+      link: https://casa-litoral.example.net/
+    description:
+      - Escribió campañas digitales, páginas de producto y comunicaciones a clientes.
+      - Trabajó con diseño para ajustar textos a distintos formatos sin perder consistencia.
+    from: "2017"
+    to: "2021"
+    tags: [Redacción, Campañas, Colaboración]
+    location: Buenos Aires
+
+education:
+  - place:
+      name: Universidad Nacional de Lanús
+      link: "https://www.unla.edu.ar/"
+    from: "2012"
+    to: "2016"
+    location: Buenos Aires, Argentina
+    degree: Licenciatura
+    major: Comunicación Social
+
+technical_expertise: []
+skills:
+  - Estrategia editorial, entrevistas, edición y revisión
+  - Tono de marca, calendarios de contenido, coordinación con diseño
+methodology: []
+tools:
+  - Google Docs
+  - Herramientas de gestión editorial
+achievements:
+  - name: Taller de edición digital y accesibilidad de contenidos
+    description: Formación breve, 2023

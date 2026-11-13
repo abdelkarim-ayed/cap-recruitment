@@ -1,0 +1,17 @@
+{
+  "source": "template-based/outputs/vantage-cv/precv-010-vantage-cv.pdf",
+  "pdf_type": "text_based",
+  "page_count": 2,
+  "confidence": 1.0,
+  "processing_time_ms": 57,
+  "is_complex_layout": true,
+  "pages_with_columns": [
+    1
+  ],
+  "pages_with_tables": [
+    1
+  ],
+  "pages_needing_ocr": [],
+  "has_encoding_issues": false,
+  "markdown_chars": 2811
+}

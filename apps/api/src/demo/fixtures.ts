@@ -5,8 +5,12 @@ import { DOCUMENT_STORAGE, type DocumentStorage } from '../documents/document-st
 import { FIXTURE_REGISTRY, type FixtureRegistry, type TaskFixture } from '../processing/execution.js';
 import { ProcessingRepository } from '../processing/processing.repository.js';
 import { ProcessingService } from '../processing/processing.service.js';
+import { declaredCvResponse } from './cv-fixture.js';
 
-export function demoOnly() { if (process.env.NODE_ENV === 'production') throw new Error('Demo commands are forbidden in production.'); }
+export function demoOnly() {
+  if (process.env.NODE_ENV === 'production') throw new Error('Demo commands are forbidden in production.');
+  if ((process.env.PROCESSING_RUNNER??'disabled') !== 'disabled') throw new Error('Demo commands require the background runner disabled.');
+}
 export async function processDemo(app: INestApplicationContext, id: string, outcome: 'success'|'failure'|'empty') {
   demoOnly();
   const database=app.get(DatabaseService);
@@ -21,9 +25,11 @@ export async function processDemo(app: INestApplicationContext, id: string, outc
     if(!source)continue; // Executor persists explicit missing-document failure.
     const bytes=await app.get<DocumentStorage>(DOCUMENT_STORAGE).read(source.storage_ref);
     if(createHash('sha256').update(bytes).digest('hex')!==source.content_hash)throw new Error('Document integrity mismatch.');
-    fixtures.push({fixtureKey:`demo-${id}-${task.id}-${outcome}`,applicationId:id,documentId:source.id,sourceHash:source.content_hash,taskId:task.id,args:task.args,
-      text:`FIXTURE ONLY: recorded text for document ${source.id}. No parsing performed.`,
-      result:outcome==='failure'?{status:'failed',value:null,reason:'FIXTURE ONLY: simulated unreadable document.',retryable:false}:{status:'completed',value:{skills:outcome==='empty'?[]:task.args.skills.slice(0,2)},evidence:task.args.evidence?['FIXTURE ONLY: chosen demonstration skills, not claims about the uploaded document.']:[]}});
+    const markdown=`FIXTURE ONLY: declared text for document ${source.id}. No parsing performed.`;
+    const referenceDate=row.vacancy_snapshot.extractionReferenceDate;
+    if(!referenceDate)throw new Error('Legacy dataset has no frozen publication date; recreate it separately.');
+    fixtures.push({fixtureKey:`demo-${id}-${task.id}-${outcome}`,applicationId:id,documentId:source.id,sourceHash:source.content_hash,taskId:task.id,args:task.args,referenceDate,markdown,
+      result:outcome==='failure'?{status:'failed',value:null,reason:'FIXTURE ONLY: simulated unreadable document.',retryable:false}:{status:'completed',response:declaredCvResponse(task.args,markdown,referenceDate,outcome==='empty')}});
   }
   const registry=app.get<FixtureRegistry>(FIXTURE_REGISTRY);registry.load(fixtures);
   await app.get(ProcessingRepository).bind(fixtures);

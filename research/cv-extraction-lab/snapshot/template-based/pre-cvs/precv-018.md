@@ -1,0 +1,8 @@
+- Impression: Project/general management — mid; credential-first.
+- Tone: very specific about one thing, vague about everything else. (~6-8 lines)
+- Story: odd mix of jobs; common thread not obvious yet.
+- Skills: leans practical/problem-solving over terminology.
+- Creds: little formal shown; practical history carries more weight.
+- Extra: leans on practical know-how over formal quals.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: volunteering/languages may exist, not specified.

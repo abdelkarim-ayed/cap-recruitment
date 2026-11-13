@@ -1,0 +1,581 @@
+{
+  "source_directory": "/tmp/opencode/cvextract-batch003.tz7szT",
+  "basis": "Pre-recorded strict explicit-linkage readings; unresolved contexts remain unresolved, not ground-truth accuracy.",
+  "cases": [
+    {
+      "id": "01-lavandula-original",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-044-lavandula.md",
+      "comparison": "skill_comparison",
+      "input_kind": "PDF-inspector parsed Markdown",
+      "request_sha256": "f1dc15e55694abfa9ced2471a55ab6966a6883422edd568813f07bc17733b356",
+      "cached_response_path": "/home/ubuntu/.cache/cvextract/requests/f1dc15e55694abfa9ced2471a55ab6966a6883422edd568813f07bc17733b356/attempts/540a6853be0d4280970e2a94e6faa8fa/response.json",
+      "user_response_path": "/tmp/opencode/cvextract-batch003.tz7szT/01-lavandula-original.json",
+      "cache_verified": true,
+      "model": "jev-1.14.0",
+      "usage": {
+        "input_tokens": 1659,
+        "output_tokens": 247
+      },
+      "questions": [
+        {
+          "id": "skill_a_original",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "Microsoft Excel",
+            "aliases": [
+              "Excel",
+              "MS Excel"
+            ]
+          },
+          "provisional": "stated_or_studied",
+          "assessment": "disagrees",
+          "answer": {
+            "type": "choice",
+            "choice": "applied",
+            "confidence": 0.8,
+            "probabilities": {
+              "not_mentioned": 0.01,
+              "stated_or_studied": 0.04,
+              "applied": 0.85,
+              "used_professionally": 0.1
+            }
+          }
+        },
+        {
+          "id": "skill_a_revised",
+          "form": "skill_evidence_v002",
+          "arguments": {
+            "name": "Microsoft Excel",
+            "aliases": [
+              "Excel",
+              "MS Excel"
+            ]
+          },
+          "provisional": "stated_or_studied",
+          "assessment": "disagrees",
+          "answer": {
+            "type": "choice",
+            "choice": "applied",
+            "confidence": 0.44,
+            "probabilities": {
+              "not_mentioned": 0.02,
+              "stated_or_studied": 0.32,
+              "applied": 0.58,
+              "used_professionally": 0.08
+            }
+          }
+        },
+        {
+          "id": "skill_b_original",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "spreadsheets",
+            "aliases": [
+              "spreadsheet creation",
+              "spreadsheet tracking"
+            ]
+          },
+          "provisional": "applied (professional context ambiguous)",
+          "assessment": "unresolved",
+          "answer": {
+            "type": "choice",
+            "choice": "applied",
+            "confidence": 0.69,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 0.01,
+              "applied": 0.77,
+              "used_professionally": 0.22
+            }
+          }
+        },
+        {
+          "id": "skill_b_revised",
+          "form": "skill_evidence_v002",
+          "arguments": {
+            "name": "spreadsheets",
+            "aliases": [
+              "spreadsheet creation",
+              "spreadsheet tracking"
+            ]
+          },
+          "provisional": "applied (professional context ambiguous)",
+          "assessment": "unresolved",
+          "answer": {
+            "type": "choice",
+            "choice": "applied",
+            "confidence": 0.51,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 0.01,
+              "applied": 0.63,
+              "used_professionally": 0.36
+            }
+          }
+        }
+      ],
+      "pre_result_notes": "Original failing named-Excel case. Excel appears in list; community project names only a spreadsheet. Generic spreadsheet application is evidenced, while work/profile context is ambiguous. Compare v001/v002 under identical state; previous full-request result is a historical observation, not an exact replay."
+    },
+    {
+      "id": "02-lavandula-flat",
+      "cv": "parser-evaluation/cvextract/templates/semantic-batch-003/inputs/precv-044-lavandula-flat.md",
+      "comparison": "skill_comparison",
+      "input_kind": "controlled formatting derivative",
+      "request_sha256": "2acf44a84ff5686f0f61e020643691a9cfe7bd67f90294cb6a64c145a14a7825",
+      "cached_response_path": "/home/ubuntu/.cache/cvextract/requests/2acf44a84ff5686f0f61e020643691a9cfe7bd67f90294cb6a64c145a14a7825/attempts/274dfbca1c0341f1bbb9ee208c52cee7/response.json",
+      "user_response_path": "/tmp/opencode/cvextract-batch003.tz7szT/02-lavandula-flat.json",
+      "cache_verified": true,
+      "model": "jev-1.14.0",
+      "usage": {
+        "input_tokens": 1629,
+        "output_tokens": 247
+      },
+      "questions": [
+        {
+          "id": "skill_a_original",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "Microsoft Excel",
+            "aliases": [
+              "Excel",
+              "MS Excel"
+            ]
+          },
+          "provisional": "stated_or_studied",
+          "assessment": "disagrees",
+          "answer": {
+            "type": "choice",
+            "choice": "applied",
+            "confidence": 0.77,
+            "probabilities": {
+              "not_mentioned": 0.01,
+              "stated_or_studied": 0.03,
+              "applied": 0.83,
+              "used_professionally": 0.13
+            }
+          }
+        },
+        {
+          "id": "skill_a_revised",
+          "form": "skill_evidence_v002",
+          "arguments": {
+            "name": "Microsoft Excel",
+            "aliases": [
+              "Excel",
+              "MS Excel"
+            ]
+          },
+          "provisional": "stated_or_studied",
+          "assessment": "disagrees",
+          "answer": {
+            "type": "choice",
+            "choice": "applied",
+            "confidence": 0.24,
+            "probabilities": {
+              "not_mentioned": 0.03,
+              "stated_or_studied": 0.43,
+              "applied": 0.43,
+              "used_professionally": 0.11
+            }
+          }
+        },
+        {
+          "id": "skill_b_original",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "spreadsheets",
+            "aliases": [
+              "spreadsheet creation",
+              "spreadsheet tracking"
+            ]
+          },
+          "provisional": "applied (professional context ambiguous)",
+          "assessment": "unresolved",
+          "answer": {
+            "type": "choice",
+            "choice": "applied",
+            "confidence": 0.75,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 0.0,
+              "applied": 0.81,
+              "used_professionally": 0.19
+            }
+          }
+        },
+        {
+          "id": "skill_b_revised",
+          "form": "skill_evidence_v002",
+          "arguments": {
+            "name": "spreadsheets",
+            "aliases": [
+              "spreadsheet creation",
+              "spreadsheet tracking"
+            ]
+          },
+          "provisional": "applied (professional context ambiguous)",
+          "assessment": "unresolved",
+          "answer": {
+            "type": "choice",
+            "choice": "applied",
+            "confidence": 0.55,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 0.01,
+              "applied": 0.66,
+              "used_professionally": 0.33
+            }
+          }
+        }
+      ],
+      "pre_result_notes": "Controlled derivative of the parsed Markdown, not another parser result or independent CV. Only heading-prefix removal and whitespace flattening; same words/facts/order. Same native template as request 01, different hydrated CV text. Tests formatting sensitivity, not recovery of missing/reordered facts."
+    },
+    {
+      "id": "03-french-count",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-041-vantage-cv.md",
+      "comparison": "count_diagnostic",
+      "input_kind": "PDF-inspector parsed Markdown",
+      "request_sha256": "939a6ac4cfaaba3276f9a84ab80e722a80c3164fc7f6eb7342c7411457beb7a7",
+      "cached_response_path": "/home/ubuntu/.cache/cvextract/requests/939a6ac4cfaaba3276f9a84ab80e722a80c3164fc7f6eb7342c7411457beb7a7/attempts/37d11fb1ace2453091f1c8777b7e01fb/response.json",
+      "user_response_path": "/tmp/opencode/cvextract-batch003.tz7szT/03-french-count.json",
+      "cache_verified": true,
+      "model": "jev-1.14.0",
+      "usage": {
+        "input_tokens": 1764,
+        "output_tokens": 230
+      },
+      "questions": [
+        {
+          "id": "coverage_original",
+          "form": "skill_coverage_count",
+          "arguments": {
+            "items": [
+              {
+                "name": "reception and front-desk service",
+                "aliases": [
+                  "accueil",
+                  "accueil et réception"
+                ]
+              },
+              {
+                "name": "appointment follow-up",
+                "aliases": [
+                  "suivi de rendez-vous",
+                  "confirmations de rendez-vous"
+                ]
+              },
+              {
+                "name": "Microsoft Excel",
+                "aliases": [
+                  "Excel",
+                  "MS Excel"
+                ]
+              },
+              {
+                "name": "payroll administration",
+                "aliases": [
+                  "gestion de la paie",
+                  "traitement des salaires"
+                ]
+              }
+            ]
+          },
+          "provisional": "2",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "2",
+            "confidence": 0.87,
+            "probabilities": {
+              "0": 0.0,
+              "1": 0.01,
+              "2": 0.9,
+              "3": 0.09,
+              "4": 0.0
+            }
+          }
+        },
+        {
+          "id": "coverage_revised",
+          "form": "coverage_v002",
+          "arguments": {
+            "items": [
+              {
+                "name": "reception and front-desk service",
+                "aliases": [
+                  "accueil",
+                  "accueil et réception"
+                ]
+              },
+              {
+                "name": "appointment follow-up",
+                "aliases": [
+                  "suivi de rendez-vous",
+                  "confirmations de rendez-vous"
+                ]
+              },
+              {
+                "name": "Microsoft Excel",
+                "aliases": [
+                  "Excel",
+                  "MS Excel"
+                ]
+              },
+              {
+                "name": "payroll administration",
+                "aliases": [
+                  "gestion de la paie",
+                  "traitement des salaires"
+                ]
+              }
+            ]
+          },
+          "provisional": "2",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "2",
+            "confidence": 0.98,
+            "probabilities": {
+              "0": 0.0,
+              "1": 0.01,
+              "2": 0.98,
+              "3": 0.01,
+              "4": 0.0
+            }
+          }
+        },
+        {
+          "id": "excel_evidence",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "Microsoft Excel",
+            "aliases": [
+              "Excel",
+              "MS Excel"
+            ]
+          },
+          "provisional": "not_mentioned",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "not_mentioned",
+            "confidence": 0.69,
+            "probabilities": {
+              "not_mentioned": 0.77,
+              "stated_or_studied": 0.21,
+              "applied": 0.0,
+              "used_professionally": 0.02
+            }
+          }
+        },
+        {
+          "id": "payroll_evidence",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "payroll administration",
+            "aliases": [
+              "gestion de la paie",
+              "traitement des salaires"
+            ]
+          },
+          "provisional": "not_mentioned",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "not_mentioned",
+            "confidence": 1.0,
+            "probabilities": {
+              "not_mentioned": 1.0,
+              "stated_or_studied": 0.0,
+              "applied": 0.0,
+              "used_professionally": 0.0
+            }
+          }
+        }
+      ],
+      "pre_result_notes": "Prior count selected 3, later comparison selected 2 for both forms. Generic Tableur is not named Excel; payroll absent. Two suspected extra items queried explicitly; no per-item expansion added to normal extraction. New request context, not an exact replay or causal explanation."
+    },
+    {
+      "id": "04-retail-experience",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-023-moderner-cv.md",
+      "comparison": "experience_comparison",
+      "input_kind": "PDF-inspector parsed Markdown",
+      "request_sha256": "5037de8fb7300947f0146f39a6b3f777b0260b4bbc84cc36aef2073310e3ecf5",
+      "cached_response_path": "/home/ubuntu/.cache/cvextract/requests/5037de8fb7300947f0146f39a6b3f777b0260b4bbc84cc36aef2073310e3ecf5/attempts/57f4a64b5e4044b5a6b49f44a540c4ef/response.json",
+      "user_response_path": "/tmp/opencode/cvextract-batch003.tz7szT/04-retail-experience.json",
+      "cache_verified": true,
+      "model": "jev-1.14.0",
+      "usage": {
+        "input_tokens": 1241,
+        "output_tokens": 143
+      },
+      "questions": [
+        {
+          "id": "experience_original",
+          "form": "experience_five_bins",
+          "arguments": {
+            "scope": "customer-facing retail, market sales and parcel-counter service",
+            "include_paid_apprenticeships": false
+          },
+          "provisional": "5_to_under_8 (gap duration not exact)",
+          "assessment": "unresolved",
+          "answer": {
+            "type": "choice",
+            "choice": "5_to_under_8",
+            "confidence": 0.64,
+            "probabilities": {
+              "under_1": 0.0,
+              "1_to_under_3": 0.0,
+              "3_to_under_5": 0.01,
+              "5_to_under_8": 0.71,
+              "8_plus": 0.28
+            }
+          }
+        },
+        {
+          "id": "experience_revised",
+          "form": "experience_v002",
+          "arguments": {
+            "scope": "customer-facing retail, market sales and parcel-counter service",
+            "include_paid_apprenticeships": false
+          },
+          "provisional": "5_to_under_8 (gap duration not exact)",
+          "assessment": "unresolved",
+          "answer": {
+            "type": "choice",
+            "choice": "5_to_under_8",
+            "confidence": 0.73,
+            "probabilities": {
+              "under_1": 0.0,
+              "1_to_under_3": 0.01,
+              "3_to_under_5": 0.02,
+              "5_to_under_8": 0.78,
+              "8_plus": 0.19
+            }
+          }
+        }
+      ],
+      "pre_result_notes": "Original winner was plausible but probability on 8+ was 0.32. Even earliest possible start January 2019 to reference November 2026 is less than eight years. Compare probability on that unsupported upper bin, not just winner; short unspecified gap means exact total is not known. No computed upper bound or expected answer is included in the request."
+    },
+    {
+      "id": "05-jsume-positive-control",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-003-jsume.md",
+      "comparison": "skill_comparison",
+      "input_kind": "PDF-inspector parsed Markdown",
+      "request_sha256": "1572510728176e2c56b91d6745a7fdb5701bc1de691556d58041f126c5fca340",
+      "cached_response_path": "/home/ubuntu/.cache/cvextract/requests/1572510728176e2c56b91d6745a7fdb5701bc1de691556d58041f126c5fca340/attempts/c713b89363ba4853acc48971426f5fdf/response.json",
+      "user_response_path": "/tmp/opencode/cvextract-batch003.tz7szT/05-jsume-positive-control.json",
+      "cache_verified": true,
+      "model": "jev-1.14.0",
+      "usage": {
+        "input_tokens": 1779,
+        "output_tokens": 257
+      },
+      "questions": [
+        {
+          "id": "skill_a_original",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "Microsoft Excel",
+            "aliases": [
+              "Excel",
+              "MS Excel"
+            ]
+          },
+          "provisional": "used_professionally",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "used_professionally",
+            "confidence": 1.0,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 0.0,
+              "applied": 0.0,
+              "used_professionally": 1.0
+            }
+          }
+        },
+        {
+          "id": "skill_a_revised",
+          "form": "skill_evidence_v002",
+          "arguments": {
+            "name": "Microsoft Excel",
+            "aliases": [
+              "Excel",
+              "MS Excel"
+            ]
+          },
+          "provisional": "used_professionally",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "used_professionally",
+            "confidence": 1.0,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 0.0,
+              "applied": 0.0,
+              "used_professionally": 1.0
+            }
+          }
+        },
+        {
+          "id": "skill_b_original",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "Python",
+            "aliases": []
+          },
+          "provisional": "stated_or_studied",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "stated_or_studied",
+            "confidence": 1.0,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 1.0,
+              "applied": 0.0,
+              "used_professionally": 0.0
+            }
+          }
+        },
+        {
+          "id": "skill_b_revised",
+          "form": "skill_evidence_v002",
+          "arguments": {
+            "name": "Python",
+            "aliases": []
+          },
+          "provisional": "stated_or_studied",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "stated_or_studied",
+            "confidence": 1.0,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 1.0,
+              "applied": 0.0,
+              "used_professionally": 0.0
+            }
+          }
+        }
+      ],
+      "pre_result_notes": "Problematic JSume encoding-warning format, but explicit Excel reports/pivots in employment are a positive linkage control. Python appears in basic skills/course, not an identified application; generic templates are not Python use. Checks that stricter wording does not erase real professional evidence or invent application."
+    }
+  ],
+  "totals": {
+    "requests": 5,
+    "questions": 18,
+    "provisional_assessment": {
+      "disagrees": 4,
+      "unresolved": 6,
+      "agrees": 8
+    },
+    "input_tokens": 8072,
+    "output_tokens": 1124
+  }
+}

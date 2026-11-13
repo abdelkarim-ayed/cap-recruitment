@@ -1,0 +1,8 @@
+- Impression: Education/support — lead/specialist; skill-first.
+- Tone: very specific about one thing, vague about everything else. (~2 lines)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: hands-on basics; specifics to be pinned down later.
+- Creds: possibly some training/certs — unconfirmed.
+- Extra: keeps social/portfolio in mind for later.
+- Timeline: timeline unclear / partially known.
+- Notes: leave room to reshape sections to fit an unknown template.

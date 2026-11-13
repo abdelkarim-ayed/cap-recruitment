@@ -1,0 +1,8 @@
+- Impression: IT Support — entry; story-first.
+- Tone: sparse, almost a note-to-self. (~4-5 lines)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: a couple of tools mentioned in context, not a full list.
+- Creds: education hinted at, level/details missing.
+- Extra: hints at weekend projects.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: open to adding portfolio/links later if relevant.

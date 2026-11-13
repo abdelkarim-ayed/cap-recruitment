@@ -1,5 +1,6 @@
 import type { ApplicationActions, InterviewActions, InterviewPlanActions, ReviewActions, VacancyActions, WorkflowActions } from './actions.js';
-import type { FormDefinition, ProcessingDefinition, SkillValue, Vacancy } from './vacancies.js';
+import type { FormDefinition, ProcessingDefinition, Vacancy } from './vacancies.js';
+import type { CvFieldValue, cvFieldDescriptors } from './cv-extractor.js';
 
 export interface Person { id: string; name: string; email: string }
 export type ProcessingFailureCategory = 'ordinary_terminal' | 'operational' | 'uncertain' | 'unclassified';
@@ -46,18 +47,22 @@ export interface ReviewMetadata {
 }
 export interface ApplicationView {
   id: string; vacancyId: string; candidateId: string; candidate: { name: string; email: string };
-  vacancy: { id: string; title: string; description: string; location?: string; revision: number; formDefinition: FormDefinition; processingDefinition?: ProcessingDefinition };
+  vacancy: { id: string; title: string; description: string; location?: string; revision: number; formDefinition: FormDefinition; processingDefinition?: ProcessingDefinition; extractionReferenceDate?: string | null };
   answers: Record<string, unknown>; documents: ApplicationDocument[]; stage: string; processingState: string; submittedAt: string;
   review?: ReviewMetadata; actions?: ApplicationActions; processingClosed?: boolean;
 }
+export interface CvMachineValue { version: 1; fields: Record<string, CvFieldValue>; rawResponse?: unknown }
+export type ReviewField = ReturnType<typeof cvFieldDescriptors>[number] & {
+  original: CvFieldValue | null; effective: CvFieldValue | null; source: 'machine' | 'hr' | 'unavailable';
+  hasCorrection: boolean; correction: CvFieldValue | null; correctedBy: string | null; correctedAt: string | null; corrector: Person | null;
+};
 export interface ReviewTask {
   taskId: string; sourceInputId: string; outputKey: string; status: string; attempts: number; retryable: boolean;
   failureCategory?: ProcessingFailureCategory | null;
-  result: { status: string; value: SkillValue | null; reason?: string; evidence?: string[] };
-  skillResults: { skill: string; original: boolean | null; effective: boolean | null }[];
-  provenance: { mode: string; fixtureId?: string; provider?: string; reader?: string; model?: string } | null;
-  hasCorrection: boolean; correction: SkillValue | null; correctedBy: string | null; correctedAt: string | null;
-  corrector: Person | null; effectiveValue: SkillValue | null;
+  result: { status: string; value: CvMachineValue | null; reason?: string; rawResponse?: unknown };
+  fields: ReviewField[];
+  provenance: { mode: string; fixtureId?: string; provider?: string; reader?: string; model?: string; parser?: unknown; diagnostics?: unknown; requestHash?: string; cacheHit?: boolean } | null;
+  hasCorrection: boolean; effectiveValue: Record<string, CvFieldValue | null>;
 }
 export interface ReviewView {
   applicationId: string; answers: Record<string, unknown>; formDefinition: FormDefinition;

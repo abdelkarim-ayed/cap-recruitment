@@ -1,0 +1,59 @@
+{
+  "reference_date": "2026-11-12",
+  "tasks": [
+    {
+      "id": "education_accounting",
+      "type": "education_level",
+      "args": {
+        "scope": "accounting and finance"
+      }
+    },
+    {
+      "id": "cert_acca",
+      "type": "certification",
+      "args": {
+        "name": "ACCA professional qualification (fully qualified)",
+        "aliases": [
+          "fully qualified ACCA",
+          "Association of Chartered Certified Accountants professional qualification"
+        ]
+      }
+    },
+    {
+      "id": "experience_accounting",
+      "type": "experience_years",
+      "args": {
+        "scope": "accounting, accounts payable and financial reporting",
+        "include_paid_apprenticeships": false
+      }
+    },
+    {
+      "id": "coverage_tools",
+      "type": "skill_coverage",
+      "args": {
+        "items": [
+          {"name": "Microsoft Excel", "aliases": ["Excel", "MS Excel"]},
+          {"name": "Power Query", "aliases": []},
+          {"name": "SQL", "aliases": ["Structured Query Language"]},
+          {"name": "SAP", "aliases": ["SAP ERP"]}
+        ]
+      }
+    },
+    {
+      "id": "evidence_sql",
+      "type": "skill_evidence",
+      "args": {
+        "name": "SQL",
+        "aliases": ["Structured Query Language"]
+      }
+    },
+    {
+      "id": "evidence_power_query",
+      "type": "skill_evidence",
+      "args": {
+        "name": "Power Query",
+        "aliases": []
+      }
+    }
+  ]
+}

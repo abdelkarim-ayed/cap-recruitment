@@ -14,6 +14,7 @@
     "vacancies:check": "node tests/vacancies-smoke.mjs",
     "applications:check": "node tests/applications-smoke.mjs",
     "processing:run": "node dist/processing/process.js",
+    "jev:key": "node dist/integrations/jev/jev-key-cli.js",
     "extraction:probe": "node dist/processing/probe.js",
     "extraction:bench": "node tests/extraction-bench.mjs",
     "extraction:check": "node tests/applications-smoke.mjs --processing --real-reader",
@@ -32,6 +33,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@firecrawl/pdf-inspector": "1.25.2",
     "@nestjs/common": "12.1.2",
     "@nestjs/core": "12.1.2",
     "@nestjs/platform-express": "12.1.2",

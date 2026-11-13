@@ -1,0 +1,76 @@
+contacts:
+  name: Valentina Rojas
+  title: Jefatura de equipos y coordinación de proyectos
+  email: valentina.rojas.cv@example.net
+  address: "Santiago, Chile"
+  location: Chile
+  linkedin:
+    url: https://www.linkedin.com/in/valentina-rojas-proyectos/
+    displayText: valentina-rojas-proyectos
+  github:
+    url: https://github.com/valentina-rojas-proyectos/
+    displayText: valentina-rojas-proyectos
+  website:
+    url: https://valentina-rojas-proyectos.example.net/
+    displayText: valentina-rojas-proyectos.example.net
+
+position: Jefatura de equipos y coordinación de proyectos
+tagline: "Jefa de equipo con experiencia en operaciones de servicio y coordinación de mejoras. Ha asumido responsabilidades de planificación, seguimiento y apoyo a equipos que trabajan por turnos. En los últimos años se ha acercado más a la entrega de proyectos, organizando tareas y dependencias sin perder de vista el trabajo diario."
+objective: "Busco seguir proyectos de principio a fin y aportar experiencia práctica liderando equipos operativos."
+
+jobs:
+  - position: Jefa de operaciones
+    company:
+      name: Servicios Cordillera
+      link: https://servicios-cordillera.example.net/
+    product:
+      name: Operaciones de servicio
+      link: https://servicios-cordillera.example.net/
+    description:
+      - Coordina turnos y prioridades para un equipo de nueve personas que atiende solicitudes de clientes empresariales.
+      - Revisa tareas abiertas con los responsables y ayuda a resolver bloqueos antes del cambio de turno.
+      - Participa en la planificación de mejoras internas y comunica avances a áreas de soporte.
+      - Acompaña a nuevos integrantes durante sus primeras semanas y comparte procedimientos de trabajo.
+    from: "2022"
+    to: "Present"
+    tags: [Liderazgo, Operaciones, Seguimiento]
+    location: Santiago, Chile
+  - position: Supervisora de servicio
+    company:
+      name: Contacto Sur
+      link: https://contacto-sur.example.net/
+    product:
+      name: Atención y soporte a clientes
+      link: https://contacto-sur.example.net/
+    description:
+      - Supervisó un equipo de atención y organizó la cobertura de turnos en periodos de alta demanda.
+      - Revisó casos pendientes, distribuyó consultas y coordinó escalaciones con áreas técnicas.
+      - Preparó reportes de seguimiento y participó en reuniones de mejora de servicio.
+    from: "2018"
+    to: "2022"
+    tags: [Supervisión, Servicio, Reportes]
+    location: Santiago, Chile
+  - position: Coordinadora de atención
+    company:
+      name: Red Punto
+      link: https://red-punto.example.net/
+    product:
+      name: Atención al cliente
+      link: https://red-punto.example.net/
+    description:
+      - Apoyó la operación diaria y mantuvo informados a clientes y colegas sobre solicitudes en curso.
+      - Ayudó a organizar un grupo pequeño durante cambios de horario y cobertura.
+    from: "2015"
+    to: "2018"
+    tags: [Coordinación, Atención]
+    location: Santiago, Chile
+
+education: []
+technical_expertise: []
+skills:
+  - Coordinación de equipos, planificación de turnos, seguimiento de acciones
+  - Comunicación con clientes, organización de reuniones, resolución de bloqueos
+methodology:
+  - Acompañamiento de incorporación con guías breves y casos reales
+tools: []
+achievements: []

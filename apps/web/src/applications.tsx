@@ -2,10 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { api, download, errorMessage } from './api';
 import { Badge, Heading, Notice, Loading, Empty, Pager } from './ui';
 import { PdfPreview } from './pdf-preview';
-import type { ApplicationView, ReviewTask, ReviewView, StaffVacancy } from '@recruitment/domain';
-import type { SkillValue } from '@recruitment/domain/vacancies';
+import { cvFamilyLabels, cvQuestionLabel, cvValueLabel, normalizeCvChoice, type ApplicationView, type ReviewTask, type ReviewField, type ReviewView, type StaffVacancy, type CvFieldValue } from '@recruitment/domain';
 import { ScreeningImport } from './screening-import';
-import { readinessLabel, taskDraft, sameReviewDraft, type ReviewDraft, type SavedDraft } from './review-presentation';
+import { readinessLabel, fieldDraft, sameReviewDraft, type ReviewDraft, type SavedDraft } from './review-presentation';
 import { useNavigationGuard, useOptionalNavigation } from './navigation-guard';
 import { ApplicationInformation, applicationJourney } from './application-information';
 import { IntentDialog } from './intent-dialog';
@@ -67,31 +66,31 @@ export function ApplicationList({staff,memoryScope}:{staff:boolean;memoryScope?:
   </div>;
 }
 
-function TaskCard({task,title,editing=false,onDocument,onSave,busy,draft,onDraft,onReapply,onDiscard,closed,processingClosed}:{task:ReviewTask;title:string;editing?:boolean;onDocument?:()=>void;onSave:(correction:{taskId:string;value:SkillValue|null;remove?:boolean})=>void;busy:boolean;draft?:SavedDraft;onDraft:(draft:ReviewDraft)=>void;onReapply:()=>void;onDiscard:()=>void;closed:boolean;processingClosed?:boolean}) {
-  const current=draft?.active?draft.value:taskDraft(task),{skills,nullValue,skillFlags}=current;
+function TaskCard({task,field,title,editing=false,onDocument,onSave,busy,draft,onDraft,onReapply,onDiscard,closed,processingClosed}:{task:ReviewTask;field:ReviewField;title:string;editing?:boolean;onDocument?:()=>void;onSave:(correction:{taskId:string;questionId:string;value:CvFieldValue|null;remove?:boolean})=>void;busy:boolean;draft?:SavedDraft;onDraft:(draft:ReviewDraft)=>void;onReapply:()=>void;onDiscard:()=>void;closed:boolean;processingClosed?:boolean}) {
+  const current=draft?.active?draft.value:fieldDraft(field);
   const paused=!!draft&&!draft.active;
   const readOnly=busy||closed||paused;
-  const change=(patch:Partial<ReviewDraft>)=>onDraft({...current,...patch});
+  const raw=task.result.value?.rawResponse;
+  const rawAnswer=raw&&typeof raw==='object'&&'answers' in raw&&raw.answers&&typeof raw.answers==='object'?(raw.answers as Record<string,unknown>)[field.questionId]:undefined;
   return <article className="extraction-card">
     <div className="section-heading"><h3>{title}</h3>{editing&&onDocument&&<IconButton icon="eye" label={`Show source document for ${title}`} onClick={onDocument}/>} {task.provenance?.mode==='fixture'&&<span className="small fixture-label">Fixture result</span>}{task.provenance?.mode==='live'&&<span className="small muted">{task.provenance.provider==='typesafe'?'Jev result':'Automated result'}</span>}</div>
-    <div className="saved-value" aria-label={`Latest saved value for ${task.outputKey}`}>
+    <p className="small muted">{field.question.instructions}</p>
+    <div className="saved-value" aria-label={`Latest saved value for ${field.columnKey}`}>
       <span className="eyebrow">LATEST SAVED VALUE</span>
-      <h4>{task.hasCorrection?'Saved HR correction':task.result.status==='completed'?'Original extraction (no correction)':'Unavailable — extraction has not succeeded'}</h4>
-      {task.skillResults?<dl>{task.skillResults.map((row:any)=><div key={row.skill}><dt>{row.skill}</dt><dd>{row.effective===null?'Unavailable':row.effective?'Detected':'Not detected'}</dd></div>)}</dl>:<p className="effective-skills">{task.effectiveValue==null?'Unavailable':task.effectiveValue.skills?.length?task.effectiveValue.skills.join(', '):'No skills found.'}</p>}
-      {task.hasCorrection&&<small className="saved-state">Saved {task.correctedAt?new Date(task.correctedAt).toLocaleString():''}{task.corrector?` · ${task.corrector.name||task.corrector.email}`:''}</small>}
+      <h4>{field.hasCorrection?'Saved HR correction':task.result.status==='completed'?'Original extraction (no correction)':'Unavailable — extraction has not succeeded'}</h4>
+      <p className="effective-skills">{cvValueLabel(field.configuration,field.effective)}</p>
+      {field.hasCorrection&&<small className="saved-state">Saved {field.correctedAt?new Date(field.correctedAt).toLocaleString():''}{field.corrector?` · ${field.corrector.name||field.corrector.email}`:''}</small>}
     </div>
-    {editing&&draft&&<div className="review-draft"><p>{paused?'Your unsaved draft is preserved. Compare it with the latest saved value before reapplying.':'Unsaved correction'}</p>{paused&&<pre aria-label={`Preserved draft for ${task.outputKey}`}>{task.skillResults?JSON.stringify(draft.value.skillFlags,null,2):draft.value.nullValue?'Unavailable':draft.value.skills}</pre>}<div className="actions">{paused&&<button disabled={busy||closed} onClick={onReapply}>Reapply local draft</button>}<button disabled={busy} onClick={onDiscard}>Discard local draft</button></div></div>}
-    {editing&&<form className="correction-form" onSubmit={e=>{e.preventDefault();if(readOnly)return;onSave({taskId:task.taskId,value:task.skillResults?{skills:Object.keys(skillFlags).filter(skill=>skillFlags[skill]==='true'),unavailableSkills:Object.keys(skillFlags).filter(skill=>skillFlags[skill]==='unknown')}:nullValue?null:{skills:skills.split(',').map(v=>v.trim()).filter(Boolean)}});}}>
-      {task.skillResults?<div className="grid two">{task.skillResults.map((row:any)=><label key={row.skill}>Review {row.skill}<select disabled={readOnly} value={skillFlags[row.skill]} onChange={e=>change({skillFlags:{...skillFlags,[row.skill]:e.target.value}})}><option value="true">Detected</option><option value="false">Not detected</option><option value="unknown">Unavailable</option></select></label>)}</div>:<><label>Skills (comma separated)<input disabled={readOnly||nullValue} value={skills} onChange={e=>change({skills:e.target.value})} placeholder="SQL, TypeScript"/></label>
-      <label className="check"><input disabled={readOnly} type="checkbox" checked={nullValue} onChange={e=>change({nullValue:e.target.checked})}/> Mark this information unavailable</label></>}
-      <div className="actions"><button disabled={readOnly}>Save correction</button>{task.hasCorrection&&<button type="button" disabled={readOnly} onClick={()=>onSave({taskId:task.taskId,value:null,remove:true})}>Use original</button>}</div>
+    {editing&&draft&&<div className="review-draft"><p>{paused?'Your unsaved draft is preserved. Compare it with the latest saved value before reapplying.':'Unsaved correction'}</p>{paused&&<pre aria-label={`Preserved draft for ${field.columnKey}`}>{cvValueLabel(field.configuration,JSON.parse(draft.value.selection) as CvFieldValue|null)}</pre>}<div className="actions">{paused&&<button disabled={busy||closed} onClick={onReapply}>Reapply local draft</button>}<button disabled={busy} onClick={onDiscard}>Discard local draft</button></div></div>}
+    {editing&&<form className="correction-form" onSubmit={e=>{e.preventDefault();if(readOnly)return;onSave({taskId:task.taskId,questionId:field.questionId,value:JSON.parse(current.selection) as CvFieldValue|null});}}>
+      <label>Review {cvFamilyLabels[field.type]}<select disabled={readOnly} value={current.selection} onChange={e=>onDraft({selection:e.target.value})}><option value="null">Unavailable</option>{Object.keys(field.question.criteria).map(key=>{const value=normalizeCvChoice(field.configuration,key);return <option key={key} value={JSON.stringify(value)}>{cvValueLabel(field.configuration,value)}</option>;})}</select></label>
+      <div className="actions"><button disabled={readOnly}>Save correction</button>{field.hasCorrection&&<button type="button" disabled={readOnly} onClick={()=>onSave({taskId:task.taskId,questionId:field.questionId,value:null,remove:true})}>Use original</button>}</div>
     </form>}
     <details className="original-result"><summary>Original extraction and evidence · {extractionLabel(task.status,processingClosed)}</summary>
-      <pre>{task.result.status==='completed'?JSON.stringify(task.result.value,null,2):'Unavailable (null)'}</pre>
+      <p>{cvValueLabel(field.configuration,field.original)}</p>{rawAnswer!==undefined&&<pre>{JSON.stringify(rawAnswer,null,2)}</pre>}
       {task.result.reason&&<p className="notice">{task.result.reason}</p>}
-       {(task.result.evidence?.length??0)>0&&<ul className="evidence">{task.result.evidence?.map((text:string,i:number)=><li key={i}>{text}</li>)}</ul>}
       {task.provenance?.fixtureId&&<small className="fixture-label">Fixture: {task.provenance.fixtureId}</small>}
-       <dl className="processing-details"><div><dt>Source field</dt><dd>{task.sourceInputId}</dd></div><div><dt>Output column</dt><dd>{task.outputKey}</dd></div><div><dt>Attempts</dt><dd>{task.attempts}/3</dd></div>{task.provenance?.reader&&<div><dt>Document reader</dt><dd>{task.provenance.reader}</dd></div>}{task.provenance?.model&&<div><dt>Model</dt><dd>{task.provenance.model}</dd></div>}</dl>
+       <dl className="processing-details"><div><dt>Source field</dt><dd>{task.sourceInputId}</dd></div><div><dt>Output column</dt><dd>{field.columnKey}</dd></div><div><dt>Extractor attempts</dt><dd>{task.attempts}/3</dd></div>{task.provenance?.model&&<div><dt>Model</dt><dd>{task.provenance.model}</dd></div>}</dl>{task.provenance?.diagnostics!==undefined&&<details><summary>Parser warnings and diagnostics</summary><pre>{JSON.stringify(task.provenance.diagnostics,null,2)}</pre></details>}
     </details>
   </article>;
 }
@@ -118,7 +117,7 @@ function ApplicationDetail({id,staff}:{id:string;staff:boolean}) {
   const showReview=staff&&review&&review.actions.edit.visible&&review.tasks.length>0;
   const pdfDocuments=record?.documents.filter(doc=>doc.filename.toLowerCase().endsWith('.pdf'))??[];
   const selectedDocument=reviewDocument==='hidden'?undefined:pdfDocuments.find(doc=>doc.id===reviewDocument)??pdfDocuments.find(doc=>doc.inputId===review?.tasks[0]?.sourceInputId)??pdfDocuments[0];
-  const taskCards=(editing:boolean)=>review?.tasks.map(task=><TaskCard key={task.taskId} task={task} editing={editing} onDocument={pdfDocuments.some(doc=>doc.inputId===task.sourceInputId)?()=>setReviewDocument(pdfDocuments.find(doc=>doc.inputId===task.sourceInputId)!.id):undefined} title={`Skills · ${record?.vacancy.formDefinition.inputs.find(input=>input.id===task.sourceInputId)?.label||'Document'}`} busy={busy||needsRefresh} closed={!review.actions.edit.allowed} processingClosed={review.processingClosed} draft={drafts[task.taskId]} onDraft={value=>{if(sameReviewDraft(value,taskDraft(task)))discard(task.taskId);else setDrafts(current=>({...current,[task.taskId]:{value,active:true}}));}} onDiscard={()=>discard(task.taskId)} onReapply={()=>setDrafts(current=>({...current,[task.taskId]:{...current[task.taskId],active:true}}))} onSave={correction=>update({corrections:[correction]},task.taskId)}/>);
+  const taskCards=(editing:boolean)=>review?.tasks.flatMap(task=>task.fields.map(field=>{const key=`${task.taskId}:${field.questionId}`;return <TaskCard key={key} task={task} field={field} editing={editing} onDocument={pdfDocuments.some(doc=>doc.inputId===task.sourceInputId)?()=>setReviewDocument(pdfDocuments.find(doc=>doc.inputId===task.sourceInputId)!.id):undefined} title={`${cvQuestionLabel(field.configuration)} · ${record?.vacancy.formDefinition.inputs.find(input=>input.id===task.sourceInputId)?.label||'Document'}`} busy={busy||needsRefresh} closed={!review.actions.edit.allowed} processingClosed={review.processingClosed} draft={drafts[key]} onDraft={value=>{if(sameReviewDraft(value,fieldDraft(field)))discard(key);else setDrafts(current=>({...current,[key]:{value,active:true}}));}} onDiscard={()=>discard(key)} onReapply={()=>setDrafts(current=>({...current,[key]:{...current[key],active:true}}))} onSave={correction=>update({corrections:[correction]},key)}/>;}));
   return <div ref={focusTarget} tabIndex={-1} className="application-detail">{!reviewEditor&&!confirmRelease&&<Notice message={error}/>} {!record?!error?<Loading/>:<button onClick={()=>setRefresh(v=>v+1)}>Retry</button>:<>
     <a className="application-back-link" href="#/applications">← Applications</a>
     <Heading title={staff?(record.candidate.name||record.candidate.email):'Your application'} status={<Badge>{staff?record.stage:candidateStatus(record.stage)}</Badge>}><IconButton icon="refresh" label="Refresh application" disabled={busy} onClick={refreshView}/></Heading>

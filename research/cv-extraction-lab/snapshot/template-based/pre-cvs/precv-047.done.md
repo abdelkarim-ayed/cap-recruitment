@@ -1,0 +1,8 @@
+- Impression: QA-minded — junior; patchy/no-clear-focus.
+- Tone: unpolished, honest about gaps. (~max 10)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: unclear; might only become obvious from details.
+- Creds: trade experience seems more relevant than formal quals here.
+- Extra: focuses on reliability more than ambition.
+- Timeline: timeline unclear / partially known.
+- Notes: leave room to reshape sections to fit an unknown template.

@@ -1,0 +1,10 @@
+{
+  "kind": "controlled formatting derivative; NOT a parser output or independent CV",
+  "source_markdown": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-044-lavandula.md",
+  "source_sha256": "bf626adfd20140e98f66d8ba7611ea081627dfff25319b0ade3b9646a75b4e73",
+  "derived_markdown": "parser-evaluation/cvextract/templates/semantic-batch-003/inputs/precv-044-lavandula-flat.md",
+  "derived_sha256": "b1e0ca9b33e52949ddd4ba4f5c173317596e11d88dbd4127adbd075f51588f95",
+  "transformation": "re.sub(r'(?m)^#{1,6}[ \\t]+', '', text); re.sub(r'\\s+', ' ', text).strip() + '\\n'",
+  "words_and_order_preserved_after_heading_marker_removal": true,
+  "facts_added_or_corrected": false
+}

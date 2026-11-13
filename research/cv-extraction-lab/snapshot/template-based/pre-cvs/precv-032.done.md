@@ -1,0 +1,8 @@
+- Impression: Hospitality — junior; project-first.
+- Tone: quietly detail-oriented. (~2 lines)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: hands-on basics; specifics to be pinned down later.
+- Creds: trade experience seems more relevant than formal quals here.
+- Extra: references tools without listing a full stack.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: community-adjacent, details TBD.

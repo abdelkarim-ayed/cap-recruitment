@@ -1,5 +1,6 @@
 import type { Actor } from './api';
 import type { StaffVacancy } from '@recruitment/domain';
+import { CvQuestionPreview } from './cv-extractor-editor';
 
 export const vacancyStatusLabels={draft:'Draft',published:'Published',closed:'Closed'};
 export function VacancyStatus({status}:{status:StaffVacancy['status']}){
@@ -39,7 +40,7 @@ export function VacancyInformation({vacancy}:{vacancy:StaffVacancy}){
       <h2 id="vacancy-automation-heading">Automated document information</h2>
       {!vacancy.processingDefinition.tasks.length?<p className="muted">No automated checks configured.</p>:<ul className="vacancy-form-outline">{vacancy.processingDefinition.tasks.map(task=><li key={task.id}>
         <div className="vacancy-field-label">{vacancy.formDefinition.inputs.find(input=>input.id===task.sourceInputId)?.label||'Document'}</div>
-        <p className="vacancy-field-meta">Skills to check: {task.args.skills.join(', ')}</p>
+        <p className="vacancy-field-meta">CV extractor · {task.args.questions.length} questions</p>{task.args.questions.map(question=><CvQuestionPreview key={question.id} question={question} referenceDate={vacancy.extractionReferenceDate}/>)}
       </li>)}</ul>}
     </section>
   </>;

@@ -1,0 +1,8 @@
+- Impression: FP&A-curious — junior; credential-first.
+- Tone: very specific about one thing, vague about everything else. (~4-5 lines)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: a couple of tools mentioned in context, not a full list.
+- Creds: trade experience seems more relevant than formal quals here.
+- Extra: leans on practical know-how over formal quals.
+- Timeline: timeline unclear / partially known.
+- Notes: leave room to reshape sections to fit an unknown template.

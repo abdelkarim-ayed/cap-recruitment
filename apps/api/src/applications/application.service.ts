@@ -31,7 +31,7 @@ function visible(row: ApplicationRow, actor: Actor):Omit<ApplicationView,'docume
   const vacancy = row.vacancy_snapshot;
   return { id: row.id, vacancyId: row.vacancy_id, candidateId: row.candidate_id, candidate: row.candidate_identity,
     vacancy: { id: vacancy.id, title: vacancy.title, description: vacancy.description, ...(vacancy.location === undefined ? {} : { location: vacancy.location }), revision: vacancy.revision, formDefinition: vacancy.formDefinition,
-      ...(roleAllows(actor.role,'review.read') ? { processingDefinition: vacancy.processingDefinition } : {}) },
+      ...(roleAllows(actor.role,'review.read') ? { processingDefinition: vacancy.processingDefinition, extractionReferenceDate: vacancy.extractionReferenceDate ?? null } : {}) },
     answers: row.answers, stage: actor.role==='candidate'?candidateStage(row.stage):row.stage, processingState: row.processing_state, submittedAt: new Date(row.submitted_at).toISOString(),
     ...(roleAllows(actor.role,'review.read') ? { processingClosed:processingClosed(row),review: { required:vacancy.processingDefinition.tasks.length>0,status: row.review_status,revision: row.review_revision,reviewedBy: row.reviewed_by,reviewedAt: row.reviewed_at?new Date(row.reviewed_at).toISOString():null }, actions:applicationActions(actor) } : {}) };
 }
@@ -61,12 +61,13 @@ export class ApplicationService {
         const existing = await client.query<ApplicationRow>('SELECT * FROM applications WHERE candidate_id=$1 AND vacancy_id=$2', [actor.id, vacancyId]);
         if (existing.rows[0]) return { created: false, id: existing.rows[0].id };
         // Close and submit cannot both act on an outdated published state.
-        const vacancyResult = await client.query('SELECT * FROM vacancies WHERE id=$1 FOR SHARE', [vacancyId]);
+        const vacancyResult = await client.query('SELECT *,extraction_reference_date::text AS extraction_reference_date FROM vacancies WHERE id=$1 FOR SHARE', [vacancyId]);
         const row = vacancyResult.rows[0];
         if (!row) throw new NotFoundException('Vacancy not found.');
         if (row.status !== 'published') throw new ConflictException('Vacancy is not open for applications.');
+        if(row.processing_definition.version!==2 || !row.extraction_reference_date) throw new ConflictException('Vacancy extraction context is unavailable; staff must recreate this legacy vacancy.');
         const snapshot: Vacancy = { id: row.id, ownerId: row.owner_id, title: row.title, description: row.description, ...(row.location === null ? {} : { location: row.location }), status: row.status, revision: row.revision,
-          formDefinition: row.form_definition, processingDefinition: row.processing_definition, createdAt: new Date(row.created_at).toISOString(), updatedAt: new Date(row.updated_at).toISOString() };
+          formDefinition: row.form_definition, processingDefinition: row.processing_definition, extractionReferenceDate: row.extraction_reference_date ?? null, createdAt: new Date(row.created_at).toISOString(), updatedAt: new Date(row.updated_at).toISOString() };
         const normalized = files.map(file => ({ ...file, originalname: file.originalname.replace(/[\\/]/g, '_').replace(/[\x00-\x1f\x7f]/g, '_').slice(0, 200) }));
         const checked = validateSubmission(snapshot.formDefinition, rawAnswers, normalized.map(file => ({ inputId: file.fieldname, filename: file.originalname, byteCount: file.size })));
         if (checked.issues.length) throw new BadRequestException({ statusCode: 400, error: 'Bad Request', message: 'Invalid application submission.', issues: checked.issues });
@@ -116,7 +117,7 @@ export class ApplicationService {
     const order=sort==='candidate'?"lower(candidate_identity->>'name'),id":sort==='position'?'lower(title),id':sort==='oldest'?'submitted_at,id':'submitted_at DESC,id DESC';
     const hr=roleAllows(actor.role,'review.read');
     const result = await this.database.query(`WITH scoped AS (SELECT id,vacancy_id,candidate_id,candidate_identity,stage,processing_state,submitted_at,review_status,review_revision,reviewed_by,reviewed_at,processing_released_at,${hr?applicationWorkSql:'NULL::text'} AS work_item,${recruitmentStatusSql} AS recruitment_status,${hr?reviewReadinessSql:'NULL::text'} AS readiness,vacancy_snapshot->>'title' AS title,jsonb_array_length(vacancy_snapshot->'processingDefinition'->'tasks')>0 AS review_required,
-      EXISTS(SELECT 1 FROM extraction_corrections c WHERE c.application_id=applications.id) AS has_corrections FROM applications
+      EXISTS(SELECT 1 FROM extraction_field_corrections c WHERE c.application_id=applications.id) AS has_corrections FROM applications
       WHERE ($1::text IS NULL OR candidate_id=$1) AND ($2::uuid IS NULL OR vacancy_id=$2)),
        visible AS (SELECT * FROM scoped WHERE ($5::text IS NULL OR processing_state=$5) AND ($6::text IS NULL OR (review_required AND review_status=$6))
            AND (NOT $7::boolean OR stage IN ('received','review_ready')) AND ($8::timestamptz IS NULL OR submitted_at >= $8) AND ($9::timestamptz IS NULL OR submitted_at < $9) AND ($10::text IS NULL OR readiness=$10)

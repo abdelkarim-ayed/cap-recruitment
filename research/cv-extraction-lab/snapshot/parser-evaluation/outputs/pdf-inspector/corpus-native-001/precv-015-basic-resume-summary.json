@@ -1,0 +1,18 @@
+{
+  "parser": "pdf-inspector",
+  "parser_version": "1.25.2",
+  "method": "process_pdf; native text only; no OCR",
+  "source_pdf": "template-based/outputs/basic-resume/precv-015-basic-resume.pdf",
+  "pdf_sha256": "41a8227027c0868f80548480f7fabfce3526cdf54bee5a8634a307d7cc8a5099",
+  "markdown_path": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-015-basic-resume.md",
+  "markdown_sha256": "30bee2d8c6ee10cd63756d2d86d8968554b6f5ec52e4d44f420dd8809d1dad5a",
+  "markdown_bytes": 1578,
+  "pdf_type": "text_based",
+  "page_count": 1,
+  "pages_needing_ocr": [],
+  "has_encoding_issues": false,
+  "pages_with_columns": [
+    1
+  ],
+  "pages_with_tables": []
+}

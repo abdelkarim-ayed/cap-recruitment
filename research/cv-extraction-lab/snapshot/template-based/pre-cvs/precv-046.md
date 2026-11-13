@@ -1,0 +1,8 @@
+- Impression: ML-adjacent generalist — entry; social/volunteer-first.
+- Tone: unpolished, honest about gaps. (~6-8 lines)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: leans practical/problem-solving over terminology.
+- Creds: education hinted at, level/details missing.
+- Extra: focuses on reliability more than ambition.
+- Timeline: timeline unclear / partially known.
+- Notes: leave room to reshape sections to fit an unknown template.

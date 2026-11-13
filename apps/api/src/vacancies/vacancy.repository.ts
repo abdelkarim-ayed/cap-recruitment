@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import type { PoolClient, QueryResultRow } from 'pg';
 import type { CreateVacancy, FormDefinition, ProcessingDefinition, Vacancy } from '@recruitment/domain/vacancies';
@@ -7,6 +7,7 @@ import { DatabaseService } from '../database/database.service.js';
 interface VacancyRow extends QueryResultRow {
   id: string; owner_id: string; status: Vacancy['status']; revision: number;
   interview_revision: number;
+  extraction_reference_date: string | null;
   title: string; description: string; location: string | null;
   form_definition: FormDefinition; processing_definition: ProcessingDefinition;
   created_at: Date | string; updated_at: Date | string;
@@ -21,8 +22,10 @@ export interface PublicationPlan {
 }
 
 function record(row: VacancyRow): Vacancy {
+  if (row.processing_definition.version !== 2) throw new ConflictException('This disposable legacy vacancy needs recreation for the CV extractor schema; no historical conversion is performed.');
   return { id: row.id, ownerId: row.owner_id, status: row.status, revision: row.revision, title: row.title, description: row.description,
     ...(row.location === null ? {} : { location: row.location }), formDefinition: row.form_definition, processingDefinition: row.processing_definition,
+    extractionReferenceDate: row.extraction_reference_date ?? null,
     createdAt: new Date(row.created_at).toISOString(), updatedAt: new Date(row.updated_at).toISOString(), ...(row.owner_email?{owner:{name:row.owner_name??'',email:row.owner_email}}:{}) };
 }
 @Injectable()
@@ -30,11 +33,11 @@ export class VacancyRepository {
   constructor(private readonly database: DatabaseService) {}
   async create(ownerId: string, value: CreateVacancy) {
     const result = await this.database.query<VacancyRow>(`INSERT INTO vacancies (id,owner_id,title,description,location,form_definition,processing_definition)
-      VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *, (SELECT name FROM "user" WHERE id=owner_id) AS owner_name, (SELECT email FROM "user" WHERE id=owner_id) AS owner_email`, [randomUUID(), ownerId, value.title, value.description, value.location ?? null, JSON.stringify(value.formDefinition), JSON.stringify(value.processingDefinition)]);
+      VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *, extraction_reference_date::text AS extraction_reference_date, (SELECT name FROM "user" WHERE id=owner_id) AS owner_name, (SELECT email FROM "user" WHERE id=owner_id) AS owner_email`, [randomUUID(), ownerId, value.title, value.description, value.location ?? null, JSON.stringify(value.formDefinition), JSON.stringify(value.processingDefinition)]);
     return record(result.rows[0]);
   }
   async get(id: string, publicOnly = false) {
-    const result = await this.database.query<VacancyRow>('SELECT v.*,u.name AS owner_name,u.email AS owner_email FROM vacancies v JOIN "user" u ON u.id=v.owner_id WHERE v.id=$1 AND ($2::boolean=false OR v.status=\'published\')', [id, publicOnly]);
+    const result = await this.database.query<VacancyRow>('SELECT v.*,v.extraction_reference_date::text AS extraction_reference_date,u.name AS owner_name,u.email AS owner_email FROM vacancies v JOIN "user" u ON u.id=v.owner_id WHERE v.id=$1 AND ($2::boolean=false OR v.status=\'published\')', [id, publicOnly]);
     return result.rows[0] ? record(result.rows[0]) : undefined;
   }
   async owners(){
@@ -55,7 +58,7 @@ export class VacancyRepository {
   }
   async change(id: string, operation: (current: Vacancy, readPlan: () => Promise<PublicationPlan>) => Vacancy | Promise<Vacancy>) {
     return this.database.transaction(async client => {
-      const result = await client.query<VacancyRow>('SELECT v.*,u.name AS owner_name,u.email AS owner_email FROM vacancies v JOIN "user" u ON u.id=v.owner_id WHERE v.id=$1 FOR UPDATE OF v', [id]);
+      const result = await client.query<VacancyRow>('SELECT v.*,v.extraction_reference_date::text AS extraction_reference_date,u.name AS owner_name,u.email AS owner_email FROM vacancies v JOIN "user" u ON u.id=v.owner_id WHERE v.id=$1 FOR UPDATE OF v', [id]);
       if (!result.rows[0]) return undefined;
       const current = record(result.rows[0]);
       // Read only when publication needs it, using the same locked transaction.
@@ -78,7 +81,9 @@ export class VacancyRepository {
   }
   private async save(client: PoolClient, next: Vacancy) {
     const result = await client.query<VacancyRow>(`UPDATE vacancies SET status=$2,revision=revision+1,title=$3,description=$4,location=$5,
-      form_definition=$6,processing_definition=$7,updated_at=now() WHERE id=$1 RETURNING *, (SELECT name FROM "user" WHERE id=owner_id) AS owner_name, (SELECT email FROM "user" WHERE id=owner_id) AS owner_email`,
+      form_definition=$6,processing_definition=$7,updated_at=now(),
+      extraction_reference_date=CASE WHEN status='draft' AND $2='published' AND extraction_reference_date IS NULL THEN (statement_timestamp() AT TIME ZONE 'UTC')::date ELSE extraction_reference_date END
+      WHERE id=$1 RETURNING *, extraction_reference_date::text AS extraction_reference_date, (SELECT name FROM "user" WHERE id=owner_id) AS owner_name, (SELECT email FROM "user" WHERE id=owner_id) AS owner_email`,
     [next.id, next.status, next.title, next.description, next.location ?? null, JSON.stringify(next.formDefinition), JSON.stringify(next.processingDefinition)]);
     return record(result.rows[0]);
   }

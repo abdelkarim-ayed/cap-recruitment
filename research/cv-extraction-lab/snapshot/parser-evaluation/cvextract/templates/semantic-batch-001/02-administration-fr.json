@@ -1,0 +1,85 @@
+{
+  "model": "jev-1.14.0",
+  "state": {
+    "cv": "$cv",
+    "reference_date": "2026-11-12",
+    "question_args": {
+      "education_level": {"scope": ""},
+      "certification": {
+        "name": "Certificat fédéral de capacité d'employé de commerce",
+        "aliases": ["CFC employé de commerce", "CFC employée de commerce", "Certificat fédéral de capacité d'employée de commerce"]
+      },
+      "experience_years": {
+        "scope": "administrative and reception work, excluding retail customer service",
+        "include_paid_apprenticeships": false
+      },
+      "skill_coverage": {
+        "items": [
+          {"name": "reception and front-desk service", "aliases": ["accueil", "accueil et réception"]},
+          {"name": "appointment follow-up", "aliases": ["suivi de rendez-vous", "confirmations de rendez-vous"]},
+          {"name": "Microsoft Excel", "aliases": ["Excel", "MS Excel"]},
+          {"name": "payroll administration", "aliases": ["gestion de la paie", "traitement des salaires"]}
+        ]
+      },
+      "skill_evidence_spreadsheets": {
+        "name": "spreadsheets",
+        "aliases": ["tableur", "feuille de calcul"]
+      }
+    }
+  },
+  "questions": {
+    "education_level": {
+      "type": "choice",
+      "instructions": "Use state.cv and state.question_args.education_level.scope. Choose the highest completed qualification within that scope as of state.reference_date. An empty scope means any field. Do not count ongoing or planned study, attendance without completion, or short training certificates as completed academic qualifications.",
+      "criteria": {
+        "secondary_or_lower": "A completed secondary-school qualification or lower, with no higher qualifying level within the scope.",
+        "vocational_technical": "A completed upper-secondary or post-secondary vocational/technical qualification below higher education.",
+        "short_cycle_higher": "A completed short-cycle higher-education qualification below bachelor's level, such as an associate degree, HND or foundation degree.",
+        "bachelors": "A completed bachelor's degree or equivalent within the scope.",
+        "masters": "A completed master's degree or equivalent within the scope.",
+        "doctorate": "A completed doctorate or equivalent within the scope.",
+        "not_stated": "No completed qualification within the scope is evidenced. Ongoing study alone does not establish completion."
+      }
+    },
+    "certification": {
+      "type": "choice",
+      "instructions": "Use state.cv and state.question_args.certification. The name and aliases identify ONE credential, not alternative qualifications. Is that credential stated as held or completed, including an entry under certifications? Generic duties, related skills, preparation and planned study do not establish it. Do not assess authenticity, expiry or current validity.",
+      "criteria": {
+        "present": "The named credential or an equivalent alias is stated as held or completed.",
+        "not_mentioned": "The CV does not evidence that the named credential is held or completed."
+      }
+    },
+    "experience_years": {
+      "type": "choice",
+      "instructions": "Use dated work in state.cv and state.question_args.experience_years.scope to choose total documented relevant work duration. An empty scope means overall work. Include paid apprenticeships only when state.question_args.experience_years.include_paid_apprenticeships is true. Count overlapping periods once. Present means state.reference_date. Do not infer that a listed skill was used throughout a role or substitute an undated summary claim for dated work. Zero evidenced duration belongs to under_1, not proof of no experience.",
+      "criteria": {
+        "under_1": "Less than one year of documented relevant work, including zero evidenced duration.",
+        "1_to_under_3": "At least one but less than three years of documented relevant work.",
+        "3_to_under_5": "At least three but less than five years of documented relevant work.",
+        "5_to_under_8": "At least five but less than eight years of documented relevant work.",
+        "8_plus": "At least eight years of documented relevant work."
+      }
+    },
+    "skill_coverage": {
+      "type": "choice",
+      "instructions": "Use state.cv and the skill items in state.question_args.skill_coverage.items. How many supplied items are explicitly mentioned or unambiguously described? Each item's name and aliases refer to the same item; count that item once. Basic exposure or a skills-list mention counts. Do not infer a specific item solely from a broader or related activity. This is document coverage, not proficiency.",
+      "criteria": {
+        "0": "Exactly 0 of the supplied items are evidenced.",
+        "1": "Exactly 1 of the supplied items are evidenced.",
+        "2": "Exactly 2 of the supplied items are evidenced.",
+        "3": "Exactly 3 of the supplied items are evidenced.",
+        "4": "Exactly 4 of the supplied items are evidenced."
+      }
+    },
+    "skill_evidence_spreadsheets": {
+      "type": "choice",
+      "instructions": "Use state.cv and the ONE skill identified by state.question_args.skill_evidence_spreadsheets.name and its aliases. Choose its strongest explicit evidence context, not ability. A tools-list mention alone does not establish application or professional use. Do not infer the named skill solely from a related activity or proximity to employment history.",
+      "criteria": {
+        "not_mentioned": "No identifiable mention or unambiguous description of the named skill.",
+        "stated_or_studied": "The skill is listed, claimed or studied, without a concrete application example.",
+        "applied": "The skill is explicitly used in a concrete nonprofessional project, practical training, volunteering or other nonprofessional activity; no explicit professional use.",
+        "used_professionally": "The CV explicitly links the skill's use to professional work."
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "parser": "pdf-inspector",
+  "parser_version": "1.25.2",
+  "method": "process_pdf; native text only; no OCR",
+  "source_pdf": "template-based/outputs/rendercv/precv-043-rendercv.pdf",
+  "pdf_sha256": "f7921b09947116a9696eab135e885aff458f49e0dcb6cc5184ba411a9faeb815",
+  "markdown_path": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-043-rendercv.md",
+  "markdown_sha256": "2cb00a52b261c31615370cc28bd83f0480205af3f62f96aeb7693e923089da6b",
+  "markdown_bytes": 1535,
+  "pdf_type": "text_based",
+  "page_count": 1,
+  "pages_needing_ocr": [],
+  "has_encoding_issues": false,
+  "pages_with_columns": [],
+  "pages_with_tables": []
+}

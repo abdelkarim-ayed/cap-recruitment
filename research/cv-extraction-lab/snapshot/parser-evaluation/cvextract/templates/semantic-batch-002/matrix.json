@@ -1,0 +1,226 @@
+{
+  "reference_date": "2026-11-12",
+  "model": "jev-1.14.0",
+  "forms": {
+    "education_level": "education_level_completed",
+    "certification": "certification_no_validity",
+    "experience_years": "experience_five_bins",
+    "skill_coverage": "coverage_v002",
+    "skill_evidence_a": "skill_evidence",
+    "skill_evidence_b": "skill_evidence"
+  },
+  "cases": [
+    {
+      "id": "01-accounting",
+      "cv": "precv-005-calligraphics.md",
+      "question_args": {
+        "education_level": {"scope": "accounting and finance"},
+        "certification": {"name": "ACCA professional qualification (fully qualified)", "aliases": ["fully qualified ACCA", "Association of Chartered Certified Accountants professional qualification"]},
+        "experience_years": {"scope": "accounting, accounts payable and financial reporting", "include_paid_apprenticeships": false},
+        "skill_coverage": {"items": [
+          {"name": "Microsoft Excel", "aliases": ["Excel", "MS Excel"]},
+          {"name": "Power Query", "aliases": []},
+          {"name": "SQL", "aliases": ["Structured Query Language"]},
+          {"name": "VAT returns", "aliases": ["value-added tax returns"]},
+          {"name": "SAP", "aliases": ["SAP ERP"]}
+        ]},
+        "skill_evidence_a": {"name": "SQL", "aliases": ["Structured Query Language"]},
+        "skill_evidence_b": {"name": "Power Query", "aliases": []}
+      },
+      "provisional": {
+        "education_level": "bachelors",
+        "certification": "not_mentioned",
+        "experience_years": "5_to_under_8",
+        "skill_coverage": "4",
+        "skill_evidence_a": "stated_or_studied",
+        "skill_evidence_b": "used_professionally"
+      },
+      "notes": "Part-qualified ACCA and completed Applied Skills must not become the full professional qualification. BA completed. Dated accounting roles June 2019 to present support 5–under 8. Power Query routine is explicit at work; SQL is only basics in Tools. No SAP evidence."
+    },
+    {
+      "id": "02-property-support",
+      "cv": "precv-051-calligraphics.md",
+      "question_args": {
+        "education_level": {"scope": ""},
+        "certification": {"name": "Emergency First Aid at Work", "aliases": ["EFAW"]},
+        "experience_years": {"scope": "property maintenance and general building support", "include_paid_apprenticeships": false},
+        "skill_coverage": {"items": [
+          {"name": "basic hand tools", "aliases": ["hand tools"]},
+          {"name": "fault reporting", "aliases": ["reporting faults", "reporting damage"]},
+          {"name": "bicycle brake adjustment", "aliases": ["adjusting bicycle brakes"]},
+          {"name": "welding", "aliases": []}
+        ]},
+        "skill_evidence_a": {"name": "bicycle brake adjustment", "aliases": ["adjusting bicycle brakes"]},
+        "skill_evidence_b": {"name": "CMMS", "aliases": ["computerised maintenance management system", "computerized maintenance management system"]}
+      },
+      "provisional": {
+        "education_level": "secondary_or_lower",
+        "certification": "not_mentioned",
+        "experience_years": "5_to_under_8 (tentative)",
+        "skill_coverage": "3",
+        "skill_evidence_a": "applied",
+        "skill_evidence_b": "not_mentioned"
+      },
+      "notes": "2023–present employer/date is detached into a contact-area table. General assistant 2020–2023 plausibly within broad scope; months/gaps unspecified. Tools and reporting do not establish CMMS. Bicycle project is personal, not professional."
+    },
+    {
+      "id": "03-backend",
+      "cv": "precv-001-cobalt-cv.md",
+      "question_args": {
+        "education_level": {"scope": "computer science and software engineering"},
+        "certification": {"name": "AWS Certified Developer - Associate", "aliases": ["AWS Certified Developer-Associate", "Amazon Web Services Certified Developer Associate"]},
+        "experience_years": {"scope": "software engineering and backend development", "include_paid_apprenticeships": false},
+        "skill_coverage": {"items": [
+          {"name": "Python", "aliases": []},
+          {"name": "PostgreSQL", "aliases": ["Postgres"]},
+          {"name": "Docker", "aliases": []},
+          {"name": "Kubernetes", "aliases": ["K8s"]},
+          {"name": "Redis", "aliases": []},
+          {"name": "Rust", "aliases": []}
+        ]},
+        "skill_evidence_a": {"name": "Docker", "aliases": []},
+        "skill_evidence_b": {"name": "Python", "aliases": []}
+      },
+      "provisional": {
+        "education_level": "bachelors",
+        "certification": "present",
+        "experience_years": "8_plus",
+        "skill_coverage": "4",
+        "skill_evidence_a": "stated_or_studied",
+        "skill_evidence_b": "used_professionally"
+      },
+      "notes": "Positive credential with punctuation aliases; BSc completed. Dated roles September 2018–present exceed eight years at reference date. Docker listed, not explicitly used in a concrete activity; Python ingestion jobs explicitly professional. Kubernetes/Rust absent."
+    },
+    {
+      "id": "04-laboratory-fr",
+      "cv": "precv-035-cobalt-cv.md",
+      "question_args": {
+        "education_level": {"scope": "laboratory techniques and biomedical science"},
+        "certification": {"name": "Formation SIMDUT", "aliases": ["SIMDUT", "WHMIS training", "Workplace Hazardous Materials Information System training"]},
+        "experience_years": {"scope": "laboratory research and laboratory quality control", "include_paid_apprenticeships": false},
+        "skill_coverage": {"items": [
+          {"name": "PCR", "aliases": ["polymerase chain reaction", "réaction en chaîne par polymérase"]},
+          {"name": "Microsoft Excel", "aliases": ["Excel", "MS Excel"]},
+          {"name": "micropipettes", "aliases": ["micropipetting", "micropipetage"]},
+          {"name": "SQL", "aliases": ["Structured Query Language"]},
+          {"name": "LIMS", "aliases": ["laboratory information management system"]}
+        ]},
+        "skill_evidence_a": {"name": "Microsoft Excel", "aliases": ["Excel", "MS Excel"]},
+        "skill_evidence_b": {"name": "PCR", "aliases": ["polymerase chain reaction", "réaction en chaîne par polymérase"]}
+      },
+      "provisional": {
+        "education_level": "short_cycle_higher (mapping unresolved)",
+        "certification": "present",
+        "experience_years": "5_to_under_8 (tentative; missing months)",
+        "skill_coverage": "3",
+        "skill_evidence_a": "stated_or_studied",
+        "skill_evidence_b": "stated_or_studied"
+      },
+      "notes": "Quebec technical DEC classification not settled; vocational/technical versus short-cycle requires mapping policy, not an automatic error label. Explicit 2020–2021 gap, short contracts, year-only dates make duration ambiguous. Molecular biology analyses do not alone identify PCR use. Quality system does not establish LIMS; generic check sheet does not establish Excel application. SIMDUT update explicitly listed as professional training; no validity checking."
+    },
+    {
+      "id": "05-assembly",
+      "cv": "precv-011-metronic.md",
+      "question_args": {
+        "education_level": {"scope": "engineering and mechanical assembly"},
+        "certification": {"name": "Counterbalance forklift operator certificate", "aliases": ["Counterbalance forklift training certificate"]},
+        "experience_years": {"scope": "component assembly work", "include_paid_apprenticeships": false},
+        "skill_coverage": {"items": [
+          {"name": "hand tools", "aliases": []},
+          {"name": "component assembly", "aliases": ["assembling components"]},
+          {"name": "stock checks", "aliases": ["checking stock", "inventory checks"]},
+          {"name": "welding", "aliases": []}
+        ]},
+        "skill_evidence_a": {"name": "power tools", "aliases": []},
+        "skill_evidence_b": {"name": "welding", "aliases": []}
+      },
+      "provisional": {
+        "education_level": "vocational_technical",
+        "certification": "not_mentioned",
+        "experience_years": "3_to_under_5",
+        "skill_coverage": "3",
+        "skill_evidence_a": "used_professionally",
+        "skill_evidence_b": "not_mentioned"
+      },
+      "notes": "Level 2 engineering diploma; September 2023 assembly start gives about three years at reference date. Pallet-truck operation is not the named forklift credential. Power tools explicitly used in employment; generic mechanical/assembly work does not establish welding."
+    },
+    {
+      "id": "06-administration-es",
+      "cv": "precv-003-jsume.md",
+      "question_args": {
+        "education_level": {"scope": ""},
+        "certification": {"name": "Microsoft Office Specialist: Excel", "aliases": ["MOS Excel", "Microsoft Office Specialist Excel"]},
+        "experience_years": {"scope": "administrative work and reception, excluding retail sales", "include_paid_apprenticeships": false},
+        "skill_coverage": {"items": [
+          {"name": "Microsoft Excel", "aliases": ["Excel", "MS Excel"]},
+          {"name": "Python", "aliases": []},
+          {"name": "SQL", "aliases": ["Structured Query Language"]},
+          {"name": "document management", "aliases": ["gestión documental", "gestión de documentos"]},
+          {"name": "pivot tables", "aliases": ["tablas dinámicas"]}
+        ]},
+        "skill_evidence_a": {"name": "Python", "aliases": []},
+        "skill_evidence_b": {"name": "Microsoft Excel", "aliases": ["Excel", "MS Excel"]}
+      },
+      "provisional": {
+        "education_level": "vocational_technical (tentative mapping/completion)",
+        "certification": "not_mentioned",
+        "experience_years": "8_plus",
+        "skill_coverage": "4",
+        "skill_evidence_a": "stated_or_studied",
+        "skill_evidence_b": "used_professionally"
+      },
+      "notes": "JSume encoding warning. Education/course rows appear under work; bachelor explicitly incomplete must not outrank Técnico. Técnico level/completion not fully specified. Advanced Excel course is not MOS. Generic database work not SQL, repetitive templates not explicit Python scripts. Excel reports/pivots explicitly professional. June 2018–present administrative roles exceed eight years."
+    },
+    {
+      "id": "07-building-services",
+      "cv": "precv-054-jsume.md",
+      "question_args": {
+        "education_level": {"scope": "building services and maintenance"},
+        "certification": {"name": "Working at height training", "aliases": ["Working at heights training", "Working at height"]},
+        "experience_years": {"scope": "building services operation and maintenance", "include_paid_apprenticeships": false},
+        "skill_coverage": {"items": [
+          {"name": "ventilation checks", "aliases": ["ventilation equipment checks"]},
+          {"name": "CMMS", "aliases": ["computerised maintenance management system", "computerized maintenance management system"]},
+          {"name": "work orders", "aliases": []}
+        ]},
+        "skill_evidence_a": {"name": "CMMS", "aliases": ["computerised maintenance management system", "computerized maintenance management system"]},
+        "skill_evidence_b": {"name": "working at height", "aliases": ["working at heights"]}
+      },
+      "provisional": {
+        "education_level": "not_stated",
+        "certification": "present",
+        "experience_years": "8_plus",
+        "skill_coverage": "2",
+        "skill_evidence_a": "not_mentioned",
+        "skill_evidence_b": "stated_or_studied"
+      },
+      "notes": "JSume encoding warning. Internal training explicitly named but no academic qualification. Building services roles January 2016–present; earlier workshop role not needed. Work orders/logs do not establish CMMS. Working-at-height training does not alone evidence application. Project heading compressor repair has little detail and is not queried."
+    },
+    {
+      "id": "08-electrical-es",
+      "cv": "precv-050-vercanard.md",
+      "question_args": {
+        "education_level": {"scope": "industrial electricity and electrical maintenance"},
+        "certification": {"name": "Formación de trabajo en altura", "aliases": ["Curso de trabajo en altura", "Capacitación en trabajo en altura"]},
+        "experience_years": {"scope": "electrical installation and electrical maintenance", "include_paid_apprenticeships": false},
+        "skill_coverage": {"items": [
+          {"name": "electrical preventive maintenance", "aliases": ["mantenimiento preventivo eléctrico"]},
+          {"name": "schematic reading", "aliases": ["lectura de esquemas", "reading electrical schematics"]},
+          {"name": "PLC programming", "aliases": ["programación de PLC"]},
+          {"name": "welding", "aliases": ["soldadura"]}
+        ]},
+        "skill_evidence_a": {"name": "schematic reading", "aliases": ["lectura de esquemas", "reading electrical schematics"]},
+        "skill_evidence_b": {"name": "circuit labelling", "aliases": ["etiquetado de circuitos", "circuit identification and labelling"]}
+      },
+      "provisional": {
+        "education_level": "not_stated (award ambiguous)",
+        "certification": "not_mentioned",
+        "experience_years": "8_plus (tentative contract duration)",
+        "skill_coverage": "2",
+        "skill_evidence_a": "stated_or_studied",
+        "skill_evidence_b": "used_professionally"
+      },
+      "notes": "Formación técnica 2014–2017 names study but not a specific awarded qualification; vocational/technical is a plausible alternative pending policy. Contracts 2017–2021 and role 2021–present span nine years, but actual time on short contracts is unclear. Schematic reading listed, not explicitly linked to work; circuit identification is not by itself evidence of reading diagrams. Circuit labels explicitly updated during plant shutdown. Internal electrical safety is not named height training."
+    }
+  ]
+}

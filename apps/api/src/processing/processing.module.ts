@@ -1,22 +1,25 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../database/database.module.js';
 import { DocumentsModule } from '../documents/documents.module.js';
-import { ContextTaskExecutor, ContextTextReader, DisabledTaskExecutor, DisabledTextReader, FixtureRegistry, FIXTURE_REGISTRY, TASK_EXECUTOR, DOCUMENT_TEXT_READER } from './execution.js';
+import { ContextTaskExecutor, ContextMarkdownReader, DisabledTaskExecutor, FixtureRegistry, FIXTURE_REGISTRY, TASK_EXECUTOR, DOCUMENT_MARKDOWN_READER } from './execution.js';
 import { ProcessingRepository } from './processing.repository.js';
 import { ProcessingService } from './processing.service.js';
-import { PdfTextReader } from './pdf-reader.js';
-import { JevTaskExecutor } from './jev-executor.js';
+import { CvPdfReader } from './cv-pdf-reader.js';
+import { CvCachedMarkdownReader, CvParserMemoryCache, CvResponseMemoryCache } from './cv-memory-cache.js';
+import { CvExecutor } from './cv-executor.js';
+import { CvAttemptRepository } from './cv-attempt.repository.js';
+import { CvAttemptCoordinator } from './cv-attempts.js';
+import { CvBackgroundRunner } from './cv-runner.js';
 import { processingSettings } from './settings.js';
 import { IntegrationsModule } from '../integrations/integrations.module.js';
 import { JevGateway } from '../integrations/jev/jev.gateway.js';
 
-@Module({ imports: [DatabaseModule,DocumentsModule,IntegrationsModule], providers: [ProcessingRepository,ProcessingService,
+@Module({ imports: [DatabaseModule, DocumentsModule, IntegrationsModule], providers: [ProcessingRepository, ProcessingService, CvAttemptRepository, CvBackgroundRunner,
   { provide: FIXTURE_REGISTRY, useClass: FixtureRegistry },
-  { provide: DOCUMENT_TEXT_READER, inject: [FIXTURE_REGISTRY], useFactory: (registry: FixtureRegistry) => new ContextTextReader(processingSettings().reader === 'pdf' ? new PdfTextReader() : new DisabledTextReader(),registry) },
-  { provide: TASK_EXECUTOR, inject: [FIXTURE_REGISTRY, JevGateway], useFactory: (registry: FixtureRegistry, gateway: JevGateway) => {
+  { provide: DOCUMENT_MARKDOWN_READER, inject: [FIXTURE_REGISTRY], useFactory: (registry: FixtureRegistry) => new ContextMarkdownReader(processingSettings().reader === 'pdf' ? new CvCachedMarkdownReader(new CvPdfReader(), new CvParserMemoryCache()) : undefined, registry) },
+  { provide: TASK_EXECUTOR, inject: [FIXTURE_REGISTRY, JevGateway, CvAttemptRepository], useFactory: (registry: FixtureRegistry, gateway: JevGateway, attempts: CvAttemptRepository) => {
     const config = processingSettings();
-    if (config.executor === 'jev' && !gateway.isConfigured()) throw new Error('JEV_API_KEY is not configured for the mandatory gateway.');
-    return new ContextTaskExecutor(config.executor === 'jev' ? new JevTaskExecutor(gateway) : new DisabledTaskExecutor(),registry);
+    return new ContextTaskExecutor(config.executor === 'jev' ? new CvExecutor(new CvAttemptCoordinator(attempts, gateway, new CvResponseMemoryCache()), () => gateway.isConfigured()) : new DisabledTaskExecutor(), registry);
   } },
-], exports: [ProcessingService,ProcessingRepository,FIXTURE_REGISTRY] })
+], exports: [ProcessingService, ProcessingRepository, FIXTURE_REGISTRY] })
 export class ProcessingModule {}

@@ -14,6 +14,7 @@ import { projectRoot } from '../configuration/environment.js';
 import type { Role } from '../auth/access.js';
 import type { CreateVacancy, Vacancy } from '@recruitment/domain/vacancies';
 import { demoOnly, processDemo } from './fixtures.js';
+import { demoCvQuestions } from './cv-fixture.js';
 
 demoOnly();
 const directory=join(projectRoot,'.local','demo');
@@ -48,7 +49,7 @@ try{
     {id:'documents',type:'separator',label:'Supporting documents',args:{}},
     {id:'cv',name:'cv',label:'Your CV',type:'document',required:true,args:{accept:['.pdf','.docx']}},
     {id:'portfolio',name:'portfolio',label:'Optional portfolio document',type:'document',required:false,args:{}},
-  ]},processingDefinition:{version:1,tasks:[{id:'cv_skills',sourceInputId:'cv',outputKey:'extracted_skills',type:'extractSkills',args:{skills:['SQL','TypeScript','Python'],evidence:true}}]}};
+  ]},processingDefinition:{version:2,tasks:[{id:'cv_extract',sourceInputId:'cv',outputKey:'cv_facts',type:'cvExtractor',args:demoCvQuestions}]}};
   const jobs:Record<string,Vacancy>={};
   for(const alias of ['published','draft']){
     const title=alias==='published'?`${definition.title} — RenderCV`:'[DEMO] Operations coordinator — draft';

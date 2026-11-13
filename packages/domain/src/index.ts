@@ -2,6 +2,8 @@ export * from './actions.js';
 export * from './interview-plans.js';
 export * from './screening.js';
 export * from './workflow-views.js';
+export * from './cv-extractor.js';
+export * from './extractors.js';
 
 export const applicationStages = [
   'received', 'review_ready', 'preselected', 'interview', 'offer', 'hired', 'not_selected',

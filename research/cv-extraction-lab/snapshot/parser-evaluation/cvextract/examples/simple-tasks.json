@@ -1,0 +1,43 @@
+{
+  "reference_date": "2026-11-12",
+  "questions": [
+    {
+      "id": "education",
+      "type": "education_level",
+      "scope": "engineering",
+      "expected_within_months": 6
+    },
+    {
+      "id": "safety_certificate",
+      "type": "certification",
+      "certification": {
+        "name": "IOSH Managing Safely",
+        "aliases": ["Managing Safely (IOSH)"]
+      }
+    },
+    {
+      "id": "experience",
+      "type": "experience_years",
+      "scope": "building maintenance"
+    },
+    {
+      "id": "secondary_skills",
+      "type": "skill_coverage",
+      "skills": [
+        "Excel",
+        {"name": "SQL", "aliases": ["T-SQL", "Transact-SQL"]},
+        {"name": "CMMS", "aliases": ["computerised maintenance management system", "computerized maintenance management system"]}
+      ]
+    },
+    {
+      "id": "sql_evidence",
+      "type": "skill_evidence",
+      "skill": {"name": "SQL", "aliases": ["T-SQL", "Transact-SQL"]}
+    },
+    {
+      "id": "cmms_evidence",
+      "type": "skill_evidence",
+      "skill": "CMMS"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+- Impression: IT Support — junior; credential-first.
+- Tone: very specific about one thing, vague about everything else. (~6-8 lines)
+- Story: odd mix of jobs; common thread not obvious yet.
+- Skills: leans practical/problem-solving over terminology.
+- Creds: trade experience seems more relevant than formal quals here.
+- Extra: seems open to change in direction.
+- Timeline: has a vague gap in timeline.
+- Social/supplementary: volunteering/languages may exist, not specified.

@@ -2,6 +2,24 @@
 
 Product source baseline includes skills, R1/R2/R3a–d/SI/B1-P/F/R/J, T2a and the UI overhaul/consistency commits `0fdc705` / `73bb014`, locally merged without squash as `cebce84`. No push. Authorized local demo setup applied migrations 007/008 and seeded lifecycle fixtures on 2026-11-07. Verification/runtime observations below are dated evidence, not a guarantee of current process/build activation or complete functional QA.
 
+**2026-11-13 worktree delta:** `feat/cv-extractor-integration` replaces the skills
+workflow in source with the five-family CV feature across definitions,
+publication/snapshots, guarded processing, per-field review/CSV, form-builder
+wording preview and source demo fixtures. **Uncommitted/unmerged, not deployed,
+and untested/unbuilt after the user's explicit stop-testing instruction.**
+Migrations 009/010 are unapplied, normal/automatic live execution stays disabled,
+and main/UI services are unchanged. Earlier foundation checks below predate
+this vertical integration; old test/smoke/view fixtures and static OpenAPI need
+new-contract alignment, not a claimed pass. See [source contract](contracts/processing-review-api.md)
+and [checkpoint boundaries](../plan/research/cv-extraction-implementation.md).
+
+Additional explicitly approved source-only follow-up: empty-start, RAM-only Jev
+credential loading/rotation through a hidden-input/stdin local CLI and Unix IPC /
+Windows named pipe; no key environment/file fallback, key-returning route or
+spending reset. No actual key was accessed/changed and no service was started or
+restarted. No tests/builds; Windows transport/ACL behavior is unverified. See
+[local key control](guides/jev-key-control.md).
+
 ## Implemented
 
 - React/Vite + NestJS + shared TypeScript/Zod domain package; PostgreSQL, local private file storage, Redis connectivity and Jev admission guard.
@@ -46,6 +64,23 @@ Product source baseline includes skills, R1/R2/R3a–d/SI/B1-P/F/R/J, T2a and th
 ## Verification evidence
 
 Entries record what passed at each checkpoint, not a current all-suite pass. Old statements about unapplied migrations, unguarded editors or UI gaps describe their dated snapshot; implemented behavior is above/in contracts, not those historical limitations.
+
+2026-11-13 bounded `feat/cv-extractor-integration` worktree, checkpoints 1/2:
+exact five-family TypeScript schema/wording port, typed field/correction/export
+helpers, native Node parser, memory caches and durable request-attempt source
+implemented but **not integrated into the active skills workflow**. Domain/API
+builds and web typecheck passed; 12 new domain and 29 focused API offline checks
+passed. All three rendered request contracts match; 20 historical pairs/102
+answers validate against their original requests. Three PDF parses (two CV
+identities) match transferred Python Markdown bytes and compared flags, including
+the JSume encoding warning. Dependency pinned locally to pdf-inspector 1.25.2;
+no global tooling changes. Fake-worker recovery/duplicate/closure tests are not
+real PostgreSQL/Redis/HTTP race or live-quality evidence. Migration 009 is source
+only/unapplied; publication/correction schema and runtime/UI wiring remain next.
+Broader domain run found an existing screening duplicate-CSV test failure,
+reproduced on unchanged main (`screening.test.ts:18`), left outside this scope.
+No provider calls, data operations, service management, commits or push. See
+[checkpoint notes](../plan/research/cv-extraction-implementation.md).
 
 Reported at the 2026-10-31 skills checkpoint: 42 API + 16 domain + 29 DOM tests (87 total), domain/API/web builds and real PDF/PostgreSQL fixture integration including per-skill correction/export. Earlier checkpoints report vacancy/intake/interview concurrency, private-file authorization and password/OTP integration checks. These are historical check results, not a fresh test run or live-provider evaluation.
 
@@ -117,7 +152,13 @@ Feedback disposition: email/form clarity, visual/action hierarchy, candidate pub
 
 ## Contract gaps
 
-The static OpenAPI files lag live-provenance/per-skill response and correction extensions; use the processing contract and source until aligned. Their move into `contracts/` does not fix their schemas. `review_ready` remains in schemas because it remains an accepted value, despite being unreachable through current commands. Prose corrections do not silently change wire behavior.
+The static OpenAPI files lag the version-2 CV definitions, first-publication
+context, Choice result envelope and question-level correction/review/export
+contract in the unmerged worktree (and previously lagged skills extensions).
+Use the processing contract/source until aligned; no final schema check was
+run after the user's stop instruction. Their earlier move into `contracts/`
+did not fix schemas. `review_ready` remains accepted though no current command
+writes it. Prose does not silently change wire behavior.
 
 ## Presentation
 

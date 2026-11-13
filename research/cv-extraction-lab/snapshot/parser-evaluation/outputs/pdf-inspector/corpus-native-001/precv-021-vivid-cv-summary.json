@@ -1,0 +1,18 @@
+{
+  "parser": "pdf-inspector",
+  "parser_version": "1.25.2",
+  "method": "process_pdf; native text only; no OCR",
+  "source_pdf": "template-based/outputs/vivid-cv/precv-021-vivid-cv.pdf",
+  "pdf_sha256": "59c5f2c02c934bd1566b25cea5adf6f3b598c9e51dbbe896ca0f783b11d13a50",
+  "markdown_path": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-021-vivid-cv.md",
+  "markdown_sha256": "5e570916015d21558c2a7beebf337daf916136ace80b41d972056c228f0dc423",
+  "markdown_bytes": 1505,
+  "pdf_type": "text_based",
+  "page_count": 1,
+  "pages_needing_ocr": [],
+  "has_encoding_issues": false,
+  "pages_with_columns": [
+    1
+  ],
+  "pages_with_tables": []
+}

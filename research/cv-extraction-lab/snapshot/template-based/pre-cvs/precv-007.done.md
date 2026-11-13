@@ -1,0 +1,8 @@
+- Impression: IT career-changer — junior; project-first.
+- Tone: quietly detail-oriented. (~max 10)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: unclear; might only become obvious from details.
+- Creds: trade experience seems more relevant than formal quals here.
+- Extra: mentions helping others informally.
+- Timeline: has a vague gap in timeline.
+- Social/supplementary: open to adding portfolio/links later if relevant.

@@ -1,0 +1,65 @@
+{
+  "model": "jev-1.14.0",
+  "state": {
+    "cv": "$cv",
+    "reference_date": "2026-11-12",
+    "question_args": {
+      "skill_a": {
+        "name": "Microsoft Excel",
+        "aliases": [
+          "Excel",
+          "MS Excel"
+        ]
+      },
+      "skill_b": {
+        "name": "spreadsheets",
+        "aliases": [
+          "spreadsheet creation",
+          "spreadsheet tracking"
+        ]
+      }
+    }
+  },
+  "questions": {
+    "skill_a_original": {
+      "type": "choice",
+      "instructions": "Use state.cv and the ONE skill identified by state.question_args.skill_a.name and its aliases. Choose its strongest explicit evidence context, not ability. A tools-list mention alone does not establish application or professional use. Do not infer the named skill solely from a related activity or proximity to employment history.",
+      "criteria": {
+        "not_mentioned": "No identifiable mention or unambiguous description of the named skill.",
+        "stated_or_studied": "The skill is listed, claimed or studied, without a concrete application example.",
+        "applied": "The skill is explicitly used in a concrete nonprofessional project, practical training, volunteering or other nonprofessional activity; no explicit professional use.",
+        "used_professionally": "The CV explicitly links the skill's use to professional work."
+      }
+    },
+    "skill_a_revised": {
+      "type": "choice",
+      "instructions": "Use state.cv and the ONE skill identified by state.question_args.skill_a.name and its aliases. Choose the strongest evidence context explicitly linked to that skill, not ability. Before assigning applied or used_professionally, the concrete activity must identify the supplied skill or an unambiguous equivalent. A named product listed elsewhere in the CV does not establish that it was used for a generically described activity. Related tools, likely usage and proximity to work history are insufficient. A list-only claim remains stated_or_studied unless a concrete application of that same skill is evidenced.",
+      "criteria": {
+        "not_mentioned": "No identifiable mention or unambiguous description of the named skill.",
+        "stated_or_studied": "The skill is listed, claimed or studied, without a concrete application example.",
+        "applied": "The skill is explicitly used in a concrete nonprofessional project, practical training, volunteering or other nonprofessional activity; no explicit professional use.",
+        "used_professionally": "The CV explicitly links the skill's use to professional work."
+      }
+    },
+    "skill_b_original": {
+      "type": "choice",
+      "instructions": "Use state.cv and the ONE skill identified by state.question_args.skill_b.name and its aliases. Choose its strongest explicit evidence context, not ability. A tools-list mention alone does not establish application or professional use. Do not infer the named skill solely from a related activity or proximity to employment history.",
+      "criteria": {
+        "not_mentioned": "No identifiable mention or unambiguous description of the named skill.",
+        "stated_or_studied": "The skill is listed, claimed or studied, without a concrete application example.",
+        "applied": "The skill is explicitly used in a concrete nonprofessional project, practical training, volunteering or other nonprofessional activity; no explicit professional use.",
+        "used_professionally": "The CV explicitly links the skill's use to professional work."
+      }
+    },
+    "skill_b_revised": {
+      "type": "choice",
+      "instructions": "Use state.cv and the ONE skill identified by state.question_args.skill_b.name and its aliases. Choose the strongest evidence context explicitly linked to that skill, not ability. Before assigning applied or used_professionally, the concrete activity must identify the supplied skill or an unambiguous equivalent. A named product listed elsewhere in the CV does not establish that it was used for a generically described activity. Related tools, likely usage and proximity to work history are insufficient. A list-only claim remains stated_or_studied unless a concrete application of that same skill is evidenced.",
+      "criteria": {
+        "not_mentioned": "No identifiable mention or unambiguous description of the named skill.",
+        "stated_or_studied": "The skill is listed, claimed or studied, without a concrete application example.",
+        "applied": "The skill is explicitly used in a concrete nonprofessional project, practical training, volunteering or other nonprofessional activity; no explicit professional use.",
+        "used_professionally": "The CV explicitly links the skill's use to professional work."
+      }
+    }
+  }
+}

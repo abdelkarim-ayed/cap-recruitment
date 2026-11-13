@@ -5,7 +5,8 @@ import '../../configuration/environment.js';
 // This warning applies to future agent sessions as well. Never commit API keys.
 export const JEV_CONFIG = Object.freeze({
   url: 'https://api.typesafe.ai/v1/systemone',
-  apiKey: process.env.JEV_API_KEY ?? '',
+  // Credentials are deliberately absent: each process starts empty and accepts
+  // only RAM-only local IPC updates. No JEV_API_KEY/environment/file fallback.
   model: 'jev-1.14.0',
   redisUrl: process.env.REDIS_URL ?? 'redis://127.0.0.1:56379',
   // Fixed, shared namespace: do not randomize/change to evade exhausted budgets.

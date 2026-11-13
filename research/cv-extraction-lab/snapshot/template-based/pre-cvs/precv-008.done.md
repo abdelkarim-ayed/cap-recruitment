@@ -1,0 +1,8 @@
+- Impression: Civil/structural-adjacent — mid; project-first.
+- Tone: quietly detail-oriented. (~2 lines)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: hands-on basics; specifics to be pinned down later.
+- Creds: little formal shown; practical history carries more weight.
+- Extra: mentions helping others informally.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: community-adjacent, details TBD.

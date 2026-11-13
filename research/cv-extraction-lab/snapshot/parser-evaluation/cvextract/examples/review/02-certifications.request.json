@@ -1,0 +1,25 @@
+{
+  "model": "jev-1.14.0",
+  "state": {
+    "cv": "$cv",
+    "reference_date": "2026-11-12"
+  },
+  "questions": {
+    "iosh": {
+      "type": "choice",
+      "instructions": "Does the CV state that IOSH Managing Safely is held or completed? Related work, preparation and planned study do not count.",
+      "criteria": {
+        "present": "Stated as held or completed.",
+        "not_mentioned": "Not evidenced as held or completed."
+      }
+    },
+    "aws_developer": {
+      "type": "choice",
+      "instructions": "Does the CV state that AWS Certified Developer - Associate (also accept: AWS Developer Associate; AWS Certified Developer-Associate) is held or completed? Related work, preparation and planned study do not count.",
+      "criteria": {
+        "present": "Stated as held or completed.",
+        "not_mentioned": "Not evidenced as held or completed."
+      }
+    }
+  }
+}

@@ -1,39 +1,85 @@
-# Jev: mandatory safeguards and current extraction
+# Jev: mandatory safeguards and CV extraction
 
-Read this before Jev work and load project skill `typesafe-ai`. Implementation permission, a funded account, fake data or this document is not permission for paid calls or spending-limit tests.
+Read before Jev work and load project `typesafe-ai`. Source implementation,
+funding or synthetic fixtures are not authorization for paid/limit tests.
 
 ## Red lines
 
-- All real calls, including future probes/benchmarks/tests, must use `apps/api/src/integrations/jev/jev.gateway.ts`. Never add direct fetch/SDK/key routes to bypass it.
-- Do not raise/reset limits, alter the Redis namespace/volume, endpoint/model or introduce automatic live retries without explicit scoped approval. An exhausted allowance is a stop condition.
-- Never read/print/commit credentials. Key environment reference: `JEV_API_KEY`. Standalone `extraction:probe` is parse-only and rejects skill arguments.
-- Keep reader/executor defaults disabled. No unattended/bulk live drain, paid validation or quota test is authorized. Only separately approved synthetic inputs for any live evaluation.
-- User's overall development/showcase spending ceiling is $5, not a target. Request allowances are not currency accounting. No verified per-CV cost/throughput supports large-scale price claims.
+- Every real call uses `apps/api/src/integrations/jev/jev.gateway.ts`; no direct
+  fetch/SDK/key route or probe bypass. Standalone extraction probe is parse-only.
+- Never read/print credentials, alter endpoint/model/limits/Redis namespace,
+  refund/reset counters or renew allowance without explicit scoped consent.
+  Exhausted allowance stops execution. The user explicitly authorized RAM-only
+  local credential loading/rotation; the gateway no longer reads `JEV_API_KEY`.
+  This is source permission, not authorization for an agent to read/set real keys.
+- Reader/executor/runner defaults stay disabled. No unattended/bulk live drain,
+  paid evaluation or quota test is authorized. Overall development/showcase
+  ceiling is $5, not a target; request counts are not currency accounting.
+- No SDK or hidden transport retries, OCR/hosted fallback, default payload logs
+  or fixture execution in production. Keep candidate data private.
 
-## Fixed gateway configuration
+## Fixed gateway controls
 
-Source: `apps/api/src/integrations/jev/jev.config.ts`. Endpoint `https://api.typesafe.ai/v1/systemone`, pinned model `jev-1.14.0`, namespace `recruitment:jev:spending-guard:v1`. One active Redis lease, three attempts per rolling minute, twenty attempts total (no total TTL). Failed/uncertain admissions consume allowance. Redis unavailable blocks calls; HTTP has no retry. Lease 60 seconds, HTTP timeout 10 seconds, request 60,000 bytes, response 1,000,000 bytes, redirects rejected. Preserve Redis storage; a timeout is not proof external billing stopped.
+`jev.config.ts`: `https://api.typesafe.ai/v1/systemone`, `jev-1.14.0`, shared
+namespace `recruitment:jev:spending-guard:v1`; one active Redis lease, three
+admissions/minute, twenty total without total TTL. Failed/uncertain admissions
+consume allowance. Lease 60 seconds, HTTP timeout 10 seconds, request 60,000
+bytes, response 1,000,000 bytes, no redirects/retries. No control values changed.
+Redis operations now have a three-second deadline matching the prior connect
+bound; timeout/disconnection fails closed and never refunds admission.
 
-## Selected starter (merged, fixture-tested only)
+Effective hydrated request serialization/hash is shared with cache identity;
+prepared bytes/model/hash are verified before transport. Structured gateway
+failures distinguish provably unsent, known response and ambiguous send. Typed
+errors, not message spelling, determine later retry policy.
 
-- HR supplies predefined skills; trim/lowercase/deduplicate. One grouped Noul question per skill against shared CV text. Detect claimed knowledge/use (lists, coursework, projects/work); exclude negation, requirements and unrelated mentions. Positive >=0.8 is provisional, not verified competence.
-- Persist compatible `{skills:[detected names]}` JSONB. Project `skillResults:[{skill,original:boolean|null,effective:boolean|null}]` from frozen configured skills.
-- Corrections can include `unavailableSkills`; omitted skills false, explicit unavailable null. Whole-list/null corrections remain supported. UI sends sibling unknowns explicitly. Actor/time/revision remains task-level.
-- CSV retains old columns and appends URI-encoded lower-case skill original/effective columns (blank for null). No migration/rewrite of old results was required for this slice.
-- Noul emits no quotations. Legacy evidence flag remains accepted; new form tasks default false. Earlier excerpt-choice implementation is superseded, not a second active extractor.
+## RAM-only credentials
 
-Real reader: PDF.js 6.4.299 in a killable child without inherited credentials; text-native PDF, 10 MiB, 20 pages, 60,000 characters, eight-second timeout, 192 MiB V8 heap cap. Not an OS sandbox/complete native-memory quota. DOCX/OCR/rectangles absent. Executor separately bounds 12,000 characters and 20 skills and checks serialized payload length; gateway enforces bytes. These are current development bounds, not approved production sizing policy. Do not change them during documentation cleanup.
+Each process starts empty. A hidden-input/stdin CLI can set/replace/clear its key
+over owner-restricted Unix IPC or a Windows named pipe, targeting the backend PID.
+No secret file, HTTP endpoint, key getter, environment fallback or automatic
+provider validation. An in-flight request retains its captured key; later requests
+use the replacement. Key updates cannot enable extraction or reset spending/send
+guards. Missing credentials leave unbound live work unclaimed; explicitly bound
+fixtures remain available. See [usage and security boundaries](guides/jev-key-control.md).
+Windows ACL/helper behavior and all new credential source changes are untested/
+unbuilt by instruction; existing running services were not updated.
 
-## Wiring and recovery limitation
+## Bounded source implementation — not activation evidence
 
-`processing/settings.ts` selects reader/executor; `processing.module.ts` injects JevGateway through the narrow decision-client port. Fixtures dispatch through context ports; no missing-fixture live fallback. CLI requires explicit application selection for live mode unless a separate bulk override is set; that override is not consent.
+In `feat/cv-extractor-integration`, the old thresholded Noul skills workflow is
+replaced in source by one CV extractor task containing ordered Choice questions.
+The exact transferred wording remains; raw choices/probabilities/confidence/
+model/usage are retained. No confidence thresholds, competence inference or
+extraction-driven recruitment decisions. Native pdf-inspector and memory caches
+remain distinct from raw model responses and HR field corrections.
 
-### Recovery limitation
+Durable `cv_request_attempts` (unapplied migration 009) stores send knowledge, not
+response/Markdown cache data. The confirmed send boundary precedes gateway I/O;
+cross-worker same-request sends are excluded. Interrupted/ambiguous sends,
+unknown acknowledgements and cache loss after success do not authorize another
+payment. Application-token/closure fences protect persistence, not cancellation
+of externally admitted billing. Do not clear this ledger during demo/data resets.
 
-Returned live failures and the service timeout after entering a live executor are persisted non-retryable. However, `ProcessingRepository.claim()` unconditionally marks interrupted `status='processing'` tasks retryable on expired-lease recovery. Executor provenance is saved only with the result. A crash after admission/before persistence cannot therefore be safely distinguished from pre-call interruption. Fencing prevents stale database writes, not a second paid call. This contradicts the intended no-automatic-live-retry guarantee in this edge case. **Do not enable a continuous live runner until an explicit attempt-boundary/recovery design addresses it.** No spending tests were run to reproduce this source-level finding.
+## Recovery limitation
 
-Redis command timeout/disconnection behavior also needs review before unattended operation. No guard changes or tests follow from this finding; see [processing obstacle](../plan/changeability.md#processing-and-operations).
+The earlier main implementation unconditionally retried expired processing tasks
+without durable paid-send knowledge. This worktree changes claim recovery to
+consult send guards and uses the new coordinator before live transport. **That
+source change has not received PostgreSQL/HTTP/race or end-to-end verification.**
+The earlier fake-worker tests predate final integration. The user stopped further
+tests/builds; no fresh safety/quality pass may be claimed. Running main/services
+are unchanged and migrations 009/010 are unapplied.
 
-## Evidence provenance
+Only demonstrably unsent transient failures can schedule delayed whole-task
+retry (12 hours/max three boundaries). Budget/config/content failures and known
+provider 429 stop under the initial conservative policy; ambiguous sends never
+qualify. A successful response cache hit retains original usage/attempt identity,
+not a new billed observation. No durable cache reconstruction is selected.
 
-Skills commit `9e5f7c8`, main merge `fd9fe9e`; prior documentation preserved in `74d4cf2`. Historical checks in [status](status.md). No live acceptance/quality evaluation, gateway-limit tests, pending-record execution or production guarantees. Earlier direct-transport commands in Git history must never be run as live instructions.
+Backend automatic mode supports trusted fixtures only; unattended live mode is
+refused. Existing explicit CLI synthetic-consent/selection guards remain, but
+are not paid permission. Resolve remaining operational/recovery verification and
+obtain separate bounded consent before live activation. See
+[processing contract](contracts/processing-review-api.md) and
+[checkpoint notes](../plan/research/cv-extraction-implementation.md).

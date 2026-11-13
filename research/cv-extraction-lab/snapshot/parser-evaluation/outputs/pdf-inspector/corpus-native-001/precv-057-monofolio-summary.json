@@ -1,0 +1,18 @@
+{
+  "parser": "pdf-inspector",
+  "parser_version": "1.25.2",
+  "method": "process_pdf; native text only; no OCR",
+  "source_pdf": "template-based/outputs/monofolio/precv-057-monofolio.pdf",
+  "pdf_sha256": "5a5c4d8ec83923ce981d4a37daeceb4af503d265fbf1c5fe909fbf0052cd11f7",
+  "markdown_path": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-057-monofolio.md",
+  "markdown_sha256": "92793d02d2526cd08e4d7dc9d79301ee13ff8b7a63496a7b394b46a89e900327",
+  "markdown_bytes": 2453,
+  "pdf_type": "text_based",
+  "page_count": 1,
+  "pages_needing_ocr": [],
+  "has_encoding_issues": false,
+  "pages_with_columns": [
+    1
+  ],
+  "pages_with_tables": []
+}

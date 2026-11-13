@@ -2,6 +2,12 @@
 
 T2a is source-implemented. Authorized local setup on 2026-11-07 applied migrations 007/008 and successfully seeded five vacancies/25 applications; all 25 private document hashes were verified through storage. API/DB/Redis readiness and frontend/proxy HTTP checks passed. **This is setup evidence, not completion of Q-T2A or other QA gates:** reset/repeatability, authenticated workflows/privacy, races and manual UX remain pending. No launcher is implemented; services were launched explicitly in [RMUX](rmux.md).
 
+**CV source cutover, 2026-11-13:** the commands now require migrations through
+010 and version-2 CV fixtures. The earlier local skills dataset has not been
+converted/recreated, and 009/010 have not been applied. Final source is unbuilt/
+untested by instruction. This is not currently a ready-to-launch recipe; use the
+[bounded launch handoff](../../plan/cv-demo-launch.md) for separate approvals.
+
 ## Dataset
 
 `demo:lifecycle` declares five vacancies and 25 applications. IDs are stable in the reserved `recruitment-lifecycle-v1` namespace; the older RenderCV demo remains separate. Event timestamps are relative to a single seed-time UTC half-hour boundary, with accounts/vacancies preceding submissions, processing/review/screening and historical interviews. Future appointments use distinct half-hour slots. Reset recalculates dates; ordinary seed preserves the existing dates and edits.
@@ -16,7 +22,7 @@ T2a is source-implemented. Authorized local setup on 2026-11-07 applied migratio
 
 Staff logins are `lifecycle.hr`, `lifecycle.hr2`, `lifecycle.admin`, `lifecycle.interviewer`, `lifecycle.interviewer2`, all at `example.test`. Each application has its own candidate login `lifecycle.<scenario-key>@example.test` (keys are listed by `plan` and the manifest). `lifecycle.candidate@example.test` is initially empty for manual intake. Initial password: **`DemoRecruitment!2026`**, synthetic/development only. Existing passwords, accounts and sessions are not reset. The admin has no owner override. The second interviewer handles the second configured interview.
 
-Each application has an attached text-only synthetic PDF, using five varied fictional profile patterns. Results, notices and interview assessments are **declared synthetic snapshots**, not outputs from executed transitions, interviews, parsing or AI. Machine results retain `mode:fixture`, a fixture ID and `method:declared-lifecycle-snapshot`; HR corrections are separate. The existing trusted fixture schema validates results and document identity/hash. Neither the seeded skill lists nor simulated failures establish extraction quality or a paid attempt. No worker or genuine in-flight external request is simulated.
+Each application has an attached text-only synthetic PDF, using five varied fictional profile patterns. Results, notices and interview assessments are **declared synthetic snapshots**, not outputs from executed transitions, interviews, parsing or AI. Machine results retain `mode:fixture`, a fixture ID and `method:declared-lifecycle-snapshot`; HR corrections are separate. The updated source fixture schema covers five-family Choice responses, a frozen declared publication date, simulated zero usage and independent category/null-count corrections. These are not extraction-quality or paid-attempt evidence. No genuine in-flight external request is simulated.
 
 ## Commands and prerequisites
 
@@ -26,16 +32,21 @@ After building domain/API, this prints the catalog without opening environment f
 pnpm --filter @recruitment/api demo:lifecycle plan
 ```
 
-The following commands **write DB/private files**. Do not execute until their operation is authorized and migrations 007/008 are applied. They never apply migrations, start/stop services, send mail, contact Redis/Jev or drain pending tasks. The CLI imports only database/document modules, not AppModule/ProcessingModule.
+The following commands **write DB/private files**. Do not execute until their
+operation is authorized and migrations through 010 are applied. They never apply
+migrations, start/stop services, send mail, contact Redis/Jev or drain pending
+tasks. Require `PROCESSING_RUNNER=disabled` as well as disabled reader/executor.
+The CLI imports only database/document modules, not AppModule/ProcessingModule.
 
 ```sh
 NODE_ENV=development PROCESSING_READER=disabled PROCESSING_EXECUTOR=disabled pnpm --filter @recruitment/api demo:lifecycle seed
 NODE_ENV=development PROCESSING_READER=disabled PROCESSING_EXECUTOR=disabled pnpm --filter @recruitment/api demo:lifecycle reset
 ```
 
-- `seed`: initialize only when absent. An existing complete dataset is preserved; a partial one requires explicit reset. It does not repair or update existing snapshots silently.
+- `seed`: initialize only when absent. An existing complete compatible dataset is preserved; a partial/legacy dataset requires explicit reset. It does not repair or update existing snapshots silently.
 - `reset`: replace the exact reserved dataset, including its reviews, interview changes and associated notices. **Edits and new submissions using reserved lifecycle candidate accounts inside lifecycle vacancies are disposable.** Both candidate and vacancy must belong to this dataset. Unrelated vacancies, the older demo, accounts/passwords/sessions, provider keys/configuration and spending counters remain untouched.
 - Reset refuses owner/account/identity/document collisions, submissions by unrelated candidates inside a demo vacancy, active/expired leases or processing state, and attempted non-fixture/unknown executor history. Move/preserve unrelated submissions through a separately agreed operation; do not widen reset filters.
+- Durable live request history also refuses fixture reset. The request-attempt ledger is never cleared with disposable recruitment data.
 - One transaction/advisory lock covers ownership checks and DB replacement. Vacancy/application row locks protect the reset boundary; do not use it as a concurrent business-workflow runner. No runtime clock or auth bypass is added.
 - Canonical private PDFs are hash-checked and reused under exact IDs rather than reuploaded on every reset. Extra manual demo-submission objects are retired in the transaction, then unlinked only after a fresh lookup confirms committed removal. Other stored files are untouched. Newly uploaded bytes after a failed transaction are removed only when a fresh lookup proves they were not committed. Failed/uncertain cleanup or a lost reset COMMIT acknowledgement can retain a private orphan; no broad storage reconciliation is attempted.
 

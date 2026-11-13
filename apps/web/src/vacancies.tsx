@@ -56,7 +56,7 @@ export function VacancyList({staff,actorId,candidate=false,memoryScope}:{staff:b
     </section>}
   </div>;
 }
-const initial:CreateVacancy={title:'',description:'',formDefinition:{version:1,inputs:[{id:'full_name',name:'full_name',label:'Full name',type:'text',required:true,args:{}},{id:'cv',name:'cv',label:'Your CV',type:'document',required:true,args:{accept:['.pdf','.docx']}}]},processingDefinition:{version:1,tasks:[]}};
+const initial:CreateVacancy={title:'',description:'',formDefinition:{version:1,inputs:[{id:'full_name',name:'full_name',label:'Full name',type:'text',required:true,args:{}},{id:'cv',name:'cv',label:'Your CV',type:'document',required:true,args:{accept:['.pdf']}}]},processingDefinition:{version:2,tasks:[]}};
 function PublicationPlanSummary({plan}:{plan:InterviewPlanView}) {
   return <><h3>Saved interview plan</h3>{plan.steps.length?<ol>{plan.steps.map(interview=><li key={interview.id}>{interview.name}{interview.instructions&&<p className="prewrap small">{interview.instructions}</p>}</li>)}</ol>:<p>No interviews configured. This empty plan will also be locked.</p>}<a href={`#/vacancies/${plan.vacancyId}/interviews`}>Review or edit the draft interview plan</a></>;
 }

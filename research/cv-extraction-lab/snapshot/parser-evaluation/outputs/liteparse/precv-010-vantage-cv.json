@@ -1,0 +1,851 @@
+{
+  "total_pages": 2,
+  "pages": [
+    {
+      "page": 1,
+      "width": 595.2756,
+      "height": 841.8898,
+      "text": "    Marcus Whitfield\n\n    Maintenance Supervisor / Lead\n\nmarcus.whitfield.example@example.net     marcus-whitfield-example.dev     $7 @marcus-whitfield-example     fi@ marcus-whitfield-example\n    Sheffield, United Kingdom\n    Maintenance lead with 10+ years in facilities and production environments. Career-changer from hospitality/operations into\n    maintenance supervision. Focus on team coordination, practical problem-solving and clear documentation.\n    Experience                                                                                Objective\n\n    Maintenance Supervisor                                                                    Seeking a maintenance supervisor or lead\n    Crestfield Facilities - Multi-site Facilities                                             role where I can coordinate teams, improve\n    £9 Mar 2022 - Present                                                   Sheffield, UK     routines and support safe, reliable operations.\n    • Coordinated maintenance activities across two sites (offices + light industrial).       Education\n    • Led a team of 6 technicians, allocated work and tracked completion.\n    • Introduced simple preventive maintenance schedules and checklists.                      City & Guilds\n    • Liaised with contractors and procurement for parts and services.                        2020 - 2022                       Sheffield, UK\n    • Supported health and safety compliance and incident reporting.                          NVQ Level 3 in Facilities Management in\n    Maintenance Technician                                                                    Distance learning\n    Ridgeview Properties - Building Maintenance                                               Firth Meadow School\n    £9 Jun 2018 - Feb 2022                                                  Sheffield, UK     2013 - 2013                       Sheffield, UK\n    • Carried out reactive and planned maintenance across mixed-use buildings.\n    • Diagnosed electrical, plumbing and HVAC faults, arranged repairs.                       GCSEs including English and Mathematics in\n    • Maintained asset registers and service records.                                         General\n    • Supported out-of-hours call-out rota.                                                   Technical Expertise\n    Facilities Assistant                                                                      Team coordination\n    The Crown & Anchor - Hospitality Facilities                                               Preventive maintenance\n       2015 - 2018                                                          Sheffield, UK     Fault diagnosis\n    • General maintenance, stock management and customer-facing duties.                       Asset register management\n    • Developed practical problem-solving skills in a fast-paced environment.                 H&S compliance                               om\n    • Supervised weekend staff and handled minor incidents.                                   Skills/Exposure\n\n                                                                                              • Team coordination and shift planning •\n                                                                                              Preventive maintenance scheduling • Fault\n                                                                                              diagnosis (electrical, plumbing, HVAC basics)\n                                                                                              • Asset register management • H&S\n                                                                                              compliance and incident reporting • Multi-\n                                                                                              site facilities management • Contractor\n                                                                                              management and procurement • Cross-\n                                                                                              functional communication\n\n                                                                                              Methodology/Approach\n\n                                                                                              • Practical problem-solving and\n                                                                                              resourcefulness • Clear documentation and\n                                                                                              checklists • Team support and knowledge\n                                                                                              sharing • Safety-first mindset\n\n                                                                                              Tools\n\n                                                                                              • CMMS (basic), Excel, email/phone • Hand\n                                                                                              tools, basic electrical/plumbing tools • Mobile\n                                                                                              job management app\n\n                                                                                              Achievements/Certifications\n\n                                                                                              IOSH Managing Safely\n                                                                                              2022 First Aid at Work\n                                                                                              2023 (renewed) Asbestos Awareness",
+      "text_items": [
+        {
+          "text": "Marcus Whitfield",
+          "x": 34.015747,
+          "y": 33.007996,
+          "width": 126.368,
+          "height": 15.135986,
+          "font_name": "SDOFFU+LibertinusSerif-Bold",
+          "font_size": 16.0,
+          "confidence": 1.0
+        },
+        {
+          "text": "Maintenance Supervisor / Lead",
+          "x": 34.015747,
+          "y": 63.936035,
+          "width": 152.49597,
+          "height": 11.35199,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 12.0,
+          "confidence": 1.0
+        },
+        {
+          "text": "marcus.whitfield.example@example.net",
+          "x": 47.015747,
+          "y": 88.66797,
+          "width": 130.17598,
+          "height": 7.567993,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 8.0,
+          "confidence": 1.0
+        },
+        {
+          "text": "marcus-whitfield-example.dev",
+          "x": 200.19975,
+          "y": 88.66797,
+          "width": 98.74397,
+          "height": 7.567993,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 8.0,
+          "confidence": 1.0
+        },
+        {
+          "text": "$7",
+          "x": 309.6,
+          "y": 87.36,
+          "width": 8.16,
+          "height": 9.12,
+          "font_name": "OCR",
+          "font_size": 9.12,
+          "confidence": 0.364
+        },
+        {
+          "text": "@marcus-whitfield-example",
+          "x": 321.95975,
+          "y": 88.66797,
+          "width": 92.68802,
+          "height": 7.567993,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 8.0,
+          "confidence": 1.0
+        },
+        {
+          "text": "fi@ marcus-whitfield-example",
+          "x": 424.8,
+          "y": 87.36,
+          "width": 98.38379,
+          "height": 8.875961,
+          "font_name": "OCR",
+          "font_size": 8.639999,
+          "confidence": 0.582
+        },
+        {
+          "text": "Sheffield, United Kingdom",
+          "x": 34.015747,
+          "y": 101.63202,
+          "width": 85.864,
+          "height": 7.567993,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 8.0,
+          "confidence": 1.0
+        },
+        {
+          "text": "Maintenance lead with 10+ years in facilities and production environments. Career-changer from hospitality/operations into",
+          "x": 34.015747,
+          "y": 118.56598,
+          "width": 498.00684,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "maintenance supervision. Focus on team coordination, practical problem-solving and clear documentation.",
+          "x": 34.015747,
+          "y": 131.3844,
+          "width": 427.29974,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Experience",
+          "x": 34.015747,
+          "y": 149.43597,
+          "width": 59.352722,
+          "height": 11.030884,
+          "font_name": "SDOFFU+LibertinusSerif-Bold",
+          "font_size": 11.76,
+          "confidence": 1.0
+        },
+        {
+          "text": "Objective",
+          "x": 376.662,
+          "y": 149.34192,
+          "width": 49.697754,
+          "height": 11.124939,
+          "font_name": "SDOFFU+LibertinusSerif-Bold",
+          "font_size": 11.76,
+          "confidence": 1.0
+        },
+        {
+          "text": "Maintenance Supervisor",
+          "x": 34.015747,
+          "y": 171.591,
+          "width": 107.8,
+          "height": 9.192383,
+          "font_name": "SDOFFU+LibertinusSerif-Bold",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Seeking a maintenance supervisor or lead",
+          "x": 376.662,
+          "y": 171.63995,
+          "width": 166.80579,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Crestfield Facilities - Multi-site Facilities",
+          "x": 34.015747,
+          "y": 184.32123,
+          "width": 156.0748,
+          "height": 9.280579,
+          "font_name": "HUIYIQ+LibertinusSerif-Italic",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "role where I can coordinate teams, improve",
+          "x": 376.662,
+          "y": 184.45837,
+          "width": 173.3424,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "£9",
+          "x": 34.559998,
+          "y": 198.23999,
+          "width": 8.639999,
+          "height": 9.12,
+          "font_name": "OCR",
+          "font_size": 9.12,
+          "confidence": 0.465
+        },
+        {
+          "text": "Mar 2022 - Present",
+          "x": 49.265747,
+          "y": 199.7674,
+          "width": 72.603004,
+          "height": 8.514038,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.0,
+          "confidence": 1.0
+        },
+        {
+          "text": "Sheffield, UK",
+          "x": 309.50598,
+          "y": 199.7674,
+          "width": 47.546997,
+          "height": 8.514038,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.0,
+          "confidence": 1.0
+        },
+        {
+          "text": "routines and support safe, reliable operations.",
+          "x": 376.662,
+          "y": 197.2768,
+          "width": 182.7406,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "• Coordinated maintenance activities across two sites (offices + light industrial).",
+          "x": 34.015747,
+          "y": 218.80157,
+          "width": 320.85208,
+          "height": 9.378601,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Education",
+          "x": 376.662,
+          "y": 217.5863,
+          "width": 53.81378,
+          "height": 11.125,
+          "font_name": "SDOFFU+LibertinusSerif-Bold",
+          "font_size": 11.76,
+          "confidence": 1.0
+        },
+        {
+          "text": "• Led a team of 6 technicians, allocated work and tracked completion.",
+          "x": 34.015747,
+          "y": 231.72778,
+          "width": 280.05463,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "• Introduced simple preventive maintenance schedules and checklists.",
+          "x": 34.015747,
+          "y": 244.5462,
+          "width": 281.358,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "City & Guilds",
+          "x": 376.662,
+          "y": 239.75696,
+          "width": 60.152405,
+          "height": 9.270813,
+          "font_name": "SDOFFU+LibertinusSerif-Bold",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "• Liaised with contractors and procurement for parts and services.",
+          "x": 34.015747,
+          "y": 257.36456,
+          "width": 266.6776,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "2020 - 2022",
+          "x": 376.662,
+          "y": 257.9654,
+          "width": 44.668396,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Sheffield, UK",
+          "x": 509.47665,
+          "y": 257.9654,
+          "width": 51.773407,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "• Supported health and safety compliance and incident reporting.",
+          "x": 34.015747,
+          "y": 270.18298,
+          "width": 263.13004,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "NVQ Level 3 in Facilities Management in",
+          "x": 376.662,
+          "y": 276.17377,
+          "width": 164.04218,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Maintenance Technician",
+          "x": 34.015747,
+          "y": 288.26398,
+          "width": 108.95642,
+          "height": 9.270813,
+          "font_name": "SDOFFU+LibertinusSerif-Bold",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Distance learning",
+          "x": 376.662,
+          "y": 288.9922,
+          "width": 70.53061,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Ridgeview Properties - Building Maintenance",
+          "x": 34.015747,
+          "y": 301.08234,
+          "width": 173.9696,
+          "height": 9.270813,
+          "font_name": "HUIYIQ+LibertinusSerif-Italic",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Firth Meadow School",
+          "x": 376.662,
+          "y": 307.07318,
+          "width": 93.68802,
+          "height": 9.270813,
+          "font_name": "SDOFFU+LibertinusSerif-Bold",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "£9",
+          "x": 34.559998,
+          "y": 314.88,
+          "width": 8.639999,
+          "height": 9.12,
+          "font_name": "OCR",
+          "font_size": 9.12,
+          "confidence": 0.713
+        },
+        {
+          "text": "Jun 2018 - Feb 2022",
+          "x": 48.662746,
+          "y": 316.51874,
+          "width": 75.14099,
+          "height": 8.514038,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.0,
+          "confidence": 1.0
+        },
+        {
+          "text": "Sheffield, UK",
+          "x": 309.50598,
+          "y": 316.51874,
+          "width": 47.546997,
+          "height": 8.514038,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.0,
+          "confidence": 1.0
+        },
+        {
+          "text": "2013 - 2013",
+          "x": 376.662,
+          "y": 325.28162,
+          "width": 44.668396,
+          "height": 9.270782,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Sheffield, UK",
+          "x": 509.47665,
+          "y": 325.28162,
+          "width": 51.773407,
+          "height": 9.270782,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "• Carried out reactive and planned maintenance across mixed-use buildings.",
+          "x": 34.015747,
+          "y": 335.66077,
+          "width": 306.34802,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "• Diagnosed electrical, plumbing and HVAC faults, arranged repairs.",
+          "x": 34.015747,
+          "y": 348.4792,
+          "width": 274.87042,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "GCSEs including English and Mathematics in",
+          "x": 376.662,
+          "y": 343.49,
+          "width": 181.25104,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "• Maintained asset registers and service records.",
+          "x": 34.015747,
+          "y": 361.2976,
+          "width": 194.5496,
+          "height": 9.270782,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "General",
+          "x": 376.662,
+          "y": 356.3084,
+          "width": 31.497192,
+          "height": 9.270782,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "• Supported out-of-hours call-out rota.",
+          "x": 34.015747,
+          "y": 374.11597,
+          "width": 156.3296,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Technical Expertise",
+          "x": 376.662,
+          "y": 376.61792,
+          "width": 104.72281,
+          "height": 11.1249695,
+          "font_name": "SDOFFU+LibertinusSerif-Bold",
+          "font_size": 11.76,
+          "confidence": 1.0
+        },
+        {
+          "text": "Facilities Assistant",
+          "x": 34.015747,
+          "y": 392.19702,
+          "width": 83.19219,
+          "height": 9.270782,
+          "font_name": "SDOFFU+LibertinusSerif-Bold",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Team coordination",
+          "x": 376.662,
+          "y": 398.91602,
+          "width": 75.39142,
+          "height": 9.270782,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "The Crown & Anchor - Hospitality Facilities",
+          "x": 34.015747,
+          "y": 405.01538,
+          "width": 170.1182,
+          "height": 9.270813,
+          "font_name": "HUIYIQ+LibertinusSerif-Italic",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Preventive maintenance",
+          "x": 376.662,
+          "y": 411.7344,
+          "width": 96.382996,
+          "height": 9.270782,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "2015 - 2018",
+          "x": 49.265747,
+          "y": 420.45178,
+          "width": 44.658005,
+          "height": 8.514008,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.0,
+          "confidence": 1.0
+        },
+        {
+          "text": "Sheffield, UK",
+          "x": 309.50598,
+          "y": 420.45178,
+          "width": 47.546997,
+          "height": 8.514008,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.0,
+          "confidence": 1.0
+        },
+        {
+          "text": "Fault diagnosis",
+          "x": 376.662,
+          "y": 424.5528,
+          "width": 60.103394,
+          "height": 9.270782,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "• General maintenance, stock management and customer-facing duties.",
+          "x": 34.015747,
+          "y": 439.5938,
+          "width": 286.8166,
+          "height": 9.270782,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Asset register management",
+          "x": 376.662,
+          "y": 437.37122,
+          "width": 108.98581,
+          "height": 9.270782,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "• Developed practical problem-solving skills in a fast-paced environment.",
+          "x": 34.015747,
+          "y": 452.41217,
+          "width": 295.44067,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "H&S compliance",
+          "x": 376.662,
+          "y": 450.18958,
+          "width": 66.836,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "om",
+          "x": 487.19998,
+          "y": 453.59998,
+          "width": 74.4,
+          "height": 4.3199997,
+          "font_name": "OCR",
+          "font_size": 4.3199997,
+          "confidence": 0.343
+        },
+        {
+          "text": "• Supervised weekend staff and handled minor incidents.",
+          "x": 34.015747,
+          "y": 465.2306,
+          "width": 229.46704,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Skills/Exposure",
+          "x": 376.662,
+          "y": 470.4991,
+          "width": 83.201996,
+          "height": 11.1249695,
+          "font_name": "SDOFFU+LibertinusSerif-Bold",
+          "font_size": 11.76,
+          "confidence": 1.0
+        },
+        {
+          "text": "• Team coordination and shift planning •",
+          "x": 376.662,
+          "y": 492.79718,
+          "width": 162.49384,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Preventive maintenance scheduling • Fault",
+          "x": 376.662,
+          "y": 505.6156,
+          "width": 170.63763,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "diagnosis (electrical, plumbing, HVAC basics)",
+          "x": 376.662,
+          "y": 518.3262,
+          "width": 181.20203,
+          "height": 9.378601,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "• Asset register management • H&S",
+          "x": 376.662,
+          "y": 531.25244,
+          "width": 142.03137,
+          "height": 9.270752,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "compliance and incident reporting • Multi-",
+          "x": 376.662,
+          "y": 544.0708,
+          "width": 171.28436,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "site facilities management • Contractor",
+          "x": 376.662,
+          "y": 556.88916,
+          "width": 156.26099,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "management and procurement • Cross-",
+          "x": 376.662,
+          "y": 569.7076,
+          "width": 157.13318,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "functional communication",
+          "x": 376.662,
+          "y": 582.526,
+          "width": 105.73218,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Methodology/Approach",
+          "x": 376.662,
+          "y": 602.8356,
+          "width": 126.52585,
+          "height": 11.124939,
+          "font_name": "SDOFFU+LibertinusSerif-Bold",
+          "font_size": 11.76,
+          "confidence": 1.0
+        },
+        {
+          "text": "• Practical problem-solving and",
+          "x": 376.662,
+          "y": 625.1336,
+          "width": 125.69479,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "resourcefulness • Clear documentation and",
+          "x": 376.662,
+          "y": 637.95197,
+          "width": 171.98999,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "checklists • Team support and knowledge",
+          "x": 376.662,
+          "y": 650.7704,
+          "width": 166.10999,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "sharing • Safety-first mindset",
+          "x": 376.662,
+          "y": 663.5888,
+          "width": 116.99237,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Tools",
+          "x": 376.662,
+          "y": 683.8983,
+          "width": 28.811981,
+          "height": 11.124939,
+          "font_name": "SDOFFU+LibertinusSerif-Bold",
+          "font_size": 11.76,
+          "confidence": 1.0
+        },
+        {
+          "text": "• CMMS (basic), Excel, email/phone • Hand",
+          "x": 376.662,
+          "y": 706.08856,
+          "width": 172.67603,
+          "height": 9.378601,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "tools, basic electrical/plumbing tools • Mobile",
+          "x": 376.662,
+          "y": 719.0148,
+          "width": 182.10364,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "job management app",
+          "x": 376.2014,
+          "y": 731.8332,
+          "width": 84.27017,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "Achievements/Certifications",
+          "x": 376.662,
+          "y": 752.1427,
+          "width": 151.78638,
+          "height": 11.125,
+          "font_name": "SDOFFU+LibertinusSerif-Bold",
+          "font_size": 11.76,
+          "confidence": 1.0
+        },
+        {
+          "text": "IOSH Managing Safely",
+          "x": 376.662,
+          "y": 774.31335,
+          "width": 99.91101,
+          "height": 9.270813,
+          "font_name": "SDOFFU+LibertinusSerif-Bold",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "2022 First Aid at Work",
+          "x": 376.662,
+          "y": 787.1318,
+          "width": 97.66681,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "2023 (renewed) Asbestos Awareness",
+          "x": 376.662,
+          "y": 799.8424,
+          "width": 151.72363,
+          "height": 9.378601,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        }
+      ]
+    },
+    {
+      "page": 2,
+      "width": 595.2756,
+      "height": 841.8898,
+      "text": "2022 Manual Handling\n2023",
+      "text_items": [
+        {
+          "text": "2022 Manual Handling",
+          "x": 376.662,
+          "y": 33.526,
+          "width": 98.891815,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        },
+        {
+          "text": "2023",
+          "x": 376.662,
+          "y": 46.34436,
+          "width": 18.227997,
+          "height": 9.270813,
+          "font_name": "PSDRHS+LibertinusSerif-Regular",
+          "font_size": 9.8,
+          "confidence": 1.0
+        }
+      ]
+    }
+  ]
+}

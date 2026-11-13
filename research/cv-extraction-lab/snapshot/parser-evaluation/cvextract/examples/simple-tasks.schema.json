@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CV extraction task configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["questions"],
+  "properties": {
+    "reference_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Resolved vacancy first-publication date, frozen for production extraction/reprocessing. Draft previews may use today provisionally; never default production extraction to PDF-processing time."
+    },
+    "questions": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Types may repeat. IDs must be unique across this list; enforce in the builder.",
+      "items": {
+        "oneOf": [
+          {"$ref": "#/$defs/education"},
+          {"$ref": "#/$defs/certification"},
+          {"$ref": "#/$defs/experience"},
+          {"$ref": "#/$defs/coverage"},
+          {"$ref": "#/$defs/evidence"}
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$"},
+    "named_value": {
+      "description": "A plain name, or a name with programmatically supplied/handwritten accepted evidence strings. Accepted skill terms are target-specific, not automatically symmetric.",
+      "oneOf": [
+        {"type": "string", "minLength": 1},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name"],
+          "properties": {
+            "name": {"type": "string", "minLength": 1},
+            "aliases": {
+              "type": "array", "uniqueItems": true,
+              "items": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      ]
+    },
+    "scope": {
+      "oneOf": [
+        {"type": "string"},
+        {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      ],
+      "description": "Empty/omitted means any field or overall work. Multiple scopes mean OR."
+    },
+    "education": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "type": {"const": "education_level"},
+        "scope": {"$ref": "#/$defs/scope"},
+        "expected_within_months": {
+          "type": "integer", "minimum": 0,
+          "description": "Optional look-ahead from frozen publication date. Omitted/zero means completed-only; no implicit two-month window. Returned level may qualify through expected completion; no separate awarded/expected status in the selected shape."
+        }
+      }
+    },
+    "certification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "certification"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "type": {"const": "certification"},
+        "certification": {"$ref": "#/$defs/named_value"}
+      }
+    },
+    "experience": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "type": {"const": "experience_years"},
+        "scope": {"$ref": "#/$defs/scope"}
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "skills"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "type": {"const": "skill_coverage"},
+        "skills": {
+          "type": "array", "minItems": 1, "maxItems": 254, "uniqueItems": true,
+          "items": {"$ref": "#/$defs/named_value"}
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "skill"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "type": {"const": "skill_evidence"},
+        "skill": {"$ref": "#/$defs/named_value"}
+      }
+    }
+  }
+}

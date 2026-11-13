@@ -1,0 +1,8 @@
+- Impression: Plumber — mid; credential-first.
+- Tone: pragmatic, hands-on. (~4-5 lines)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: a couple of tools mentioned in context, not a full list.
+- Creds: little formal shown; practical history carries more weight.
+- Extra: hints at weekend projects.
+- Timeline: timeline unclear / partially known.
+- Notes: leave room to reshape sections to fit an unknown template.

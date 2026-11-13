@@ -1,0 +1,8 @@
+- Impression: Electrical — lead/specialist; story-first.
+- Tone: sparse, almost a note-to-self. (~6-8 lines)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: leans practical/problem-solving over terminology.
+- Creds: possibly some training/certs — unconfirmed.
+- Extra: focuses on reliability more than ambition.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: community-adjacent, details TBD.

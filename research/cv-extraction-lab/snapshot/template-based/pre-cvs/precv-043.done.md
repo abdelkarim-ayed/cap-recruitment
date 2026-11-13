@@ -1,0 +1,8 @@
+- Impression: Backend-ish tinkerer — mid; project-first.
+- Tone: generic but serviceable impression. (~max 10)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: unclear; might only become obvious from details.
+- Creds: little formal shown; practical history carries more weight.
+- Extra: seems open to change in direction.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: open to adding portfolio/links later if relevant.

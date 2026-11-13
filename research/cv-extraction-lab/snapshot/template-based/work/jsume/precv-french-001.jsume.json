@@ -1,0 +1,69 @@
+{
+  "$schema": "https://unpkg.com/@jsume/schemas/dist/draft-2020-12.json",
+  "basics": {
+    "name": "Camille Durand",
+    "label": "Chargée de communication et marketing",
+    "email": "camille.durand.example@example.fr",
+    "phone": "+33 6 00 00 00 01",
+    "summary": "Conçoit des contenus utiles pour les équipes commerciales et les clients. Expérience en communication de proximité, réseaux sociaux et organisation d'événements. À l'aise pour adapter un message selon le canal et les publics visés.",
+    "location": {
+      "city": "Lyon",
+      "country": "France"
+    },
+    "profiles": []
+  },
+  "work": [
+    {
+      "company": "Maison des Rives",
+      "location": "Lyon, France",
+      "position": "Chargée de communication",
+      "startDate": {"year": 2023, "month": 1},
+      "endDate": false,
+      "highlights": [
+        "Gestion du calendrier éditorial et rédaction de newsletters",
+        "Animation des comptes LinkedIn et Instagram, suivi des publications",
+        "Coordination de lancements de collections et participation à un salon régional"
+      ]
+    },
+    {
+      "company": "Les Ateliers Orianne",
+      "location": "Lyon, France",
+      "position": "Assistante marketing",
+      "startDate": {"year": 2021, "month": 9},
+      "endDate": {"year": 2023, "month": 1},
+      "highlights": [
+        "Mise à jour du site WordPress et fiches produits",
+        "Aide à l'organisation de journées portes ouvertes"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Université Lumière Lyon 2",
+      "location": "Lyon, France",
+      "major": "Information-Communication",
+      "degree": "Licence",
+      "startDate": {"year": 2018, "month": 9},
+      "endDate": {"year": 2021, "month": 6}
+    }
+  ],
+  "skills": [
+    {
+      "name": "Communication",
+      "keywords": ["Rédaction web", "Newsletters", "Adaptation aux différents canaux"]
+    },
+    {
+      "name": "Outils",
+      "keywords": ["Canva", "WordPress", "Meta Business Suite", "Google Analytics"]
+    },
+    {
+      "name": "Événementiel",
+      "keywords": ["Organisation événementielle", "Coordination de prestataires"]
+    }
+  ],
+  "languages": [
+    {"language": "Français", "fluency": "Langue maternelle"},
+    {"language": "Anglais", "fluency": "Professionnel"},
+    {"language": "Espagnol", "fluency": "Notions"}
+  ]
+}

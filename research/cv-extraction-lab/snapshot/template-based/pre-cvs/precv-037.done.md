@@ -1,0 +1,8 @@
+- Impression: Property/facilities — junior; story-first.
+- Tone: jumps between roles without tying them together. (~4-5 lines)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: a couple of tools mentioned in context, not a full list.
+- Creds: trade experience seems more relevant than formal quals here.
+- Extra: keeps social/portfolio in mind for later.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: open to adding portfolio/links later if relevant.
