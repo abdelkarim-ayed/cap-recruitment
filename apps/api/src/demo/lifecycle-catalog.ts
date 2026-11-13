@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { createVacancySchema, type Vacancy } from '@recruitment/domain/vacancies';
 import type { Role } from '../auth/access.js';
+import { demoCvQuestions } from './cv-fixture.js';
 
 export const lifecycleNamespace = 'recruitment-lifecycle-v1';
 export function lifecycleId(key: string) {
@@ -9,7 +10,7 @@ export function lifecycleId(key: string) {
 }
 export function lifecycleSafety(env: NodeJS.ProcessEnv) {
   if (!['development','test'].includes(env.NODE_ENV ?? '')) throw new Error('Lifecycle fixtures require NODE_ENV=development (or test).');
-  if ((env.PROCESSING_EXECUTOR ?? 'disabled') !== 'disabled' || (env.PROCESSING_READER ?? 'disabled') !== 'disabled') {
+  if ((env.PROCESSING_EXECUTOR ?? 'disabled') !== 'disabled' || (env.PROCESSING_READER ?? 'disabled') !== 'disabled' || (env.PROCESSING_RUNNER??'disabled') !== 'disabled') {
     throw new Error('Lifecycle fixtures require disabled processing reader/executor; no live fallback.');
   }
 }
@@ -23,13 +24,13 @@ type Journey = 'received'|'preselected'|'rejected'|'upcoming'|'feedback-due'|'re
 export interface LifecycleScenario { key: string; job: JobKey; processing: Processing; journey: Journey; purpose: string }
 export const lifecycleScenarios: readonly LifecycleScenario[] = [
   {key:'pending',job:'review',processing:'pending',journey:'received',purpose:'Pending extraction; screening and manual release remain available.'},
-  {key:'ready',job:'review',processing:'success',journey:'received',purpose:'Ready for shared HR review; original fixture skills.'},
-  {key:'empty',job:'review',processing:'empty',journey:'received',purpose:'Successful empty skills differs from unavailable evidence.'},
+  {key:'ready',job:'review',processing:'success',journey:'received',purpose:'Ready for shared HR review; declared five-family CV fixture.'},
+  {key:'empty',job:'review',processing:'empty',journey:'received',purpose:'Successful non-mention/zero fixture differs from unavailable evidence.'},
   {key:'ordinary-failure',job:'review',processing:'ordinary',journey:'received',purpose:'Ordinary terminal failure permits partial/unknown review.'},
   {key:'operational-block',job:'review',processing:'operational',journey:'received',purpose:'Operational failure blocks review until explicit release.'},
   {key:'uncertain-block',job:'review',processing:'uncertain',journey:'received',purpose:'Synthetic uncertain failure; not a paid attempt or recovery test.'},
   {key:'released',job:'review',processing:'released',journey:'received',purpose:'Manually released pending evidence, unfinished review.'},
-  {key:'corrected',job:'review',processing:'corrected',journey:'received',purpose:'Original machine fixture and separate HR correction/unknown skill.'},
+  {key:'corrected',job:'review',processing:'corrected',journey:'received',purpose:'Original machine fixture and independent HR category/unknown count corrections.'},
   {key:'reviewed',job:'review',processing:'reviewed',journey:'received',purpose:'Completed review locks corrections but does not decide screening.'},
   {key:'screened-pending',job:'review',processing:'pending',journey:'preselected',purpose:'Screening freezes unfinished review; empty plan permits explicit owner Offer.'},
   {key:'screening-rejected',job:'review',processing:'success',journey:'rejected',purpose:'Screening rejection and candidate notice; evidence remains read-only.'},
@@ -65,9 +66,9 @@ export function lifecycleCatalog(now = new Date()) {
       {id:'name',name:'full_name',label:'Full name',type:'text',required:true,args:{maxLength:200}},
       {id:'motivation',name:'motivation',label:'Motivation',type:'long_text',required:false,args:{maxLength:2000}},
       {id:'cv',name:'cv',label:'Synthetic CV',type:'document',required:true,args:{accept:['.pdf']}},
-    ]},processingDefinition:{version:1,tasks:processing?[{id:'skills',sourceInputId:'cv',outputKey:'skills',type:'extractSkills',args:{skills:['SQL','TypeScript','Python'],evidence:false}}]:[]}});
+    ]},processingDefinition:{version:2,tasks:processing?[{id:'cv_extract',sourceInputId:'cv',outputKey:'cv_facts',type:'cvExtractor',args:demoCvQuestions}]:[]}});
     const status = key === 'draft' ? 'draft' : key === 'closed' ? 'closed' : 'published';
-    const vacancy: Vacancy = {...definition,id:lifecycleId(`vacancy:${key}`),ownerId:owner.id,status,revision:status==='draft'?1:status==='closed'?3:2,createdAt:at(-30*24),updatedAt:at(status==='closed'?-24:-29*24)};
+    const vacancy: Vacancy = {...definition,id:lifecycleId(`vacancy:${key}`),ownerId:owner.id,status,revision:status==='draft'?1:status==='closed'?3:2,extractionReferenceDate:status==='draft'?null:at(-29*24).slice(0,10),createdAt:at(-30*24),updatedAt:at(status==='closed'?-24:-29*24)};
     const steps = key === 'interviews' ? ['Technical interview','HR interview'].map((name,position) => ({id:lifecycleId(`step:${key}:${position}`),name,position,instructions:'SYNTHETIC FIXTURE: assess only this demonstration application.'})) : [];
     return {key,owner,vacancy,steps,publishedAt:at(-29*24),interviewRevision:steps.length?2:1};
   });

@@ -1,14 +1,14 @@
 import type { FormDefinition, ProcessingDefinition } from '@recruitment/domain/vacancies';
-import { normalizeSkills } from '@recruitment/domain/vacancies';
+import { extractorRegistry, type ReviewTask } from '@recruitment/domain';
 import { processingClosed } from '../processing/processing-policy.js';
 
-type Task={outputKey:string;status:string;result:{status:string};hasCorrection:boolean;provenance:{mode?:string}|null;skillResults:{skill:string;effective:boolean|null}[]};
+type Task=ReviewTask;
 type View={application:{candidate_identity:{name:string;email:string};submitted_at:string|Date;stage:string;review_status:string;review_editor?:{email:string}|null;answers:Record<string,unknown>;processing_released_at?:string|Date|null};tasks:Task[]};
 const fields=(form:FormDefinition)=>form.inputs.filter(input=>input.type!=='separator');
 export function decisionHeaders(form:FormDefinition,definition:ProcessingDefinition){
   return ['application_id','candidate_name','candidate_email','submitted_at','vacancy_title','vacancy_url','application_url','review',
     ...fields(form).map(input=>`${input.type==='document'?'document':'answer'}.${input.name}${input.type==='document'?'.url':''}`),
-    ...definition.tasks.flatMap(task=>[`${task.outputKey}.result`,...normalizeSkills(task.args.skills).map(skill=>`${task.outputKey}.skill.${skill}`)]),'decision','reason'];
+    ...definition.tasks.flatMap(task=>[`${task.outputKey}.result`,...extractorRegistry[task.type].fieldIds(task.args).map(id=>`${task.outputKey}.question.${id}`)]),'decision','reason'];
 }
 function reviewSummary(view:View){
   if(!view.tasks.length)return 'Not required';
@@ -18,7 +18,7 @@ function reviewSummary(view:View){
 }
 function resultSummary(task:Task,closed:boolean){
   const fixture=task.provenance?.mode==='fixture';
-  if(task.hasCorrection)return `HR correction${fixture?' (fixture source)':''}`;
+  if(task.hasCorrection)return `Includes HR corrections${fixture?' (fixture source)':''}`;
   if(task.result.status==='completed')return fixture?'Fixture result':'Automated result';
   if(closed&&['pending','processing'].includes(task.status))return `${fixture?'Fixture · ':''}Processing closed; unavailable`;
   return `${fixture?'Fixture · ':''}${task.status==='failed'?'Processing failed; unavailable':task.status==='processing'?'Processing; unavailable':task.status==='pending'?'Not processed; unavailable':'Unavailable'}`;
@@ -38,5 +38,5 @@ export function decisionValues({id,vacancyId,title,webOrigin,form,view,documents
       if(Array.isArray(value))return value.length?value.map(label).join(', '):'None selected';
       return typeof value==='boolean'?(value?'Yes':'No'):label(value);
     }),
-    ...view.tasks.flatMap(task=>[resultSummary(task,processingClosed(view.application)),...task.skillResults.map(skill=>skill.effective===null?'Unknown':skill.effective?'Yes':'No')]),'',''];
+    ...view.tasks.flatMap(task=>[resultSummary(task,processingClosed(view.application)),...task.fields.map(field=>field.effective===null?'Unavailable':field.effective)]),'',''];
 }

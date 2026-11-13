@@ -5,6 +5,9 @@ import type { DocumentStorage } from '../documents/document-storage.js';
 import { FixtureRegistry, type TaskFixture } from '../processing/execution.js';
 import { lifecycleId, type LifecycleCatalog } from './lifecycle-catalog.js';
 import { samplePdf } from './sample-pdf.js';
+import { declaredCvResponse } from './cv-fixture.js';
+import { buildCvRequest } from '@recruitment/domain';
+import { normalizeCvResponse } from '../processing/cv-response.js';
 
 type Application = LifecycleCatalog['applications'][number];
 const json = JSON.stringify;
@@ -15,24 +18,25 @@ export function lifecycleTaskFixture(application: Application): TaskFixture | un
   const task = job.vacancy.processingDefinition.tasks[0];
   if (!task) return;
   const category = scenario.processing === 'ordinary' ? 'ordinary_terminal' : scenario.processing === 'uncertain' ? 'uncertain' : 'operational';
-  return {fixtureKey:`lifecycle-v1-${scenario.key}`,applicationId:id,documentId,sourceHash:hash(samplePdf(lines)),taskId:task.id,args:task.args,
-    text:lines.join('\n'),result:['ordinary','operational','uncertain'].includes(scenario.processing)
+  const referenceDate=job.vacancy.extractionReferenceDate!;
+  return {fixtureKey:`lifecycle-v2-${scenario.key}`,applicationId:id,documentId,sourceHash:hash(samplePdf(lines)),taskId:task.id,args:task.args,referenceDate,
+    markdown:lines.join('\n'),result:['ordinary','operational','uncertain'].includes(scenario.processing)
       ? {status:'failed',value:null,reason:`FIXTURE ONLY: declared ${category} failure; no provider attempt.`,retryable:false,failureCategory:category}
-      : {status:'completed',value:{skills:scenario.processing==='empty'?[]:['SQL','TypeScript']},evidence:[]}};
+      : {status:'completed',response:declaredCvResponse(task.args,lines.join('\n'),referenceDate,scenario.processing==='empty')}};
 }
 
 async function prerequisites(client: PoolClient) {
   const table = await client.query("SELECT to_regclass('application_migrations') AS name");
   if (!table.rows[0]?.name) throw new Error('Application migrations are required; lifecycle seed never applies them.');
-  const migrations = await client.query("SELECT id FROM application_migrations WHERE id IN ('007_screening_decisions','008_review_release')");
-  if (migrations.rowCount !== 2) throw new Error('Apply migrations 007/008 in a separately approved operation before lifecycle seeding.');
+  const migrations = await client.query("SELECT id FROM application_migrations WHERE id IN ('007_screening_decisions','008_review_release','009_cv_request_attempts','010_cv_fields_publication')");
+  if (migrations.rowCount !== 4) throw new Error('Migrations through 010 are required; apply only in a separately approved operation.');
 }
 
 // Exact reserved IDs plus parent/identity checks. Never identify reset targets by title/email prefix alone.
 export async function inspectLifecycleOwnership(client: PoolClient, catalog: LifecycleCatalog) {
   const jobIds = catalog.jobs.map(job => job.vacancy.id);
   const applications = catalog.applications;
-  const jobs = await client.query('SELECT id,owner_id FROM vacancies WHERE id=ANY($1::uuid[]) ORDER BY id FOR UPDATE',[jobIds]);
+  const jobs = await client.query('SELECT id,owner_id,processing_definition FROM vacancies WHERE id=ANY($1::uuid[]) ORDER BY id FOR UPDATE',[jobIds]);
   for (const row of jobs.rows) {
     if (catalog.jobs.find(job => job.vacancy.id===row.id)?.owner.id !== row.owner_id) throw new Error('Lifecycle vacancy ownership collision; refusing reset.');
   }
@@ -58,7 +62,9 @@ export async function inspectLifecycleOwnership(client: PoolClient, catalog: Lif
   }
   const nonFixture = await client.query("SELECT application_id FROM application_tasks WHERE application_id=ANY($1::uuid[]) AND attempts>0 AND provenance->>'mode' IS DISTINCT FROM 'fixture'",[applicationIds]);
   if (nonFixture.rowCount) throw new Error('Non-fixture or uncertain executor history exists; reset refused. Preserve and review it separately.');
-  return {jobs:jobs.rows.length,applications:rows.rows.length,applicationIds,extraFileIds:files.rows.filter(row=>extraApplicationIds.includes(row.application_id)).map(row=>row.stored_file_id)};
+  const guarded = await client.query("SELECT request_hash FROM cv_request_attempts WHERE application_id=ANY($1::uuid[]) AND mode='live'",[applicationIds]);
+  if(guarded.rowCount)throw new Error('Durable live request history exists; fixture reset refused. The request ledger is never cleared by demo reset.');
+  return {jobs:jobs.rows.length,legacyDefinition:jobs.rows.some(row=>row.processing_definition?.version!==2),applications:rows.rows.length,applicationIds,extraFileIds:files.rows.filter(row=>extraApplicationIds.includes(row.application_id)).map(row=>row.stored_file_id)};
 }
 
 async function accounts(client: PoolClient, catalog: LifecycleCatalog, passwordHash: string) {
@@ -124,9 +130,10 @@ async function insertApplication(client: PoolClient, application: Application, s
     new FixtureRegistry().load([fixture]);
     const task = job.vacancy.processingDefinition.tasks[0];
     const failure = fixture.result.status==='failed' ? fixture.result : undefined;
+    const original = fixture.result.status==='completed'?{status:'completed',value:normalizeCvResponse(task.args,buildCvRequest(task.args,fixture.markdown,fixture.referenceDate,'jev-1.14.0'),fixture.result.response)}:fixture.result;
     await client.query(`INSERT INTO application_tasks(application_id,task_id,source_input_id,output_key,args,fixture_key,status,attempts,retryable,result,provenance,reason,failure_category,updated_at)
-      VALUES($1,$2,$3,$4,$5,$6,$7,1,false,$8,$9,$10,$11,$12)`,[id,task.id,task.sourceInputId,task.outputKey,json(task.args),fixture.fixtureKey,fixture.result.status,json(fixture.result),json({mode:'fixture',fixtureId:fixture.fixtureKey,method:'declared-lifecycle-snapshot'}),failure?.reason??null,failure?.failureCategory??null,application.processedAt]);
-    if (scenario.processing==='corrected') await client.query('INSERT INTO extraction_corrections(application_id,task_id,value,corrected_by,corrected_at) VALUES($1,$2,$3,$4,$5)',[id,task.id,json({skills:['SQL'],unavailableSkills:['Python']}),catalogStaff('hr2'),application.reviewedAt]);
+      VALUES($1,$2,$3,$4,$5,$6,$7,1,false,$8,$9,$10,$11,$12)`,[id,task.id,task.sourceInputId,task.outputKey,json(task.args),fixture.fixtureKey,fixture.result.status,json(original),json({mode:'fixture',fixtureId:fixture.fixtureKey,method:'declared-lifecycle-snapshot',referenceDate:fixture.referenceDate}),failure?.reason??null,failure?.failureCategory??null,application.processedAt]);
+    if (scenario.processing==='corrected') for(const [question,value] of [['SQL','used_professionally'],['Coverage',null]] as const) await client.query('INSERT INTO extraction_field_corrections(application_id,task_id,question_id,value,corrected_by,corrected_at) VALUES($1,$2,$3,$4,$5,$6)',[id,task.id,question,json(value),catalogStaff('hr2'),application.reviewedAt]);
   }
   if (application.screened) await client.query('INSERT INTO screening_notifications(id,application_id,recipient_id,decision,title,body,created_at) VALUES($1,$2,$3,$4,$5,$6,$7)',[
     lifecycleId(`screening:${scenario.key}`),id,candidate.id,application.rejected?'rejected':'preselected',application.rejected?'Application outcome':'Application preselected',
@@ -185,6 +192,7 @@ export async function seedLifecycle(database: Pick<DatabaseService,'transaction'
       const existing = await inspectLifecycleOwnership(client,catalog);
       if (existing.jobs || existing.applications) {
         if (!reset) {
+          if(existing.legacyDefinition)throw new Error('Existing lifecycle data uses the legacy extraction schema; explicit separately authorized reset is required.');
           if (existing.jobs!==catalog.jobs.length || !catalog.applications.every(application=>existing.applicationIds.includes(application.id))) throw new Error('Partial lifecycle dataset; explicit reset required.');
           return {status:'preserved' as const,removed:[] as string[]};
         }
@@ -192,8 +200,8 @@ export async function seedLifecycle(database: Pick<DatabaseService,'transaction'
       await accounts(client,catalog,passwordHash);
       const removed = reset ? await clearDataset(client,catalog,existing) : [];
       for (const {vacancy,steps,interviewRevision} of catalog.jobs) {
-        await client.query(`INSERT INTO vacancies(id,owner_id,status,revision,interview_revision,title,description,location,form_definition,processing_definition,created_at,updated_at)
-          VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,[vacancy.id,vacancy.ownerId,vacancy.status,vacancy.revision,interviewRevision,vacancy.title,vacancy.description,vacancy.location??null,json(vacancy.formDefinition),json(vacancy.processingDefinition),vacancy.createdAt,vacancy.updatedAt]);
+        await client.query(`INSERT INTO vacancies(id,owner_id,status,revision,interview_revision,title,description,location,form_definition,processing_definition,created_at,updated_at,extraction_reference_date)
+          VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,[vacancy.id,vacancy.ownerId,vacancy.status,vacancy.revision,interviewRevision,vacancy.title,vacancy.description,vacancy.location??null,json(vacancy.formDefinition),json(vacancy.processingDefinition),vacancy.createdAt,vacancy.updatedAt,vacancy.extractionReferenceDate??null]);
         for (const step of steps) await client.query('INSERT INTO interview_steps(id,vacancy_id,position,name,instructions) VALUES($1,$2,$3,$4,$5)',[step.id,vacancy.id,step.position,step.name,step.instructions]);
       }
       for (const application of catalog.applications) {

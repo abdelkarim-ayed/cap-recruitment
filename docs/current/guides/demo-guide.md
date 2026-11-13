@@ -1,5 +1,11 @@
 # Manual demo — implemented workflows
 
+**2026-11-13 CV cutover:** source integration is not a demo launch. The final
+source has not been built/tested; migrations 009/010 and any scoped recreation of
+the old skills dataset remain unexecuted. T2b launcher and T1 mail viewer are still
+planned, not delivered. [Launch handoff](../../plan/cv-demo-launch.md) is the next
+session's starting point. Do not run the old setup block below blindly.
+
 For the separate five-vacancy/25-application dataset, see [lifecycle fixtures](lifecycle-demo.md). Local setup applied migrations 007/008 and seeded it on 2026-11-07; Q-T2A and other functional/manual gates remain pending. API/frontend run in the shared [RMUX workspace](rmux.md). Commands below remain operator reference, not blanket authorization for future migrations, reseeds or process changes.
 
 ## Interview checkpoint — manual test
@@ -75,9 +81,9 @@ New seed vacancy: **[DEMO] Backend developer — RenderCV**, containing fresh sc
 ## HR check
 1. Login demo.hr. Vacancy rows show one title link, location/status and quiet owner metadata with `(you)`. Use status/owner/sort filters, **My drafts** or **All vacancies**; options/count/page are dataset-wide, not current-page filtering.
 2. Open the RenderCV vacancy → Applications. Four scenarios: Casey successful/completed review; Jordan simulated failed extraction; Drew pending; Avery successful empty list.
-3. Use independent **Work to do** / **Recruitment status** and sort controls; work filters require backend support. Detail retains original processing/review facts. Compact **decision export** uses the undecided matching set with effective skill columns; separate diagnostic export-all still includes every vacancy application. Neither early screening nor export requires completed review.
+3. Use independent **Work to do** / **Recruitment status** and sort controls; work filters require backend support. Detail retains original processing/review facts. Compact **decision export** uses the undecided matching set with effective question fields; separate diagnostic export-all includes originals/raw diagnostics. Neither early screening nor export requires completed review.
 4. Open application information/documents and use the labelled preview icon. In human review, authorized source-PDF bytes sit beside per-field correction controls; completion/release have separate confirmations. Download remains available; non-PDFs are download-only. Native browser PDF viewing support varies.
-5. Save a skills correction: **latest saved value** appears prominently and is used in export. Original extraction/evidence stays unchanged under its expandable section. Refresh/relogin preserves the correction. Explicit null differs from empty skills.
+5. Save one question correction: **latest saved value** appears prominently and is used in export. Original extraction/raw answer stays separate. Sibling corrections retain their values/attribution. Explicit unknown/null differs from successful zero or non-mention. The new schema/source must be activated separately before this path can be claimed available.
 6. Latest editor and save time are visible. Revision remains an internal concurrency counter, **not historical versions**; technical counters are not shown in normal review UI.
 7. Login demo.hr2 or admin and continue shared review. Completion is optional and never candidate approval/export gating. Test interviewer exclusion separately.
 
@@ -88,7 +94,14 @@ New seed vacancy: **[DEMO] Backend developer — RenderCV**, containing fresh sc
 ```sh
 pnpm --filter @recruitment/api demo:process APPLICATION_UUID success
 ```
-Choose failure/empty instead for those recorded outcomes. Refresh afterward. Unattempted tasks only; refuses overwriting results. Actual source identity/hash/args verified, real persisted executor used. **No parsing/AI**: success chooses first two configured skill names, regardless of CV text. Every result retains fixture provenance. No automatic poller; ordinary submissions stay pending until run. Underlying processing:run and recovery: [processing contract](../contracts/processing-review-api.md).
+Choose failure/empty for declared failure or non-mention/zero outcomes. Refresh
+afterward. Unattempted tasks only; refuses overwriting results. Source identity,
+hash, arguments and frozen date must match. **No parsing/AI**: values are declared
+five-family fixtures, independent of actual PDF claims, with visible fixture
+provenance and simulated zero usage. Normal submissions remain pending until
+explicit fixture processing. A separately configured fixture-only runner exists
+in source but is disabled; it is not an auto-demo launcher. See the
+[processing contract](../contracts/processing-review-api.md).
 
 For a vacancy with **no extraction tasks**, submit normally: no processing/review action is needed. Review marker auto-completes as not applicable; no reviewer/date or candidate approval implied. Staff screens omit extraction controls; mixed tables show a dash, and review-status filters exclude these records. PDF preview/download and CSV remain available. No bulk “review applications” decision is introduced.
 

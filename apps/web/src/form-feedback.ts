@@ -1,5 +1,6 @@
 import type { FormDefinition, ProcessingDefinition } from '@recruitment/domain/vacancies';
 import { errorMessage } from './api';
+import { cvFamilyLabels } from '@recruitment/domain';
 
 type Issue={path:string|readonly PropertyKey[];message:string};
 export function formIssues(issues:readonly Issue[],form:FormDefinition,processing?:ProcessingDefinition){
@@ -14,7 +15,9 @@ export function formIssues(issues:readonly Issue[],form:FormDefinition,processin
       if(path.includes('value'))label+=' · stored choice value';
     }else if(path[0]==='processingDefinition'){
       const task=processing?.tasks[Number(path[2])],source=form.inputs.find(input=>input.id===task?.sourceInputId);
-      label=`Skill check${source?` for ${source.label}`:''}${path.includes('outputKey')?' · result column prefix':''}`;
+      const questionIndex=path.indexOf('questions');
+      const question=questionIndex<0?undefined:task?.args.questions[Number(path[questionIndex+1])];
+      label=`CV extractor${source?` for ${source.label}`:''}${question?` · ${cvFamilyLabels[question.type]} ${Number(path[questionIndex+1])+1}`:''}${path.includes('aliases')?' · accepted term':''}${path.includes('outputKey')?' · result column prefix':''}`;
     }else if(path[0]==='title')label='Position title';
     else if(path[0]==='description')label='Description';
     else if(path[0]==='location')label='Location';

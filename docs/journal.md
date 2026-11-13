@@ -1,5 +1,24 @@
 # Significant checkpoints (report-support notes)
 
+## 2026-11-13 — CV source and RAM-only credentials, local merge only
+
+User approved bounded five-family CV integration and local key rotation, then
+requested local main merge before a separate demo discussion. Transfer/planning
+payload preserved in `a35a521`; source `82698b8` locally merged without squash.
+One task per extractor, native Markdown, exact transferred question wording,
+raw/typed results, memory caches/send guards, frozen publication date, independent
+field corrections/export, UI preview and declared fixture sources. Keys start
+empty and remain RAM-only via local IPC; loading is not paid consent.
+
+Foundation offline checks/small parser parity predated final integration. User
+stopped further tests/builds; no final pass, live quality or demo readiness claim.
+009/010 and dataset recreation remain unexecuted. Read-only discovery found no
+listeners on 3000/5173/58025 and one RMUX window; no health/workflow execution or
+service management. T1 viewer/T2b launcher remain planned; existing file capture/
+latest-mail CLI are not a viewer. [Launch handoff](plan/cv-demo-launch.md) records
+the next bounded approvals. No provider/key/data/volume operation, push, worktree
+cleanup or UI-preview service change accompanied merge.
+
 Selective notes, not an exhaustive history or source of current behavior. [Current docs](current/README.md) and [plan](plan/README.md) take precedence. Add major decisions/results only; do not invent evaluation outcomes, methodology or chronology. Git contains superseded detail.
 
 ## 2026-10-31 — guarded skills starter merged

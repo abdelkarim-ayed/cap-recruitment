@@ -1,5 +1,12 @@
 # CV extraction lab → platform handoff
 
+**Later source checkpoint, 2026-11-13:** transfer is now checkpointed as
+`a35a521`, and bounded CV/key-control source `82698b8` is locally merged into main.
+The destination/seam observations below describe the transfer-time baseline,
+not current launch readiness. Use [current contract](../../current/contracts/processing-review-api.md)
+and [demo launch handoff](../cv-demo-launch.md); final source remains unbuilt/
+untested, 009/010 unapplied, no deployment/provider activation or push.
+
 Updated 2026-11-13: **authorized portable transfer complete**, with lab originals preserved, at [research/cv-extraction-lab](../../../research/cv-extraction-lab/README.md). Snapshot/configuration/fixture files and the 20 exact referenced request/response pairs were copied and checksum-verified; no platform implementation, install, database migration/data mutation, provider call, commit or push. Main's existing behavior is not the new lab design. The next implementation session starts with a bounded integration plan, not another transfer or automatic backlog execution.
 
 ## Reading order and authority
@@ -45,6 +52,11 @@ Paths below are relative to `/home/ubuntu/code`.
 - **Parser feasibility and quality policy:** offline Node parity on representative already-parsed PDF fixtures, warnings/empty/garbled/unsupported input handling; explicit skill negation/international mappings remain open. Retain substantive uncertain answers for HR without inventing thresholds, missing categories, automatic caps or extra questions.
 
 ## Two-phase delivery checkpoints
+
+Active bounded source checkpoint: [implementation notes](cv-extraction-implementation.md)
+record the exact offline port, storage proposal and remaining runtime approval
+boundaries. The latest user instruction selects bounded **in-memory** caches,
+superseding older persistent-cache suggestions below; the snapshot stays frozen.
 
 **Phase 1 — portable assets complete, not implementation:** [archive README/manifest](../../../research/cv-extraction-lab/README.md) record the exact scope and deliberate omissions. 831 payload files / 9,255,468 bytes, all 63 exported PDFs/Markdown provenance pairs and all 20 exact observation pairs (102 answers) verified. Authoring/configuration, parsed output, current specs and old experiments remain distinct. No environments/latch/broad cache/CLI source transferred; no exact-regeneration requirement. Assets are now available for a later scoped offline implementation/parity checkpoint, not already executed tests.
 

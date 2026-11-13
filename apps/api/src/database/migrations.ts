@@ -136,4 +136,29 @@ export const applicationMigrations = [{
     ADD COLUMN processing_released_by text REFERENCES "user"(id) ON DELETE SET NULL;
     ALTER TABLE applications ADD CONSTRAINT applications_release_attribution CHECK(processing_released_at IS NOT NULL OR processing_released_by IS NULL);
     ALTER TABLE application_tasks ADD COLUMN failure_category text CHECK(failure_category IN ('ordinary_terminal','operational','uncertain','unclassified'));`,
+}, {
+  id: '009_cv_request_attempts',
+  // Source-only safety checkpoint. No extraction runner is enabled and no
+  // recruitment data/history or spending counters are rewritten/reset.
+  sql: `CREATE TABLE cv_request_attempts (
+    mode text NOT NULL CHECK(mode IN ('fixture','live')),
+    request_hash text NOT NULL CHECK(request_hash ~ '^[a-f0-9]{64}$'),
+    attempt_id uuid NOT NULL UNIQUE,
+    application_id uuid NOT NULL, task_id text NOT NULL, processing_token uuid NOT NULL,
+    state text NOT NULL CHECK(state IN ('prepared','send_started','succeeded','retryable_unsent','terminal','uncertain')),
+    attempts integer NOT NULL DEFAULT 0 CHECK(attempts BETWEEN 0 AND 3),
+    retry_after timestamptz, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY(mode,request_hash),
+    CHECK((state='retryable_unsent') = (retry_after IS NOT NULL))
+  );`,
+}, {
+  id: '010_cv_fields_publication',
+  sql: `ALTER TABLE vacancies ADD COLUMN extraction_reference_date date;
+    CREATE TABLE extraction_field_corrections (
+      application_id uuid NOT NULL, task_id text NOT NULL, question_id text NOT NULL,
+      value jsonb NOT NULL, corrected_by text REFERENCES "user"(id) ON DELETE SET NULL,
+      corrected_at timestamptz NOT NULL DEFAULT now(),
+      PRIMARY KEY(application_id,task_id,question_id),
+      FOREIGN KEY(application_id,task_id) REFERENCES application_tasks(application_id,task_id) ON DELETE CASCADE
+    );`,
 }] as const;

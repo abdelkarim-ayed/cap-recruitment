@@ -1,5 +1,6 @@
 .badge-green{background:#ecf8ef;border-color:#cae7d3;color:#24683e}.badge-red{background:#fff1f0;border-color:#f0d0cc;color:#a23636}.badge-amber{background:#fff8e7;border-color:#ecdcae;color:#855f10}.badge-blue{background:#edf3ff;border-color:#ccdafa;color:#2456b5}
 .screening-wizard small{overflow-wrap:anywhere}
+.cv-question-preview{margin:16px 0;padding:12px 16px;border-left:2px solid #dce4ef;max-width:80ch;overflow-wrap:anywhere}.cv-question-preview>p{margin:6px 0}.cv-question-preview summary{cursor:pointer}.form-builder .cv-extractor-editor .choice-row{grid-template-columns:minmax(0,1fr) auto}.cv-extractor-editor .field-body{display:block}.cv-extractor-editor .actions{margin:12px 0;flex-wrap:wrap}
 .import-steps{list-style:none;padding:0;display:flex;gap:8px;margin:16px 0 22px;flex-wrap:wrap}.import-steps li{padding:8px 14px;border-radius:6px;background:#f2f4f7;color:#637087;font-size:13px}.import-steps li[aria-current="step"]{background:#eaf1ff;color:#2456b5;font-weight:600}
 .import-help{font-size:13px;color:#596575;margin-bottom:18px}.import-help summary{cursor:pointer}.import-upload{max-width:560px}
 .import-summary{display:flex;align-items:center;gap:12px 22px;flex-wrap:wrap;margin:22px 0 16px;padding:14px 0;border-block:1px solid #e2e7ef;font-size:13px}.import-summary>span{display:inline-flex;align-items:center;gap:5px}
