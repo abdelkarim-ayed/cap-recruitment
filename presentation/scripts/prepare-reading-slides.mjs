@@ -6,24 +6,37 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const draft = readFileSync(resolve(root, 'draft.md'), 'utf8');
 const matches = [...draft.matchAll(/^## (\d{2}) — (.+)\n([\s\S]*?)(?=^## |$(?![\s\S]))/gm)];
 const sectionDefinitions = [
-  { start: 2, number: '01', name: 'Introduction générale', summary: 'Contexte du recrutement · Étude de l’existant · Problématique et solution' },
-  { start: 7, number: '02', name: 'Besoins et méthodologie', summary: 'Besoins fonctionnels · Exigences de qualité · Démarche de développement' },
-  { start: 11, number: '03', name: 'Conception', summary: 'Cas d’utilisation · Modèle de données · Architecture et choix structurants' },
-  { start: 15, number: '04', name: 'Réalisation', summary: 'Candidatures · Extraction et revue RH · Entretiens et décisions' },
-  { start: 26, number: '05', name: 'Résultats et contribution', summary: 'Vérifications · Démonstration · Relation avec les ODD' },
-  { start: 29, number: '06', name: 'Bilan et perspectives', summary: 'Avancement · Backlog · Conclusion' },
+  { start: 3, number: '01', name: 'Contexte et problématique', summary: 'Cadre du PFE · Existant · Objectifs et périmètre' },
+  { start: 8, number: '02', name: 'Analyse des besoins', summary: 'Acteurs et fonctionnalités · Qualité · Démarche de réalisation' },
+  { start: 11, number: '03', name: 'Conception de la solution', summary: 'Modèle métier · Choix techniques · Extraction économique et contrôle humain' },
+  { start: 20, number: '04', name: 'Réalisation et parcours', summary: 'Publier · Candidater · Examiner · Décider · Coordonner les intervenants' },
+  { start: 29, number: '05', name: 'Validation et bilan', summary: 'Éléments vérifiés · Limites · Perspectives · Conclusion' },
+  { start: 35, number: 'A', name: 'Annexes de discussion', summary: 'Évaluation proposée · Règles métier de référence' },
 ];
 const sources = {
-  3: 'Ashby (2026), candidatures par embauche ; HR Dive / Ladders (2018), premier examen du CV. Périmètres distincts.',
-  4: 'Sources : Greenhouse, Workable, Textkernel (Parser ; Semantic Search & Matching). Revue documentaire des offres.',
-  26: 'Vérifications locales : docs/status.md et workflow CI configuré. Contrôles d’intégration exécutés séparément.',
-  28: 'Nations unies : ODD 8, cible 8.5. Contribution envisagée ; impact non mesuré.',
+  5: 'Panorama documentaire : Greenhouse, Workable, Textkernel. Pas de benchmark comparatif exécuté.',
+  16: 'Contrat courant : processing-review-api.md ; cinq familles d’extraction, sorties typées.',
+  17: 'Hypothèses utilisateur : ≤ 5 000 tokens d’entrée par requête, 0,05 USD / million ; une requête par extracteur. Repère public : parseur commercial 0,05–0,20 USD/page. Voir cost-model.md.',
+  27: 'Sources : docs/current/status.md et docs/journal.md. Vérifications datées et de portée limitée.',
+  28: 'Jeu synthétique : cinq offres et vingt-cinq scénarios. Aucune mesure de précision IA déduite.',
+  33: 'Protocole proposé : corpus, annotation et critères d’acceptation à convenir avec l’encadrant.',
 };
 const visualSpecs = {
   'IMG-01': { kind: 'illustration', file: 'IMG-01-contexte-recrutement.png', label: 'Illustration : contexte du recrutement' },
   'DIA-02': { kind: 'diagram', file: 'DIA-02-use-cases.svg', label: 'Cas d’utilisation UML' },
   'DIA-03': { kind: 'diagram', file: 'DIA-03-classes.svg', label: 'Modèle de classes conceptuel' },
   'DIA-04': { kind: 'diagram', file: 'DIA-04-architecture.svg', label: 'Architecture technique' },
+  'DIA-05': { kind: 'diagram', file: 'DIA-05-processing.svg', label: 'Chaîne d’extraction documentaire' },
+  'DIA-06': { kind: 'diagram', file: 'DIA-06-lifecycle.svg', label: 'Parcours de recrutement' },
+  'DIA-07': { kind: 'diagram', file: 'DIA-07-review.svg', label: 'Origine et correction des informations' },
+  'CAP-10': { kind: 'capture', file: 'CAP-10-offre-publication.png', label: 'Offre : configuration et publication' },
+  'CAP-11': { kind: 'capture', file: 'CAP-11-candidature.png', label: 'Candidat : formulaire et dépôt' },
+  'CAP-12': { kind: 'capture', file: 'CAP-12-revue-cv.png', label: 'RH : CV source et correction par champ' },
+  'CAP-13': { kind: 'capture', file: 'CAP-13-import-decisions.png', label: 'Présélection : aperçu et confirmation CSV' },
+  'CAP-14': { kind: 'capture', file: 'CAP-14-agenda.png', label: 'Entretiens : agenda et rendez-vous' },
+  'CAP-15': { kind: 'capture', file: 'CAP-15-decision.png', label: 'Responsable : décision explicite' },
+  'CAP-16': { kind: 'capture', file: 'additional-inbox-view.png', label: 'Boîte de réception interne' },
+  'CAP-17': { kind: 'capture', file: 'export-csv.png', label: 'Export CSV ouvert dans un tableur' },
   'CAP-02': { kind: 'capture', file: 'CAP-02-configuration-offre.png', label: 'Configuration d’une offre' },
   'CAP-03': { kind: 'capture', file: 'CAP-03-depot-candidature.png', label: 'Dépôt d’une candidature' },
   'CAP-04': { kind: 'capture', file: 'CAP-04-dossier-rh.png', label: 'Consultation RH' },
@@ -51,7 +64,11 @@ const contents = matches.map(([, number, title, body]) => {
   }
   return { number: n, kind: n === 1 ? 'cover' : 'content', title, section: section?.name ?? '', items, table, visual, placeholders, notes, source: sources[n] ?? '' };
 });
-if (contents.length !== 30 || contents.some((s, i) => s.number !== i + 1)) throw new Error('Expected 30 sequential contents');
+if (contents.length !== 36 || contents.some((s, i) => s.number !== i + 1)) throw new Error('Expected 36 sequential contents');
+// Body text size per content number, where the default 21pt would overflow the
+// fixed 4.48in body area. Keep larger only where content is genuinely short.
+const bodySizes = { 32: 18, 17: 19, 26: 19, 14: 19 };
+for (const content of contents) if (bodySizes[content.number]) content.bodySize = bodySizes[content.number];
 const slides = [];
 for (const content of contents) {
   const section = sectionDefinitions.find(s => s.start === content.number);

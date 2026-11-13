@@ -1,0 +1,22 @@
+// Source: docs/current/workflows.md and guides/transition-map.md. Selected recruitment paths.
+digraph Lifecycle {
+  graph [rankdir=TB, bgcolor="transparent", pad=0.15, nodesep=0.5, ranksep=0.65, splines=polyline, fontname="Liberation Sans", fontsize=22, labelloc=b, label="Aucune décision d’embauche automatique"];
+  node [shape=box, style="rounded,filled", fillcolor="#f0f7f6", color="#0f766e", fontcolor="#172b4d", fontname="Liberation Sans", fontsize=22, margin="0.18,0.12", penwidth=1.4];
+  edge [fontname="Liberation Sans", fontsize=18, color="#64748b", fontcolor="#475569", penwidth=1.3];
+  received [label="Candidature\nreçue"];
+  preselected [label="Présélectionnée"];
+  interviews [label="Entretiens\nconfigurés"];
+  offer [label="Proposition\npropriétaire"];
+  hired [label="Embauche\npropriétaire", penwidth=2.2];
+  rejected [label="Non retenue\nterminal", fillcolor="#fff1f2", color="#be123c", penwidth=2.2];
+  {rank=same; received; preselected; interviews;}
+  {rank=same; rejected; offer; hired;}
+  received -> preselected [label="RH :\nprésélection"];
+  received -> rejected [label="RH : rejet"];
+  preselected -> interviews [label="1re\nplanification"];
+  preselected -> offer [label="0 entretien\n+ action explicite"];
+  interviews -> offer [label="tous Pass\n+ action explicite"];
+  interviews -> rejected [label="un Fail : fin\nannule les autres\nen cours", color="#be123c", fontcolor="#be123c"];
+  rejected -> offer [style=invis];
+  offer -> hired [label="action\nséparée"];
+}

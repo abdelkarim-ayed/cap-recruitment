@@ -1,0 +1,9 @@
+%% Conceptual field lineage, not a schema, audit history or acceptance claim.
+flowchart LR
+  PDF["PDF original privé, conservé"] -->|extraction| O["Résultat extrait original<br/>brut + valeur du champ"]
+  PDF -->|consultation RH| C["Correction RH séparée<br/>valeur · auteur · date"]
+  O -->|comparaison RH| C
+  O --> E["Champ effectif<br/>correction si présente, sinon original"]
+  C --> E
+  E --> X["Revue / CSV : valeur effective"]
+  %% Originals are never overwritten; a present null correction means reviewed unknown.

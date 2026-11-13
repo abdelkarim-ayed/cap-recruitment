@@ -1,0 +1,18 @@
+// Source: docs/current/contracts/processing-review-api.md, immutable originals and per-field correction.
+digraph Review {
+  graph [rankdir=LR, bgcolor="transparent", pad=0.15, nodesep=0.4, ranksep=0.6, splines=polyline, fontname="Liberation Sans", fontsize=21, labelloc=b, label="Traçabilité par champ · aucune réécriture de l’original"];
+  node [shape=box, style="rounded,filled", fillcolor="#f0f7f6", color="#0f766e", fontcolor="#172b4d", fontname="Liberation Sans", fontsize=23, margin="0.22,0.16", penwidth=1.4];
+  edge [fontname="Liberation Sans", fontsize=20, color="#64748b", fontcolor="#475569", penwidth=1.3];
+  pdf [label="PDF original\nprivé, conservé"];
+  original [label="Résultat extrait\noriginal\nbrut + champ typé"];
+  correction [label="Correction RH\nséparée\nvaleur · auteur · date", fillcolor="#fff8eb", color="#b7791f"];
+  effective [label="Champ effectif\ncorrection si présente,\nsinon original"];
+  export [label="Revue / CSV\nvaleur effective"];
+  {rank=same; original; correction;}
+  pdf -> original [label="extraction"];
+  pdf -> correction [label="consultation\nRH"];
+  original -> correction [label="comparaison RH"];
+  original -> effective;
+  correction -> effective;
+  effective -> export;
+}

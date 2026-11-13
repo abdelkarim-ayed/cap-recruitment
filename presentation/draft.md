@@ -1,284 +1,332 @@
-# CAP : script de présentation
+# CAP — Pré-soutenance PFE
 
-Révision éditoriale après retour utilisateur. **CAP** est un nom de travail proposé, à confirmer. Les 30 contenus sont conservés, avec six intercalaires de section : **36 pages** au total. La table de correspondance des pages est générée dans `dist/page-map.md`.
-
-Les titres et points ci-dessous sont destinés aux slides. Les notes orales restent dans ce document. Sources externes et preuves internes dans [notes.md](notes.md#références-externes--contexte-pas-résultats-du-projet). Métadonnées de couverture dans `metadata.json`, en attente des valeurs utilisateur.
+Version de travail du 13 novembre 2026, prête pour relecture de l’encadrant. CAP : « Centralisation et Assistance au Parcours de recrutement », développement proposé du nom existant. 32 diapositives principales, deux annexes, six intercalaires : **40 pages**. Correspondance physique dans `dist/page-map.md`. Notes orales non affichées dans le PDF. Sources dans [notes.md](notes.md), captures dans [assets/requests.md](assets/requests.md), plan de production du rapport dans [report-plan.md](report-plan.md).
 
 ## 01 — CAP
 **Plateforme de gestion du recrutement**
 
-Centralisation des candidatures et coordination du parcours de sélection.
+*(Diapositive de couverture rendue depuis `metadata.json` : nom, sous-titre, mission, auteur, encadrant, organisme, date.)*
 
-Note orale : présentation d’avancement. Nom proposé, à confirmer ; aucune durée de développement inventée.
+Note orale : annoncer un projet d’ingénierie logicielle avec une composante IA. Il ne s’agit ni d’entraîner un modèle de sélection ni de remplacer le recruteur. CAP est développé pour expliciter le sens du nom : centralisation du dossier, assistance à la préparation de l’information, continuité du parcours. Confirmer le nom et les informations académiques avant la version définitive.
 
-## 02 — Contexte : acteurs du recrutement
-- **Candidat** : candidature, CV et pièces justificatives.
-- **Équipe RH** : examen des dossiers et organisation du recrutement.
-- **Responsable de l’offre** : définition du besoin et décisions finales.
-- **Interviewer** : évaluation des candidatures qui lui sont confiées.
+## 02 — Plan de la présentation
+- **Contexte et problématique** : pourquoi cette plateforme ?
+- **Analyse des besoins** : pour qui et selon quelles règles ?
+- **Conception** : comment articuler métier, données et IA ?
+- **Réalisation** : le parcours d’une candidature.
+- **Validation et bilan** : acquis, limites et perspectives.
 
-`[IMG-01 — illustration du travail collectif autour des candidatures]`
+Note orale : viser environ 20 à 25 minutes, durée de travail proposée et non consigne institutionnelle. Les deux annexes servent aux questions. Les vues de conception peuvent être parcourues rapidement pour conserver du temps aux écrans métier.
 
-Note orale : le responsable est le propriétaire de l’offre, capacité portée par un compte recruteur ou administrateur. Le processus précis de l’entreprise reste à compléter avec l’encadrant.
+## 03 — Cadre et enjeux du projet
+- **Organisme d’accueil : BeeCoders.**
+- **Domaine :** gestion du recrutement pour une entreprise.
+- **Intervenants :** candidats, équipe RH, responsables d’offres et interviewers.
+- **Enjeu :** relier les informations du dossier aux actions de chaque intervenant.
 
-## 03 — Recrutement : volume et temps de lecture
-- **Plus de 300 candidatures par embauche** en moyenne pendant 2025 dans les données Ashby.
-- **7,4 secondes au premier examen d’un CV**, selon Ladders, étude de 2018 rapportée par HR Dive.
+**Un périmètre ciblé : de la publication de l’offre à la décision d’embauche.**
 
-**Enjeu : une information pertinente, rapidement accessible.**
+Note orale : ne pas inventer l’historique, l’effectif, les clients ou un diagnostic terrain de BeeCoders. Le nom de l’organisme provient des métadonnées déjà fournies. Le processus présenté est celui du prototype ; l’organisation réelle reste à préciser oralement si nécessaire. Un logo officiel pourra être ajouté, sans bloquer cette version.
 
-Note orale : deux sources et périmètres distincts ; premier examen et lecture approfondie sont différents. Ces chiffres ne mesurent ni notre entreprise ni la performance du projet. Sources S1 et S2.
+## 04 — Problématique
+**Comment rendre les candidatures exploitables et coordonner leur suivi, tout en conservant la maîtrise humaine des décisions ?**
 
-## 04 — Existant : outils et solutions spécialisées
-| Approche | Fonctions principales | Point d’attention |
+- **Information hétérogène :** formulaires, CV et pièces jointes.
+- **Travail collectif :** responsabilités et actions à coordonner.
+- **Assistance IA :** résultats à vérifier, erreurs à rendre visibles.
+
+Note orale : présenter ces points comme les difficultés auxquelles répond la conception, pas comme les conclusions d’une enquête menée dans l’entreprise. Les objectifs de réduction du temps de traitement ne sont pas encore mesurés.
+
+## 05 — Étude de l’existant et positionnement
+| Approche | Apport principal | Question pour le projet |
 |---|---|---|
-| Courriels et tableurs | Collecte, échanges, comparaison manuelle | Coordination répartie entre plusieurs outils |
-| ATS : Greenhouse, Workable | Suivi des candidatures, entretiens, évaluations | Paramétrage du parcours et des droits |
-| IA spécialisée : Textkernel | Extraction des CV, normalisation des compétences, recherche sémantique | Intégration au SI et qualité à évaluer sur les CV cibles |
+| Courriels et tableurs | Collecter et comparer des dossiers | Comment garder un suivi commun ? |
+| ATS : Greenhouse, Workable | Centraliser le parcours de recrutement | Comment adapter les règles et les accès ? |
+| Extraction : Textkernel | Structurer les informations des CV | Comment vérifier et intégrer ces résultats ? |
 
-Note orale : panorama documentaire des fonctions annoncées, pas benchmark réalisé. Textkernel illustre des briques IA intégrables ; aucune utilisation de RAG n’est déduite de la seule présence de recherche sémantique. Sources S3, S4 et S6. Notre solution est introduite après la problématique.
+Note orale : panorama fonctionnel documentaire, et non benchmark commercial. Les références sont conservées dans notes.md. Ces solutions ne sont pas présentées comme incapables de répondre au besoin. Le PFE porte sur la conception et l’intégration d’un parcours maîtrisé, pas sur une supériorité démontrée face aux ATS existants.
 
-## 05 — Problématique : efficacité du travail RH
-**Comment accélérer l’examen des candidatures et la coordination du recrutement ?**
+## 06 — Solution proposée
+- **Centraliser** les offres, candidatures et documents privés.
+- **Assister** la lecture des CV par des questions structurées.
+- **Permettre** la revue, la correction et les échanges CSV.
+- **Coordonner** la présélection, les entretiens et les décisions finales.
 
-- **Centralisation** des dossiers et des échanges utiles.
-- **Réduction des ressaisies** grâce à des données structurées.
-- **Lisibilité du suivi** : étapes, responsabilités et évaluations.
+**CAP : Centralisation et Assistance au Parcours de recrutement.**
 
-Note orale : objectifs du projet ; réduction du temps de travail encore à mesurer. La préparation des données par IA constitue une piste, à intégrer et évaluer.
+Note orale : CAP est ici développé pour rendre explicite le sens du nom, sans prétendre retrouver sa motivation historique. Centralisation = dossier commun ; Assistance = préparation des informations, non décision automatique ; Parcours = continuité entre candidat, RH et interviewer. Déploiement dédié à une entreprise ; paie et gestion des employés hors périmètre. L’IA prépare l’information ; les acteurs autorisés décident.
 
-## 06 — Solution proposée : périmètre de CAP
-- **Déploiement dédié** à une entreprise.
-- **Espace candidat** pour le dépôt et la consultation des candidatures.
-- **Espace RH** pour la revue, l’export et le suivi des entretiens.
-- **Assistance à l’extraction** intégrable au parcours de recrutement.
+## 07 — Une plateforme, plusieurs façons de travailler
+- **Parcours traditionnel :** lire les dossiers et décider dans l’application.
+- **Assistance facultative :** extraire les informations utiles avant leur revue.
+- **Échanges CSV :** exploiter les données dans un tableur ou un outil externe.
+- **Cadre commun :** conserver les identifiants, responsabilités et décisions.
 
-**Périmètre métier : du dépôt de candidature à la décision de recrutement.**
+Note orale : plateforme généraliste dans le périmètre du recrutement, configurable par offre, pas moteur universel de processus. Excel/LibreOffice et des outils d’analyse ou d’IA peuvent exploiter le CSV ; ce sont des usages externes possibles, pas des connecteurs natifs livrés. Le retour dans CAP porte sur des décisions contrôlées, pas sur un remplacement libre des données. Exporter n’autorise pas à transmettre des CV privés à n’importe quel service. Les entretiens et l’extraction peuvent être absents du parcours configuré.
 
-Note orale : paie et gestion des employés hors périmètre. L’extraction est aujourd’hui simulée ; son intégration réelle fait partie du backlog. Les étapes internes ne sont pas encore publiées au candidat.
+## 08 — Acteurs et besoins fonctionnels
+| Acteur / responsabilité | Besoins principaux | Portée |
+|---|---|---|
+| Candidat | Consulter, déposer, suivre | Ses candidatures |
+| Équipe RH | Examiner, corriger, exporter, présélectionner | Travail partagé |
+| Propriétaire d’offre | Configurer, publier, proposer, confirmer l’embauche | Ses offres |
+| Interviewer | Consulter, évaluer, demander une replanification | Entretiens affectés |
 
-## 07 — Besoins fonctionnels : gestion des candidatures
-- **BF1 : gestion des accès** et des comptes candidats/personnel.
-- **BF2 : configuration des offres**, formulaires et documents attendus.
-- **BF3 : dépôt et consultation** des candidatures et pièces jointes.
-- **BF4 : exploitation des dossiers**, résultats d’extraction, corrections RH et export.
+Note orale : propriétaire est une capacité portée par un compte RH ou administrateur, pas un rôle autonome. Un administrateur ne peut pas se substituer automatiquement au propriétaire pour les décisions finales. Le candidat voit uniquement les informations publiques autorisées, pas les corrections ou évaluations internes.
 
-Note orale : les identifiants BF sont des repères de présentation. BF4 est implémenté avec résultats simulés ; le lecteur documentaire et l’exécuteur IA restent à intégrer.
+## 09 — Exigences de qualité
+- **Confidentialité :** documents privés et vues adaptées aux droits.
+- **Intégrité :** dépôt original conservé et décisions cohérentes.
+- **Fiabilité :** erreurs explicites, conflits détectés, confirmations ciblées.
+- **Maintenabilité :** modules métier et contrats TypeScript partagés.
+- **Utilisabilité :** actions lisibles et corrections au contact du CV source.
 
-## 08 — Besoins fonctionnels : suivi du recrutement
-- **BF5 : présélection** et définition du parcours d’entretien.
-- **BF6 : planification** des rendez-vous et affectation des interviewers.
-- **BF7 : évaluations** et enregistrement des décisions internes.
-- **BF8 : notifications internes** aux intervenants concernés.
+Note orale : exigences traduites en mécanismes concrets, sans revendiquer de certification sécurité ni de validation complète en production. Les vérifications authentifiées, les courses concurrentes et l’accessibilité restent des axes de consolidation.
 
-Note orale : le réimport et la publication des progrès au candidat sont différés. Le responsable de l’offre garde les décisions Offer/Hired.
+## 10 — Démarche de réalisation
+- **Définir** un scénario et ses règles métier.
+- **Construire** le contrat, la persistance et les autorisations backend.
+- **Intégrer** le parcours utilisateur et les confirmations nécessaires.
+- **Vérifier** le périmètre retenu et documenter les limites.
 
-## 09 — Besoins non fonctionnels : qualité du système
-- **Confidentialité** : accès aux dossiers selon le rôle, la propriété et l’assignation.
-- **Intégrité** : dépôts conservés, règles métier et opérations cohérentes.
-- **Maintenabilité** : modules, contrats partagés et tests automatisés.
-- **Évolutivité** : intégrations mail et extraction remplaçables.
-- **Utilisabilité** : actions lisibles et parcours adaptés aux intervenants.
+**Développement itératif par incréments fonctionnels.**
 
-Note orale : exigences visées, avec des réponses déjà implémentées pour les accès, l’intégrité et la modularité. L’UX nécessite une revue ; performance, accessibilité et exploitation en production n’ont pas de seuil validé à ce stade.
+Note orale : démarche attestée par les checkpoints et décisions du dépôt, sans inventer des sprints Scrum, un calendrier ou des rituels. Progression générale : socle et dépôt, revue et entretiens, consolidation des règles et de l’UX, intégration documentaire. Le journal est sélectif ; il ne permet pas de reconstruire une durée totale de développement.
 
-## 10 — Méthodologie : développement itératif
-- **Cadrage** : scénarios métier et périmètre du checkpoint.
-- **Backend** : contrats API, persistance et règles de gestion.
-- **Interface** : intégration des parcours et retours manuels.
-- **Validation** : tests, corrections et mise à jour de la documentation.
+## 11 — Cas d’utilisation essentiels
+`[DIA-02 — acteurs et principales actions autorisées]`
 
-**Progression : accès → candidatures → revue RH → entretiens.**
+**L’autorisation combine le rôle, la propriété de l’offre et l’affectation à l’entretien.**
 
-Note orale : organisation par checkpoints inspirée Kanban ; appellation à convenir avec l’encadrant. Aucun sprint ou rituel Scrum fictif. Le suivi existe dans le statut, les décisions et le backlog.
+Note orale : les contrôles sont appliqués côté serveur ; l’affichage des boutons n’est pas la frontière de sécurité. Vue de synthèse, pas inventaire de tous les endpoints. Les besoins d’inscription et récupération d’accès restent dans les fonctionnalités support.
 
-## 11 — Conception fonctionnelle : cas d’utilisation
-`[DIA-02 — cas d’utilisation UML]`
+## 12 — Modèle métier centré sur la candidature
+`[DIA-03 — relations conceptuelles entre offre, candidature, documents, tâches et entretiens]`
 
-**Droits adaptés au dossier : rôle, propriété de l’offre et assignation à l’entretien.**
+**Un même dossier relie les données d’origine, leur exploitation et les étapes de recrutement.**
 
-Note orale : diagramme volontairement centré sur les actions majeures. Propriétaire = capacité d’un compte RH/admin ; feedback réservé à l’interviewer assigné, y compris lorsqu’il possède aussi un rôle RH/admin. Aucun rôle propriétaire distinct.
+Note orale : vue conceptuelle simplifiée, pas schéma relationnel exhaustif. Le dépôt conserve son instantané ; une correction ne remplace ni la réponse du candidat ni le résultat de l’extraction. Les détails d’attribution et de présence des corrections sont développés dans le contrat de traitement.
 
-## 12 — Conception fonctionnelle : modèle de données
-`[DIA-03 — classes UML conceptuelles]`
+## 13 — Architecture de la solution
+`[DIA-04 — architecture technique actuelle]`
 
-**La candidature relie les documents, l’extraction, les corrections et les entretiens.**
+**React / Vite · NestJS · PostgreSQL · TypeScript / Zod · Monorepo pnpm**
 
-Note orale : vue conceptuelle simplifiée, pas reproduction exhaustive des tables. Définition de formulaire et de traitement figée au dépôt. Les corrections sont séparées des résultats originaux ; elles ne constituent pas un historique complet de révisions.
+Note orale : backend modulaire, pas architecture microservices. Documents servis par des accès contrôlés. Le traitement documentaire est exécuté hors de la requête de dépôt. Redis participe aux garde-fous des appels externes ; la messagerie et le stockage sont isolés derrière des interfaces. Le branchement réel ne vaut pas validation de qualité.
 
-## 13 — Conception technique : architecture
-`[DIA-04 — architecture modulaire et interfaces d’intégration]`
+## 14 — Des choix techniques liés aux besoins
+| Besoin | Choix retenu | Compromis |
+|---|---|---|
+| Faire évoluer un prototype cohérent | Backend modulaire, contrats partagés | Déploiement commun |
+| Allier règles stables et formulaires variables | PostgreSQL et JSONB | Validation métier explicite |
+| Préparer les CV à faible coût | Lecture PDF native sur CPU local | Pas de lecture des scans par OCR |
+| Garder un dépôt réactif | Traitement différé, caches privés | États et reprises à gérer |
 
-**React / Vite · NestJS / TypeScript · PostgreSQL · Monorepo pnpm**
+Note orale : mettre en évidence conception modulaire, modèle relationnel, données semi-structurées, validation et traitements asynchrones. Le parseur local extrait le texte présent dans le PDF : ce n’est ni de l’OCR ni une inférence IA locale. L’analyse sémantique est effectuée par le service externe. Éviter une brique OCR/vision pour les PDF textuels vise à limiter ressources et latence ; aucun benchmark local n’en quantifie encore le gain. Pas de microservices nécessaires pour expliquer cette séparation des responsabilités.
 
-Note orale : documents privés stockés localement ; accès via API. Mail et extraction derrière des ports dédiés. Traitement actuel par fixtures, déclenché explicitement ; lecteur documentaire réel et provider IA à intégrer. Le schéma distingue cette extension future.
+## 15 — Du PDF à une information structurée
+`[DIA-05 — chaîne documentaire et extraction encadrée]`
 
-## 14 — Conception : choix structurants
-- **Dépôt immuable** : conservation des réponses et fichiers d’origine.
-- **Corrections séparées** : enrichissement du dossier par les RH.
-- **Autorisations contextuelles** : rôle complété par la propriété et l’assignation.
-- **États distincts** : traitement, revue et progression du recrutement.
+**Des résultats typés, conservés avec leur origine, puis soumis à la revue humaine.**
 
-**Un dossier stable et des responsabilités identifiables à chaque étape.**
+Note orale : le lecteur natif produit du Markdown à partir du PDF, sans OCR. Une requête regroupe les questions d’un extracteur ; la réponse complète est validée avant persistance. Le worker et la passerelle Jev sont intégrés. Les caches et gardes de tentative limitent les répétitions ; leur robustesse en concurrence n’est pas une garantie vérifiée. Le déploiement documenté utilise le mode réel pour les nouvelles soumissions synthétiques autorisées, après chargement de clé par l’utilisateur.
 
-Note orale : extraction et revue n’autorisent aucune acceptation automatique. Les contrôles portent sur les actions backend, pas seulement la visibilité des boutons.
+## 16 — Cinq familles de questions sur les CV
+| Famille | Information recherchée | Limite d’interprétation |
+|---|---|---|
+| Formation | Niveau documenté, domaine éventuel | En cours ≠ diplôme obtenu |
+| Certification | Certification déclarée obtenue | Authenticité non vérifiée |
+| Expérience | Classe de durée, domaine éventuel | Déclarations du CV |
+| Couverture d’une liste | Nombre d’éléments mentionnés | Mention ≠ maîtrise |
+| Contexte d’une compétence | Étudiée, appliquée, professionnelle | Contexte ≠ niveau vérifié |
 
-## 15 — Réalisation : accès et espaces de travail
-- **Authentification** par email et mot de passe.
-- **Inscription candidate** avec vérification de l’adresse email.
-- **Comptes internes** pour les RH et les interviewers.
-- **Récupération d’accès** par code de réinitialisation.
+Note orale : configuration par questions structurées, pas prompt libre. La date de publication sert de référence temporelle stable. Les durées d’expérience sont des classes, pas une précision calculée au mois. Une réponse absente ou invalide est une erreur de traitement, pas un zéro ou un jugement défavorable sur le candidat.
 
-Note orale : les comptes du personnel sont provisionnés en interne. Capture de connexion non nécessaire : privilégier les écrans qui montrent la valeur métier.
+## 17 — Une extraction pensée pour rester économique
+- **Lecture locale :** texte PDF natif sur CPU, sans étape OCR ni appel vision.
+- **Une requête par extracteur** : toutes les questions voyagent ensemble.
+- **Réutilisation :** caches privés du Markdown et de la réponse validée.
+- **Ordre de grandeur :** ≤ 5 000 tokens à 0,05 $ / million → **≈ 0,00025 $ par CV**.
 
-## 16 — Réalisation : configuration des offres
-- **Formulaire adaptable** au poste et aux informations attendues.
-- **Documents requis ou facultatifs**, avec contraintes de dépôt.
-- **Tâches d’extraction** associées aux documents sources.
-- **Parcours d’entretien** défini par le propriétaire de l’offre.
+Note orale : hypothèses de travail communiquées par l’utilisateur, pas un tarif fournisseur vérifié ni une facture observée. Le contrat envoie une seule requête multi-questions par extracteur : les cinq familles ne coûtent pas cinq appels. La sortie s’ajoute à son propre tarif et peut doubler le montant. À ce niveau, la question n’est plus technique mais organisationnelle : la revue humaine reste-t-elle le goulot ? Repère public : un parseur commercial facturé 0,05 à 0,20 $ la page. Comparaison de coût d’appel, pas de qualité : ni OCR, ni DOCX, ni 150 champs multilingues chez nous. Voir cost-model.md.
 
-`[CAP-02 — formulaire de configuration d’une offre]`
+## 18 — Corriger sans effacer l’original
+`[DIA-07 — filiation d’un champ, de la source à la valeur effective]`
 
-Note orale : les champs/formats disponibles correspondent aux presets implémentés. L’offre publiée est verrouillée ; les étapes d’entretien se figent dès la première instance. Capture réelle à fournir, sans faux écran généré.
+**Document source, résultat original et correction RH restent distincts.**
 
-## 17 — Réalisation : dépôt d’une candidature
-- **Formulaire candidat** et pièces jointes dans un même parcours.
-- **Contrôles serveur** sur les données et contraintes de dépôt.
-- **Conservation du dossier** après soumission.
-- **Consultation personnelle** des candidatures déposées.
+Note orale : les RH relisent le PDF et peuvent corriger chaque champ avec attribution. L’export utilise la valeur effective. Une absence de correction, une valeur nulle et une suppression de correction ont des significations distinctes. Le système conserve l’original et la correction courante, pas un historique exhaustif de toutes les modifications.
 
-`[CAP-03 — formulaire candidat ou confirmation de dépôt]`
+## 19 — Progression du recrutement
+`[DIA-06 — présélection, entretiens éventuels, proposition et embauche]`
 
-Note orale : réponses/fichiers non modifiables après soumission. La confirmation affiche la réception, sans publier les décisions RH internes.
+**Traitement, revue RH et recrutement : trois états indépendants.**
 
-## 18 — Réalisation : consultation des dossiers
-- **Vue RH partagée** avec filtres et tri.
-- **Accès aux documents privés** depuis la candidature.
-- **Repères de suivi** : progression, traitement et corrections.
-- **Comparaison facilitée** par la centralisation des informations.
+Note orale : la présélection est explicite et peut intervenir sans revue terminée. Elle clôt le travail de traitement/revue sans le déclarer réussi. Avec zéro entretien, la présélection permet au propriétaire de proposer l’embauche ; sinon tous les entretiens configurés doivent être réussis. Proposition et embauche sont deux commandes distinctes, jamais une conséquence automatique de l’IA.
 
-`[CAP-04 — liste RH et aperçu d’un dossier]`
+## 20 — Configurer et publier une offre
+- **Formulaire** adapté aux informations attendues.
+- **Documents et questions d’extraction** configurables.
+- **Plan d’entretien** ordonné, éventuellement vide.
+- **Publication confirmée** sur une version cohérente.
 
-Note orale : comparaison humaine ; aucun classement automatique des candidats. Afficher uniquement des données synthétiques et conserver les libellés fixture lorsqu’ils sont présents.
+`[CAP-10 — offre et revue de publication]`
 
-## 19 — Extraction : organisation par tâches
-- **Source** : document joint à la candidature.
-- **Consigne** : compétences recherchées et paramètres définis dans l’offre.
-- **Sortie** : résultat structuré, état et provenance.
-- **Suivi** : erreurs et reprises gérées au niveau du traitement.
+Note orale : tâches et entretiens sont facultatifs. La publication fige le plan d’entretien, y compris vide, et la date de référence documentaire. Les révisions de l’offre et du plan sont vérifiées séparément. Utiliser une capture récente ; l’ancien écran du deck d’octobre ne prouve pas cette règle.
 
-**Contrat de traitement implémenté ; extraction réelle à intégrer.**
+## 21 — Déposer une candidature
+- **Un formulaire** et les pièces requises.
+- **Contrôles serveur** avant acceptation.
+- **Dépôt conservé**, non modifiable après soumission.
+- **Suivi personnel** des informations publiques autorisées.
 
-Note orale : exemple actuel extractSkills ; pas de scoring global d’employabilité. Les ports DocumentTextReader/TaskExecutor sont séparés ; les fixtures permettent de vérifier le relais et le stockage.
+`[CAP-11 — formulaire candidat avec données synthétiques]`
 
-## 20 — Extraction : stratégie de simulation
-- **Fixtures déterministes** : succès, erreur et résultat vide.
-- **Scénarios reproductibles** pour la revue et les corrections RH.
-- **Vérification du traitement** : exécution, persistance et récupération.
-- **Intégration progressive** d’un lecteur documentaire et d’un fournisseur IA.
+Note orale : une candidature par candidat et offre. Le dépôt ne doit pas attendre le fournisseur IA. Aucun résultat interne de revue ou feedback d’entretien n’est exposé dans l’espace candidat. La sortie d’un formulaire saisi demande une confirmation d’abandon.
 
-**Objectif actuel : fiabilisation du parcours avant l’évaluation de l’extraction.**
+## 22 — Examiner et corriger le dossier
+- **CV source visible** pendant la revue.
+- **Résultats par champ**, corrections indépendantes.
+- **Disponibilité de la revue** distincte de l’état du traitement.
+- **Libération manuelle confirmée** si le traitement reste bloqué.
 
-Note orale : fixture = donnée de test, pas analyse sémantique du CV. Le succès utilise les compétences configurées. Aucun taux de précision ni gain de temps mesuré ; pas de traitement automatique lancé en arrière-plan.
+`[CAP-12 — CV source et panneau de correction RH]`
 
-## 21 — Réalisation : revue et correction RH
-- **Lecture conjointe** du document et des résultats disponibles.
-- **Correction RH** visible dans la valeur effective.
-- **Résultat original conservé**, y compris en cas d’erreur.
-- **Revue partagée** entre les membres de l’équipe RH.
+Note orale : libérer la revue ne fabrique pas un résultat réussi. En cas de conflit, les brouillons locaux peuvent être comparés et réappliqués explicitement après actualisation. Ils ne sont pas fusionnés automatiquement. Les résultats présentés doivent garder leur provenance : fixture, réponse réelle ou correction humaine.
 
-`[CAP-05 — document, résultat fixture et correction RH]`
+## 23 — Exporter et confirmer la présélection
+- **Export filtré** avec les valeurs effectives disponibles.
+- **Décisions CSV** reliées aux identifiants et emails.
+- **Aperçu contrôlé** : lignes invalides et décisions déjà prises.
+- **Confirmation finale** du groupe de décisions retenu.
 
-Note orale : absence de tâches = absence de revue à effectuer ; ce marqueur ne vaut pas présélection. Les dernières corrections sont affichées, sans navigateur d’historique fictif.
+`[CAP-13 — aperçu du réimport de décisions]`
 
-## 22 — Réalisation : export et analyse externe
-- **Export CSV** des candidatures et informations de revue.
-- **Valeurs originales et corrigées** disponibles pour l’analyse.
-- **Export à tout moment**, indépendamment de l’avancement de la revue.
-- **Présélection manuelle** dans l’application.
+Note orale : le réimport est implémenté, contrairement au deck précédent. L’exclusion d’une ligne n’est pas un rejet. Le lot inclus est appliqué atomiquement ; la première décision enregistrée fait foi. Les champs non disponibles restent vides avec un état fidèle ; importer des décisions ne corrige pas les résultats d’extraction. Présélection et rejet sont définitifs dans ce parcours.
 
-**Évolution prévue : réimport contrôlé d’une sélection de décisions.**
+## 24 — Organiser les entretiens
+- **Agenda partagé** et rendez-vous datés.
+- **Interviewer affecté** à chaque entretien.
+- **Contrôle des chevauchements** et replanification.
+- **Évaluation finale** après le début prévu.
 
-Note orale : réimport non livré. Identifiants stables, aperçu, erreurs, doublons et atomicité à définir avant implémentation. Les filtres de liste ne restreignent pas l’export actuel.
+`[CAP-14 — agenda et détail d’un entretien]`
 
-## 23 — Réalisation : organisation des entretiens
-- **Étapes ordonnées** pour chaque offre.
-- **Agenda partagé** et affectation des interviewers.
-- **Créneaux, durée et fuseau horaire** explicites.
-- **Détection des chevauchements** et replanification.
+Note orale : une instance par candidature et étape, un interviewer responsable ; pas de synchronisation avec un calendrier externe ni de panel. Pass/Fail décide de la réussite de l’entretien ; le score facultatif n’est pas un seuil automatique. Les demandes de replanification et les changements alimentent les notifications pertinentes.
 
-`[CAP-06 — agenda et détail d’un rendez-vous]`
+## 25 — Enregistrer une décision explicite
+- **Proposition d’embauche** réservée au propriétaire de l’offre.
+- **Prérequis** : présélection et entretiens réussis, s’ils existent.
+- **Embauche** confirmée dans une action distincte.
+- **Notifications ciblées** selon les événements et les destinataires.
 
-Note orale : créneaux par demi-heure ; pas de synchronisation calendrier. Une instance par candidature/étape ; pas de retries d’entretien.
+`[CAP-15 — détail de candidature et action du responsable]`
 
-## 24 — Réalisation : évaluations et décisions
-- **Retour de l’interviewer** : notes, Pass/Fail et score facultatif sur 10.
-- **Échec terminal** : clôture de la candidature et annulation des entretiens restants.
-- **Proposition d’embauche** : après réussite du parcours configuré.
-- **Embauche confirmée** : décision finale du propriétaire de l’offre.
+Note orale : ne pas confondre décision interne Offer avec génération ou signature d’un contrat. Les notifications candidat couvrent les résultats publics autorisés de présélection/rejet, pas une publication de toutes les étapes internes. Le feedback et les changements de rendez-vous ont leurs destinataires internes spécifiques.
 
-**Évaluations centralisées et règles de progression explicites.**
+## 26 — Coordonner les acteurs du recrutement
+- **RH :** une liste partagée, des filtres et une revue commune.
+- **Responsable :** les choix de l’offre et les décisions finales.
+- **Interviewer :** ses rendez-vous, demandes et évaluations.
+- **Candidat :** son dépôt et les informations de suivi autorisées.
 
-Note orale : le score n’est pas un seuil automatique ; seul l’assigné soumet le retour, après le début prévu. Offer/Hired réservés au propriétaire, sans override administrateur. États Hired/Not selected finaux.
+**Le dossier et les notifications relient les intervenants.**
 
-## 25 — Réalisation : notifications internes
-- **Affectation et changement de rendez-vous** signalés à l’interviewer.
-- **Demande de replanification et feedback** transmis aux responsables concernés.
-- **Boîte de réception individuelle** avec statut lu/non lu.
-- **Conservation des dossiers métier** indépendante des notifications.
+Note orale : une petite équipe peut cumuler des responsabilités ; une autre peut séparer préparation, présélection et entretien, dans les limites des droits implémentés. L’outil fournit une structure minimale, pas une méthode d’organisation universelle. Pas d’assignation exclusive des dossiers RH, de workflow d’approbation configurable, de chat ou de débat formalisé. Inbox interne et notifications candidat ont des causes précises ; pas de fil de conversation partagé ni de diffusion de toutes les évaluations. Les conflits sont détectés et la première décision de présélection enregistrée fait foi.
 
-Note orale : créateur/propriétaire destinataires des demandes et feedback, dédupliqués. Pas de copie systématique au propriétaire pour les réservations ; pas de publication candidate. Suppression des messages sept jours après première lecture, jamais des non-lus.
+## 27 — Une boîte de réception pour les actions à traiter
+- **Affectations et changements** de rendez-vous signalés à l'interviewer.
+- **Demandes de replanification** et retours transmis aux responsables.
+- **Statut lu / non lu** conservé par destinataire.
+- **Dossiers métier indépendants** : supprimer un message ne supprime pas une candidature.
 
-## 26 — Validation : résultats du checkpoint
-- **66 tests automatisés**, dont **26 tests DOM**, au dernier checkpoint.
-- **Vérifications d’intégration** sur PostgreSQL et les parcours API.
-- **Scénarios sensibles** : droits, conflits horaires, concurrence et décisions terminales.
-- **Outillage qualité** : build, contrôle de types, CI configurée et documentation API.
+`[CAP-16 — boîte de réception interne avec plusieurs messages non lus]`
 
-**Parcours central implémenté et vérifié sur les scénarios retenus.**
+Note orale : les notifications ont des causes métier précises et des destinataires choisis, pas une diffusion générale. Les messages lus sont purgés après un délai ; les non-lus ne le sont jamais. Il n'y a ni fil de discussion ni chat.
 
-Note orale : contrôles locaux processing/interviews séparés de la CI ; aucune exécution distante revendiquée. La dernière retouche UX n’a pas été retestée manuellement. L’évaluation de l’extraction réelle et de l’utilisabilité reste à mener. Sources I1 et I7.
+## 28 — Un export qui reste exploitable ailleurs
+- **Valeurs effectives** et provenance incluses dans le fichier.
+- **Colonnes stables** par identifiant de question.
+- **Ouverture directe** dans un tableur ou un outil d'analyse.
+- **Import de décisions** séparé, confirmé et atomique.
 
-## 27 — Démonstration : parcours d’une candidature
-- **Dépôt** d’une candidature synthétique.
-- **Examen RH**, résultat simulé et correction.
-- **Export CSV** du dossier exploitable.
-- **Planification** d’un entretien dans l’agenda.
+`[CAP-17 — fichier d'export ouvert dans un tableur]`
 
-**Fil conducteur : continuité du dossier entre les intervenants.**
+Note orale : l'export sert au travail externe et au contrôle ; il ne modifie aucune donnée. Le réimport ne porte que sur des décisions, jamais sur les résultats d'extraction. Les liens de documents restent authentifiés.
 
-Note orale : choisir/répéter un chemin court ; alternative avec les captures réelles des slides précédentes. Aucun faux retour d’entretien ; l’heure prévue conditionne sa saisie. Pas de dépendance à une IA live.
+## 29 — Stratégie de vérification et preuves
+| Niveau | Éléments disponibles | Portée de la preuve |
+|---|---|---|
+| Règles et interfaces | Contrôles unitaires, modèles hors ligne, tests DOM datés | Scénarios ciblés |
+| Intégration locale | Builds, migrations et disponibilité des services documentés | Préparation technique |
+| Usage et exploitation | Parcours manuels partiels, régression complète en attente | Consolidation à poursuivre |
 
-## 28 — ODD 8 : travail décent et croissance économique
-- **Organisation du recrutement** : information centralisée et responsabilités explicites.
-- **Dimension sociale** : examen humain des candidatures et accès maîtrisé aux données.
-- **Dimension environnementale** : dématérialisation des échanges, bilan numérique à évaluer.
+Note orale : les nombres de tests des checkpoints ne sont pas additionnés et ne décrivent pas une régression complète de la dernière version. Les builds du 13 novembre ont réussi ; le démarrage du worker réel a été observé. Cela ne prouve ni une validation bout en bout réelle ni la confidentialité ou les courses concurrentes dans tous les scénarios. Aucune nouvelle exécution de tests applicatifs n’a été faite pour cette présentation.
 
-**Contribution envisagée : de meilleures conditions de traitement des candidatures.**
+## 30 — Démonstration : un dossier de bout en bout
+- **Publier et déposer** une candidature synthétique.
+- **Lire et corriger** un champ au contact du CV.
+- **Exporter et présélectionner** avec confirmation.
+- **Parcourir les entretiens** puis la décision du responsable.
 
-Note orale : rapprochement avec la cible 8.5, sans impact démontré sur l’emploi, l’équité ou l’environnement. Icône officielle facultative ; ne pas la faire générer par un modèle. Source S5.
+**Support préparé : cinq offres et vingt-cinq scénarios synthétiques.**
 
-## 29 — Bilan d’avancement et backlog
-Le parcours central couvre désormais le **dépôt**, la **revue RH** et les **entretiens**, avec des données persistantes et des accès contrôlés.
+Note orale : proposer un parcours court à partir des captures ou de dossiers préparés ; ne pas dépendre d’un appel payant pendant la soutenance. Ces scénarios servent au workflow, pas à mesurer la précision. Le premier achèvement documenté utilisait un parseur natif avec réponse simulée ; ne pas le présenter comme résultat Jev. Les captures seront fournies manuellement par l’utilisateur.
 
-Le prochain chantier associe **simplification de l’UX**, **clarification des rôles et capacités** et **refactorisation ciblée**. L’intégration de l’extraction réelle sera accompagnée d’une comparaison de solutions sur un **corpus de CV relu humainement**.
+## 31 — Limites actuelles
+- **Qualité IA :** précision et robustesse encore à mesurer.
+- **Documents :** PDF natif ; OCR et lecture réelle du DOCX non intégrés.
+- **Validation :** régression complète, confidentialité et concurrence à consolider.
+- **Usage :** gain de temps et accessibilité non quantifiés.
 
-Le **réimport de décisions** et la **visibilité du suivi pour le candidat** complètent le backlog fonctionnel.
+**Une intégration fonctionnelle ne constitue pas encore une validation en production.**
 
-Note orale : backlog à prioriser avec l’encadrant, sans échéances promises. Protocole envisagé : précision/rappel par tâche, qualité des preuves, taux d’erreur, coût et latence. Corpus et seuils d’acceptation à convenir ; pas de résultats déjà obtenus.
+Note orale : l’extraction réelle est branchée, donc la qualifier de simple simulation serait désormais faux. En revanche, l’activation locale n’établit aucune performance mesurée. Les mécanismes de contrôle des appels et de reprise locale existent dans le code ; les comportements de panne et de concurrence restent à vérifier dans le périmètre autorisé.
 
-## 30 — Conclusion : apports du projet
-- **Dossier centralisé**, du dépôt jusqu’aux évaluations internes.
-- **Coordination RH structurée**, avec des responsabilités et décisions explicites.
-- **Architecture modulaire**, préparée à l’intégration de l’extraction.
+## 32 — Bilan : apports métier et techniques
+- **Produit :** un dossier commun et des responsabilités explicites, du dépôt à l’embauche.
+- **Ingénierie full-stack :** contrats typés, API modulaire et interfaces adaptées aux acteurs.
+- **Données et IA :** extraction structurée, sources conservées et corrections humaines séparées.
+- **Fiabilité :** transactions, autorisations contextuelles et gestion des conflits.
 
-**Prochaine étape : consolidation de l’usage et évaluation de l’assistance IA.**
+**Compétences mobilisées :** analyse des besoins · modélisation · développement full-stack · intégration d’un service externe · conception de schémas · concurrence et transactions · vérification.
 
-Note orale : la valeur actuelle tient à la centralisation et au suivi ; l’accélération attendue sera mesurée lors de l’évaluation. Discussion avec l’encadrant sur les priorités.
+Note orale : relier chaque ligne aux acquis du cursus plutôt qu’à une liste de technologies. Le bilan décrit le système et ses choix, sans inventer une attribution personnelle détaillée ni des technologies nouvellement apprises. Ne pas promettre une sélection plus juste ou plus rapide sans protocole. Le lien éventuel à l’ODD 8 peut être évoqué comme intention, sans impact démontré.
 
-## Notes d’édition
-- Titres nominaux, termes métier mis en évidence, labels BF avec deux-points.
-- Petits repères de section entre crochets et soulignement, espacés du titre.
-- Trois diagrammes rendus à partir de code ; sources Mermaid pour classes/architecture et DOT pour le rendu local sans navigateur.
-- Visuels externes : une illustration de contexte facultative ; cinq captures produit à fournir manuellement. Voir assets/requests.md pour pages/noms/prompts.
-- Métadonnées, nom CAP et visuels externes restent à confirmer. Cette version assemblée permet la relecture ; les anciennes notes décrivent des propositions antérieures.
+## 33 — Perspectives prioritaires
+- **Consolider les parcours** : régression, droits, conflits et reprises.
+- **Évaluer l’extraction** sur un corpus relu humainement.
+- **Évaluer l’usage** : temps de revue, erreurs et compréhension des statuts.
+- **Préparer le déploiement** : exploitation, installation et accompagnement.
+
+Note orale : priorités proposées pour discussion avec l’encadrant ; pas de calendrier garanti. Les fonctionnalités CSV, le plan figé à publication, la revue par champ et le worker réel ne doivent plus figurer comme futures intégrations. Les extensions OCR et autres formats viendraient après consolidation du périmètre actuel.
+
+## 34 — Conclusion et discussion
+**Centraliser le dossier. Structurer l’information. Garder la décision humaine.**
+
+- Un prototype couvrant le parcours de recrutement retenu.
+- Une assistance documentaire intégrée et révisable.
+- Une prochaine étape centrée sur la validation de la qualité et de l’usage.
+
+**Merci pour votre attention — questions et retours.**
+
+Note orale : terminer ici la présentation principale. Solliciter un retour sur le cadrage PFE, la profondeur technique attendue et le protocole d’évaluation. Les annexes suivantes ne sont montrées que si elles servent la discussion.
+
+## 35 — Annexe : protocole d’évaluation proposé
+| Axe | Méthode envisagée | Mesures possibles |
+|---|---|---|
+| Extraction | CV variés, annotation humaine, comparaison par famille | Exactitude, erreurs, sorties non exploitables |
+| Workflow | Scénarios de bout en bout et conflits contrôlés | Respect des règles, cohérence des états |
+| Utilisabilité | Tâches RH avec et sans assistance | Temps de revue, corrections, difficultés |
+| Exploitation | Observations dans un périmètre autorisé | Latence, coût, comportement en panne |
+
+Note orale : protocole non exécuté. Définir corpus et vérité de référence avant la mesure ; séparer mise au point et évaluation. Pour les classes de durée ou de contexte, utiliser un accord par classe et une matrice de confusion ; pour les réponses catégorielles, exactitude et erreurs par catégorie. La confiance renvoyée par un fournisseur n’est pas une précision mesurée. Aucun appel fournisseur ni test payant n’est autorisé par ce document.
+
+## 36 — Annexe : invariants métier à retenir
+- **Publication :** vérification des révisions et gel du plan d’entretien.
+- **Dépôt :** réponses et documents d’origine immuables.
+- **Revue :** correction séparée ; clôture explicite et conflits détectés.
+- **Sélection :** décision humaine finale, indépendante de l’extraction.
+- **Embauche :** proposition puis confirmation par le propriétaire.
+
+Note orale : sources de référence : contrats vacancy, application, processing-review et interview ; action-policy pour les capacités. Ces invariants expliquent l’utilité des transactions, verrous et compteurs de révision. Ils ne doivent pas être présentés comme une preuve de test exhaustif de toutes les combinaisons.

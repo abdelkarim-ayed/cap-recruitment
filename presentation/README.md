@@ -1,41 +1,44 @@
-# Présentation d’avancement
+# Pré-soutenance PFE — CAP
 
-**[Ouvrir le PDF partagé](exports/status.pdf)** — seul export binaire publié. `pdf:build` actualise désormais `exports/status.pdf` (suivi par Git) ; `dist/` reste ignoré pour les intermédiaires, SVG de rendu et aperçus PNG. L’ancien `dist/status.pdf` peut subsister localement mais n’est plus la référence. Après modification, reconstruire et committer le PDF avec ses sources.
+**[Ouvrir le PDF](exports/status.pdf)** — version restructurée le 13 novembre 2026 pour relecture de l’encadrant.
 
-Contrôle visuel : privilégier la compilation PDF ; rasteriser uniquement les pages à examiner, à basse résolution (par exemple `--pages 20,21 --ppi 70`), jamais systématiquement les 36 pages. Ne lire que les aperçus nécessaires.
+42 pages : **34 diapositives principales, deux annexes et six intercalaires**. Fil conducteur : contexte/problème → besoins → conception → réalisation → validation/bilan. Équilibre produit/ingénierie : usages traditionnels et assistés, choix techniques, coût estimatif et coordination. Six diagrammes, huit captures réelles et les deux logos officiels. CAP est développé en **Centralisation et Assistance au Parcours de recrutement** ; métadonnées académiques et validation finale restent à confirmer.
 
-## Version courante
+## Documents utiles
 
-**PDF : [`exports/status.pdf`](exports/status.pdf)**. 36 pages : 30 contenus et six intercalaires. Couverture CAP (nom proposé), trois diagrammes et six images utilisateur intégrées sans recadrage. Auteur/encadrant/organisme/date renseignés ; établissement/formation reste à compléter. Contenu et cadrage soumis à relecture.
-
-- [draft.md](draft.md) : texte et notes orales actuels.
-- [metadata.json](metadata.json) : nom, sous-titre, auteur, encadrement, établissement, organisme et date.
-- [assets/requests.md](assets/requests.md) : visuels reçus, noms de fichiers, pages et prompt externe initial.
-- [assets/manifest.json](assets/manifest.json) : provenance et état des visuels.
-- [diagrams/README.md](diagrams/README.md) : sources Mermaid/DOT et rendu.
-- [notes.md](notes.md) : sources et ancien découpage, remplacé par draft.md.
-- [brief.md](brief.md), [plan.md](plan.md), [style-notes.md](style-notes.md) : contraintes, validation et direction visuelle.
+- [draft.md](draft.md) : texte finalisable et notes orales, une seule source éditoriale.
+- [plan.md](plan.md) : structure, pagination, arbitrages et gates de revue.
+- [brief.md](brief.md) : périmètre autorisé et informations manquantes.
+- [notes.md](notes.md) : analyse des exemples, synthèse technique et preuves pour le rapport.
+- [report-plan.md](report-plan.md) : **plan de production du rapport** — structure cible, répartition en pages, briefs autoportants par chapitre, sources externes datées, plan des figures.
+- [cost-model.md](cost-model.md) : granularité réelle des appels, calcul illustratif des coûts, comparaison avec un tarif commercial publié, cadre de confiance.
+- [report-outline.md](report-outline.md) : version longue du plan de rapport, non exécutée ; `report-plan.md` prime en cas de divergence.
+- [report-frontmatter.md](report-frontmatter.md) : gabarits réservés pour couverture, page de garde, résumé, mots-clés, sommaire et glossaire.
+- [report-orchestration.md](report-orchestration.md) : comment lancer la rédaction par chapitre, prompt type, ordre de dispatch, contrôles qualité.
+- [assets/requests.md](assets/requests.md) : **six captures à fournir**, noms exacts, priorités et logos facultatifs.
+- [assets/manifest.json](assets/manifest.json) : provenance des anciens visuels et inventaire courant.
+- [diagrams/README.md](diagrams/README.md) : sources, périmètre et réutilisation des diagrammes.
+- [metadata.json](metadata.json) : couverture ; établissement/formation à compléter.
 
 ## Construction
 
 Depuis la racine :
+
 ```sh
 pnpm --filter @recruitment/presentation pdf:build
 pnpm --filter @recruitment/presentation diagram:check
 ```
 
-La construction lit draft.md, insère les intercalaires, écrit `dist/reading-slides.json` et `dist/page-map.md`, produit les SVG puis compile Typst. Les images retournées dans `assets/images/` sous les noms attendus remplacent automatiquement les emplacements vides à la construction suivante. Notes orales conservées dans le script/JSON, sources courtes dans les pieds de page concernés.
+Le build lit `draft.md`, génère `dist/reading-slides.json` et `dist/page-map.md`, rend les diagrammes SVG et compile **`exports/status.pdf`**, export partagé suivi par Git. Déposer les captures demandées dans `assets/images/` sous leurs noms exacts puis reconstruire : les placeholders sont remplacés automatiquement, sans recadrage. Les anciens fichiers sont conservés ; leurs noms ne sont pas réutilisés silencieusement.
 
-`pdf/main.typ` est le rendu actif. Typst officiel **0.15.1** installé localement dans `.local/tools/typst-0.15.1/typst`, ou `TYPST_BIN`/PATH ; aucun réglage global. Racine de compilation limitée à presentation par la commande. Un nouveau checkout doit réinstaller le [compilateur officiel](https://github.com/typst/typst/releases/tag/v0.15.1).
+`pdf/main.typ` est le rendu actif. Typst officiel 0.15.1 est installé localement dans `.local/tools/typst-0.15.1/typst`, ou accessible via `TYPST_BIN`/PATH. Racine de compilation limitée à `presentation/`. Pour un nouveau checkout : [compilateur officiel](https://github.com/typst/typst/releases/tag/v0.15.1).
 
-Les diagrammes de classes/architecture ont une source commune `diagrams/models.mjs`, qui produit Mermaid et DOT. Les cas d’utilisation UML sont définis directement en DOT. SVG rendus par **@viz-js/viz 3.31.0** (Graphviz/WASM), sans navigateur ni installation système ; Mermaid **12.1.0** vérifie les `.mmd`, avec jsdom **30.1.2**. Tout est une dépendance de développement de ce workspace.
+Graphviz/WASM via `@viz-js/viz` rend les DOT sans navigateur. Mermaid vérifie les sources `.mmd`. Dépendances limitées à ce workspace ; aucun kit distant nécessaire. `dist/` contient les intermédiaires ignorés. `deck/` reste l’ancien placeholder Reveal/Vite, pas une deuxième version du contenu.
 
-PDF vérifié : compilation, 36 pages, syntaxe Mermaid et inspection de pages rasterisées représentatives (couverture, tableaux, diagrammes, sections, texte). Sorties PDF/SVG/PNG sous `dist/`, ignorées. Données et services de l’application inchangés.
+## Vérification et relecture
 
-## Reveal.js disponible
+PDF compilé, syntaxe des cinq Mermaid vérifiée ; six diagrammes rendus. Quelques pages ont été inspectées à basse résolution avant la demande d’arrêt de l’utilisateur. **Relecture visuelle finale laissée à l’utilisateur : aucune nouvelle rasterisation ni lecture d’images de pages par l’agent.** Ces contrôles portent uniquement sur la présentation ; aucun test applicatif ni appel fournisseur exécuté.
 
-Reveal.js **6.0.2** et Vite sont installés ; `deck/` reste le placeholder initial, sans second draft à maintenir. `deck:dev` sert sur `http://localhost:5174`, `deck:build` compile le placeholder. Aucun serveur de présentation ni navigateur lancé. Si prévisualisation web demandée, utiliser un onglet RMUX nommé `presentation`, selon docs/current/guides/rmux.md.
+Le corps des diapositives s’ajuste automatiquement sur quatre contenus plus denses (`bodySize` dans `scripts/prepare-reading-slides.mjs`) pour éviter le débordement de la zone de texte.
 
-## Relecture
-
-Structure → points → draft → retours → visuels → assemblage → relecture finale. L’utilisateur a autorisé l’assemblage et les diagrammes pour faciliter la lecture ; cela ne vaut pas approbation finale du texte. En attente : retours sur le contenu/cadrage et établissement/formation. Ne pas convertir une proposition en décision métier, ni une fixture en résultat IA réel. Sources techniques dans docs/ ; contextes sensibles et données réelles restent hors des artefacts publiables.
+À finaliser : réception des captures, métadonnées et retour de l’encadrant. Les assertions de réalisation sont séparées des preuves : worker réel intégré, mais qualité IA et gain de temps non mesurés. Les exemples fournis inspirent la structure ; leur contenu métier et leurs méthodes BI/ML ne sont pas repris.

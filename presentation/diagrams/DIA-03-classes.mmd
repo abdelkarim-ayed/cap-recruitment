@@ -22,6 +22,7 @@ class Tache["TâcheExtraction"] {
   resultatOriginal
 }
 class Correction["CorrectionRH"] {
+  questionId
   valeur
   auteur
   date
@@ -41,6 +42,6 @@ Offre "1" -- "0..*" Candidature
 Offre "1" -- "0..*" Etape
 Candidature "1" -- "0..*" Document
 Candidature "1" -- "0..*" Tache
-Tache "1" -- "0..1" Correction
+Tache "1" -- "0..*" Correction
 Candidature "1" -- "0..*" Entretien
 Etape "1" -- "0..*" Entretien

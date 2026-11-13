@@ -1,0 +1,13 @@
+%% Success path; five question families share one extractor request, not five jobs.
+flowchart TB
+  subgraph Input[Extraction]
+    direction LR
+    PDF["PDF privé original"] --> MD["Lecture PDF native → Markdown"]
+    MD --> GW["JevGateway : une requête multi-question"]
+  end
+  GW -.-> F["5 familles : Formation · Certification<br/>Expérience · Couverture · Compétence"]
+  C["Caches locaux privés<br/>Markdown + réponse validée"]
+  GW --> R["Résultat original : brut + champs typés"]
+  R --> H["Revue RH / corrections séparées par champ"]
+  H --> E["Valeurs effectives : revue / export"]
+  E -.- N["Aucune décision de recrutement automatique"]

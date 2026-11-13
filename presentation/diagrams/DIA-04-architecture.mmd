@@ -1,19 +1,17 @@
-%% Generated from models.mjs. Dashed links denote future integration.
+%% Generated from models.mjs. Implemented components, not runtime/quality acceptance.
 flowchart LR
   Web["Interface web<br/>React / Vite"]
-  Api["API métier<br/>NestJS / TypeScript"]
-  Db["PostgreSQL<br/>données persistantes"]
-  Files["Documents privés<br/>stockage local"]
-  Mail["Port mail<br/>adaptateur remplaçable"]
-  Extraction["Ports extraction<br/>lecteur + exécuteur"]
-  Fixtures["Fixtures locales<br/>exécution explicite"]
-  Live["Lecture PDF/DOCX + IA<br/>à intégrer"]
-  Web -->|HTTP / JSON| Api
-  Api --> Db
-  Api --> Files
-  Api --> Mail
-  Api --> Extraction
-  Extraction -->|actuel| Fixtures
-  Extraction -.->|extension| Live
-  classDef future fill:#fff8eb,stroke:#b7791f,stroke-dasharray:5 5
-  class Live future
+  Api["API métier<br/>NestJS / TS"]
+  Data["Persistance privée<br/>PostgreSQL · fichiers"]
+  Mail["Port mail<br/>adaptateur"]
+  Extraction["Traitement différé<br/>PDF natif · worker"]
+  Cache["Caches privés<br/>Markdown / réponse"]
+  Live["Jev externe<br/>extraction structurée"]
+  Web -->|HTTP<br/>JSON| Api
+  Api -->|ports<br/>SQL| Data
+  Api -->|port| Mail
+  Api -->|hors<br/>HTTP| Extraction
+  Extraction --> Cache
+  Extraction -->|JevGateway| Live
+  classDef external fill:#fff8eb,stroke:#b7791f
+  class Live external

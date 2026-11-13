@@ -1,0 +1,33 @@
+// Selected physical schema, migrations 001–010; not the conceptual DIA-03.
+// Arrows go from referencing table to referenced table. No invented ledger FK.
+digraph ER {
+  graph [rankdir=TB, bgcolor="white", pad=0.12, nodesep=0.3, ranksep=0.4,
+    fontname="Liberation Sans", fontsize=13, fontcolor="#172B4D",
+    label="RPT-ER · Noyau relationnel du dossier CV", labelloc=t, splines=polyline];
+  node [shape=box, fontname="Liberation Sans", fontsize=11, color="#0F766E",
+    fontcolor="#172B4D", style=filled, fillcolor="white", margin="0.1,0.08"];
+  edge [color="#172B4D", fontcolor="#172B4D", fontname="Liberation Sans", fontsize=10, arrowsize=0.65];
+  user [label="\"user\"\n\nPK id"];
+  vacancies [label="vacancies\n\nPK id\lFK owner_id\lrevision / interview_revision\lextraction_reference_date\l"];
+  applications [label="applications\n\nPK id\lFK vacancy_id\lFK candidate_id\lUQ (candidate_id, vacancy_id)\lvacancy_snapshot : JSONB\l"];
+  tasks [label="application_tasks\n\nPK (application_id, task_id)\lFK application_id\lsource_input_id / args\lstatus / result / provenance\l"];
+  documents [label="application_documents\n\nPK id\lFK application_id\lFK, UQ stored_file_id\lUQ (application_id, input_id)\l"];
+  files [label="stored_files\n\nPK id\lUQ storage_ref\lcontent_hash / byte_count\l"];
+  corrections [label="extraction_field_corrections\n\nPK (application_id,\l task_id, question_id)\lFK (application_id, task_id)\lvalue : JSONB\l"];
+  ledger [label="cv_request_attempts\n\nPK (mode, request_hash)\lUQ attempt_id\lapplication_id / task_id\lstate / attempts / retry_after\lAUCUNE FK vers le dossier\l"];
+  vacancies -> user [label="owner_id"];
+  applications -> user [label="candidate_id"];
+  applications -> vacancies [label="vacancy_id"];
+  tasks -> applications [label="application_id"];
+  documents -> applications [label="application_id"];
+  documents -> files [label="stored_file_id"];
+  corrections -> tasks [label="FK composite"];
+  {rank=same; user; vacancies;}
+  {rank=same; applications; files;}
+  {rank=same; tasks; documents;}
+  {rank=same; corrections; ledger;}
+  // Layout only: ledger deliberately has no relational edge.
+  ledger -> documents [style=invis];
+  note [shape=plain, fontsize=10, label="PK : clé primaire ; UQ : unicité ; FK : clé étrangère\nFlèche : table référençante vers table référencée.\nColonnes et tables secondaires volontairement omises."];
+  note -> corrections [style=invis];
+}

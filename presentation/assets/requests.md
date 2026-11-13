@@ -1,47 +1,79 @@
-# Visuels à fournir
+# Visuels et informations à fournir
 
-**Reçus et intégrés** : les six images numérotées 3, 20, 21, 22, 25 et 27 ont été déplacées depuis `~/Downloads` vers `assets/images/`. Originaux conservés sans recadrage ni retouche, proportions respectées. Les descriptions ci-dessous servent de référence de provenance ; aucune de ces six images ne reste à fournir.
+## Priorité : six captures actuelles
 
-Pagination du PDF actuel : **36 pages** (30 contenus + 6 intercalaires). Référence générée : `../dist/page-map.md`. Les images retournées sous les noms ci-dessous sont intégrées automatiquement au prochain `pdf:build`.
+Les rectangles du PDF sont intentionnels. Déposer les fichiers dans **`presentation/assets/images/`**, sous les noms exacts ci-dessous, puis lancer `pnpm --filter @recruitment/presentation pdf:build`. Ils remplacent automatiquement les placeholders, sans recadrage. PNG préféré, paysage, environ 1600 px de large ; cadrer une zone métier lisible plutôt qu’un écran complet très dense.
 
-## Image à générer par un modèle externe
+| Priorité | Page PDF / contenu | Fichier exact | Ce qu’il faut montrer |
+|---|---|---|---|
+| **1** | **26 / 22 — Examiner et corriger** | `CAP-12-revue-cv.png` | Dossier synthétique : PDF visible et panneau de résultat/correction pour un champ. Garder l’indication de provenance réelle, simulée ou corrigée. C’est le visuel principal de la contribution IA + contrôle humain. |
+| **2** | **27 / 23 — Export et présélection** | `CAP-13-import-decisions.png` | Aperçu du CSV avec quelques lignes, décisions retenues et confirmation finale. Capturer l’aperçu suffit : inutile d’appliquer le lot pour l’image. |
+| **3** | **24 / 20 — Publier l’offre** | `CAP-10-offre-publication.png` | Configuration ou résumé avant publication : formulaire, extraction et plan d’entretien. Choisir une zone représentative plutôt que tout le long formulaire. |
+| **4** | **28 / 24 — Entretiens** | `CAP-14-agenda.png` | Agenda avec un rendez-vous synthétique lisible ; éventuellement le détail et l’interviewer affecté. |
+| **5** | **25 / 21 — Candidature** | `CAP-11-candidature.png` | Formulaire candidat avec données synthétiques et PDF choisi, ou confirmation du dépôt. Aucun nouvel appel IA nécessaire pour fournir l’image : un dossier existant convient. |
+| **6** | **29 / 25 — Décision** | `CAP-15-decision.png` | Dossier existant où le responsable voit l’action de proposition ou d’embauche, avec les prérequis lisibles. Ne pas inventer ni déclencher une décision pour la seule capture. |
 
-### IMG-01 · Page 3 · Contexte : acteurs du recrutement
+Si le temps manque : fournir d’abord **CAP-12 et CAP-13**. Les autres placeholders restent explicites et le texte est déjà complet. Les captures doivent venir de l’application, pas d’un générateur d’images. Utiliser des dossiers synthétiques ; masquer les éléments personnels ou d’accès. Ne pas convertir un libellé fixture en résultat IA réel.
 
-- **Fichier** : `presentation/assets/images/IMG-01-contexte-recrutement.png`
-- **Format** : paysage 4:3, idéalement 1600 × 1200 px ; fond blanc ou très clair.
-- **Rôle** : illustrer le travail collectif autour d’un dossier de candidature. Facultatif ; aucune autre image générée nécessaire.
-- **Prompt prêt à copier** :
+**Liste consolidée pour la version 40 pages : aucun nouveau fichier requis.** Les six noms précédents restent valables ; seule la pagination change. Faire une seule collecte, puis prévenir l’agent lorsque tous les fichiers sont déposés pour reconstruire le PDF. Aucun rafraîchissement des services ni nouvelle soumission payante n’est requis par cette demande.
 
-> Illustration éditoriale sobre pour une présentation universitaire francophone sur une plateforme de recrutement en entreprise. Trois personnes adultes, aux apparences variées, collaborent autour d’une table avec un dossier de candidature et un ordinateur portable. Une personne consulte le dossier, une autre prend des notes, la troisième participe à l’échange. Composition claire, légèrement stylisée, volumes simples, perspective naturelle. Palette bleu ardoise #172B4D, vert profond #0F766E, gris clair et blanc. Grand espace négatif, lumière douce, détails peu nombreux. Format paysage 4:3. Aucun mot, aucune lettre, aucun chiffre, aucun logo, aucune interface lisible. Pas de robot, pas de cerveau lumineux, pas de sélection automatique ni classement des personnes. Illustration de coordination humaine, sans imitation d’une capture d’application.
+## Logos facultatifs — aucun blocage
 
-Ne pas demander de texte au modèle : les acteurs et leurs rôles figurent déjà sur la slide.
+| Identifiant | Fichier souhaité | Utilisation prévue | Source |
+|---|---|---|---|
+| LOGO-01 | `LOGO-01-beecoders.png` | Couverture, organisme d’accueil | Logo officiel fourni par l’entreprise ou l’utilisateur |
+| LOGO-02 | `LOGO-02-institution.svg` | Couverture, établissement | Logo officiel de l’établissement, après identification |
 
-## Captures réelles à fournir manuellement
+Reçus le 13 novembre 2026 et intégrés à la couverture du PDF de présentation. L’établissement reste à préciser.
 
-Ces visuels viennent de l’application, **pas d’un générateur d’images**. Utiliser les comptes/dossiers synthétiques de la démo, recadrer une zone lisible et conserver les mentions fixture lorsque pertinentes. Aucun mot de passe, code de vérification ou identité réelle visible. Les noms correspondent aux emplacements actuels.
+## État des captures — reçues le 13 novembre 2026
 
-| Page PDF | Fichier dans `presentation/assets/images/` | Zone à montrer |
+Les huit captures ont été reçues et intégrées (aucun recadrage) :
+
+| ID | Fichier | Contenu fourni |
 |---|---|---|
-| **20** | `CAP-02-configuration-offre.png` | Configuration d’une offre : quelques champs de formulaire et un document attendu. Si possible, lien avec la tâche d’extraction, sans tout afficher. |
-| **21** | `CAP-03-depot-candidature.png` | Formulaire candidat renseigné avec données synthétiques et document joint, ou confirmation de dépôt. |
-| **22** | `CAP-04-dossier-rh.png` | Liste de candidatures RH avec filtres et quelques lignes lisibles, ou vue d’ensemble d’un dossier. |
-| **25** | `CAP-05-correction-rh.png` | Résultat fixture et dernière correction RH effective. Afficher les libellés qui distinguent résultat original et correction. |
-| **27** | `CAP-06-agenda.png` | Agenda avec un rendez-vous synthétique et les informations de planification utiles. |
+| CAP-10 | `CAP-10-offre-publication.png` | Brouillon prêt à publier + dialogue de confirmation, formulaire en arrière-plan |
+| CAP-11 | `CAP-11-candidature.png` | Candidature vue candidat, CV prévisualisé |
+| CAP-12 | `CAP-12-revue-cv.png` | Assistant de revue : PDF à gauche, champs extraits à droite |
+| CAP-13 | `CAP-13-import-decisions.png` | Import CSV (gauche) + éditeur CSV en ligne (droite) |
+| CAP-14 | `CAP-14-agenda.png` | Agenda en mode passé, plusieurs entretiens passés |
+| CAP-15 | `CAP-15-decision.png` | Progression entretien/recrutement, entretien réussi, prochaine action |
+| CAP-16 | `additional-inbox-view.png` | Boîte de réception RH avec plusieurs messages non lus |
+| CAP-17 | `export-csv.png` | Export CSV ouvert dans un tableur (optionnelle) |
 
-Préférer un recadrage paysage, environ 1600 px de large. Les données/manipulations doivent être réelles ; ne pas fabriquer un état d’entretien pour obtenir une capture. La mise en page pourra donner davantage de place à une capture reçue si nécessaire.
+PNG transparent ou SVG officiel ; ne pas générer une imitation de logo. **Ces logos ne sont pas branchés automatiquement au rendu** : leur placement sera ajusté s’ils sont fournis. La couverture est déjà utilisable avec les noms en texte. Aucun téléchargement tenté sans connaître l’établissement ou l’identité visuelle officielle exacte.
 
-## Diagrammes déjà réalisés : aucune génération externe
+## Informations de couverture
 
-| Page PDF | Visuel | Code et rendu |
+- Établissement et formation exacte : remplacer `[Établissement · Formation]` dans `metadata.json`.
+- Confirmer l’auteur, l’encadrant déjà renseigné, l’année académique et le nom de travail **CAP**.
+- Éventuel encadrant académique distinct et date exacte de la pré-soutenance ; sinon « Novembre 2026 » reste volontairement général.
+
+## Pas d’illustration générée nécessaire
+
+Les diagrammes expliquent le système ; les captures démontrent les usages. Aucun robot, cerveau, photo décorative, faux écran ou résultat inventé n’est nécessaire. Pas de service distant de placeholder : les emplacements sont dessinés localement par Typst, sans dépendance réseau.
+
+## Diagrammes prêts pour la présentation et le rapport
+
+| Page PDF | ID | Sujet |
 |---|---|---|
-| **14** | UML : cas d’utilisation | `diagrams/DIA-02-use-cases.dot` → `dist/diagrams/DIA-02-use-cases.svg` |
-| **15** | UML : classes conceptuelles | `diagrams/models.mjs` → `DIA-03-classes.mmd` et `.dot` → SVG |
-| **16** | Architecture modulaire | `diagrams/models.mjs` → `DIA-04-architecture.mmd` et `.dot` → SVG |
+| 14 | DIA-02 | Acteurs et cas d’utilisation |
+| 15 | DIA-03 | Modèle métier conceptuel |
+| 16 | DIA-04 | Architecture actuelle |
+| 18 | DIA-05 | Extraction documentaire |
+| 21 | DIA-07 | Source, correction et valeur effective |
+| 22 | DIA-06 | Parcours de recrutement |
 
-Les sources Mermaid sont syntaxiquement vérifiées. Les SVG intégrés sont rendus localement par Graphviz/WASM à partir des mêmes données, sans navigateur. Mermaid n’ayant pas de notation native dédiée aux cas d’utilisation UML, cette vue utilise directement DOT.
+Sources dans `presentation/diagrams/`, SVG vectoriels dans `presentation/dist/diagrams/` après build. Le [README des diagrammes](../diagrams/README.md) explique les simplifications et la réutilisation. Aucune image externe à commander pour ces schémas.
 
-## ODD et couverture
+## Visuels antérieurs conservés
 
-- **Page 33** : pas d’image générée nécessaire. Une icône officielle ODD 8 peut être ajoutée ultérieurement depuis les ressources de l’ONU, sans la redessiner par IA.
-- **Page 1** : fournir plus tard les métadonnées et éventuels logos autorisés ; nom CAP à confirmer. Champs centralisés dans `presentation/metadata.json`.
+Les six fichiers IMG-01 et CAP-02 à CAP-06 restent dans `assets/images/`, sans modification ni recadrage. Ils ne sont plus intégrés au PDF courant : les écrans d’octobre peuvent diverger du produit actuel. Provenance et anciennes pages dans `manifest.json`, sous `historicalAssets`.
+
+### IMG-01 — provenance de l’ancienne illustration
+
+Illustration fournie par l’utilisateur depuis `~/Downloads/3.png`, modèle externe non précisé. Ancien brief : trois personnes collaborant autour d’un dossier, illustration éditoriale sobre, palette bleu ardoise/vert/gris, format 4:3, sans texte ni logo ni interface lisible. Ce visuel n’est pas une preuve produit et aucune nouvelle génération n’est demandée.
+
+## Relecture visuelle
+
+À la demande de l’utilisateur, **plus de rasterisation ni lecture d’images de pages par l’agent** après son interruption du 13 novembre. L’utilisateur vérifie lui-même la mise en page dans le PDF. Quelques pages avaient été inspectées auparavant ; cela ne constitue pas une revue visuelle finale de toutes les pages.

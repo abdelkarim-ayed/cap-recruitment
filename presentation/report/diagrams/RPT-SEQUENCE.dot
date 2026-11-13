@@ -1,0 +1,32 @@
+// A deliberately tabular sequence: avoids six tiny A4 lifelines.
+// Alternatives refer to their own phase, never a post-success optional error.
+digraph Sequence {
+  graph [rankdir=TB, bgcolor="white", pad=0.08, ranksep=0.25,
+    fontname="Liberation Sans", fontsize=13, fontcolor="#172B4D",
+    label="RPT-SEQUENCE · Un extracteur, une requête groupée", labelloc=t];
+  node [shape=plain, fontname="Liberation Sans", fontsize=11, fontcolor="#172B4D"];
+  edge [style=invis];
+  success [label=<<TABLE BORDER="1" COLOR="#0F766E" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5">
+    <TR><TD COLSPAN="2" BGCOLOR="#E8F4F1"><B>Chronologie · branche sans cache réponse</B></TD></TR>
+    <TR><TD>1</TD><TD ALIGN="LEFT"><B>Candidat → HTTP → PostgreSQL</B><BR ALIGN="LEFT"/>Valider le dépôt ; commit candidature pending + documents.<BR ALIGN="LEFT"/>Répondre sans attendre l’extraction ; signal après commit.</TD></TR>
+    <TR><TD>2</TD><TD ALIGN="LEFT"><B>Worker API → PostgreSQL</B><BR ALIGN="LEFT"/>Réveil / scan : claim éligible, FOR UPDATE SKIP LOCKED.<BR ALIGN="LEFT"/>Bail + token ; initialiser / démarrer la tâche.</TD></TR>
+    <TR><TD>3</TD><TD ALIGN="LEFT"><B>Worker → stockage / parseur natif enfant</B><BR ALIGN="LEFT"/>Vérifier PDF / hash ; cache parseur ou PDF → Markdown.<BR ALIGN="LEFT"/>Construire la requête avec questions + date figée.</TD></TR>
+    <TR><TD>4</TD><TD ALIGN="LEFT"><B>Coordinateur → cache réponse privé</B><BR ALIGN="LEFT"/>Contrôler éligibilité, identité et réponse complète.<BR ALIGN="LEFT"/>Hit validé : aller à 10 ; aucun reserve / admit / send.</TD></TR>
+    <TR><TD>5</TD><TD ALIGN="LEFT"><B>Coordinateur → PostgreSQL</B><BR ALIGN="LEFT"/>Cache miss : reserve (mode, request_hash) → prepared.<BR ALIGN="LEFT"/>markSending → send_started ; commit confirmé requis.</TD></TR>
+    <TR><TD>6</TD><TD ALIGN="LEFT"><B>Coordinateur → JevGateway → Redis</B><BR ALIGN="LEFT"/>Admission atomique, après la frontière durable.<BR ALIGN="LEFT"/>Un actif ; 3 admissions/min ; 20 au total persistant.</TD></TR>
+    <TR><TD>7</TD><TD ALIGN="LEFT"><B>JevGateway → Jev → coordinateur</B><BR ALIGN="LEFT"/>Un POST borné, sans retry ; lire JSON, puis valider<BR ALIGN="LEFT"/>toute la réponse multi-question.</TD></TR>
+    <TR><TD>8</TD><TD ALIGN="LEFT"><B>Coordinateur → cache fichier privé</B><BR ALIGN="LEFT"/>Écrire atomiquement la réponse complète validée<BR ALIGN="LEFT"/><B>AVANT</B> le règlement PostgreSQL du succès.</TD></TR>
+    <TR><TD>9</TD><TD ALIGN="LEFT"><B>Coordinateur → PostgreSQL</B><BR ALIGN="LEFT"/>settle succeeded : connaissance durable de l’envoi.<BR ALIGN="LEFT"/>Recontrôler l’activité du propriétaire de la tâche.</TD></TR>
+    <TR><TD>10</TD><TD ALIGN="LEFT"><B>Worker → PostgreSQL</B><BR ALIGN="LEFT"/>Sauver completed + original immuable / provenance.<BR ALIGN="LEFT"/>Token, bail et barrières métier contrôlés ; finir le lot.</TD></TR>
+  </TABLE>>];
+  branches [label=<<TABLE BORDER="1" COLOR="#0F766E" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5">
+    <TR><TD BGCOLOR="#E8F4F1"><B>Alternatives à leur point d’origine · pas après succès</B></TD></TR>
+    <TR><TD ALIGN="LEFT"><B>3–4 · Erreur locale / cache-only miss</B><BR ALIGN="LEFT"/>Échec typé ; aucun fallback payant en reprise locale.</TD></TR>
+    <TR><TD ALIGN="LEFT"><B>5 · Accusé du commit send_started inconnu</B><BR ALIGN="LEFT"/>Ne pas appeler le gateway ; récupération selon la garde.</TD></TR>
+    <TR><TD ALIGN="LEFT"><B>6 · Prouvé non envoyé</B><BR ALIGN="LEFT"/>busy / rate / Redis indisponible → retryable_unsent.<BR ALIGN="LEFT"/>Autres refus non envoyés → terminal ; aucun remboursement.</TD></TR>
+    <TR><TD ALIGN="LEFT"><B>7 · Réponse connue ≠ transport ambigu</B><BR ALIGN="LEFT"/>HTTP non-2xx (dont 429), JSON / réponse invalide → terminal.<BR ALIGN="LEFT"/>Transport ambigu après début d’envoi → uncertain ; pas de resend.</TD></TR>
+    <TR><TD ALIGN="LEFT"><B>8 · Écriture cache impossible</B><BR ALIGN="LEFT"/>Tenter settle succeeded ; tâche en échec opérationnel.<BR ALIGN="LEFT"/>Même sans cache, le succès durable interdit un nouvel envoi.</TD></TR>
+    <TR><TD ALIGN="LEFT"><B>9–10 · Cache acquis, règlement / save non confirmé</B><BR ALIGN="LEFT"/>Garder le bail ; après expiration, replay cache-only.<BR ALIGN="LEFT"/>Cache absent / invalide : indisponible, jamais de nouvel appel.</TD></TR>
+  </TABLE>>];
+  success -> branches;
+}

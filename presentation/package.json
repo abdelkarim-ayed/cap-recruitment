@@ -6,6 +6,8 @@
     "deck:dev": "vite deck --host 127.0.0.1 --port 5174 --strictPort",
     "deck:build": "vite build deck --outDir ../dist/deck",
     "pdf:build": "node scripts/prepare-reading-slides.mjs && node scripts/render-diagrams.mjs && node scripts/typst.mjs compile pdf/main.typ exports/status.pdf --root .",
+    "report:build": "node scripts/render-diagrams.mjs && node report/diagrams/render.mjs && node report/scripts/assemble.mjs && node scripts/typst.mjs compile report/pdf/main.typ exports/report.pdf --root .",
+    "report:pages": "node scripts/typst.mjs query report/pdf/main.typ '<report-main-body-pages>' --field value --one --root .",
     "diagram:render": "node scripts/render-diagrams.mjs",
     "typst": "node scripts/typst.mjs",
     "diagram:check": "node scripts/check-diagrams.mjs"

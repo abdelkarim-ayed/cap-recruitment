@@ -1,14 +1,226 @@
 {
-  "version": 2,
+  "version": 3,
+  "updated": "2026-11-13",
   "assets": [
-    { "id": "DIA-02", "file": "../dist/diagrams/DIA-02-use-cases.svg", "source": "../diagrams/DIA-02-use-cases.dot", "kind": "uml-use-cases", "provenance": "Agent-authored from implemented actor/owner/assignment policies, rendered by Graphviz WASM", "page": 14, "status": "rendered-for-review" },
-    { "id": "DIA-03", "file": "../dist/diagrams/DIA-03-classes.svg", "source": "../diagrams/models.mjs", "mermaid": "../diagrams/DIA-03-classes.mmd", "kind": "uml-conceptual-classes", "provenance": "Agent-authored conceptual subset of implemented model; Mermaid and DOT generated from shared model; Graphviz WASM rendering", "page": 15, "status": "rendered-for-review" },
-    { "id": "DIA-04", "file": "../dist/diagrams/DIA-04-architecture.svg", "source": "../diagrams/models.mjs", "mermaid": "../diagrams/DIA-04-architecture.mmd", "kind": "architecture", "provenance": "Agent-authored from current stack/ports, future extraction marked; Mermaid and DOT generated from shared model; Graphviz WASM rendering", "page": 16, "status": "rendered-for-review" },
-    { "id": "IMG-01", "file": "images/IMG-01-contexte-recrutement.png", "kind": "external-generated-illustration", "page": 3, "status": "received-integrated", "provenance": "User-supplied illustration moved from ~/Downloads/3.png; external model unspecified; not product evidence", "width": 1448, "height": 1086, "crop": "none", "prompt": "requests.md#img-01--page-3--contexte--acteurs-du-recrutement" },
-    { "id": "CAP-02", "file": "images/CAP-02-configuration-offre.png", "kind": "real-product-capture", "page": 20, "status": "received-integrated", "provenance": "User capture moved from ~/Downloads/20.png", "width": 937, "height": 1006, "crop": "none" },
-    { "id": "CAP-03", "file": "images/CAP-03-depot-candidature.png", "kind": "real-product-capture", "page": 21, "status": "received-integrated", "provenance": "User capture moved from ~/Downloads/21.png; synthetic candidate", "width": 1097, "height": 880, "crop": "none" },
-    { "id": "CAP-04", "file": "images/CAP-04-dossier-rh.png", "kind": "real-product-capture", "page": 22, "status": "received-integrated", "provenance": "User capture moved from ~/Downloads/22.png; synthetic candidates", "width": 1087, "height": 476, "crop": "none" },
-    { "id": "CAP-05", "file": "images/CAP-05-correction-rh.png", "kind": "real-product-capture", "page": 25, "status": "received-integrated", "provenance": "User capture moved from ~/Downloads/25.png; synthetic CV and fixture labels retained", "width": 1304, "height": 945, "crop": "none" },
-    { "id": "CAP-06", "file": "images/CAP-06-agenda.png", "kind": "real-product-capture", "page": 27, "status": "received-integrated", "provenance": "User capture moved from ~/Downloads/27.png; synthetic agenda, including user-visible failed and scheduled instances", "width": 1069, "height": 532, "crop": "none" }
+    {
+      "id": "DIA-02",
+      "file": "../dist/diagrams/DIA-02-use-cases.svg",
+      "source": "../diagrams/DIA-02-use-cases.dot",
+      "page": 14,
+      "status": "rendered-for-review"
+    },
+    {
+      "id": "DIA-03",
+      "file": "../dist/diagrams/DIA-03-classes.svg",
+      "source": "../diagrams/models.mjs",
+      "page": 15,
+      "status": "rendered-for-review"
+    },
+    {
+      "id": "DIA-04",
+      "file": "../dist/diagrams/DIA-04-architecture.svg",
+      "source": "../diagrams/models.mjs",
+      "page": 16,
+      "status": "rendered-for-review"
+    },
+    {
+      "id": "DIA-05",
+      "file": "../dist/diagrams/DIA-05-processing.svg",
+      "source": "../diagrams/DIA-05-processing.dot",
+      "page": 18,
+      "status": "rendered-for-review"
+    },
+    {
+      "id": "DIA-07",
+      "file": "../dist/diagrams/DIA-07-review.svg",
+      "source": "../diagrams/DIA-07-review.dot",
+      "page": 21,
+      "status": "rendered-for-review"
+    },
+    {
+      "id": "DIA-06",
+      "file": "../dist/diagrams/DIA-06-lifecycle.svg",
+      "source": "../diagrams/DIA-06-lifecycle.dot",
+      "page": 22,
+      "status": "rendered-for-review"
+    },
+    {
+      "id": "CAP-10",
+      "file": "images/CAP-10-offre-publication.png",
+      "page": 24,
+      "status": "received-integrated",
+      "kind": "real-product-capture",
+      "provenance": "Capture fournie par l’utilisateur le 13 novembre 2026 ; données synthétiques."
+    },
+    {
+      "id": "CAP-11",
+      "file": "images/CAP-11-candidature.png",
+      "page": 25,
+      "status": "received-integrated",
+      "kind": "real-product-capture",
+      "provenance": "Capture fournie par l’utilisateur le 13 novembre 2026 ; données synthétiques."
+    },
+    {
+      "id": "CAP-12",
+      "file": "images/CAP-12-revue-cv.png",
+      "page": 26,
+      "status": "received-integrated",
+      "kind": "real-product-capture",
+      "provenance": "Capture fournie par l’utilisateur le 13 novembre 2026 ; données synthétiques."
+    },
+    {
+      "id": "CAP-13",
+      "file": "images/CAP-13-import-decisions.png",
+      "page": 27,
+      "status": "received-integrated",
+      "kind": "real-product-capture",
+      "provenance": "Capture fournie par l’utilisateur le 13 novembre 2026 ; données synthétiques."
+    },
+    {
+      "id": "CAP-14",
+      "file": "images/CAP-14-agenda.png",
+      "page": 28,
+      "status": "received-integrated",
+      "kind": "real-product-capture",
+      "provenance": "Capture fournie par l’utilisateur le 13 novembre 2026 ; données synthétiques."
+    },
+    {
+      "id": "CAP-15",
+      "file": "images/CAP-15-decision.png",
+      "page": 29,
+      "status": "received-integrated",
+      "kind": "real-product-capture",
+      "provenance": "Capture fournie par l’utilisateur le 13 novembre 2026 ; données synthétiques."
+    },
+    {
+      "id": "CAP-16",
+      "kind": "real-product-capture",
+      "file": "images/additional-inbox-view.png",
+      "page": 31,
+      "status": "received-integrated",
+      "provenance": "Capture fournie par l’utilisateur le 13 novembre 2026 ; données synthétiques."
+    },
+    {
+      "id": "CAP-17",
+      "kind": "real-product-capture",
+      "file": "images/export-csv.png",
+      "page": 32,
+      "status": "received-integrated",
+      "provenance": "Capture fournie par l’utilisateur le 13 novembre 2026 ; données synthétiques."
+    }
+  ],
+  "diagramProvenance": "Agent-authored from current project contracts; Graphviz/WASM rendering; scope and sources in diagrams/README.md.",
+  "historicalNote": "Entries below preserve provenance and page numbers of the previous October deck, not the current PDF. Historical status describes that version only.",
+  "historicalAssets": [
+    {
+      "id": "DIA-02",
+      "file": "../dist/diagrams/DIA-02-use-cases.svg",
+      "source": "../diagrams/DIA-02-use-cases.dot",
+      "kind": "uml-use-cases",
+      "provenance": "Agent-authored from implemented actor/owner/assignment policies, rendered by Graphviz WASM",
+      "page": 14,
+      "status": "rendered-for-review"
+    },
+    {
+      "id": "DIA-03",
+      "file": "../dist/diagrams/DIA-03-classes.svg",
+      "source": "../diagrams/models.mjs",
+      "mermaid": "../diagrams/DIA-03-classes.mmd",
+      "kind": "uml-conceptual-classes",
+      "provenance": "Agent-authored conceptual subset of implemented model; Mermaid and DOT generated from shared model; Graphviz WASM rendering",
+      "page": 15,
+      "status": "rendered-for-review"
+    },
+    {
+      "id": "DIA-04",
+      "file": "../dist/diagrams/DIA-04-architecture.svg",
+      "source": "../diagrams/models.mjs",
+      "mermaid": "../diagrams/DIA-04-architecture.mmd",
+      "kind": "architecture",
+      "provenance": "Agent-authored from current stack/ports, future extraction marked; Mermaid and DOT generated from shared model; Graphviz WASM rendering",
+      "page": 16,
+      "status": "rendered-for-review"
+    },
+    {
+      "id": "IMG-01",
+      "file": "images/IMG-01-contexte-recrutement.png",
+      "kind": "external-generated-illustration",
+      "page": 3,
+      "status": "received-integrated",
+      "provenance": "User-supplied illustration moved from ~/Downloads/3.png; external model unspecified; not product evidence",
+      "width": 1448,
+      "height": 1086,
+      "crop": "none",
+      "prompt": "requests.md#img-01--page-3--contexte--acteurs-du-recrutement"
+    },
+    {
+      "id": "CAP-02",
+      "file": "images/CAP-02-configuration-offre.png",
+      "kind": "real-product-capture",
+      "page": 20,
+      "status": "received-integrated",
+      "provenance": "User capture moved from ~/Downloads/20.png",
+      "width": 937,
+      "height": 1006,
+      "crop": "none"
+    },
+    {
+      "id": "CAP-03",
+      "file": "images/CAP-03-depot-candidature.png",
+      "kind": "real-product-capture",
+      "page": 21,
+      "status": "received-integrated",
+      "provenance": "User capture moved from ~/Downloads/21.png; synthetic candidate",
+      "width": 1097,
+      "height": 880,
+      "crop": "none"
+    },
+    {
+      "id": "CAP-04",
+      "file": "images/CAP-04-dossier-rh.png",
+      "kind": "real-product-capture",
+      "page": 22,
+      "status": "received-integrated",
+      "provenance": "User capture moved from ~/Downloads/22.png; synthetic candidates",
+      "width": 1087,
+      "height": 476,
+      "crop": "none"
+    },
+    {
+      "id": "CAP-05",
+      "file": "images/CAP-05-correction-rh.png",
+      "kind": "real-product-capture",
+      "page": 25,
+      "status": "received-integrated",
+      "provenance": "User capture moved from ~/Downloads/25.png; synthetic CV and fixture labels retained",
+      "width": 1304,
+      "height": 945,
+      "crop": "none"
+    },
+    {
+      "id": "CAP-06",
+      "file": "images/CAP-06-agenda.png",
+      "kind": "real-product-capture",
+      "page": 27,
+      "status": "received-integrated",
+      "provenance": "User capture moved from ~/Downloads/27.png; synthetic agenda, including user-visible failed and scheduled instances",
+      "width": 1069,
+      "height": 532,
+      "crop": "none"
+    }
+  ],
+  "logos": [
+    {
+      "id": "LOGO-01",
+      "file": "images/LOGO-01-beecoders.png",
+      "status": "received-integrated",
+      "use": "couverture, organisme"
+    },
+    {
+      "id": "LOGO-02",
+      "file": "images/LOGO-02-institution.svg",
+      "status": "received-integrated",
+      "use": "couverture, établissement"
+    }
   ]
 }

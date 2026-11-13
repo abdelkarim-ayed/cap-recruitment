@@ -1,26 +1,36 @@
-# Presentation brief
+# Brief — pré-soutenance PFE
 
-## Confirmed
-- Progress meeting about the company-specific recruitment implementation.
-- PDF presentation output; browser deck is an optional preview/presentation route.
-- Existing project docs are evidence/reference, not approved slide wording.
-- User reviews point-only notes before prose drafting, then iterates on draft.
-- Approximately 30 content slides for a progress meeting; six section dividers now requested, making 36 PDF pages. French wording revised toward nominal/precise titles and concise points. Explicit functional/non-functional requirements, three diagrams, eleven realization slides, one ODD slide.
-- PDF assembly and diagram coding/rendering now authorized. Cover has proposed codename CAP and metadata placeholders. Section labels bracketed/underlined and separated from titles; key terms bold. Current script in draft.md; no final content approval yet.
-- Existing-solutions table precedes the proposed solution and includes documented Textkernel parsing/semantic-search functions, alongside ATS/generic tools. No claimed RAG architecture or supplier benchmark. Penultimate content is prose synthesis “Bilan d’avancement et backlog”; conclusion highlights concrete value without invented metrics.
-- Diagrams and generated images may be included. Agent provides stable names and descriptions/prompts; user generates/returns images.
-- Optional later decision/work log for the report, only if time allows. Reorganize existing evidence; do not invent dates, results or history.
+## Cadrage retenu le 13 novembre 2026
 
-## Pending user inputs
-- Further examples if useful; supplied structure is now reflected in notes.md.
-- Audience and approximate speaking duration (30 contents + six section dividers).
-- Institution/program, confirmation/replacement of proposed CAP name, and any additional branding. Provided: Ayed Abdelkarim, Aziz Ben Ismail, BeeCoders, 11 octobre 2026 (Tunis online date check), academic year 2026–2027.
-- Image framing/content feedback: five manual captures and context illustration received and integrated without cropping. Provenance/pages in assets/manifest.json and assets/requests.md. Typst is the active PDF renderer; Reveal remains an unused placeholder.
+- Présentation en français pour une nouvelle revue par l’encadrant, proche de la version finale, sous contrainte de temps utilisateur.
+- Projet d’ingénierie logicielle : plateforme de recrutement avec assistance documentaire IA. Ni projet de prédiction d’embauche ni entraînement d’un modèle.
+- Travail autorisé directement sur main : restructuration, rédaction, diagrammes, assemblage Typst/PDF et placeholders. Les exemples anciens servent d’inspiration, pas de cahier des charges.
+- Délégation de tâches bornées explicitement autorisée avec GPT-6.1 Sol : lecture des exemples, synthèse des faits, diagrammes.
+- Après précision utilisateur : 34 diapositives principales dont couverture et plan, deux annexes, six intercalaires : 42 pages. Équilibre recherché entre produit et compétences d’ingénierie ; rapport plus technique et approfondi. Durée de travail suggérée : 20–25 minutes avec parcours sélectif, à adapter à la consigne réelle.
+- Les étapes intermédiaires de validation ne bloquent plus cette révision : l’utilisateur demande une version assemblée. La validation finale du contenu reste humaine.
 
-## Evidence boundaries
-- Implemented: persisted identity/intake, vacancies/forms, private documents, mock extraction/review/export; bounded interview/agenda/internal decision/inbox workflow.
-- Extraction is fixture-only, not live AI or measured parsing accuracy.
-- Selection is manual; CSV decision reimport and candidate business updates remain deferred.
-- Automated checks are documented; latest UI polish has no further user/browser verification yet.
+## À compléter
 
-Current repository evidence: ../docs/current/status.md, ../docs/current/product.md, ../docs/current/workflows.md and ../docs/current/contracts/. Requested changes and deferred decisions: ../docs/plan/. Recheck these when drafting.
+- Établissement, formation, éventuel encadrant académique distinct, date exacte. Développement éditorial proposé du nom existant : CAP = Centralisation et Assistance au Parcours de recrutement, sans origine historique revendiquée.
+- Six captures récentes : [demandes précises](assets/requests.md). Anciens visuels conservés, sans les présenter comme preuve de l’interface actuelle.
+- Logos officiels facultatifs ; aucun logo ni écran produit inventé.
+- Le contexte privé annoncé n’a pas été retrouvé : `docs/.ignore/` ne contient ici que `tmp/`, avec un ancien SVG de présentation, un spike et un script de transfert. Ne pas déduire de faits personnels manquants.
+
+## Limites de preuve
+
+Le worker réel et le lecteur PDF natif sont intégrés ; la qualité de l’extraction intégrée n’est pas mesurée. Le CSV de décisions, le gel du plan à publication, les corrections par champ et les règles de décision sont implémentés. Les contrôles datés ne constituent pas une régression complète actuelle. Aucune précision, réduction de temps, enquête terrain, méthode Scrum formelle ou validation production n’est inventée.
+
+Références : [notes et sources](notes.md), [script et notes orales](draft.md), [plan de revue](plan.md).
+
+## Précisions produit et économie
+
+Recrutement généraliste dans un périmètre borné : travail RH partagé, responsabilités finales, affectation des entretiens et notifications ciblées. CSV exploitable dans un tableur ou un outil externe, dont IA, sans prétendre à des connecteurs natifs. Lecture PDF sur CPU local sans OCR ; extraction sémantique externe. Coût illustratif selon hypothèses utilisateur, pas mesure réelle : [modèle](cost-model.md). L’exemple de rapport est une inspiration extérieure, pas une norme de l’établissement.
+
+## Rapport technique — décisions du 13 novembre
+
+- **Étendu, 70–84 pages**, en **français** comme la présentation.
+- **Estimations de coût autorisées** mais étiquetées ; la granularité réelle est d’**une requête multi-questions par extracteur**, pas une par famille.
+- **Couverture et page de garde en réserve** : gabarits vides dans [report-frontmatter.md](report-frontmatter.md), modèle institutionnel à fournir.
+- **Huit captures** reçues le 13 novembre (dont boîte de réception et export CSV), six diagrammes et deux logos officiels ; les fichiers servent au deck et au rapport.
+- **Rédaction par chapitre, modèles distincts** : briefs autoportants dans [report-plan.md](report-plan.md), dispatch et contrôles dans [report-orchestration.md](report-orchestration.md).
+- **Recherche externe** : paysage ATS/parseurs, tarifs publiés, AI Act et NIST, avec URL et date de consultation, dans `report-plan.md` §4.

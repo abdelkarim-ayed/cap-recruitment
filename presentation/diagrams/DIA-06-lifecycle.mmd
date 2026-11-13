@@ -1,0 +1,13 @@
+%% Selected recruitment paths, not processing/review state or an exhaustive transition graph.
+flowchart LR
+  R["Candidature reçue"] -->|RH : présélection| P["Présélectionnée"]
+  R -->|RH : rejet| N["Non retenue : terminal"]
+  P -->|1re planification| I["Entretiens configurés"]
+  P -->|0 entretien configuré + action explicite| O["Proposition<br/>propriétaire"]
+  I -->|tous Pass + action explicite| O
+  I -->|un Fail : fin, annule les autres en cours| N
+  O -->|action séparée| H["Embauche<br/>propriétaire"]
+  Caption["Aucune décision d’embauche automatique"]
+  classDef terminal stroke-width:3px
+  class N,H terminal
+  %% Pass is not Offer; Offer is not Hired. Later manual rejections omitted for readability.

@@ -10,13 +10,18 @@ const output = resolve(root, 'dist/diagrams');
 mkdirSync(output, { recursive: true });
 const q = JSON.stringify;
 const escape = s => s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-const defaults = `graph [rankdir=LR, bgcolor="transparent", pad=0.22, nodesep=0.45, ranksep=0.8, fontname="Liberation Sans"];
-node [fontname="Liberation Sans", fontsize=18, color="#0f766e", fontcolor="#172b4d", penwidth=1.3];
-edge [fontname="Liberation Sans", fontsize=14, color="#64748b", fontcolor="#475569", penwidth=1.2];`;
+const defaults = `graph [rankdir=LR, bgcolor="transparent", pad=0.15, nodesep=0.3, ranksep=0.45, fontname="Liberation Sans", splines=polyline];
+node [fontname="Liberation Sans", fontsize=22, color="#0f766e", fontcolor="#172b4d", penwidth=1.3];
+edge [fontname="Liberation Sans", fontsize=18, color="#64748b", fontcolor="#475569", penwidth=1.2];`;
 const classDot = `graph Classes {
 ${defaults}
-${classes.map(c => `${c.id} [shape=plain, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="12" COLOR="#0f766e"><TR><TD BGCOLOR="#e0f2f1"><B>${escape(c.title)}</B></TD></TR><HR/><TR><TD ALIGN="LEFT">${c.fields.map(escape).join('<BR ALIGN="LEFT"/>')}</TD></TR></TABLE>>];`).join('\n')}
-${associations.map(([a, b, from, to]) => `${a} -- ${b} [taillabel=${q(from)}, headlabel=${q(to)}, labeldistance=2, labelangle=25];`).join('\n')}
+${classes.map(c => `${c.id} [shape=plain, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="8" COLOR="#0f766e"><TR><TD BGCOLOR="#e0f2f1"><B>${escape(c.title)}</B></TD></TR><HR/><TR><TD ALIGN="LEFT">${c.fields.map(escape).join('<BR ALIGN="LEFT"/>')}</TD></TR></TABLE>>];`).join('\n')}
+{rank=same; Offre; Etape;}
+{rank=same; Candidature; Entretien;}
+{rank=same; Document; Tache;}
+Offre -- Candidature -- Document -- Correction [style=invis];
+Etape -- Entretien -- Tache [style=invis];
+${associations.map(([a, b, from, to]) => `${a} -- ${b} [taillabel=${q(from)}, headlabel=${q(to)}, labeldistance=1.6, labelangle=25, constraint=false];`).join('\n')}
 }`;
 const classMermaid = `%% Generated from models.mjs; conceptual UML, selected relationships only.
 classDiagram
@@ -31,7 +36,7 @@ const members = {
   Candidature: ['reponsesFigees', 'progressionInterne'],
   Document: ['fichierPrive', 'empreinte'],
   Tache: ['source', 'parametres', 'etat', 'resultatOriginal'],
-  Correction: ['valeur', 'auteur', 'date'],
+  Correction: ['questionId', 'valeur', 'auteur', 'date'],
   Etape: ['ordre', 'consignes'],
   Entretien: ['date', 'interviewer', 'notes', 'score', 'passFail'],
 };
@@ -40,15 +45,16 @@ const actualClassMermaid = classMermaid.replace(/class (\w+)\["([^"]+)"\] \{[^}]
 const archDot = `digraph Architecture {
 ${defaults}
 node [shape=box, style="rounded,filled", fillcolor="#f0f7f6", margin="0.22,0.17"];
-${components.map(c => `${c.id} [label=${q(`${c.title}\n${c.detail}`)}${c.group === 'future' ? ', style="rounded,dashed,filled", fillcolor="#fff8eb", color="#b7791f"' : ''}${c.id === 'Db' ? ', shape=cylinder' : ''}];`).join('\n')}
-${flows.map(([a, b, label, future]) => `${a} -> ${b} [label=${q(label)}${future ? ', style=dashed, color="#b7791f"' : ''}];`).join('\n')}
+${components.map(c => `${c.id} [label=${q(`${c.title}\n${c.detail}`)}${c.group === 'external' ? ', fillcolor="#fff8eb", color="#b7791f"' : ''}${c.id === 'Data' ? ', shape=cylinder' : ''}];`).join('\n')}
+{rank=same; Web; Mail;}
+${flows.map(([a, b, label]) => `${a} -> ${b} [label=${q(label)}${b === 'Mail' ? ', constraint=false' : ''}];`).join('\n')}
 }`;
-const archMermaid = `%% Generated from models.mjs. Dashed links denote future integration.
+const archMermaid = `%% Generated from models.mjs. Implemented components, not runtime/quality acceptance.
 flowchart LR
 ${components.map(c => `  ${c.id}["${c.title}<br/>${c.detail}"]`).join('\n')}
-${flows.map(([a, b, label, future]) => `  ${a} ${future ? '-.->' : '-->'}${label ? `|${label}|` : ''} ${b}`).join('\n')}
-  classDef future fill:#fff8eb,stroke:#b7791f,stroke-dasharray:5 5
-  class Live future
+${flows.map(([a, b, label]) => `  ${a} -->${label ? `|${label.replaceAll('\n', '<br/>')}|` : ''} ${b}`).join('\n')}
+  classDef external fill:#fff8eb,stroke:#b7791f
+  class Live external
 `;
 for (const [name, dot, mermaid] of [
   ['DIA-03-classes', classDot, actualClassMermaid],
@@ -58,7 +64,7 @@ for (const [name, dot, mermaid] of [
   writeFileSync(resolve(source, `${name}.mmd`), mermaid);
 }
 const viz = await instance();
-for (const name of ['DIA-02-use-cases', 'DIA-03-classes', 'DIA-04-architecture']) {
+for (const name of ['DIA-02-use-cases', 'DIA-03-classes', 'DIA-04-architecture', 'DIA-05-processing', 'DIA-06-lifecycle', 'DIA-07-review']) {
   const dot = readFileSync(resolve(source, `${name}.dot`), 'utf8');
   const svg = viz.renderString(dot, { format: 'svg', engine: 'dot' });
   writeFileSync(resolve(output, `${name}.svg`), svg);

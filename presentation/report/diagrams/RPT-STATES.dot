@@ -1,0 +1,47 @@
+// Separate task status, durable request knowledge, and application closure fence.
+digraph States {
+  graph [rankdir=TB, bgcolor="white", pad=0.12, nodesep=0.25, ranksep=0.4,
+    fontname="Liberation Sans", fontsize=13, fontcolor="#172B4D",
+    label="RPT-STATES · Deux machines et une barrière", labelloc=t, compound=true];
+  node [shape=box, style="rounded,filled", fillcolor="white", color="#0F766E",
+    fontname="Liberation Sans", fontsize=11, fontcolor="#172B4D", margin="0.1,0.08"];
+  edge [fontname="Liberation Sans", fontsize=10, color="#172B4D", fontcolor="#172B4D", arrowsize=0.65];
+  subgraph cluster_task {
+    label="A · application_tasks.status"; color="#0F766E";
+    pending [label="pending"];
+    processing [label="processing"];
+    completed [label="completed\nOriginal final : jamais rejoué"];
+    failed [label="failed\nvalue = null"];
+    pending -> processing [label="start / claim actif"];
+    processing -> completed [label="save succès"];
+    processing -> failed [label="échec ou\nbail expiré"];
+    failed -> processing [label="retry autorisé / délai / < 3\nou reprise cache-only", constraint=false];
+    {rank=same; completed; failed;}
+  }
+  barrier [label="BARRIÈRE APPLICATION · pas un état cancelled\nLibération manuelle OU revue terminée OU présélection/rejet\nFerme claims, start et écritures tardives de résultat.\nL’appel externe peut continuer / coûter ; sa garde peut être réglée.", penwidth=2];
+  completed -> barrier [style=invis];
+  failed -> barrier [style=invis];
+  subgraph cluster_attempt {
+    label="B · cv_request_attempts.state · identité (mode, request_hash)"; color="#0F766E";
+    prepared [label="prepared"];
+    send [label="send_started\nCommit confirmé avant gateway"];
+    succeeded [label="succeeded\nPas de nouvel envoi"];
+    retry [label="retryable_unsent\nProuvé non envoyé"];
+    terminal [label="terminal\nPas de nouvel envoi"];
+    uncertain [label="uncertain\nPas de nouvel envoi"];
+    prepared -> send [label="markSending"];
+    send -> succeeded [label="réponse validée"];
+    send -> retry [label="busy / rate /\nRedis indisponible"];
+    send -> terminal [label="réponse connue\nou refus définitif"];
+    send -> uncertain [label="transport ambigu /\npropriétaire expiré"];
+    retry -> prepared [label="≥ 12 h / garde < 3\npropriétaire actif", constraint=false];
+    {rank=same; succeeded; retry;}
+    {rank=same; terminal; uncertain;}
+    succeeded -> terminal [style=invis];
+    retry -> uncertain [style=invis];
+  }
+  barrier -> prepared [style=invis];
+  notes [shape=plain, fontsize=10, label="prepared expiré : réattribuable, sans preuve d’envoi.\nAccusé DB inconnu : bloquer l’invocation, pas inventer un état DB.\nCache validé avant settle ; reprise locale soumise aux barrières.\nStatut tâche ≠ état d’envoi ≠ préparation de revue ≠ recrutement."];
+  terminal -> notes [style=invis];
+  uncertain -> notes [style=invis];
+}

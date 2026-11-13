@@ -55,7 +55,9 @@
 ]
 #let cover() = {
   stack(spacing: 22pt,
-    text(size: 13pt, fill: muted)[#meta.institution],
+    grid(columns: (1fr, auto), column-gutter: 20pt, align: horizon,
+      text(size: 13pt, fill: muted)[#meta.institution],
+      box(height: 34pt)[#image("../assets/images/LOGO-02-institution.svg", height: 34pt, fit: "contain")]),
     line(length: 80pt, stroke: 3pt + accent),
     text(size: 76pt, weight: "bold", fill: ink)[#meta.codename],
     text(size: 29pt, fill: accent)[#meta.subtitle],
@@ -68,7 +70,7 @@
         text(size: 19pt)[#meta.supervisor]),
       stack(spacing: 10pt,
         text(size: 12pt, fill: muted)[ORGANISME D’ACCUEIL],
-        text(size: 19pt)[#meta.organization],
+        image("../assets/images/LOGO-01-beecoders.png", height: 26pt, fit: "contain"),
         text(size: 12pt, fill: muted)[#upper(meta.occasion)],
         text(size: 17pt)[#meta.date · #meta.academicYear])))
 }
@@ -85,39 +87,28 @@
     stack(spacing: 12pt,
       align(center)[#image(slide.visual.path, width: 100%, height: 3.65in, fit: "contain")],
       items-view(slide.items, size: 17pt))
-  } else if slide.number == 3 {
-    stack(spacing: 25pt,
-      grid(columns: (1fr, 1fr), column-gutter: 26pt,
-        block(fill: light, inset: 22pt, radius: 5pt, width: 100%)[
-          #text(size: 46pt, weight: "bold", fill: accent)[> 300]
-          #v(13pt)
-          #text(size: 20pt)[candidatures par embauche]
-          #v(8pt)
-          #text(size: 14pt, fill: muted)[Moyenne 2025 · Données Ashby]
-        ],
-        block(fill: rgb("f1f5f9"), inset: 22pt, radius: 5pt, width: 100%)[
-          #text(size: 46pt, weight: "bold")[7,4 s]
-          #v(13pt)
-          #text(size: 20pt)[au premier examen d’un CV]
-          #v(8pt)
-          #text(size: 14pt, fill: muted)[Ladders, 2018 · HR Dive]
-        ]),
-      text(size: 22pt)[Une information pertinente, rapidement accessible.])
   } else if slide.table.len() > 0 {
-    table(columns: (0.85fr, 1.15fr, 1fr), inset: (x: 14pt, y: 16pt),
+    table(columns: (0.85fr, 1.15fr, 1fr), inset: (x: 14pt, y: 12pt),
       stroke: 0.5pt + rgb("dbe4ed"),
       fill: (x, y) => if y == 0 { rgb("e0f2f1") } else if calc.rem(y, 2) == 0 { rgb("f8fafc") } else { white },
-      ..slide.table.enumerate().map(((i, row)) => row.map(cell => text(size: 18pt,
+       ..slide.table.enumerate().map(((i, row)) => row.map(cell => text(size: 17pt,
         weight: if i == 0 { "bold" } else { "regular" })[#inline(cell)])).flatten())
   } else if slide.visual != none {
     let capture = slide.visual.kind == "capture"
-    grid(columns: if capture { (0.85fr, 1.65fr) } else { (1.1fr, 1fr) }, column-gutter: 26pt,
-      items-view(slide.items, size: if capture { 18pt } else { 20pt }),
-      if slide.visual.available {
-        image(slide.visual.path, width: 100%, height: if capture { 4.3in } else { 3.6in }, fit: "contain")
-      } else { pending-image(slide.visual) })
+    let wide = capture and slide.visual.id in ("CAP-17",)
+    if wide {
+      stack(spacing: 14pt,
+        items-view(slide.items, size: 18pt),
+        image(slide.visual.path, width: 100%, height: 2.9in, fit: "contain"))
+    } else {
+      grid(columns: if capture { (0.85fr, 1.65fr) } else { (1.1fr, 1fr) }, column-gutter: 26pt,
+        items-view(slide.items, size: if capture { 18pt } else { 20pt }),
+        if slide.visual.available {
+          image(slide.visual.path, width: 100%, height: if capture { 4.3in } else { 3.6in }, fit: "contain")
+        } else { pending-image(slide.visual) })
+    }
   } else {
-    items-view(slide.items, size: if slide.number == 29 { 22pt } else { 21pt }, paragraph: slide.number == 29)
+    items-view(slide.items, size: slide.at("bodySize", default: 21) * 1pt)
   }
 }
 #for (index, slide) in slides.enumerate() {
