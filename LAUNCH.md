@@ -1,10 +1,48 @@
 # CAP / recruitment demo — launch
 
+## New machine / another checkout
+
+Start with [README.md](README.md#tools-to-install) for official Node/pnpm/Podman/
+Compose installation links, optional PDF tools and a complete disabled-by-default
+first launch. Commands below describe both the current session and optional
+extraction activation; **do not copy this machine's paths/PID/cohort cutoff into
+an unrelated deployment**. Replace checkout/runtime paths and agree synthetic
+data/spending scope for that environment. RMUX is optional; use separate terminals.
+
+### Explicit extraction modes after the safe first launch
+
+Keep one backend only; stop your own disabled backend deliberately before choosing
+a different mode. Every restart loses the RAM key. From your checkout root:
+
+```sh
+# Offline: real native parsing, declared answers for the supplied known PDFs only.
+NODE_ENV=development MAIL_DRIVER=file EXTRACTION_DRIVER=disabled PROCESSING_READER=pdf PROCESSING_EXECUTOR=disabled PROCESSING_RUNNER=offline-demo node apps/api/dist/main.js
+```
+
+For **real Jev**, first agree a synthetic-data cohort and retain the existing hard
+controls. Get a UTC timestamp once with `node -p 'new Date().toISOString()'`; keep
+that exact non-secret value as `PROCESSING_LIVE_SINCE` across restarts so new work
+in the authorized cohort is recoverable. Do not use a historical cutoff to drain
+unapproved records, or recompute it every restart and strand pending work.
+
+```sh
+export PROCESSING_LIVE_SINCE='REPLACE_WITH_YOUR_FIXED_UTC_ISO_TIMESTAMP'
+NODE_ENV=development MAIL_DRIVER=file EXTRACTION_DRIVER=disabled PROCESSING_READER=pdf PROCESSING_EXECUTOR=jev PROCESSING_RUNNER=jev EXTRACTION_LIVE_CONSENT=synthetic node apps/api/dist/main.js
+```
+
+The placeholder deliberately fails validation until replaced with a full ISO UTC
+value such as the output above. Load the key yourself from a second terminal:
+`node apps/api/dist/integrations/jev/jev-key-cli.js set`. No PID needed; use an
+absolute CLI path when running outside the checkout. No automatic provider probe.
+Then create a **new** synthetic application; duplicate submissions return the
+existing application and do not requeue it.
+
 ## Running session
 
 - UI: **http://localhost:5173**; API: localhost:3000.
-- Checkout `/home/ubuntu/cv-offline-demo`, branch `feat/cv-offline-demo` (historical
-  branch name). Fixes are separately committed; **not merged/pushed**.
+- Services still use `/home/ubuntu/cv-offline-demo`; retain that worktree even
+  after source merges into main. See Git history/status for publication state;
+  merging source is not a service restart or key transfer.
 - RMUX: `workspace:backend` / `workspace:frontend`. Attach:
   `rmux attach-session -t workspace`. Leave services alive.
 - Backend PID at this launch: **164375**; credentials start empty after restart.
@@ -52,7 +90,7 @@ the default backend socket; they do not inherit the backend's credential.
    corrections and export effective CSV. Review completion/screening are explicit
    human actions, never extraction-driven decisions.
 
-Mail stays file-captured. Read an exact recipient locally, from the API checkout:
+Mail stays file-captured. Read an exact recipient locally, from the repository root:
 `MAIL_DRIVER=file node apps/api/dist/integrations/mail/read-local-mail.js ADDRESS`
 (set the runtime root above when needed). Do not put mail codes in chat/docs.
 Mailpit does not display file captures. Mail-history viewer/full service launcher
@@ -142,6 +180,7 @@ billing guarantee. No `/health/jev` route or diagnostic provider call was added.
 API/web builds and runtime readiness passed. **No tests, agent-paid requests or
 credential loading**; live end-to-end/provider quality, race/privacy and Windows
 acceptance are not claimed. User will load a key and inspect the real workflow.
-Source fixes are separately committed; merge/push await the user's instruction.
+Source fixes are separately committed; user authorized their main merge/GitHub
+push. See Git for publication state; that does not expand the live/data scope.
 See [status](docs/current/status.md), [safety](docs/current/jev-safety.md) and
 [remaining work](docs/plan/tasks.md#non-qa-implementation-remainder).
