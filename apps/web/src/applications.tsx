@@ -71,10 +71,8 @@ function TaskCard({task,field,title,editing=false,onDocument,onSave,busy,draft,o
   const paused=!!draft&&!draft.active;
   const readOnly=busy||closed||paused;
   return <article className="extraction-card">
-    <div className="section-heading"><h3>{title}</h3>{editing&&onDocument&&<IconButton icon="eye" label={`Show source document for ${title}`} onClick={onDocument}/>} {task.provenance?.mode==='fixture'&&<span className="small fixture-label">Fixture result</span>}{task.provenance?.mode==='live'&&<span className="small muted">{task.provenance.provider==='typesafe'?'Jev result':'Automated result'}</span>}</div>
+    <div className="section-heading"><h3>{title}</h3>{editing&&onDocument&&<IconButton icon="eye" label={`Show source document for ${title}`} onClick={onDocument}/>} {task.provenance?.mode==='fixture'&&<small className="muted">Synthetic fixture</small>}{task.provenance?.mode==='live'&&<small className="muted">{task.provenance.provider==='typesafe'?'Jev':'Automated'}</small>}</div>
     <div className="saved-value" aria-label={`Latest saved value for ${field.columnKey}`}>
-      <span className="eyebrow">LATEST SAVED VALUE</span>
-      <h4>{field.hasCorrection?'Saved HR correction':task.result.status==='completed'?'Original extraction (no correction)':'Unavailable — extraction has not succeeded'}</h4>
       <p className="effective-skills">{cvValueLabel(field.configuration,field.effective)}</p>
       {field.hasCorrection&&<small className="saved-state">Saved {field.correctedAt?new Date(field.correctedAt).toLocaleString():''}{field.corrector?` · ${field.corrector.name||field.corrector.email}`:''}</small>}
     </div>
@@ -132,7 +130,7 @@ function ApplicationDetail({id,staff}:{id:string;staff:boolean}) {
     {showReview&&review&&viewTab==='review'&&<>
         <section className="application-section" aria-labelledby="application-results-heading">
           <h2 id="application-results-heading">Automated results</h2>
-          <dl className="application-result-metadata"><div><dt>Original processing</dt><dd>{extractionLabel(review.processingState??record.processingState,review.processingClosed)}</dd></div>{review.readiness&&<div><dt>Review availability</dt><dd>{readinessLabel(review.readiness.state,review.review.status)}</dd></div>}</dl>
+          <p className="small muted" title="Processing state and review readiness are separate. Extraction can be complete while review is still pending.">{extractionLabel(review.processingState??record.processingState,review.processingClosed)} · {review.readiness?readinessLabel(review.readiness.state,review.review.status):'Review not applicable'}</p>
           {review.release&&<p className="small muted">Released {new Date(review.release.at).toLocaleString()}{review.release.actor?` · ${review.release.actor.name||review.release.actor.email}`:''}. Unfinished extraction remains unavailable.</p>}
           {review.actions.release?.allowed&&<button disabled={busy||needsRefresh} onClick={()=>setConfirmRelease(true)}>Continue with manual review</button>}
           <div className="application-review-fields">{!reviewEditor&&taskCards(false)}</div>
