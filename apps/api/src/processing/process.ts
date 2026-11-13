@@ -17,7 +17,7 @@ if (!fixturePath && (!id || id === 'pending') && process.env.PROCESSING_ALLOW_AL
 const app = await NestFactory.createApplicationContext(ProcessingModule, { logger: false });
 try {
   if(!fixturePath) {
-    console.log(`PID ${process.pid}: starts with an empty Jev key. Load it through jev:key --pid ${process.pid} within two minutes to continue this explicitly requested run.`);
+    console.log(`PID ${process.pid}: starts with an empty Jev key. Load it through jev:key set --worker-pid ${process.pid} within two minutes to continue this explicitly requested run.`);
     // No application claim/admission/provider call before credential preflight.
     // This does not authorize paid execution beyond the existing explicit gates.
     await app.get(JevGateway).waitUntilConfigured(AbortSignal.timeout(120000));

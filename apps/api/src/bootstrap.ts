@@ -8,10 +8,20 @@ import { AppModule } from './app.module.js';
 import { AuthService } from './auth/auth.service.js';
 import type { INestApplication } from '@nestjs/common';
 import { RUNTIME_CONFIG, type RuntimeConfig } from './configuration/runtime-config.js';
+import { JevKeyControl } from './integrations/jev/jev-key-control.js';
 
 export async function createApplication(logger: false | undefined = undefined) {
-  const app = await NestFactory.create(AppModule, { bodyParser: false, ...(logger === false ? { logger: false } : {}) });
-  return configureApplication(app);
+  let app: INestApplication | undefined;
+  try {
+    app = await NestFactory.create(AppModule, { abortOnError: false, bodyParser: false, ...(logger === false ? { logger: false } : {}) });
+    // One shared backend control socket, acquired before any module lifecycle
+    // hooks can start a worker. Occupied/stale address fails closed, never stolen.
+    await app.get(JevKeyControl).startBackend();
+    return configureApplication(app);
+  } catch (error) {
+    await app?.close();
+    throw error;
+  }
 }
 
 // Shared by production bootstrap and Nest test modules with adapter overrides.

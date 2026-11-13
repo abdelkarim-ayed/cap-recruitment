@@ -12,7 +12,7 @@ export const jevKeyCommandSchema = z.discriminatedUnion('op', [
 ]);
 export type JevKeyCommand = z.infer<typeof jevKeyCommandSchema>;
 export const jevKeyReplySchema = z.discriminatedUnion('ok', [
-  z.strictObject({ ok: z.literal(true), instanceId: z.uuid(), revision: z.number().int().nonnegative(), configured: z.boolean() }),
+  z.strictObject({ ok: z.literal(true), instanceId: z.uuid(), revision: z.number().int().nonnegative(), configured: z.boolean(), pid: z.number().int().positive() }),
   z.strictObject({ ok: z.literal(false), error: z.enum(['invalid_command','state_changed','control_unavailable']) }),
 ]);
 export type JevKeyReply = z.infer<typeof jevKeyReplySchema>;

@@ -16,6 +16,14 @@ export function jevKeyAddress(pid: number) {
   if (Buffer.byteLength(path) > 100) throw new Error('Local credential socket path is too long.');
   return { path, directory };
 }
+// API singleton identity is stable across checkouts and HTTP ports. Explicit
+// non-HTTP CLI workers retain their separate PID-specific control addresses.
+export function jevBackendKeyAddress() {
+  const owner = createHash('sha256').update(`recruitment-backend-v1\0${homedir()}`).digest('hex').slice(0, 20);
+  if (process.platform === 'win32') return { path: `\\\\.\\pipe\\recruitment-backend-${owner}`, directory: undefined };
+  const directory = join(tmpdir(), `rec-backend-${process.getuid!()}-${owner}`);
+  return { path: join(directory, 'control.sock'), directory };
+}
 export async function requirePrivateJevDirectory(directory: string, create = false) {
   if (create) {
     try { await mkdir(directory, { mode: 0o700 }); }
