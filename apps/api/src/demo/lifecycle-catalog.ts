@@ -56,11 +56,14 @@ export function lifecycleCatalog(now = new Date()) {
   // UTC half-hour boundary: deterministic relative dates, independent of host DST.
   const baseline = Math.floor(now.getTime() / 1800000) * 1800000;
   const at = (hours: number) => new Date(baseline + hours * 3600000).toISOString();
-  const actor = (key: string, name: string, role: Role) => ({key,id:lifecycleId(`actor:${key}`),name,email:`lifecycle.${key}@example.test`,role,createdAt:at(-45*24)});
-  const staff = [actor('hr','Alex Lifecycle','recruiter'),actor('hr2','Sam Lifecycle','recruiter'),actor('admin','Morgan Lifecycle','admin'),actor('interviewer','Jamie Lifecycle','interviewer'),actor('interviewer2','Robin Lifecycle','interviewer')];
+  const actor = (key: string, name: string, role: Role) => ({key,id:lifecycleId(`actor:${key}`),name,email:`${name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z]+/g,'.')}@example.test`,role,createdAt:at(-45*24)});
+  const slug = (name: string) => name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z]+/g,'.') || 'candidate';
+  const staff = [actor('hr','Alex Martin','recruiter'),actor('hr2','Sam Bernard','recruiter'),actor('admin','Morgan Dubois','admin'),actor('interviewer','Jamie Rossi','interviewer'),actor('interviewer2','Robin Petit','interviewer')];
   const profileFor = (index: number) => lifecycleScenarios[index].processing === 'empty' ? offlineProfiles[2] : offlineProfiles[index % offlineProfiles.length];
   const candidates = lifecycleScenarios.map((scenario,index) => actor(scenario.key,profileFor(index).name,'candidate'));
-  const actors = [...staff,actor('candidate','Taylor Lifecycle Intake','candidate'),...candidates];
+  const seen: Record<string, number> = {};
+  for (const candidate of candidates) { const base = slug(candidate.name); const n = (seen[base] = (seen[base] ?? 0) + 1); if (n > 1) candidate.email = `${base}.${n}@example.test`; }
+  const actors = [...staff,actor('candidate','Taylor Nguyen','candidate'),...candidates];
   const jobs = (['draft','review','interviews','no-tasks','closed'] as const).map(key => {
     const processing = key === 'review' || key === 'interviews' || key === 'draft';
     const owner = key === 'no-tasks' ? staff[1] : staff[0];
@@ -71,14 +74,14 @@ export function lifecycleCatalog(now = new Date()) {
       'no-tasks': ['Finance Operations Analyst', 'Support reconciliations, month-end reporting and audit documentation. This demonstration role has no automatic extraction or interviews.'],
       closed: ['Financial Accountant', 'Prepare month-end accounts, balance-sheet reconciliations and audit evidence. Applications are now closed; existing recruitment records remain inspectable.'],
     };
-    const definition = createVacancySchema.parse({title:`${roles[key][0]} · Demo`,description:`${roles[key][1]}\n\nSynthetic demonstration vacancy and applicants (${lifecycleNamespace}); not a real job offer or extraction-quality evidence.`,location:'Hybrid · Demo team',formDefinition:{version:1,inputs:[
+    const definition = createVacancySchema.parse({title:roles[key][0],description:roles[key][1],location:'Tunis · Hybrid',formDefinition:{version:1,inputs:[
       {id:'name',name:'full_name',label:'Full name',type:'text',required:true,args:{maxLength:200}},
       {id:'motivation',name:'motivation',label:'Motivation',type:'long_text',required:false,args:{maxLength:2000}},
-      {id:'cv',name:'cv',label:'Synthetic CV',type:'document',required:true,args:{accept:['.pdf']}},
+      {id:'cv',name:'cv',label:'CV',type:'document',required:true,args:{accept:['.pdf']}},
     ]},processingDefinition:{version:2,tasks:processing?[{id:'cv_extract',sourceInputId:'cv',outputKey:'cv_facts',type:'cvExtractor',args:demoCvQuestions}]:[]}});
     const status = key === 'draft' ? 'draft' : key === 'closed' ? 'closed' : 'published';
     const vacancy: Vacancy = {...definition,id:lifecycleId(`vacancy:${key}`),ownerId:owner.id,status,revision:status==='draft'?1:status==='closed'?3:2,extractionReferenceDate:status==='draft'?null:at(-29*24).slice(0,10),createdAt:at(-30*24),updatedAt:at(status==='closed'?-24:-29*24)};
-    const steps = key === 'interviews' ? ['Technical interview','HR interview'].map((name,position) => ({id:lifecycleId(`step:${key}:${position}`),name,position,instructions:'SYNTHETIC FIXTURE: assess only this demonstration application.'})) : [];
+    const steps = key === 'interviews' ? ['Technical interview','HR interview'].map((name,position) => ({id:lifecycleId(`step:${key}:${position}`),name,position,instructions:'Assess the candidate against the requirements of this role.'})) : [];
     return {key,owner,vacancy,steps,publishedAt:at(-29*24),interviewRevision:steps.length?2:1};
   });
   const applications = lifecycleScenarios.map((scenario,index) => {
@@ -86,7 +89,7 @@ export function lifecycleCatalog(now = new Date()) {
     const candidate = candidates[index];
     const id = lifecycleId(`application:${scenario.key}`);
     const profile = profileFor(index);
-    const lines = [`SYNTHETIC PROFILE ${profile.id}`, profile.name, 'Transferred PDF; destination-authored fixture declarations, not provider inference.'];
+    const lines = [profile.name, 'Curriculum vitae', 'Experience, education and skills.'];
     const screened = scenario.journey !== 'received';
     const rejected = scenario.journey === 'rejected';
     const interviewJourney = ['upcoming','feedback-due','reschedule','cancelled','partial-pass','all-passed','interview-failed'].includes(scenario.journey);

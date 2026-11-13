@@ -17,11 +17,10 @@ function reviewSummary(view:View){
   return `${label}${editor&&status!=='pending'?` by ${editor.email}`:''}${status!=='completed'&&view.tasks.some(task=>task.hasCorrection)?' · corrections saved':''}`;
 }
 function resultSummary(task:Task,closed:boolean){
-  const fixture=task.provenance?.mode==='fixture';
-  if(task.hasCorrection)return `Includes HR corrections${fixture?' (fixture source)':''}`;
-  if(task.result.status==='completed')return fixture?'Fixture result':'Automated result';
-  if(closed&&['pending','processing'].includes(task.status))return `${fixture?'Fixture · ':''}Processing closed; unavailable`;
-  return `${fixture?'Fixture · ':''}${task.status==='failed'?'Processing failed; unavailable':task.status==='processing'?'Processing; unavailable':task.status==='pending'?'Not processed; unavailable':'Unavailable'}`;
+  if(task.hasCorrection)return 'Includes HR corrections';
+  if(task.result.status==='completed')return 'Automated result';
+  if(closed&&['pending','processing'].includes(task.status))return 'Processing closed; unavailable';
+  return task.status==='failed'?'Processing failed; unavailable':task.status==='processing'?'Processing; unavailable':task.status==='pending'?'Not processed; unavailable':'Unavailable';
 }
 export function decisionValues({id,vacancyId,title,webOrigin,form,view,documents}:{id:string;vacancyId:string;title:string;webOrigin:string;form:FormDefinition;view:View;documents:{id:string;input_id:string}[]}){
   // Configured web origin, never a Host header, cookie or signed/public object URL.

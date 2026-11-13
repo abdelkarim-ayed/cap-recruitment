@@ -21,7 +21,7 @@ export async function lifecycleTaskFixture(application: Application): Promise<Ta
   const markdown = await profileMarkdown(application.profile);
   return {fixtureKey:`lifecycle-v3-${scenario.key}`,applicationId:id,documentId,sourceHash:hash(await profilePdf(application.profile)),taskId:task.id,args:task.args,referenceDate,
     markdown,result:['ordinary','operational','uncertain'].includes(scenario.processing)
-      ? {status:'failed',value:null,reason:`FIXTURE ONLY: declared ${category} failure; no provider attempt.`,retryable:false,failureCategory:category}
+      ? {status:'failed',value:null,reason:category==='uncertain'?'The automated reading could not be confirmed.':category==='operational'?'The document service did not respond in time.':'The document could not be read reliably.',retryable:false,failureCategory:category}
       : {status:'completed',response:profileResponse(application.profile,task.args,markdown,referenceDate)}};
 }
 
@@ -116,12 +116,12 @@ async function insertApplication(client: PoolClient, application: Application, s
     review_status,review_revision,reviewed_by,review_updated_at,reviewed_at,flow_revision,processing_released_at,processing_released_by,
     screening_decision,screening_by,screening_at,screening_reason)
     VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)`,[
-    id,job.vacancy.id,candidate.id,json({name:candidate.name,email:candidate.email}),json(snapshot),json({name:candidate.name,motivation:'Synthetic lifecycle QA application; not a real applicant.'}),
+    id,job.vacancy.id,candidate.id,json({name:candidate.name,email:candidate.email}),json(snapshot),json({name:candidate.name,motivation:'I would like to contribute to this team and grow with the role.'}),
     application.stage,application.processingState,application.submittedAt,application.reviewStatus,
     reviewed?3:released?2:1,reviewed?catalogStaff('hr2'):null,reviewed?application.reviewedAt:null,scenario.processing==='reviewed'?application.reviewedAt:null,
     flowRevision,released?application.reviewedAt:null,released?catalogStaff('hr2'):null,
     application.screened?(application.rejected?'rejected':'preselected'):null,application.screened?catalogStaff('hr'):null,application.screened?application.screenedAt:null,
-    application.rejected?'FIXTURE ONLY: screening outcome selected for QA.':null,
+    application.rejected?'Profile does not match the requirements for this role.':null,
   ]);
   await client.query('INSERT INTO application_documents(id,application_id,input_id,stored_file_id) VALUES($1,$2,\'cv\',$3)',[application.documentId,id,application.fileId]);
   const fixture = await lifecycleTaskFixture(application);
@@ -137,7 +137,7 @@ async function insertApplication(client: PoolClient, application: Application, s
   }
   if (application.screened) await client.query('INSERT INTO screening_notifications(id,application_id,recipient_id,decision,title,body,created_at) VALUES($1,$2,$3,$4,$5,$6,$7)',[
     lifecycleId(`screening:${scenario.key}`),id,candidate.id,application.rejected?'rejected':'preselected',application.rejected?'Application outcome':'Application preselected',
-    `SYNTHETIC FIXTURE: ${job.vacancy.title}. Your application was ${application.rejected?'not selected':'preselected'}.`,application.screenedAt]);
+    `${job.vacancy.title}. Your application was ${application.rejected?'not selected':'preselected'}.`,application.screenedAt]);
 }
 const catalogStaff = (key: string) => lifecycleId(`actor:${key}`);
 
@@ -155,8 +155,8 @@ export function lifecycleInterviews(application: Application) {
       status:completed?'completed':cancelled?'cancelled':'scheduled',outcome:completed?(failed?'fail':'pass'):null,
       startsAt:past?(index?application.pastSecondStart:application.pastStart):(index?application.futureSecondStart:application.futureStart),
       submittedAt:completed?new Date(new Date(index?application.pastSecondStart:application.pastStart).getTime()+3600000).toISOString():null,
-      issue:journey==='reschedule'?'SYNTHETIC FIXTURE: please choose another slot.':null,
-      cancellationCause:cancelled?(journey==='interview-failed'?{type:'interview_failed',actorId:catalogStaff('interviewer'),interviewId:lifecycleId(`interview:${key}:0`),stepName:application.job.steps[0].name}:{type:'hr_cancelled',actorId:catalogStaff('hr'),reason:'SYNTHETIC FIXTURE: appointment cancelled.'}):null,
+      issue:journey==='reschedule'?'Could you propose another slot?':null,
+      cancellationCause:cancelled?(journey==='interview-failed'?{type:'interview_failed',actorId:catalogStaff('interviewer'),interviewId:lifecycleId(`interview:${key}:0`),stepName:application.job.steps[0].name}:{type:'hr_cancelled',actorId:catalogStaff('hr'),reason:'Appointment cancelled.'}):null,
     };
   });
 }
@@ -170,14 +170,14 @@ async function insertInterviews(client: PoolClient, application: Application) {
       status,notes,score,outcome,submitted_at,cancellation_cause,change_cause,scheduling_issue,issue_at,created_at,updated_at,revision)
       VALUES($1,$2,$3,$4,$5,$6,$7,$8,30,'UTC',$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)`,[
       interview.id,application.job.vacancy.id,application.id,interview.step.id,interview.interviewerId,catalogStaff('hr'),cause.actorId,interview.startsAt,
-      'Demo room / https://example.test/interview',interview.status,interview.status==='completed'?'SYNTHETIC FIXTURE: declared final assessment; no interview took place.':null,
+      'Meeting room 2 / https://meet.example.test/interview',interview.status,interview.status==='completed'?'Clear understanding of the stack. Good communication and relevant examples.':null,
       interview.status==='completed'?interview.outcome==='pass'?7:3:null,interview.outcome,interview.submittedAt,interview.cancellationCause?json(interview.cancellationCause):null,json(cause),interview.issue,interview.issue?updatedAt:null,application.screenedAt,updatedAt,interview.status==='scheduled'?1:2,
     ]);
     // Fixture notices are declared snapshots, not evidence of command delivery/deduplication.
     await client.query('INSERT INTO inbox_notifications(id,recipient_id,interview_id,kind,title,body,cause,created_at,read_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)',[
       lifecycleId(`notice:${application.scenario.key}:${interview.index}`),interview.status==='completed'||interview.issue?catalogStaff('hr'):interview.interviewerId,interview.id,
       interview.status==='completed'?'feedback':interview.issue?'scheduling_issue':interview.status==='cancelled'?'cancelled':'assigned',
-      `SYNTHETIC FIXTURE: ${interview.step.name}`,`Declared ${interview.status} scenario: ${application.scenario.key}.`,json(cause),updatedAt,
+      `${interview.step.name} · ${application.candidate.name}`,interview.status==='completed'?'Assessment submitted.':interview.status==='cancelled'?'Appointment cancelled.':'Appointment scheduled.',json(cause),updatedAt,
       application.scenario.journey==='all-passed'?updatedAt:null,
     ]);
   }

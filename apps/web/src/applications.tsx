@@ -71,7 +71,7 @@ function TaskCard({task,field,title,editing=false,onDocument,onSave,busy,draft,o
   const paused=!!draft&&!draft.active;
   const readOnly=busy||closed||paused;
   return <article className="extraction-card">
-    <div className="section-heading"><h3>{title}</h3>{editing&&onDocument&&<IconButton icon="eye" label={`Show source document for ${title}`} onClick={onDocument}/>} {task.provenance?.mode==='fixture'&&<small className="muted">Synthetic fixture</small>}{task.provenance?.mode==='live'&&<small className="muted">{task.provenance.provider==='typesafe'?'Jev':'Automated'}</small>}</div>
+    <div className="section-heading"><div><h3>{title.split(' · ')[0]}</h3><p className="field-qualifier">{title.split(' · ').slice(1).join(' · ')}</p></div>{editing&&onDocument&&<IconButton icon="eye" label={`Show source document for ${title}`} onClick={onDocument}/>}</div>
     <div className="saved-value" aria-label={`Latest saved value for ${field.columnKey}`}>
       <p className="effective-skills">{cvValueLabel(field.configuration,field.effective)}</p>
       {field.hasCorrection&&<small className="saved-state">Saved {field.correctedAt?new Date(field.correctedAt).toLocaleString():''}{field.corrector?` · ${field.corrector.name||field.corrector.email}`:''}</small>}
@@ -84,7 +84,6 @@ function TaskCard({task,field,title,editing=false,onDocument,onSave,busy,draft,o
     <details className="original-result"><summary>Original extraction and evidence · {extractionLabel(task.status,processingClosed)}</summary>
       <p>{cvValueLabel(field.configuration,field.original)}</p>
       {task.result.reason&&<p className="notice">{task.result.reason}</p>}
-      {task.provenance?.fixtureId&&<small className="fixture-label">Fixture: {task.provenance.fixtureId}</small>}
     </details>
   </article>;
 }
