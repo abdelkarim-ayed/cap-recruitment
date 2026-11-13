@@ -60,7 +60,10 @@ export function lifecycleCatalog(now = new Date()) {
   const slug = (name: string) => name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z]+/g,'.') || 'candidate';
   const staff = [actor('hr','Alex Martin','recruiter'),actor('hr2','Sam Bernard','recruiter'),actor('admin','Morgan Dubois','admin'),actor('interviewer','Jamie Rossi','interviewer'),actor('interviewer2','Robin Petit','interviewer')];
   const profileFor = (index: number) => lifecycleScenarios[index].processing === 'empty' ? offlineProfiles[2] : offlineProfiles[index % offlineProfiles.length];
-  const candidates = lifecycleScenarios.map((scenario,index) => actor(scenario.key,profileFor(index).name,'candidate'));
+  // One distinct applicant per scenario: the product allows a single application
+  // per candidate and vacancy, so repeated profile names would look like duplicates.
+  const candidateNames = ['Daniel Mercer','Amélie Hartmann','Grace Ellington','Ronan Keating','Yasmine Ben Ali','Karim Haddad','Lucie Fontaine','Omar Trabelsi','Inès Roussel','Mehdi Kacem','Clara Moreau','Anis Gharbi','Sofia Lemaire','Youssef Mansour','Camille Girard','Nour Bouazizi','Théo Lambert','Salma Jebali','Nathan Perrin','Rim Chaabane','Élodie Marchand','Bilal Sassi','Manon Delacroix','Adam Ferchichi','Lina Ouali'];
+  const candidates = lifecycleScenarios.map((scenario,index) => actor(scenario.key,candidateNames[index] ?? profileFor(index).name,'candidate'));
   const seen: Record<string, number> = {};
   for (const candidate of candidates) { const base = slug(candidate.name); const n = (seen[base] = (seen[base] ?? 0) + 1); if (n > 1) candidate.email = `${base}.${n}@example.test`; }
   const actors = [...staff,actor('candidate','Taylor Nguyen','candidate'),...candidates];

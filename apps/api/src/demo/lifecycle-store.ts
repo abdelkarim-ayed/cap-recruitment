@@ -103,7 +103,7 @@ async function insertApplication(client: PoolClient, application: Application, s
   } else {
     ref = await storage.put(bytes);
     created.push({id:application.fileId,ref});
-    await client.query('INSERT INTO stored_files(id,storage_ref,content_hash,byte_count,filename,media_type,created_at) VALUES($1,$2,$3,$4,$5,$6,$7)',[application.fileId,ref,contentHash,bytes.length,`${scenario.key}-fixture.pdf`,'application/octet-stream',application.submittedAt]);
+    await client.query('INSERT INTO stored_files(id,storage_ref,content_hash,byte_count,filename,media_type,created_at) VALUES($1,$2,$3,$4,$5,$6,$7)',[application.fileId,ref,contentHash,bytes.length,`${candidate.name.replaceAll(' ','-').toLowerCase()}-cv.pdf`,'application/octet-stream',application.submittedAt]);
   }
   const reviewed = ['corrected','reviewed'].includes(scenario.processing);
   const released = scenario.processing==='released';
