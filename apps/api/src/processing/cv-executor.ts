@@ -12,7 +12,7 @@ export class CvExecutor implements TaskExecutor {
   describe(): ExecutionResult['provenance'] { return { mode: 'live', provider: 'typesafe', model: JEV_CONFIG.model }; }
   async execute(document: ParsedCvDocument, context: ExecutionContext): Promise<ExecutionResult> {
     const request = prepareCvRequest(buildCvRequest(context.args, document.markdown, context.referenceDate, JEV_CONFIG.model), JEV_CONFIG.model, JEV_CONFIG.limits.maxRequestBytes);
-    const result = await this.coordinator.execute({ applicationId: context.applicationId, taskId: context.taskId, token: context.token }, 'live', request, context.signal);
+    const result = await this.coordinator.execute({ applicationId: context.applicationId, taskId: context.taskId, token: context.token }, 'live', request, context.signal, context.cacheOnly);
     return { result: { status: 'completed', value: normalizeCvResponse(context.args, request.request, result.response) },
       provenance: { ...this.describe(), sourceHash: context.sourceHash, parser: document.parser, diagnostics: document.diagnostics, markdownHash: document.markdownHash,
         referenceDate: context.referenceDate, requestHash: request.hash, requestBody: request.body, cacheHit: result.cacheHit, attemptId: result.attemptId, usage: result.response.usage } };
