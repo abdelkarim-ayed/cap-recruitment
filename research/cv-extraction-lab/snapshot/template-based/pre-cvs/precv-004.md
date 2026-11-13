@@ -1,0 +1,8 @@
+- Impression: Junior web-minded — senior; skill-first.
+- Tone: pragmatic, hands-on. (~2 lines)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: hands-on basics; specifics to be pinned down later.
+- Creds: nothing concrete noted yet.
+- Extra: hints at weekend projects.
+- Timeline: timeline unclear / partially known.
+- Notes: leave room to reshape sections to fit an unknown template.

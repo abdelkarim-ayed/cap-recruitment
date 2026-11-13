@@ -1,0 +1,18 @@
+{
+  "parser": "pdf-inspector",
+  "parser_version": "1.25.2",
+  "method": "process_pdf; native text only; no OCR",
+  "source_pdf": "template-based/outputs/metronic/precv-013-metronic.pdf",
+  "pdf_sha256": "731f96f5266f155bf59637fb9ca944617840d7ac3204b43bc1f2c8f307c10698",
+  "markdown_path": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-013-metronic.md",
+  "markdown_sha256": "cb1e9b6d46870184f0d21d6bc2ec0a95a925765502815e8d1cf7a7fd3abf7b84",
+  "markdown_bytes": 1834,
+  "pdf_type": "text_based",
+  "page_count": 1,
+  "pages_needing_ocr": [],
+  "has_encoding_issues": false,
+  "pages_with_columns": [
+    1
+  ],
+  "pages_with_tables": []
+}

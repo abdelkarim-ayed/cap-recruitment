@@ -1,0 +1,5 @@
+{
+  "type": "choice",
+  "instructions": "Use state.cv and ${args_path}.items. Match each supplied item separately to explicit mentions or unambiguous descriptions in the CV, then choose the number of matched list items. An item's name and aliases identify one item, not extra items. A generic category does not establish a particular product, brand, method or subtype. Related duties or likely tool use are insufficient. Basic exposure and list-only mentions count when they identify the supplied item. Count each matched item once; do not count CV mentions or inferred items. This is document coverage, not proficiency.",
+  "criteria": {}
+}

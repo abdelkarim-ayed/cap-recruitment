@@ -1,0 +1,8 @@
+- Impression: Civil/structural-adjacent — senior; story-first.
+- Tone: sparse, almost a note-to-self. (~4-5 lines)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: a couple of tools mentioned in context, not a full list.
+- Creds: nothing concrete noted yet.
+- Extra: focuses on reliability more than ambition.
+- Timeline: has a vague gap in timeline.
+- Social/supplementary: open to adding portfolio/links later if relevant.

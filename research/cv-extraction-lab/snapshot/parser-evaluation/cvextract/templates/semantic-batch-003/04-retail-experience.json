@@ -1,0 +1,37 @@
+{
+  "model": "jev-1.14.0",
+  "state": {
+    "cv": "$cv",
+    "reference_date": "2026-11-12",
+    "question_args": {
+      "experience": {
+        "scope": "customer-facing retail, market sales and parcel-counter service",
+        "include_paid_apprenticeships": false
+      }
+    }
+  },
+  "questions": {
+    "experience_original": {
+      "type": "choice",
+      "instructions": "Use dated work in state.cv and state.question_args.experience.scope to choose total documented relevant work duration. An empty scope means overall work. Include paid apprenticeships only when state.question_args.experience.include_paid_apprenticeships is true. Count overlapping periods once. Present means state.reference_date. Do not infer that a listed skill was used throughout a role or substitute an undated summary claim for dated work. Zero evidenced duration belongs to under_1, not proof of no experience.",
+      "criteria": {
+        "under_1": "Less than one year of documented relevant work, including zero evidenced duration.",
+        "1_to_under_3": "At least one but less than three years of documented relevant work.",
+        "3_to_under_5": "At least three but less than five years of documented relevant work.",
+        "5_to_under_8": "At least five but less than eight years of documented relevant work.",
+        "8_plus": "At least eight years of documented relevant work."
+      }
+    },
+    "experience_revised": {
+      "type": "choice",
+      "instructions": "Use dated work in state.cv and state.question_args.experience.scope to choose total documented relevant work duration. An empty scope means overall work. Include paid apprenticeships only when state.question_args.experience.include_paid_apprenticeships is true. Count overlapping periods once. Present means state.reference_date. Do not infer that a listed skill was used throughout a role or substitute an undated summary claim for dated work. Zero evidenced duration belongs to under_1, not proof of no experience. Use elapsed duration, not an inclusive count of calendar-year numbers. Do not round a partial calendar year up to a whole year. Subtract stated gaps. The total cannot exceed the elapsed time from the earliest relevant work start to state.reference_date.",
+      "criteria": {
+        "under_1": "Less than one year of documented relevant work, including zero evidenced duration.",
+        "1_to_under_3": "At least one but less than three years of documented relevant work.",
+        "3_to_under_5": "At least three but less than five years of documented relevant work.",
+        "5_to_under_8": "At least five but less than eight years of documented relevant work.",
+        "8_plus": "At least eight years of documented relevant work."
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+- Impression: FP&A-curious — mid; social/volunteer-first.
+- Tone: career-changer, still finding wording. (~6-8 lines)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: leans practical/problem-solving over terminology.
+- Creds: little formal shown; practical history carries more weight.
+- Extra: mentions helping others informally.
+- Timeline: timeline unclear / partially known.
+- Notes: leave room to reshape sections to fit an unknown template.

@@ -1,0 +1,8 @@
+- Impression: Backend-ish tinkerer — junior; story-first.
+- Tone: sparse, almost a note-to-self. (~6-8 lines)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: leans practical/problem-solving over terminology.
+- Creds: trade experience seems more relevant than formal quals here.
+- Extra: hints at weekend projects.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: community-adjacent, details TBD.

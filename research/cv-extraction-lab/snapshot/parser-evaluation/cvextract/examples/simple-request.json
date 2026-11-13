@@ -1,0 +1,71 @@
+{
+  "model": "jev-1.14.0",
+  "state": {
+    "cv": "$cv",
+    "reference_date": "2026-11-12"
+  },
+  "questions": {
+    "education": {
+      "type": "choice",
+      "instructions": "As of 2026-11-12, what is the highest education level completed or explicitly expected to be completed within 6 months after that date in engineering? Use evidence in the CV, not an assumption that ongoing study is completed.",
+      "criteria": {
+        "secondary_or_lower": "Secondary school or lower.",
+        "vocational_technical": "Vocational or technical qualification below higher education.",
+        "short_cycle_higher": "Short-cycle higher education, below a bachelor degree.",
+        "bachelors": "Bachelor degree or equivalent.",
+        "masters": "Master degree or equivalent.",
+        "doctorate": "Doctorate or equivalent.",
+        "not_stated": "No qualifying education stated within the requested scope/time window."
+      }
+    },
+    "safety_certificate": {
+      "type": "choice",
+      "instructions": "Does the CV state that IOSH Managing Safely (also accept: Managing Safely (IOSH)) is held or completed? Related work, preparation and planned study do not count.",
+      "criteria": {
+        "present": "Stated as held or completed.",
+        "not_mentioned": "Not evidenced as held or completed."
+      }
+    },
+    "experience": {
+      "type": "choice",
+      "instructions": "As of 2026-11-12, how much documented work experience does the CV show in building maintenance? Count overlapping periods once. Use elapsed time, not a count of calendar years. Do not assume a listed skill was used throughout an entire role.",
+      "criteria": {
+        "under_1": "Under 1 year, including no evidenced duration.",
+        "1_to_under_3": "1 to under 3 years.",
+        "3_to_under_5": "3 to under 5 years.",
+        "5_to_under_8": "5 to under 8 years.",
+        "8_plus": "8 or more years."
+      }
+    },
+    "secondary_skills": {
+      "type": "choice",
+      "instructions": "How many of these supplied items are mentioned or unambiguously described in the CV: Excel; SQL (also accept: T-SQL; Transact-SQL); CMMS (also accept: computerised maintenance management system; computerized maintenance management system)? Count each item once. A generic category or related activity does not establish a specific product or skill. This is document coverage, not proficiency.",
+      "criteria": {
+        "0": "Exactly 0 supplied items are evidenced.",
+        "1": "Exactly 1 supplied items are evidenced.",
+        "2": "Exactly 2 supplied items are evidenced.",
+        "3": "Exactly 3 supplied items are evidenced."
+      }
+    },
+    "sql_evidence": {
+      "type": "choice",
+      "instructions": "What is the strongest explicit evidence for SQL (also accept: T-SQL; Transact-SQL) in the CV? Classify evidence context, not proficiency. A list-only mention is not a concrete application; do not infer professional use from nearby employment history.",
+      "criteria": {
+        "not_mentioned": "No identifiable reference.",
+        "stated_or_studied": "Listed, claimed or studied, without a concrete application example.",
+        "applied": "Applied in a personal/coursework project, practical training, volunteering or other nonprofessional activity.",
+        "used_professionally": "Explicitly applied in professional work."
+      }
+    },
+    "cmms_evidence": {
+      "type": "choice",
+      "instructions": "What is the strongest explicit evidence for CMMS in the CV? Classify evidence context, not proficiency. A list-only mention is not a concrete application; do not infer professional use from nearby employment history.",
+      "criteria": {
+        "not_mentioned": "No identifiable reference.",
+        "stated_or_studied": "Listed, claimed or studied, without a concrete application example.",
+        "applied": "Applied in a personal/coursework project, practical training, volunteering or other nonprofessional activity.",
+        "used_professionally": "Explicitly applied in professional work."
+      }
+    }
+  }
+}

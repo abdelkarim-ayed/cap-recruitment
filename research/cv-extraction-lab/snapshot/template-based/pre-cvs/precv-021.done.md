@@ -1,0 +1,8 @@
+- Impression: Change/PMO-adjacent — entry; social/volunteer-first.
+- Tone: generic but serviceable impression. (~4-5 lines)
+- Story: odd mix of jobs; common thread not obvious yet.
+- Skills: a couple of tools mentioned in context, not a full list.
+- Creds: education hinted at, level/details missing.
+- Extra: mentions languages in passing.
+- Timeline: has a vague gap in timeline.
+- Notes: would need personal/additional/location details filled in later.

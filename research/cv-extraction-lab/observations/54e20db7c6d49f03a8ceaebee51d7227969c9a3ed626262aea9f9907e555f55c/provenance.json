@@ -1,0 +1,16 @@
+{
+  "kind": "offline_research_observation_not_runtime_cache",
+  "request_sha256": "54e20db7c6d49f03a8ceaebee51d7227969c9a3ed626262aea9f9907e555f55c",
+  "response_sha256": "805e5c39d30c80917d8765bc4fb9d426f828e11345131e3d6d8e0acfbf7cd90e",
+  "source_response_path": "/home/ubuntu/.cache/cvextract/requests/54e20db7c6d49f03a8ceaebee51d7227969c9a3ed626262aea9f9907e555f55c/attempts/dae6a00b4a334e889a25250d381bf8da/response.json",
+  "source_references": [
+    "parser-evaluation/cvextract/templates/semantic-batch-001/README.md"
+  ],
+  "recorded_status": {
+    "outcome": "success",
+    "started_at": "2026-11-12T15:53:40.275060+00:00",
+    "ended_at": "2026-11-12T15:53:40.624568+00:00"
+  },
+  "verification": "request hash, success marker, response hash and Choice structure; no provider call",
+  "quality": "exploratory/provisional; not validated accuracy or new paid-attempt evidence"
+}

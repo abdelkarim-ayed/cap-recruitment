@@ -1,0 +1,1436 @@
+{
+  "source_directory": "/tmp/opencode/cvextract-batch002.kd6KXr",
+  "basis": "Agreement with pre-recorded provisional parser-text readings, not ground-truth accuracy.",
+  "cases": [
+    {
+      "id": "01-accounting",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-005-calligraphics.md",
+      "encoding_warning": false,
+      "request_sha256": "c294dcd1405b38035d8f02a20fb3a670b841f456707243d26da82c8f66069fc1",
+      "cached_response_path": "/home/ubuntu/.cache/cvextract/requests/c294dcd1405b38035d8f02a20fb3a670b841f456707243d26da82c8f66069fc1/attempts/183b3bdf967e4f32b8f50eac667b1a6e/response.json",
+      "user_response_path": "/tmp/opencode/cvextract-batch002.kd6KXr/01-accounting.json",
+      "cache_verified": true,
+      "model": "jev-1.14.0",
+      "usage": {
+        "input_tokens": 2678,
+        "output_tokens": 380
+      },
+      "questions": [
+        {
+          "id": "education_level",
+          "form": "education_level_completed",
+          "arguments": {
+            "scope": "accounting and finance"
+          },
+          "provisional": "bachelors",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "bachelors",
+            "confidence": 1.0,
+            "probabilities": {
+              "secondary_or_lower": 0.0,
+              "vocational_technical": 0.0,
+              "short_cycle_higher": 0.0,
+              "bachelors": 1.0,
+              "masters": 0.0,
+              "doctorate": 0.0,
+              "not_stated": 0.0
+            }
+          }
+        },
+        {
+          "id": "certification",
+          "form": "certification_no_validity",
+          "arguments": {
+            "name": "ACCA professional qualification (fully qualified)",
+            "aliases": [
+              "fully qualified ACCA",
+              "Association of Chartered Certified Accountants professional qualification"
+            ]
+          },
+          "provisional": "not_mentioned",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "not_mentioned",
+            "confidence": 1.0,
+            "probabilities": {
+              "present": 0.0,
+              "not_mentioned": 1.0
+            }
+          }
+        },
+        {
+          "id": "experience_years",
+          "form": "experience_five_bins",
+          "arguments": {
+            "scope": "accounting, accounts payable and financial reporting",
+            "include_paid_apprenticeships": false
+          },
+          "provisional": "5_to_under_8",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "5_to_under_8",
+            "confidence": 0.96,
+            "probabilities": {
+              "under_1": 0.0,
+              "1_to_under_3": 0.0,
+              "3_to_under_5": 0.01,
+              "5_to_under_8": 0.97,
+              "8_plus": 0.02
+            }
+          }
+        },
+        {
+          "id": "skill_coverage",
+          "form": "coverage_v002",
+          "arguments": {
+            "items": [
+              {
+                "name": "Microsoft Excel",
+                "aliases": [
+                  "Excel",
+                  "MS Excel"
+                ]
+              },
+              {
+                "name": "Power Query",
+                "aliases": []
+              },
+              {
+                "name": "SQL",
+                "aliases": [
+                  "Structured Query Language"
+                ]
+              },
+              {
+                "name": "VAT returns",
+                "aliases": [
+                  "value-added tax returns"
+                ]
+              },
+              {
+                "name": "SAP",
+                "aliases": [
+                  "SAP ERP"
+                ]
+              }
+            ]
+          },
+          "provisional": "4",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "4",
+            "confidence": 0.95,
+            "probabilities": {
+              "0": 0.0,
+              "1": 0.0,
+              "2": 0.0,
+              "3": 0.03,
+              "4": 0.96,
+              "5": 0.01
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_a",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "SQL",
+            "aliases": [
+              "Structured Query Language"
+            ]
+          },
+          "provisional": "stated_or_studied",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "stated_or_studied",
+            "confidence": 0.99,
+            "probabilities": {
+              "not_mentioned": 0.01,
+              "stated_or_studied": 0.99,
+              "applied": 0.0,
+              "used_professionally": 0.0
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_b",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "Power Query",
+            "aliases": []
+          },
+          "provisional": "used_professionally",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "used_professionally",
+            "confidence": 1.0,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 0.0,
+              "applied": 0.0,
+              "used_professionally": 1.0
+            }
+          }
+        }
+      ],
+      "pre_result_notes": "Part-qualified ACCA and completed Applied Skills must not become the full professional qualification. BA completed. Dated accounting roles June 2019 to present support 5–under 8. Power Query routine is explicit at work; SQL is only basics in Tools. No SAP evidence."
+    },
+    {
+      "id": "02-property-support",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-051-calligraphics.md",
+      "encoding_warning": false,
+      "request_sha256": "563d3e78c1c68f3319e76791227ff63c9435bea7136d4c7ea6af3852d1c4dc9a",
+      "cached_response_path": "/home/ubuntu/.cache/cvextract/requests/563d3e78c1c68f3319e76791227ff63c9435bea7136d4c7ea6af3852d1c4dc9a/attempts/4fc4d894d684417899880cbe9574a588/response.json",
+      "user_response_path": "/tmp/opencode/cvextract-batch002.kd6KXr/02-property-support.json",
+      "cache_verified": true,
+      "model": "jev-1.14.0",
+      "usage": {
+        "input_tokens": 2229,
+        "output_tokens": 369
+      },
+      "questions": [
+        {
+          "id": "education_level",
+          "form": "education_level_completed",
+          "arguments": {
+            "scope": ""
+          },
+          "provisional": "secondary_or_lower",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "secondary_or_lower",
+            "confidence": 0.99,
+            "probabilities": {
+              "secondary_or_lower": 0.99,
+              "vocational_technical": 0.0,
+              "short_cycle_higher": 0.0,
+              "bachelors": 0.0,
+              "masters": 0.0,
+              "doctorate": 0.0,
+              "not_stated": 0.01
+            }
+          }
+        },
+        {
+          "id": "certification",
+          "form": "certification_no_validity",
+          "arguments": {
+            "name": "Emergency First Aid at Work",
+            "aliases": [
+              "EFAW"
+            ]
+          },
+          "provisional": "not_mentioned",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "not_mentioned",
+            "confidence": 1.0,
+            "probabilities": {
+              "present": 0.0,
+              "not_mentioned": 1.0
+            }
+          }
+        },
+        {
+          "id": "experience_years",
+          "form": "experience_five_bins",
+          "arguments": {
+            "scope": "property maintenance and general building support",
+            "include_paid_apprenticeships": false
+          },
+          "provisional": "5_to_under_8 (tentative)",
+          "assessment": "unresolved",
+          "answer": {
+            "type": "choice",
+            "choice": "5_to_under_8",
+            "confidence": 0.84,
+            "probabilities": {
+              "under_1": 0.01,
+              "1_to_under_3": 0.03,
+              "3_to_under_5": 0.08,
+              "5_to_under_8": 0.87,
+              "8_plus": 0.01
+            }
+          }
+        },
+        {
+          "id": "skill_coverage",
+          "form": "coverage_v002",
+          "arguments": {
+            "items": [
+              {
+                "name": "basic hand tools",
+                "aliases": [
+                  "hand tools"
+                ]
+              },
+              {
+                "name": "fault reporting",
+                "aliases": [
+                  "reporting faults",
+                  "reporting damage"
+                ]
+              },
+              {
+                "name": "bicycle brake adjustment",
+                "aliases": [
+                  "adjusting bicycle brakes"
+                ]
+              },
+              {
+                "name": "welding",
+                "aliases": []
+              }
+            ]
+          },
+          "provisional": "3",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "3",
+            "confidence": 0.99,
+            "probabilities": {
+              "0": 0.0,
+              "1": 0.0,
+              "2": 0.01,
+              "3": 0.99,
+              "4": 0.0
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_a",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "bicycle brake adjustment",
+            "aliases": [
+              "adjusting bicycle brakes"
+            ]
+          },
+          "provisional": "applied",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "applied",
+            "confidence": 1.0,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 0.0,
+              "applied": 1.0,
+              "used_professionally": 0.0
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_b",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "CMMS",
+            "aliases": [
+              "computerised maintenance management system",
+              "computerized maintenance management system"
+            ]
+          },
+          "provisional": "not_mentioned",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "not_mentioned",
+            "confidence": 1.0,
+            "probabilities": {
+              "not_mentioned": 1.0,
+              "stated_or_studied": 0.0,
+              "applied": 0.0,
+              "used_professionally": 0.0
+            }
+          }
+        }
+      ],
+      "pre_result_notes": "2023–present employer/date is detached into a contact-area table. General assistant 2020–2023 plausibly within broad scope; months/gaps unspecified. Tools and reporting do not establish CMMS. Bicycle project is personal, not professional."
+    },
+    {
+      "id": "03-backend",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-001-cobalt-cv.md",
+      "encoding_warning": false,
+      "request_sha256": "adc6071e1099ce1118c4217455fbe7686c405666ec101ef1c87f976d5ccff4c5",
+      "cached_response_path": "/home/ubuntu/.cache/cvextract/requests/adc6071e1099ce1118c4217455fbe7686c405666ec101ef1c87f976d5ccff4c5/attempts/4defcd67e96c418f814ba745db802912/response.json",
+      "user_response_path": "/tmp/opencode/cvextract-batch002.kd6KXr/03-backend.json",
+      "cache_verified": true,
+      "model": "jev-1.14.0",
+      "usage": {
+        "input_tokens": 2446,
+        "output_tokens": 381
+      },
+      "questions": [
+        {
+          "id": "education_level",
+          "form": "education_level_completed",
+          "arguments": {
+            "scope": "computer science and software engineering"
+          },
+          "provisional": "bachelors",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "bachelors",
+            "confidence": 1.0,
+            "probabilities": {
+              "secondary_or_lower": 0.0,
+              "vocational_technical": 0.0,
+              "short_cycle_higher": 0.0,
+              "bachelors": 1.0,
+              "masters": 0.0,
+              "doctorate": 0.0,
+              "not_stated": 0.0
+            }
+          }
+        },
+        {
+          "id": "certification",
+          "form": "certification_no_validity",
+          "arguments": {
+            "name": "AWS Certified Developer - Associate",
+            "aliases": [
+              "AWS Certified Developer-Associate",
+              "Amazon Web Services Certified Developer Associate"
+            ]
+          },
+          "provisional": "present",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "present",
+            "confidence": 1.0,
+            "probabilities": {
+              "present": 1.0,
+              "not_mentioned": 0.0
+            }
+          }
+        },
+        {
+          "id": "experience_years",
+          "form": "experience_five_bins",
+          "arguments": {
+            "scope": "software engineering and backend development",
+            "include_paid_apprenticeships": false
+          },
+          "provisional": "8_plus",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "8_plus",
+            "confidence": 0.96,
+            "probabilities": {
+              "under_1": 0.0,
+              "1_to_under_3": 0.0,
+              "3_to_under_5": 0.0,
+              "5_to_under_8": 0.03,
+              "8_plus": 0.97
+            }
+          }
+        },
+        {
+          "id": "skill_coverage",
+          "form": "coverage_v002",
+          "arguments": {
+            "items": [
+              {
+                "name": "Python",
+                "aliases": []
+              },
+              {
+                "name": "PostgreSQL",
+                "aliases": [
+                  "Postgres"
+                ]
+              },
+              {
+                "name": "Docker",
+                "aliases": []
+              },
+              {
+                "name": "Kubernetes",
+                "aliases": [
+                  "K8s"
+                ]
+              },
+              {
+                "name": "Redis",
+                "aliases": []
+              },
+              {
+                "name": "Rust",
+                "aliases": []
+              }
+            ]
+          },
+          "provisional": "4",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "4",
+            "confidence": 0.89,
+            "probabilities": {
+              "0": 0.0,
+              "1": 0.0,
+              "2": 0.0,
+              "3": 0.02,
+              "4": 0.91,
+              "5": 0.07,
+              "6": 0.0
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_a",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "Docker",
+            "aliases": []
+          },
+          "provisional": "stated_or_studied",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "stated_or_studied",
+            "confidence": 0.97,
+            "probabilities": {
+              "not_mentioned": 0.01,
+              "stated_or_studied": 0.98,
+              "applied": 0.0,
+              "used_professionally": 0.01
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_b",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "Python",
+            "aliases": []
+          },
+          "provisional": "used_professionally",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "used_professionally",
+            "confidence": 1.0,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 0.0,
+              "applied": 0.0,
+              "used_professionally": 1.0
+            }
+          }
+        }
+      ],
+      "pre_result_notes": "Positive credential with punctuation aliases; BSc completed. Dated roles September 2018–present exceed eight years at reference date. Docker listed, not explicitly used in a concrete activity; Python ingestion jobs explicitly professional. Kubernetes/Rust absent."
+    },
+    {
+      "id": "04-laboratory-fr",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-035-cobalt-cv.md",
+      "encoding_warning": false,
+      "request_sha256": "2dc1b20adb45098ef8c522e6a8a5a56e7059196db946080311a8e7323665cf7a",
+      "cached_response_path": "/home/ubuntu/.cache/cvextract/requests/2dc1b20adb45098ef8c522e6a8a5a56e7059196db946080311a8e7323665cf7a/attempts/a3bac58eb72b430cbc05e2bfca187598/response.json",
+      "user_response_path": "/tmp/opencode/cvextract-batch002.kd6KXr/04-laboratory-fr.json",
+      "cache_verified": true,
+      "model": "jev-1.14.0",
+      "usage": {
+        "input_tokens": 2711,
+        "output_tokens": 381
+      },
+      "questions": [
+        {
+          "id": "education_level",
+          "form": "education_level_completed",
+          "arguments": {
+            "scope": "laboratory techniques and biomedical science"
+          },
+          "provisional": "short_cycle_higher (mapping unresolved)",
+          "assessment": "unresolved",
+          "answer": {
+            "type": "choice",
+            "choice": "vocational_technical",
+            "confidence": 0.52,
+            "probabilities": {
+              "secondary_or_lower": 0.0,
+              "vocational_technical": 0.59,
+              "short_cycle_higher": 0.41,
+              "bachelors": 0.0,
+              "masters": 0.0,
+              "doctorate": 0.0,
+              "not_stated": 0.0
+            }
+          }
+        },
+        {
+          "id": "certification",
+          "form": "certification_no_validity",
+          "arguments": {
+            "name": "Formation SIMDUT",
+            "aliases": [
+              "SIMDUT",
+              "WHMIS training",
+              "Workplace Hazardous Materials Information System training"
+            ]
+          },
+          "provisional": "present",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "present",
+            "confidence": 0.9,
+            "probabilities": {
+              "present": 0.95,
+              "not_mentioned": 0.05
+            }
+          }
+        },
+        {
+          "id": "experience_years",
+          "form": "experience_five_bins",
+          "arguments": {
+            "scope": "laboratory research and laboratory quality control",
+            "include_paid_apprenticeships": false
+          },
+          "provisional": "5_to_under_8 (tentative; missing months)",
+          "assessment": "unresolved",
+          "answer": {
+            "type": "choice",
+            "choice": "5_to_under_8",
+            "confidence": 0.98,
+            "probabilities": {
+              "under_1": 0.0,
+              "1_to_under_3": 0.0,
+              "3_to_under_5": 0.02,
+              "5_to_under_8": 0.98,
+              "8_plus": 0.0
+            }
+          }
+        },
+        {
+          "id": "skill_coverage",
+          "form": "coverage_v002",
+          "arguments": {
+            "items": [
+              {
+                "name": "PCR",
+                "aliases": [
+                  "polymerase chain reaction",
+                  "réaction en chaîne par polymérase"
+                ]
+              },
+              {
+                "name": "Microsoft Excel",
+                "aliases": [
+                  "Excel",
+                  "MS Excel"
+                ]
+              },
+              {
+                "name": "micropipettes",
+                "aliases": [
+                  "micropipetting",
+                  "micropipetage"
+                ]
+              },
+              {
+                "name": "SQL",
+                "aliases": [
+                  "Structured Query Language"
+                ]
+              },
+              {
+                "name": "LIMS",
+                "aliases": [
+                  "laboratory information management system"
+                ]
+              }
+            ]
+          },
+          "provisional": "3",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "3",
+            "confidence": 0.96,
+            "probabilities": {
+              "0": 0.0,
+              "1": 0.0,
+              "2": 0.03,
+              "3": 0.97,
+              "4": 0.0,
+              "5": 0.0
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_a",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "Microsoft Excel",
+            "aliases": [
+              "Excel",
+              "MS Excel"
+            ]
+          },
+          "provisional": "stated_or_studied",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "stated_or_studied",
+            "confidence": 0.92,
+            "probabilities": {
+              "not_mentioned": 0.01,
+              "stated_or_studied": 0.94,
+              "applied": 0.0,
+              "used_professionally": 0.05
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_b",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "PCR",
+            "aliases": [
+              "polymerase chain reaction",
+              "réaction en chaîne par polymérase"
+            ]
+          },
+          "provisional": "stated_or_studied",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "stated_or_studied",
+            "confidence": 0.52,
+            "probabilities": {
+              "not_mentioned": 0.01,
+              "stated_or_studied": 0.64,
+              "applied": 0.0,
+              "used_professionally": 0.35
+            }
+          }
+        }
+      ],
+      "pre_result_notes": "Quebec technical DEC classification not settled; vocational/technical versus short-cycle requires mapping policy, not an automatic error label. Explicit 2020–2021 gap, short contracts, year-only dates make duration ambiguous. Molecular biology analyses do not alone identify PCR use. Quality system does not establish LIMS; generic check sheet does not establish Excel application. SIMDUT update explicitly listed as professional training; no validity checking."
+    },
+    {
+      "id": "05-assembly",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-011-metronic.md",
+      "encoding_warning": false,
+      "request_sha256": "f428cb57e8ca068da56cffc09116240b8296c369557fe3116753ef185385b4dc",
+      "cached_response_path": "/home/ubuntu/.cache/cvextract/requests/f428cb57e8ca068da56cffc09116240b8296c369557fe3116753ef185385b4dc/attempts/44e815e9d71445588cc10ba67ba1950a/response.json",
+      "user_response_path": "/tmp/opencode/cvextract-batch002.kd6KXr/05-assembly.json",
+      "cache_verified": true,
+      "model": "jev-1.14.0",
+      "usage": {
+        "input_tokens": 2274,
+        "output_tokens": 374
+      },
+      "questions": [
+        {
+          "id": "education_level",
+          "form": "education_level_completed",
+          "arguments": {
+            "scope": "engineering and mechanical assembly"
+          },
+          "provisional": "vocational_technical",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "vocational_technical",
+            "confidence": 0.99,
+            "probabilities": {
+              "secondary_or_lower": 0.01,
+              "vocational_technical": 0.99,
+              "short_cycle_higher": 0.0,
+              "bachelors": 0.0,
+              "masters": 0.0,
+              "doctorate": 0.0,
+              "not_stated": 0.0
+            }
+          }
+        },
+        {
+          "id": "certification",
+          "form": "certification_no_validity",
+          "arguments": {
+            "name": "Counterbalance forklift operator certificate",
+            "aliases": [
+              "Counterbalance forklift training certificate"
+            ]
+          },
+          "provisional": "not_mentioned",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "not_mentioned",
+            "confidence": 1.0,
+            "probabilities": {
+              "present": 0.0,
+              "not_mentioned": 1.0
+            }
+          }
+        },
+        {
+          "id": "experience_years",
+          "form": "experience_five_bins",
+          "arguments": {
+            "scope": "component assembly work",
+            "include_paid_apprenticeships": false
+          },
+          "provisional": "3_to_under_5",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "3_to_under_5",
+            "confidence": 0.81,
+            "probabilities": {
+              "under_1": 0.01,
+              "1_to_under_3": 0.13,
+              "3_to_under_5": 0.85,
+              "5_to_under_8": 0.01,
+              "8_plus": 0.0
+            }
+          }
+        },
+        {
+          "id": "skill_coverage",
+          "form": "coverage_v002",
+          "arguments": {
+            "items": [
+              {
+                "name": "hand tools",
+                "aliases": []
+              },
+              {
+                "name": "component assembly",
+                "aliases": [
+                  "assembling components"
+                ]
+              },
+              {
+                "name": "stock checks",
+                "aliases": [
+                  "checking stock",
+                  "inventory checks"
+                ]
+              },
+              {
+                "name": "welding",
+                "aliases": []
+              }
+            ]
+          },
+          "provisional": "3",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "3",
+            "confidence": 0.73,
+            "probabilities": {
+              "0": 0.0,
+              "1": 0.0,
+              "2": 0.02,
+              "3": 0.78,
+              "4": 0.2
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_a",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "power tools",
+            "aliases": []
+          },
+          "provisional": "used_professionally",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "used_professionally",
+            "confidence": 1.0,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 0.0,
+              "applied": 0.0,
+              "used_professionally": 1.0
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_b",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "welding",
+            "aliases": []
+          },
+          "provisional": "not_mentioned",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "not_mentioned",
+            "confidence": 0.84,
+            "probabilities": {
+              "not_mentioned": 0.88,
+              "stated_or_studied": 0.12,
+              "applied": 0.0,
+              "used_professionally": 0.0
+            }
+          }
+        }
+      ],
+      "pre_result_notes": "Level 2 engineering diploma; September 2023 assembly start gives about three years at reference date. Pallet-truck operation is not the named forklift credential. Power tools explicitly used in employment; generic mechanical/assembly work does not establish welding."
+    },
+    {
+      "id": "06-administration-es",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-003-jsume.md",
+      "encoding_warning": true,
+      "request_sha256": "b866f7528c7ffdcfa0d551088fc9ac468b3fe3b7e671c75c6ef509d25c52a8f4",
+      "cached_response_path": "/home/ubuntu/.cache/cvextract/requests/b866f7528c7ffdcfa0d551088fc9ac468b3fe3b7e671c75c6ef509d25c52a8f4/attempts/330e2c15bb544c85878b65e88a06d4b8/response.json",
+      "user_response_path": "/tmp/opencode/cvextract-batch002.kd6KXr/06-administration-es.json",
+      "cache_verified": true,
+      "model": "jev-1.14.0",
+      "usage": {
+        "input_tokens": 2416,
+        "output_tokens": 380
+      },
+      "questions": [
+        {
+          "id": "education_level",
+          "form": "education_level_completed",
+          "arguments": {
+            "scope": ""
+          },
+          "provisional": "vocational_technical (tentative mapping/completion)",
+          "assessment": "unresolved",
+          "answer": {
+            "type": "choice",
+            "choice": "vocational_technical",
+            "confidence": 0.8,
+            "probabilities": {
+              "secondary_or_lower": 0.14,
+              "vocational_technical": 0.83,
+              "short_cycle_higher": 0.0,
+              "bachelors": 0.0,
+              "masters": 0.0,
+              "doctorate": 0.0,
+              "not_stated": 0.03
+            }
+          }
+        },
+        {
+          "id": "certification",
+          "form": "certification_no_validity",
+          "arguments": {
+            "name": "Microsoft Office Specialist: Excel",
+            "aliases": [
+              "MOS Excel",
+              "Microsoft Office Specialist Excel"
+            ]
+          },
+          "provisional": "not_mentioned",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "not_mentioned",
+            "confidence": 1.0,
+            "probabilities": {
+              "present": 0.0,
+              "not_mentioned": 1.0
+            }
+          }
+        },
+        {
+          "id": "experience_years",
+          "form": "experience_five_bins",
+          "arguments": {
+            "scope": "administrative work and reception, excluding retail sales",
+            "include_paid_apprenticeships": false
+          },
+          "provisional": "8_plus",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "8_plus",
+            "confidence": 0.51,
+            "probabilities": {
+              "under_1": 0.0,
+              "1_to_under_3": 0.01,
+              "3_to_under_5": 0.05,
+              "5_to_under_8": 0.33,
+              "8_plus": 0.61
+            }
+          }
+        },
+        {
+          "id": "skill_coverage",
+          "form": "coverage_v002",
+          "arguments": {
+            "items": [
+              {
+                "name": "Microsoft Excel",
+                "aliases": [
+                  "Excel",
+                  "MS Excel"
+                ]
+              },
+              {
+                "name": "Python",
+                "aliases": []
+              },
+              {
+                "name": "SQL",
+                "aliases": [
+                  "Structured Query Language"
+                ]
+              },
+              {
+                "name": "document management",
+                "aliases": [
+                  "gestión documental",
+                  "gestión de documentos"
+                ]
+              },
+              {
+                "name": "pivot tables",
+                "aliases": [
+                  "tablas dinámicas"
+                ]
+              }
+            ]
+          },
+          "provisional": "4",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "4",
+            "confidence": 0.95,
+            "probabilities": {
+              "0": 0.0,
+              "1": 0.0,
+              "2": 0.0,
+              "3": 0.02,
+              "4": 0.96,
+              "5": 0.02
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_a",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "Python",
+            "aliases": []
+          },
+          "provisional": "stated_or_studied",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "stated_or_studied",
+            "confidence": 0.99,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 0.99,
+              "applied": 0.01,
+              "used_professionally": 0.0
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_b",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "Microsoft Excel",
+            "aliases": [
+              "Excel",
+              "MS Excel"
+            ]
+          },
+          "provisional": "used_professionally",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "used_professionally",
+            "confidence": 1.0,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 0.0,
+              "applied": 0.0,
+              "used_professionally": 1.0
+            }
+          }
+        }
+      ],
+      "pre_result_notes": "JSume encoding warning. Education/course rows appear under work; bachelor explicitly incomplete must not outrank Técnico. Técnico level/completion not fully specified. Advanced Excel course is not MOS. Generic database work not SQL, repetitive templates not explicit Python scripts. Excel reports/pivots explicitly professional. June 2018–present administrative roles exceed eight years."
+    },
+    {
+      "id": "07-building-services",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-054-jsume.md",
+      "encoding_warning": true,
+      "request_sha256": "c2058faddd86cb3dd738cd9679b8ae30b98d8b9a6c551193ef49aa17f6210220",
+      "cached_response_path": "/home/ubuntu/.cache/cvextract/requests/c2058faddd86cb3dd738cd9679b8ae30b98d8b9a6c551193ef49aa17f6210220/attempts/0a054197c33d45259e0522fefc775772/response.json",
+      "user_response_path": "/tmp/opencode/cvextract-batch002.kd6KXr/07-building-services.json",
+      "cache_verified": true,
+      "model": "jev-1.14.0",
+      "usage": {
+        "input_tokens": 2182,
+        "output_tokens": 359
+      },
+      "questions": [
+        {
+          "id": "education_level",
+          "form": "education_level_completed",
+          "arguments": {
+            "scope": "building services and maintenance"
+          },
+          "provisional": "not_stated",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "not_stated",
+            "confidence": 0.99,
+            "probabilities": {
+              "secondary_or_lower": 0.01,
+              "vocational_technical": 0.0,
+              "short_cycle_higher": 0.0,
+              "bachelors": 0.0,
+              "masters": 0.0,
+              "doctorate": 0.0,
+              "not_stated": 0.99
+            }
+          }
+        },
+        {
+          "id": "certification",
+          "form": "certification_no_validity",
+          "arguments": {
+            "name": "Working at height training",
+            "aliases": [
+              "Working at heights training",
+              "Working at height"
+            ]
+          },
+          "provisional": "present",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "present",
+            "confidence": 0.98,
+            "probabilities": {
+              "present": 0.99,
+              "not_mentioned": 0.01
+            }
+          }
+        },
+        {
+          "id": "experience_years",
+          "form": "experience_five_bins",
+          "arguments": {
+            "scope": "building services operation and maintenance",
+            "include_paid_apprenticeships": false
+          },
+          "provisional": "8_plus",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "8_plus",
+            "confidence": 0.96,
+            "probabilities": {
+              "under_1": 0.0,
+              "1_to_under_3": 0.0,
+              "3_to_under_5": 0.01,
+              "5_to_under_8": 0.02,
+              "8_plus": 0.97
+            }
+          }
+        },
+        {
+          "id": "skill_coverage",
+          "form": "coverage_v002",
+          "arguments": {
+            "items": [
+              {
+                "name": "ventilation checks",
+                "aliases": [
+                  "ventilation equipment checks"
+                ]
+              },
+              {
+                "name": "CMMS",
+                "aliases": [
+                  "computerised maintenance management system",
+                  "computerized maintenance management system"
+                ]
+              },
+              {
+                "name": "work orders",
+                "aliases": []
+              }
+            ]
+          },
+          "provisional": "2",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "2",
+            "confidence": 0.88,
+            "probabilities": {
+              "0": 0.0,
+              "1": 0.04,
+              "2": 0.91,
+              "3": 0.05
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_a",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "CMMS",
+            "aliases": [
+              "computerised maintenance management system",
+              "computerized maintenance management system"
+            ]
+          },
+          "provisional": "not_mentioned",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "not_mentioned",
+            "confidence": 0.83,
+            "probabilities": {
+              "not_mentioned": 0.87,
+              "stated_or_studied": 0.08,
+              "applied": 0.0,
+              "used_professionally": 0.05
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_b",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "working at height",
+            "aliases": [
+              "working at heights"
+            ]
+          },
+          "provisional": "stated_or_studied",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "stated_or_studied",
+            "confidence": 0.89,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 0.92,
+              "applied": 0.01,
+              "used_professionally": 0.07
+            }
+          }
+        }
+      ],
+      "pre_result_notes": "JSume encoding warning. Internal training explicitly named but no academic qualification. Building services roles January 2016–present; earlier workshop role not needed. Work orders/logs do not establish CMMS. Working-at-height training does not alone evidence application. Project heading compressor repair has little detail and is not queried."
+    },
+    {
+      "id": "08-electrical-es",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-050-vercanard.md",
+      "encoding_warning": false,
+      "request_sha256": "21003c003334d7dd2c8ac5a1bde6c499ce9b8880de775228f4f59ef3c0b2b546",
+      "cached_response_path": "/home/ubuntu/.cache/cvextract/requests/21003c003334d7dd2c8ac5a1bde6c499ce9b8880de775228f4f59ef3c0b2b546/attempts/e9b3f33e204c4607918cc66c512e930c/response.json",
+      "user_response_path": "/tmp/opencode/cvextract-batch002.kd6KXr/08-electrical-es.json",
+      "cache_verified": true,
+      "model": "jev-1.14.0",
+      "usage": {
+        "input_tokens": 2436,
+        "output_tokens": 373
+      },
+      "questions": [
+        {
+          "id": "education_level",
+          "form": "education_level_completed",
+          "arguments": {
+            "scope": "industrial electricity and electrical maintenance"
+          },
+          "provisional": "not_stated (award ambiguous)",
+          "assessment": "unresolved",
+          "answer": {
+            "type": "choice",
+            "choice": "vocational_technical",
+            "confidence": 0.99,
+            "probabilities": {
+              "secondary_or_lower": 0.0,
+              "vocational_technical": 0.99,
+              "short_cycle_higher": 0.01,
+              "bachelors": 0.0,
+              "masters": 0.0,
+              "doctorate": 0.0,
+              "not_stated": 0.0
+            }
+          }
+        },
+        {
+          "id": "certification",
+          "form": "certification_no_validity",
+          "arguments": {
+            "name": "Formación de trabajo en altura",
+            "aliases": [
+              "Curso de trabajo en altura",
+              "Capacitación en trabajo en altura"
+            ]
+          },
+          "provisional": "not_mentioned",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "not_mentioned",
+            "confidence": 1.0,
+            "probabilities": {
+              "present": 0.0,
+              "not_mentioned": 1.0
+            }
+          }
+        },
+        {
+          "id": "experience_years",
+          "form": "experience_five_bins",
+          "arguments": {
+            "scope": "electrical installation and electrical maintenance",
+            "include_paid_apprenticeships": false
+          },
+          "provisional": "8_plus (tentative contract duration)",
+          "assessment": "unresolved",
+          "answer": {
+            "type": "choice",
+            "choice": "8_plus",
+            "confidence": 0.98,
+            "probabilities": {
+              "under_1": 0.0,
+              "1_to_under_3": 0.0,
+              "3_to_under_5": 0.01,
+              "5_to_under_8": 0.01,
+              "8_plus": 0.98
+            }
+          }
+        },
+        {
+          "id": "skill_coverage",
+          "form": "coverage_v002",
+          "arguments": {
+            "items": [
+              {
+                "name": "electrical preventive maintenance",
+                "aliases": [
+                  "mantenimiento preventivo eléctrico"
+                ]
+              },
+              {
+                "name": "schematic reading",
+                "aliases": [
+                  "lectura de esquemas",
+                  "reading electrical schematics"
+                ]
+              },
+              {
+                "name": "PLC programming",
+                "aliases": [
+                  "programación de PLC"
+                ]
+              },
+              {
+                "name": "welding",
+                "aliases": [
+                  "soldadura"
+                ]
+              }
+            ]
+          },
+          "provisional": "2",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "2",
+            "confidence": 0.99,
+            "probabilities": {
+              "0": 0.0,
+              "1": 0.01,
+              "2": 0.99,
+              "3": 0.0,
+              "4": 0.0
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_a",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "schematic reading",
+            "aliases": [
+              "lectura de esquemas",
+              "reading electrical schematics"
+            ]
+          },
+          "provisional": "stated_or_studied",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "stated_or_studied",
+            "confidence": 0.89,
+            "probabilities": {
+              "not_mentioned": 0.01,
+              "stated_or_studied": 0.92,
+              "applied": 0.0,
+              "used_professionally": 0.07
+            }
+          }
+        },
+        {
+          "id": "skill_evidence_b",
+          "form": "skill_evidence",
+          "arguments": {
+            "name": "circuit labelling",
+            "aliases": [
+              "etiquetado de circuitos",
+              "circuit identification and labelling"
+            ]
+          },
+          "provisional": "used_professionally",
+          "assessment": "agrees",
+          "answer": {
+            "type": "choice",
+            "choice": "used_professionally",
+            "confidence": 0.99,
+            "probabilities": {
+              "not_mentioned": 0.0,
+              "stated_or_studied": 0.0,
+              "applied": 0.01,
+              "used_professionally": 0.99
+            }
+          }
+        }
+      ],
+      "pre_result_notes": "Formación técnica 2014–2017 names study but not a specific awarded qualification; vocational/technical is a plausible alternative pending policy. Contracts 2017–2021 and role 2021–present span nine years, but actual time on short contracts is unclear. Schematic reading listed, not explicitly linked to work; circuit identification is not by itself evidence of reading diagrams. Circuit labels explicitly updated during plant shutdown. Internal electrical safety is not named height training."
+    }
+  ],
+  "totals": {
+    "requests": 8,
+    "questions": 48,
+    "provisional_assessment": {
+      "agrees": 42,
+      "unresolved": 6
+    },
+    "input_tokens": 19372,
+    "output_tokens": 2997
+  }
+}

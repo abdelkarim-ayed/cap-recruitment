@@ -1,0 +1,8 @@
+- Impression: Mechanical fitter — entry; patchy/no-clear-focus.
+- Tone: career-changer, still finding wording. (~max 10)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: unclear; might only become obvious from details.
+- Creds: education hinted at, level/details missing.
+- Extra: has done a bit of everything, mastered none obvious.
+- Timeline: timeline unclear / partially known.
+- Notes: leave room to reshape sections to fit an unknown template.

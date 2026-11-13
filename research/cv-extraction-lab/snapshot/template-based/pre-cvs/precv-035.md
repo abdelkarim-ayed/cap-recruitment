@@ -1,0 +1,8 @@
+- Impression: Lab/research-adjacent — lead/specialist; patchy/no-clear-focus.
+- Tone: career-changer, still finding wording. (~max 10)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: unclear; might only become obvious from details.
+- Creds: possibly some training/certs — unconfirmed.
+- Extra: references tools without listing a full stack.
+- Timeline: has a vague gap in timeline.
+- Notes: leave room to reshape sections to fit an unknown template.

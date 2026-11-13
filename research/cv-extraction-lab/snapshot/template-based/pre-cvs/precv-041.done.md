@@ -1,0 +1,8 @@
+- Impression: Misc/general — entry; credential-first.
+- Tone: very specific about one thing, vague about everything else. (~4-5 lines)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: a couple of tools mentioned in context, not a full list.
+- Creds: education hinted at, level/details missing.
+- Extra: seems open to change in direction.
+- Timeline: timeline unclear / partially known.
+- Notes: leave room to reshape sections to fit an unknown template.

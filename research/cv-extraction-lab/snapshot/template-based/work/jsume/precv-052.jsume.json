@@ -1,0 +1,27 @@
+{
+  "$schema": "https://unpkg.com/@jsume/schemas/dist/draft-2020-12.json",
+  "basics": {
+    "name": "Yanis Leroy",
+    "label": "Ajusteur-monteur junior",
+    "email": "yanis.leroy.cv@example.fr",
+    "phone": "+33 6 00 00 00 52",
+    "summary": "Monteur junior, à l'aise avec les outils manuels, les consignes d'atelier et le contrôle visuel. A travaillé surtout sur des tâches de préparation et de montage simple; souhaite maintenant apprendre davantage auprès d'une équipe de maintenance mécanique.",
+    "location": {"city": "Lille", "country": "France"},
+    "profiles": []
+  },
+  "work": [
+    {"company": "Métal Nord Services", "location": "Lille, France", "position": "Aide-monteur", "startDate": {"year": 2023, "month": 1}, "endDate": false,
+      "highlights": ["Prépare les postes et les pièces pour de petits ensembles mécaniques.", "Assemble des composants selon plans simples et instructions de l'équipe.", "Utilise pied à coulisse et clés dynamométriques sous supervision; signale les mesures hors tolérance.", "Note les pièces manquantes et remet la zone en ordre en fin de série."]},
+    {"company": "Atelier des Flandres", "location": "Roubaix, France", "position": "Opérateur polyvalent", "startDate": {"year": 2020, "month": 1}, "endDate": {"year": 2023, "month": 1},
+      "highlights": ["A aidé au démontage, nettoyage et remontage d'équipements d'atelier.", "Préparait les outils, suivait les fiches de travail et demandait une vérification avant remise en service."]}
+  ],
+  "education": [
+    {"institution": "Lycée professionnel Louis-Louchet", "location": "Lille, France", "major": "Module ajustage", "degree": "CAP Réalisations industrielles en chaudronnerie ou soudage", "startDate": {"year": 2018, "month": 1}, "endDate": {"year": 2020, "month": 1}, "courses": []}
+  ],
+  "skills": [
+    {"name": "Atelier", "keywords": ["Assemblage mécanique", "Lecture de plans simples", "Préparation de pièces", "Contrôle visuel"]},
+    {"name": "Outils et méthodes", "keywords": ["Pied à coulisse", "Clés dynamométriques", "Outils manuels", "Rangement sécurisé"]}
+  ],
+  "languages": [{"language": "Français", "fluency": "Courant"}, {"language": "Anglais", "fluency": "Technique de base"}],
+  "projects": [{"name": "Restauration d'un touret d'atelier à pédale", "description": "Nettoie et ajuste progressivement les pièces; documente les vérifications restantes avant utilisation."}]
+}

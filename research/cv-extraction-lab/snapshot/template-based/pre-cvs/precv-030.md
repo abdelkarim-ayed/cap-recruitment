@@ -1,0 +1,8 @@
+- Impression: People support — lead/specialist; credential-first.
+- Tone: pragmatic, hands-on. (~6-8 lines)
+- Story: odd mix of jobs; common thread not obvious yet.
+- Skills: leans practical/problem-solving over terminology.
+- Creds: possibly some training/certs — unconfirmed.
+- Extra: has volunteer time mentioned vaguely.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: volunteering/languages may exist, not specified.

@@ -1,0 +1,16 @@
+{
+  "parser": "pdf-inspector",
+  "parser_version": "1.25.2",
+  "method": "process_pdf; native text only; no OCR",
+  "source_pdf": "template-based/outputs/modern-cv/precv-006-modern-cv.pdf",
+  "pdf_sha256": "3441404d646e3794f37b1a34eea41f9d8cbda58252585d47eafff66311e5cc62",
+  "markdown_path": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-006-modern-cv.md",
+  "markdown_sha256": "6423b347a24b4c17809d98fcb21bd3f11af8a661eee703c4b156bf2672b27e93",
+  "markdown_bytes": 1475,
+  "pdf_type": "text_based",
+  "page_count": 1,
+  "pages_needing_ocr": [],
+  "has_encoding_issues": false,
+  "pages_with_columns": [],
+  "pages_with_tables": []
+}

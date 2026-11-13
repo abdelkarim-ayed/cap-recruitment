@@ -1,0 +1,107 @@
+{
+  "model": "jev-1.14.0",
+  "reference_date": "2026-11-12",
+  "comparisons": {
+    "skill_comparison": {
+      "skill_a_original": {"form": "skill_evidence", "args_key": "skill_a"},
+      "skill_a_revised": {"form": "skill_evidence_v002", "args_key": "skill_a"},
+      "skill_b_original": {"form": "skill_evidence", "args_key": "skill_b"},
+      "skill_b_revised": {"form": "skill_evidence_v002", "args_key": "skill_b"}
+    },
+    "count_diagnostic": {
+      "coverage_original": {"form": "skill_coverage_count", "args_key": "coverage"},
+      "coverage_revised": {"form": "coverage_v002", "args_key": "coverage"},
+      "excel_evidence": {"form": "skill_evidence", "args_key": "excel"},
+      "payroll_evidence": {"form": "skill_evidence", "args_key": "payroll"}
+    },
+    "experience_comparison": {
+      "experience_original": {"form": "experience_five_bins", "args_key": "experience"},
+      "experience_revised": {"form": "experience_v002", "args_key": "experience"}
+    }
+  },
+  "cases": [
+    {
+      "id": "01-lavandula-original",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-044-lavandula.md",
+      "comparison": "skill_comparison",
+      "question_args": {
+        "skill_a": {"name": "Microsoft Excel", "aliases": ["Excel", "MS Excel"]},
+        "skill_b": {"name": "spreadsheets", "aliases": ["spreadsheet creation", "spreadsheet tracking"]}
+      },
+      "provisional": {
+        "skill_a_original": "stated_or_studied",
+        "skill_a_revised": "stated_or_studied",
+        "skill_b_original": "applied (professional context ambiguous)",
+        "skill_b_revised": "applied (professional context ambiguous)"
+      },
+      "notes": "Original failing named-Excel case. Excel appears in list; community project names only a spreadsheet. Generic spreadsheet application is evidenced, while work/profile context is ambiguous. Compare v001/v002 under identical state; previous full-request result is a historical observation, not an exact replay."
+    },
+    {
+      "id": "02-lavandula-flat",
+      "cv": "parser-evaluation/cvextract/templates/semantic-batch-003/inputs/precv-044-lavandula-flat.md",
+      "comparison": "skill_comparison",
+      "question_args": {
+        "skill_a": {"name": "Microsoft Excel", "aliases": ["Excel", "MS Excel"]},
+        "skill_b": {"name": "spreadsheets", "aliases": ["spreadsheet creation", "spreadsheet tracking"]}
+      },
+      "provisional": {
+        "skill_a_original": "stated_or_studied",
+        "skill_a_revised": "stated_or_studied",
+        "skill_b_original": "applied (professional context ambiguous)",
+        "skill_b_revised": "applied (professional context ambiguous)"
+      },
+      "notes": "Controlled derivative of the parsed Markdown, not another parser result or independent CV. Only heading-prefix removal and whitespace flattening; same words/facts/order. Same native template as request 01, different hydrated CV text. Tests formatting sensitivity, not recovery of missing/reordered facts."
+    },
+    {
+      "id": "03-french-count",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-041-vantage-cv.md",
+      "comparison": "count_diagnostic",
+      "question_args": {
+        "coverage": {"items": [
+          {"name": "reception and front-desk service", "aliases": ["accueil", "accueil et réception"]},
+          {"name": "appointment follow-up", "aliases": ["suivi de rendez-vous", "confirmations de rendez-vous"]},
+          {"name": "Microsoft Excel", "aliases": ["Excel", "MS Excel"]},
+          {"name": "payroll administration", "aliases": ["gestion de la paie", "traitement des salaires"]}
+        ]},
+        "excel": {"name": "Microsoft Excel", "aliases": ["Excel", "MS Excel"]},
+        "payroll": {"name": "payroll administration", "aliases": ["gestion de la paie", "traitement des salaires"]}
+      },
+      "provisional": {
+        "coverage_original": "2",
+        "coverage_revised": "2",
+        "excel_evidence": "not_mentioned",
+        "payroll_evidence": "not_mentioned"
+      },
+      "notes": "Prior count selected 3, later comparison selected 2 for both forms. Generic Tableur is not named Excel; payroll absent. Two suspected extra items queried explicitly; no per-item expansion added to normal extraction. New request context, not an exact replay or causal explanation."
+    },
+    {
+      "id": "04-retail-experience",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-023-moderner-cv.md",
+      "comparison": "experience_comparison",
+      "question_args": {
+        "experience": {"scope": "customer-facing retail, market sales and parcel-counter service", "include_paid_apprenticeships": false}
+      },
+      "provisional": {
+        "experience_original": "5_to_under_8 (gap duration not exact)",
+        "experience_revised": "5_to_under_8 (gap duration not exact)"
+      },
+      "notes": "Original winner was plausible but probability on 8+ was 0.32. Even earliest possible start January 2019 to reference November 2026 is less than eight years. Compare probability on that unsupported upper bin, not just winner; short unspecified gap means exact total is not known. No computed upper bound or expected answer is included in the request."
+    },
+    {
+      "id": "05-jsume-positive-control",
+      "cv": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-003-jsume.md",
+      "comparison": "skill_comparison",
+      "question_args": {
+        "skill_a": {"name": "Microsoft Excel", "aliases": ["Excel", "MS Excel"]},
+        "skill_b": {"name": "Python", "aliases": []}
+      },
+      "provisional": {
+        "skill_a_original": "used_professionally",
+        "skill_a_revised": "used_professionally",
+        "skill_b_original": "stated_or_studied",
+        "skill_b_revised": "stated_or_studied"
+      },
+      "notes": "Problematic JSume encoding-warning format, but explicit Excel reports/pivots in employment are a positive linkage control. Python appears in basic skills/course, not an identified application; generic templates are not Python use. Checks that stricter wording does not erase real professional evidence or invent application."
+    }
+  ]
+}

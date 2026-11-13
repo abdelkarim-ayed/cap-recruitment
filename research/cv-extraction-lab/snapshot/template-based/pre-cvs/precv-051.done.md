@@ -1,0 +1,8 @@
+- Impression: Maintenance — entry; skill-first.
+- Tone: sparse, almost a note-to-self. (~max 10)
+- Story: odd mix of jobs; common thread not obvious yet.
+- Skills: unclear; might only become obvious from details.
+- Creds: education hinted at, level/details missing.
+- Extra: hints at weekend projects.
+- Timeline: timeline unclear / partially known.
+- Notes: would need personal/additional/location details filled in later.

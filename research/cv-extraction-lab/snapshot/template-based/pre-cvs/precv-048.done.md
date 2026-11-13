@@ -1,0 +1,8 @@
+- Impression: IT career-changer — mid; patchy/no-clear-focus.
+- Tone: unpolished, honest about gaps. (~2 lines)
+- Story: odd mix of jobs; common thread not obvious yet.
+- Skills: hands-on basics; specifics to be pinned down later.
+- Creds: little formal shown; practical history carries more weight.
+- Extra: focuses on reliability more than ambition.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: volunteering/languages may exist, not specified.

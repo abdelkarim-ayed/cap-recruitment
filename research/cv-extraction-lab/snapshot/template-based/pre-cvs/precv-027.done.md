@@ -1,0 +1,8 @@
+- Impression: Growth-minded — junior; skill-first.
+- Tone: sparse, almost a note-to-self. (~max 10)
+- Story: odd mix of jobs; common thread not obvious yet.
+- Skills: unclear; might only become obvious from details.
+- Creds: trade experience seems more relevant than formal quals here.
+- Extra: has volunteer time mentioned vaguely.
+- Timeline: timeline unclear / partially known.
+- Notes: would need personal/additional/location details filled in later.

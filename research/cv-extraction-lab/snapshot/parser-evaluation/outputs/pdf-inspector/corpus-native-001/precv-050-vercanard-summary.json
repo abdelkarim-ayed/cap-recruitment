@@ -1,0 +1,18 @@
+{
+  "parser": "pdf-inspector",
+  "parser_version": "1.25.2",
+  "method": "process_pdf; native text only; no OCR",
+  "source_pdf": "template-based/outputs/vercanard/precv-050-vercanard.pdf",
+  "pdf_sha256": "77ac519b5ce22f6e650ab35721d34222dcfcb0bbde8678ec1da6f995cb66c307",
+  "markdown_path": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-050-vercanard.md",
+  "markdown_sha256": "1fa3151ce34b214c1633376905b5cbd883327b2f8947726e69f110f09345f3ea",
+  "markdown_bytes": 1961,
+  "pdf_type": "text_based",
+  "page_count": 1,
+  "pages_needing_ocr": [],
+  "has_encoding_issues": false,
+  "pages_with_columns": [
+    1
+  ],
+  "pages_with_tables": []
+}

@@ -1,0 +1,41 @@
+contacts:
+  name: Émilie Rochat
+  title: Assistante administrative
+  email: emilie.rochat.cv@example.ch
+  address: "Lausanne, Switzerland"
+  location: Switzerland
+  linkedin: {url: "https://www.linkedin.com/in/emilie-rochat/", displayText: "emilie-rochat"}
+  github: {url: "https://github.com/emilie-rochat/", displayText: "emilie-rochat"}
+  website: {url: "https://emilie-rochat.example.ch/", displayText: "emilie-rochat.example.ch"}
+position: Assistante administrative
+tagline: "Assistante administrative débutante, à l'aise avec l'accueil, les listes de suivi et les tâches qui demandent de la régularité."
+objective: "Souhaite consolider son expérience dans une équipe où les procédures sont expliquées et partagées."
+jobs:
+  - position: Assistante d'accueil
+    company: {name: "Cabinet du Parc", link: "https://cabinet-du-parc.example.ch/"}
+    product: {name: "Accueil et rendez-vous", link: "https://cabinet-du-parc.example.ch/"}
+    description: ["Répondait aux appels, transmettait les messages et préparait les dossiers de rendez-vous.", "Vérifiait les confirmations et signalait les changements à l'équipe."]
+    from: "2024"
+    to: "2025"
+    tags: [Accueil, Suivi]
+    location: Lausanne
+  - position: Employée polyvalente
+    company: {name: "Épicerie des Deux Ponts", link: "https://deux-ponts.example.ch/"}
+    product: {name: "Commerce de proximité", link: "https://deux-ponts.example.ch/"}
+    description: ["Accueillait les clients, réapprovisionnait les rayons et aidait aux commandes.", "Suivait les demandes spéciales et prévenait le responsable lorsque les produits arrivaient."]
+    from: "2022"
+    to: "2024"
+    tags: [Service, Organisation]
+    location: Lausanne
+education:
+  - place: {name: "École de commerce de Lausanne", link: ""}
+    from: "2020"
+    to: "2022"
+    location: Lausanne, Switzerland
+    degree: Certificat de culture générale
+    major: Orientation commerce
+technical_expertise: []
+skills: ["Accueil, suivi de rendez-vous, saisie de données", "Courriels, téléphone, listes de contrôle, outils bureautiques"]
+methodology: []
+tools: ["Tableur", "Registre papier de confirmations"]
+achievements: []

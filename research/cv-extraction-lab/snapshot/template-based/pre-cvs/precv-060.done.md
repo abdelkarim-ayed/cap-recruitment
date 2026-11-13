@@ -1,0 +1,8 @@
+- Impression: Team lead — lead/specialist; patchy/no-clear-focus.
+- Tone: career-changer, still finding wording. (~2 lines)
+- Story: odd mix of jobs; common thread not obvious yet.
+- Skills: hands-on basics; specifics to be pinned down later.
+- Creds: possibly some training/certs — unconfirmed.
+- Extra: mentions helping others informally.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: volunteering/languages may exist, not specified.

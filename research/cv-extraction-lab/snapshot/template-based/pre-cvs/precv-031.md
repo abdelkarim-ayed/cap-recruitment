@@ -1,0 +1,8 @@
+- Impression: Care/support — entry; project-first.
+- Tone: quietly detail-oriented. (~max 10)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: unclear; might only become obvious from details.
+- Creds: education hinted at, level/details missing.
+- Extra: references tools without listing a full stack.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: open to adding portfolio/links later if relevant.

@@ -1,0 +1,8 @@
+- Impression: Data-curious admin — senior; project-first.
+- Tone: generic but serviceable impression. (~2 lines)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: hands-on basics; specifics to be pinned down later.
+- Creds: nothing concrete noted yet.
+- Extra: seems open to change in direction.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: community-adjacent, details TBD.

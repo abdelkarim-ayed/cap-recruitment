@@ -1,0 +1,8 @@
+- Impression: Accounts/bookkeeping — entry; project-first.
+- Tone: quietly detail-oriented. (~2 lines)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: hands-on basics; specifics to be pinned down later.
+- Creds: education hinted at, level/details missing.
+- Extra: mentions helping others informally.
+- Timeline: has a vague gap in timeline.
+- Social/supplementary: community-adjacent, details TBD.

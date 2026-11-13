@@ -1,0 +1,8 @@
+- Impression: Content/brand — lead/specialist; story-first.
+- Tone: sparse, almost a note-to-self. (~4-5 lines)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: a couple of tools mentioned in context, not a full list.
+- Creds: possibly some training/certs — unconfirmed.
+- Extra: mentions languages in passing.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: open to adding portfolio/links later if relevant.

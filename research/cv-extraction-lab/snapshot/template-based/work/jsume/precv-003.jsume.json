@@ -1,0 +1,93 @@
+{
+  "$schema": "https://unpkg.com/@jsume/schemas/dist/draft-2020-12.json",
+  "basics": {
+    "name": "Elena Márquez",
+    "label": "Administradora / Data Assistant",
+    "email": "elena.marquez.example@example.es",
+    "phone": "+34 612 345 670",
+    "summary": "Administradora con curiosidad por los datos y experiencia en oficinas. He trabajado en varios puestos administrativos y de atención al cliente, y poco a poco me he ido interesando por el análisis de datos y la automatización. Busco un puesto donde pueda combinar mis habilidades administrativas con mi interés por los datos.",
+    "location": {
+      "city": "Madrid",
+      "country": "España"
+    },
+    "profiles": []
+  },
+  "work": [
+    {
+      "company": "Grupo Solana",
+      "location": "Madrid, España",
+      "position": "Administrativa / Data Assistant",
+      "startDate": {"year": 2021, "month": 2},
+      "endDate": false,
+      "highlights": [
+        "Gestión de documentos y bases de datos internas",
+        "Preparación de informes sencillos con Excel (tablas dinámicas, gráficos)",
+        "Apoyo en la migración de datos entre sistemas",
+        "Creación de plantillas para tareas repetitivas"
+      ]
+    },
+    {
+      "company": "Clínica Dental Sonrisa",
+      "location": "Madrid, España",
+      "position": "Recepcionista / Administrativa",
+      "startDate": {"year": 2018, "month": 6},
+      "endDate": {"year": 2021, "month": 1},
+      "highlights": [
+        "Atención al paciente, gestión de citas y facturación",
+        "Mantenimiento de agenda digital y registros",
+        "Uso de software de gestión clínica"
+      ]
+    },
+    {
+      "company": "Zara",
+      "location": "Madrid, España",
+      "position": "Dependienta",
+      "startDate": {"year": 2016, "month": 9},
+      "endDate": {"year": 2018, "month": 5},
+      "highlights": [
+        "Atención al cliente, cobro, colocación de productos",
+        "Trabajo en equipo y resolución de problemas"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Universidad Complutense de Madrid",
+      "location": "Madrid, España",
+      "major": "Administración y Dirección de Empresas (incompleto)",
+      "degree": "Grado (incompleto)",
+      "startDate": {"year": 2015, "month": 9},
+      "endDate": {"year": 2018, "month": 6}
+    },
+    {
+      "institution": "IES La Paloma",
+      "location": "Madrid, España",
+      "major": "Gestión Administrativa",
+      "degree": "Técnico",
+      "startDate": {"year": 2013, "month": 9},
+      "endDate": {"year": 2015, "month": 6}
+    }
+  ],
+  "skills": [
+    {
+      "name": "Datos",
+      "keywords": ["Excel", "Tablas dinámicas", "Gráficos", "Bases de datos"]
+    },
+    {
+      "name": "Administración",
+      "keywords": ["Gestión documental", "Atención al cliente", "Organización"]
+    },
+    {
+      "name": "Automatización",
+      "keywords": ["Python (básico)", "Plantillas", "Mejora de procesos"]
+    }
+  ],
+  "languages": [
+    {"language": "Español", "fluency": "Nativo"},
+    {"language": "Inglés", "fluency": "Intermedio"}
+  ],
+  "certificates": [
+    {"name": "Curso de Excel Avanzado", "issuer": "LinkedIn Learning", "issueDate": {"year": 2022, "month": 1}},
+    {"name": "Introducción a Python", "issuer": "Coursera", "issueDate": {"year": 2023, "month": 3}}
+  ]
+}

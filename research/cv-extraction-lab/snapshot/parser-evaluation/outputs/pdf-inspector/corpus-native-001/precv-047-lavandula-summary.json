@@ -1,0 +1,18 @@
+{
+  "parser": "pdf-inspector",
+  "parser_version": "1.25.2",
+  "method": "process_pdf; native text only; no OCR",
+  "source_pdf": "template-based/outputs/lavandula/precv-047-lavandula.pdf",
+  "pdf_sha256": "ef672f6ec2ea26fc2e8e3f100b3ac64c0a3d9bcb1481417c004e23d74df795fb",
+  "markdown_path": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-047-lavandula.md",
+  "markdown_sha256": "d9a82fdaa20fb2ed3f1d166eb7907df1b96fc20271d39c812d628b4540ea5110",
+  "markdown_bytes": 1404,
+  "pdf_type": "text_based",
+  "page_count": 1,
+  "pages_needing_ocr": [],
+  "has_encoding_issues": false,
+  "pages_with_columns": [
+    1
+  ],
+  "pages_with_tables": []
+}

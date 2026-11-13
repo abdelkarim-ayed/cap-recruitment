@@ -1,0 +1,8 @@
+- Impression: Compliance/admin — entry; patchy/no-clear-focus.
+- Tone: career-changer, still finding wording. (~2 lines)
+- Story: odd mix of jobs; common thread not obvious yet.
+- Skills: hands-on basics; specifics to be pinned down later.
+- Creds: education hinted at, level/details missing.
+- Extra: keeps social/portfolio in mind for later.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: volunteering/languages may exist, not specified.

@@ -1,0 +1,77 @@
+{# Draft only. Validate JSON configuration first; use StrictUndefined.
+   reference_date must already be resolved. Aliases are optional enrichment.
+   $cv is hydrated later by the existing CLI; no CV content in this file. #}
+{% macro named(value) -%}
+{% if value is string %}{{ value }}{% else %}{{ value.name }}{% if value.get('aliases') %} (also accept: {{ value.aliases | join('; ') }}){% endif %}{% endif %}
+{%- endmacro %}
+{% macro scope_text(scope) -%}
+{{ scope if scope is string else scope | join(' OR ') }}
+{%- endmacro %}
+{
+  "model": "jev-1.14.0",
+  "state": {
+    "cv": "$cv",
+    "reference_date": {{ reference_date | tojson }}
+  },
+  "questions": {
+{% for q in questions %}
+{% if q.type == 'education_level' %}
+{% set instruction -%}
+As of {{ reference_date }}, what is the highest education level completed{% if q.get('expected_within_months', 0) %} or explicitly expected to be completed within {{ q.expected_within_months }} months after that date{% endif %}{% if q.get('scope') %} in {{ scope_text(q.scope) }}{% endif %}? Use evidence in the CV, not an assumption that ongoing study is completed.
+{%- endset %}
+{% set criteria = {
+  'secondary_or_lower': 'Secondary school or lower.',
+  'vocational_technical': 'Vocational or technical qualification below higher education.',
+  'short_cycle_higher': 'Short-cycle higher education, below a bachelor degree.',
+  'bachelors': 'Bachelor degree or equivalent.',
+  'masters': 'Master degree or equivalent.',
+  'doctorate': 'Doctorate or equivalent.',
+  'not_stated': 'No qualifying education stated within the requested scope/time window.'
+} %}
+{% elif q.type == 'certification' %}
+{% set instruction -%}
+Does the CV state that {{ named(q.certification) }} is held or completed? Related work, preparation and planned study do not count.
+{%- endset %}
+{% set criteria = {'present': 'Stated as held or completed.', 'not_mentioned': 'Not evidenced as held or completed.'} %}
+{% elif q.type == 'experience_years' %}
+{% set instruction -%}
+As of {{ reference_date }}, how much documented work experience does the CV show{% if q.get('scope') %} in {{ scope_text(q.scope) }}{% endif %}? Count overlapping periods once. Use elapsed time, not a count of calendar years. Do not assume a listed skill was used throughout an entire role.
+{%- endset %}
+{% set criteria = {
+  'under_1': 'Under 1 year, including no evidenced duration.',
+  '1_to_under_3': '1 to under 3 years.',
+  '3_to_under_5': '3 to under 5 years.',
+  '5_to_under_8': '5 to under 8 years.',
+  '8_plus': '8 or more years.'
+} %}
+{% elif q.type == 'skill_coverage' %}
+{% set instruction -%}
+How many of these supplied items are mentioned or unambiguously described in the CV: {% for skill in q.skills %}{{ named(skill) }}{% if not loop.last %}; {% endif %}{% endfor %}? Count each item once. A generic category or related activity does not establish a specific product or skill. This is document coverage, not proficiency.
+{%- endset %}
+{% elif q.type == 'skill_evidence' %}
+{% set instruction -%}
+What is the strongest explicit evidence for {{ named(q.skill) }} in the CV? Classify evidence context, not proficiency. A list-only mention is not a concrete application; do not infer professional use from nearby employment history.
+{%- endset %}
+{% set criteria = {
+  'not_mentioned': 'No identifiable reference.',
+  'stated_or_studied': 'Listed, claimed or studied, without a concrete application example.',
+  'applied': 'Applied in a personal/coursework project, practical training, volunteering or other nonprofessional activity.',
+  'used_professionally': 'Explicitly applied in professional work.'
+} %}
+{% endif %}
+    {{ q.id | tojson }}: {
+      "type": "choice",
+      "instructions": {{ instruction | trim | tojson }},
+      "criteria": {% if q.type == 'skill_coverage' %}{
+{% for count in range(q.skills | length + 1) %}
+        {{ (count | string) | tojson }}: {{ ('Exactly ' ~ count ~ ' supplied items are evidenced.') | tojson }}{% if not loop.last %},{% endif %}
+{% endfor %}
+      }{% else %}{
+{% for key, description in criteria.items() %}
+        {{ key | tojson }}: {{ description | tojson }}{% if not loop.last %},{% endif %}
+{% endfor %}
+      }{% endif %}
+    }{% if not loop.last %},{% endif %}
+{% endfor %}
+  }
+}

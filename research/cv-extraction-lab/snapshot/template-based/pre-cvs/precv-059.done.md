@@ -1,0 +1,8 @@
+- Impression: Project/general management — senior; patchy/no-clear-focus.
+- Tone: career-changer, still finding wording. (~max 10)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: unclear; might only become obvious from details.
+- Creds: nothing concrete noted yet.
+- Extra: mentions helping others informally.
+- Timeline: timeline unclear / partially known.
+- Notes: leave room to reshape sections to fit an unknown template.

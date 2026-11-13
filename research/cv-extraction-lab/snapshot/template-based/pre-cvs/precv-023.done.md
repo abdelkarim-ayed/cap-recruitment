@@ -1,0 +1,8 @@
+- Impression: Retail/sales generalist — mid; patchy/no-clear-focus.
+- Tone: unpolished, honest about gaps. (~max 10)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: unclear; might only become obvious from details.
+- Creds: little formal shown; practical history carries more weight.
+- Extra: mentions languages in passing.
+- Timeline: timeline unclear / partially known.
+- Notes: leave room to reshape sections to fit an unknown template.

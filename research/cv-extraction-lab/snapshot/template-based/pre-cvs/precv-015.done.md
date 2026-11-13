@@ -1,0 +1,8 @@
+- Impression: Accounts/bookkeeping — lead/specialist; skill-first.
+- Tone: jumps between roles without tying them together. (~max 10)
+- Story: odd mix of jobs; common thread not obvious yet.
+- Skills: unclear; might only become obvious from details.
+- Creds: possibly some training/certs — unconfirmed.
+- Extra: has done a bit of everything, mastered none obvious.
+- Timeline: timeline unclear / partially known.
+- Notes: would need personal/additional/location details filled in later.

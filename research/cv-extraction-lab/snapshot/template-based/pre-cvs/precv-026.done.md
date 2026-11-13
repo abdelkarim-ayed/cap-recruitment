@@ -1,0 +1,8 @@
+- Impression: Comms/events — entry; story-first.
+- Tone: sparse, almost a note-to-self. (~6-8 lines)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: leans practical/problem-solving over terminology.
+- Creds: education hinted at, level/details missing.
+- Extra: has volunteer time mentioned vaguely.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: community-adjacent, details TBD.

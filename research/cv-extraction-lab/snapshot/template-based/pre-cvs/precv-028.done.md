@@ -1,0 +1,8 @@
+- Impression: HR/admin — mid; skill-first.
+- Tone: pragmatic, hands-on. (~2 lines)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: hands-on basics; specifics to be pinned down later.
+- Creds: little formal shown; practical history carries more weight.
+- Extra: has volunteer time mentioned vaguely.
+- Timeline: has a vague gap in timeline.
+- Notes: leave room to reshape sections to fit an unknown template.

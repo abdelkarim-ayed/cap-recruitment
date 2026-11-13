@@ -1,0 +1,8 @@
+- Impression: Driving/delivery — senior; social/volunteer-first.
+- Tone: career-changer, still finding wording. (~6-8 lines)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: leans practical/problem-solving over terminology.
+- Creds: nothing concrete noted yet.
+- Extra: references tools without listing a full stack.
+- Timeline: timeline unclear / partially known.
+- Notes: leave room to reshape sections to fit an unknown template.

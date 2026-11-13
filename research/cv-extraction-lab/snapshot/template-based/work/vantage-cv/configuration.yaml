@@ -1,0 +1,141 @@
+contacts:
+  name: Marcus Whitfield
+  title: Maintenance Supervisor
+  email: marcus.whitfield.example@example.net
+  address: "Sheffield, United Kingdom"
+  location: United Kingdom
+  linkedin:
+    url: https://www.linkedin.com/in/marcus-whitfield-example/
+    displayText: marcus-whitfield-example
+  github:
+    url: https://github.com/marcus-whitfield-example/
+    displayText: "@marcus-whitfield-example"
+  website:
+    url: https://marcus-whitfield-example.dev/
+    displayText: marcus-whitfield-example.dev
+
+position: Maintenance Supervisor / Lead
+
+tagline: Maintenance lead with 10+ years in facilities and production environments. Career-changer from hospitality/operations into maintenance supervision. Focus on team coordination, practical problem-solving and clear documentation.
+
+objective: Seeking a maintenance supervisor or lead role where I can coordinate teams, improve routines and support safe, reliable operations.
+
+jobs:
+  - position: Maintenance Supervisor
+    company:
+      name: Crestfield Facilities
+      link: https://crestfield-example.com/
+    product:
+      name: Multi-site Facilities
+      link: https://crestfield-example.com/
+    description:
+      - Coordinated maintenance activities across two sites (offices + light industrial).
+      - Led a team of 6 technicians, allocated work and tracked completion.
+      - Introduced simple preventive maintenance schedules and checklists.
+      - Liaised with contractors and procurement for parts and services.
+      - Supported health and safety compliance and incident reporting.
+    from: "Mar 2022"
+    to: "Present"
+    tags:
+      - Team coordination
+      - Preventive maintenance
+      - H&S compliance
+    location: Sheffield, UK
+  - position: Maintenance Technician
+    company:
+      name: Ridgeview Properties
+      link: https://ridgeview-example.com/
+    product:
+      name: Building Maintenance
+      link: https://ridgeview-example.com/
+    description:
+      - Carried out reactive and planned maintenance across mixed-use buildings.
+      - Diagnosed electrical, plumbing and HVAC faults, arranged repairs.
+      - Maintained asset registers and service records.
+      - Supported out-of-hours call-out rota.
+    from: "Jun 2018"
+    to: "Feb 2022"
+    tags:
+      - Fault diagnosis
+      - Asset management
+      - Call-out rota
+    location: Sheffield, UK
+  - position: Facilities Assistant
+    company:
+      name: The Crown & Anchor
+      link: https://crown-anchor-example.com/
+    product:
+      name: Hospitality Facilities
+      link: https://crown-anchor-example.com/
+    description:
+      - General maintenance, stock management and customer-facing duties.
+      - Developed practical problem-solving skills in a fast-paced environment.
+      - Supervised weekend staff and handled minor incidents.
+    from: "2015"
+    to: "2018"
+    tags:
+      - General maintenance
+      - Supervision
+      - Problem solving
+    location: Sheffield, UK
+
+education:
+  - place:
+      name: City & Guilds
+      link: ""
+    from: "2020"
+    to: "2022"
+    location: Sheffield, UK
+    degree: "NVQ Level 3 in Facilities Management"
+    major: "Distance learning"
+  - place:
+      name: Firth Meadow School
+      link: ""
+    from: "2013"
+    to: "2013"
+    location: Sheffield, UK
+    degree: "GCSEs including English and Mathematics"
+    major: "General"
+
+technical_expertise:
+  - name: Team coordination
+    level: 85
+  - name: Preventive maintenance
+    level: 80
+  - name: Fault diagnosis
+    level: 75
+  - name: Asset register management
+    level: 70
+  - name: H&S compliance
+    level: 80
+
+skills:
+  - Team coordination and shift planning
+  - Preventive maintenance scheduling
+  - Fault diagnosis (electrical, plumbing, HVAC basics)
+  - Asset register management
+  - H&S compliance and incident reporting
+  - Multi-site facilities management
+  - Contractor management and procurement
+  - Cross-functional communication
+
+methodology:
+  - Practical problem-solving and resourcefulness
+  - Clear documentation and checklists
+  - Team support and knowledge sharing
+  - Safety-first mindset
+
+tools:
+  - CMMS (basic), Excel, email/phone
+  - Hand tools, basic electrical/plumbing tools
+  - Mobile job management app
+
+achievements:
+  - name: IOSH Managing Safely
+    description: "2022"
+  - name: First Aid at Work
+    description: "2023 (renewed)"
+  - name: Asbestos Awareness
+    description: "2022"
+  - name: Manual Handling
+    description: "2023"

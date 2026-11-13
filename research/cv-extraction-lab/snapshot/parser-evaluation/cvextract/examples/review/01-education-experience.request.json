@@ -1,0 +1,46 @@
+{
+  "model": "jev-1.14.0",
+  "state": {
+    "cv": "$cv",
+    "reference_date": "2026-11-12"
+  },
+  "questions": {
+    "education_overall": {
+      "type": "choice",
+      "instructions": "As of 2026-11-12, what is the highest education level completed? Use evidence in the CV, not an assumption that ongoing study is completed.",
+      "criteria": {
+        "secondary_or_lower": "Secondary school or lower.",
+        "vocational_technical": "Vocational or technical qualification below higher education.",
+        "short_cycle_higher": "Short-cycle higher education, below a bachelor degree.",
+        "bachelors": "Bachelor degree or equivalent.",
+        "masters": "Master degree or equivalent.",
+        "doctorate": "Doctorate or equivalent.",
+        "not_stated": "No qualifying education stated within the requested scope/time window."
+      }
+    },
+    "education_engineering": {
+      "type": "choice",
+      "instructions": "As of 2026-11-12, what is the highest education level completed or explicitly expected to be completed within 6 months after that date in engineering? Use evidence in the CV, not an assumption that ongoing study is completed.",
+      "criteria": {
+        "secondary_or_lower": "Secondary school or lower.",
+        "vocational_technical": "Vocational or technical qualification below higher education.",
+        "short_cycle_higher": "Short-cycle higher education, below a bachelor degree.",
+        "bachelors": "Bachelor degree or equivalent.",
+        "masters": "Master degree or equivalent.",
+        "doctorate": "Doctorate or equivalent.",
+        "not_stated": "No qualifying education stated within the requested scope/time window."
+      }
+    },
+    "maintenance_experience": {
+      "type": "choice",
+      "instructions": "As of 2026-11-12, how much documented work experience does the CV show in building maintenance OR industrial maintenance? Count overlapping periods once. Use elapsed time, not a count of calendar years. Do not assume a listed skill was used throughout an entire role.",
+      "criteria": {
+        "under_1": "Under 1 year, including no evidenced duration.",
+        "1_to_under_3": "1 to under 3 years.",
+        "3_to_under_5": "3 to under 5 years.",
+        "5_to_under_8": "5 to under 8 years.",
+        "8_plus": "8 or more years."
+      }
+    }
+  }
+}

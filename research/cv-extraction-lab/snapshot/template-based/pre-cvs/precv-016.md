@@ -1,0 +1,8 @@
+- Impression: Credit/control — entry; skill-first.
+- Tone: very specific about one thing, vague about everything else. (~2 lines)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: hands-on basics; specifics to be pinned down later.
+- Creds: education hinted at, level/details missing.
+- Extra: leans on practical know-how over formal quals.
+- Timeline: timeline unclear / partially known.
+- Notes: leave room to reshape sections to fit an unknown template.

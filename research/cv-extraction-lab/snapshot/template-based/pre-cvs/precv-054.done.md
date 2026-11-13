@@ -1,0 +1,8 @@
+- Impression: HVAC/electrics generalist — senior; credential-first.
+- Tone: pragmatic, hands-on. (~6-8 lines)
+- Story: odd mix of jobs; common thread not obvious yet.
+- Skills: leans practical/problem-solving over terminology.
+- Creds: nothing concrete noted yet.
+- Extra: hints at weekend projects.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: volunteering/languages may exist, not specified.

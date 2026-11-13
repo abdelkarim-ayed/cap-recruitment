@@ -1,0 +1,24 @@
+{
+  "reference_date": "2026-11-12",
+  "questions": [
+    {
+      "id": "secondary_skills",
+      "type": "skill_coverage",
+      "skills": [
+        "Excel",
+        {"name": "SQL", "aliases": ["T-SQL", "Transact-SQL"]},
+        "Power BI"
+      ]
+    },
+    {
+      "id": "sql_evidence",
+      "type": "skill_evidence",
+      "skill": {"name": "SQL", "aliases": ["T-SQL", "Transact-SQL"]}
+    },
+    {
+      "id": "excel_evidence",
+      "type": "skill_evidence",
+      "skill": "Excel"
+    }
+  ]
+}

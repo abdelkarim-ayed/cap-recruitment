@@ -1,0 +1,62 @@
+{
+  "model": "jev-1.14.0",
+  "state": {
+    "cv": "$cv",
+    "reference_date": "2026-11-12"
+  },
+  "questions": {
+    "education_level": {
+      "type": "choice",
+      "instructions": "From state.cv, choose the highest completed qualification level relevant to facilities management or building maintenance as of state.reference_date. Do not count short safety courses as academic qualifications. Do not infer an award from attendance alone.",
+      "criteria": {
+        "secondary_or_lower": "Secondary school qualifications or lower, with no higher relevant completed qualification.",
+        "vocational_technical": "Relevant vocational or technical qualification below higher education, such as UK NVQ Level 3; not a university degree.",
+        "short_cycle_higher": "Relevant short-cycle higher education, such as an associate degree, HND or foundation degree; below bachelor's level.",
+        "bachelors": "Relevant completed bachelor's degree or equivalent.",
+        "masters": "Relevant completed master's degree or equivalent.",
+        "doctorate": "Relevant completed doctorate or equivalent.",
+        "not_stated": "No completed qualification within the stated scope is evidenced."
+      }
+    },
+    "certification": {
+      "type": "choice",
+      "instructions": "Does state.cv name IOSH Managing Safely as a credential held or a course completed? Equivalent names: IOSH Managing Safely; Institution of Occupational Safety and Health Managing Safely. Do not count generic safety duties, preparation or planned study. Do not assess expiry, authenticity or current validity.",
+      "criteria": {
+        "present": "The named credential or an equivalent name is stated as held or completed, including an entry under certifications.",
+        "not_mentioned": "The CV does not evidence that the named credential is held or completed."
+      }
+    },
+    "experience_years": {
+      "type": "choice",
+      "instructions": "From employment dates in state.cv, choose the total documented duration of facilities or building maintenance work as of state.reference_date. Include hands-on maintenance, facilities support and maintenance supervision. Count overlapping periods once. Present means state.reference_date. Use only dates tied to relevant work, not a general summary claim. Zero evidenced duration belongs to under_1, not proof of no experience.",
+      "criteria": {
+        "under_1": "Less than one year of documented relevant work, including zero evidenced duration.",
+        "1_to_under_3": "At least one but less than three years of documented relevant work.",
+        "3_to_under_5": "At least three but less than five years of documented relevant work.",
+        "5_to_under_8": "At least five but less than eight years of documented relevant work.",
+        "8_plus": "At least eight years of documented relevant work."
+      }
+    },
+    "skill_coverage": {
+      "type": "choice",
+      "instructions": "How many of these four items are explicitly mentioned or unambiguously described in state.cv: CMMS (computerised/computerized maintenance management system); Microsoft Excel; contractor management; welding? Count each supplied item once. Basic exposure or a skills-list mention counts. General maintenance does not establish welding. This is document coverage, not proficiency.",
+      "criteria": {
+        "0": "None of the four supplied items is evidenced.",
+        "1": "Exactly one of the four supplied items is evidenced.",
+        "2": "Exactly two of the four supplied items are evidenced.",
+        "3": "Exactly three of the four supplied items are evidenced.",
+        "4": "All four supplied items are evidenced."
+      }
+    },
+    "skill_evidence": {
+      "type": "choice",
+      "instructions": "What is the strongest explicit evidence for CMMS (computerised/computerized maintenance management system) in state.cv? Classify the evidence context, not ability. A tools-list mention alone does not establish application or professional use. Do not assume an asset register or maintenance schedule used a CMMS unless the CV links them.",
+      "criteria": {
+        "not_mentioned": "No identifiable mention or unambiguous description of CMMS.",
+        "stated_or_studied": "CMMS is listed, claimed or studied, without a concrete application example.",
+        "applied": "CMMS is explicitly used in a concrete nonprofessional project, practical training, volunteering or other nonprofessional activity; no explicit professional use.",
+        "used_professionally": "The CV explicitly links CMMS use to professional work."
+      }
+    }
+  }
+}

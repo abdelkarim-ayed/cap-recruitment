@@ -1,0 +1,8 @@
+- Impression: Electrical — senior; social/volunteer-first.
+- Tone: quietly detail-oriented. (~4-5 lines)
+- Story: odd mix of jobs; common thread not obvious yet.
+- Skills: a couple of tools mentioned in context, not a full list.
+- Creds: nothing concrete noted yet.
+- Extra: mentions helping others informally.
+- Timeline: timeline unclear / partially known.
+- Notes: would need personal/additional/location details filled in later.

@@ -1,0 +1,8 @@
+- Impression: Logistics/warehouse — mid; social/volunteer-first.
+- Tone: quietly detail-oriented. (~4-5 lines)
+- Story: odd mix of jobs; common thread not obvious yet.
+- Skills: a couple of tools mentioned in context, not a full list.
+- Creds: little formal shown; practical history carries more weight.
+- Extra: references tools without listing a full stack.
+- Timeline: timeline unclear / partially known.
+- Notes: would need personal/additional/location details filled in later.

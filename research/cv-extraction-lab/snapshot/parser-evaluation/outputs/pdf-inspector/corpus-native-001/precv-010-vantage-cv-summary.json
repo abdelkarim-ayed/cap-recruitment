@@ -1,0 +1,20 @@
+{
+  "parser": "pdf-inspector",
+  "parser_version": "1.25.2",
+  "method": "process_pdf; native text only; no OCR",
+  "source_pdf": "template-based/outputs/vantage-cv/precv-010-vantage-cv.pdf",
+  "pdf_sha256": "c470250a3ff80887d31b9fb9810c56ad37e6097c31c41fd0f10ae606b9d861ce",
+  "markdown_path": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-010-vantage-cv.md",
+  "markdown_sha256": "3515713583b6d72be6f9ff7c7d91484f8cec6b82f8b57b20a71aff3ae99ba0b2",
+  "markdown_bytes": 2849,
+  "pdf_type": "text_based",
+  "page_count": 2,
+  "pages_needing_ocr": [],
+  "has_encoding_issues": false,
+  "pages_with_columns": [
+    1
+  ],
+  "pages_with_tables": [
+    1
+  ]
+}

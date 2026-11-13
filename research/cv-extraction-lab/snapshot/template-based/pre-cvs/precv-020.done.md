@@ -1,0 +1,8 @@
+- Impression: Ops/coordination — lead/specialist; project-first.
+- Tone: generic but serviceable impression. (~2 lines)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: hands-on basics; specifics to be pinned down later.
+- Creds: possibly some training/certs — unconfirmed.
+- Extra: leans on practical know-how over formal quals.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: community-adjacent, details TBD.

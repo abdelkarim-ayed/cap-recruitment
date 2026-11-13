@@ -1,0 +1,87 @@
+{
+  "$schema": "https://unpkg.com/@jsume/schemas/dist/draft-2020-12.json",
+  "basics": {
+    "name": "Morgan Okoye",
+    "label": "Care & Support Worker (Entry-Level)",
+    "email": "morgan.okoye.example@example.net",
+    "phone": "+44 7700 900203",
+    "summary": "Compassionate, patient and reliable entry-level care/support worker. Good listener with a calm approach, happy to help with day-to-day tasks and follow clear instructions. Looking to start a career in care/support with a supportive team.",
+    "location": {
+      "city": "Leeds",
+      "country": "United Kingdom"
+    },
+    "profiles": []
+  },
+  "work": [
+    {
+      "company": "Retail",
+      "location": "Leeds, UK",
+      "position": "Customer/General Support (Part-time)",
+      "startDate": {
+        "year": 2021,
+        "month": 9
+      },
+      "endDate": {
+        "year": 2024,
+        "month": 8
+      },
+      "highlights": [
+        "Provided friendly, patient assistance to a wide range of people",
+        "Followed clear procedures and escalated concerns appropriately",
+        "Stayed calm under pressure and worked well as part of a team"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Self-directed learning / Care Basics",
+      "location": "Leeds, UK",
+      "major": "Safeguarding, communication, person-centred care",
+      "degree": "Ongoing",
+      "startDate": {
+        "year": 2023,
+        "month": 1
+      },
+      "endDate": false,
+      "courses": [
+        "Safeguarding awareness",
+        "Person-centred care principles",
+        "Clear communication"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "name": "People Skills",
+      "keywords": [
+        "Empathy",
+        "Active listening",
+        "Patience",
+        "Clear communication"
+      ]
+    },
+    {
+      "name": "Practical",
+      "keywords": [
+        "Following instructions",
+        "Record-keeping",
+        "Staying organised"
+      ]
+    },
+    {
+      "name": "Work Style",
+      "keywords": [
+        "Reliable",
+        "Punctual",
+        "Team-oriented",
+        "Respectful"
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "English",
+      "fluency": "Fluent"
+    }
+  ]
+}

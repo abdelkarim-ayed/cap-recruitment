@@ -1,0 +1,8 @@
+- Impression: HVAC/electrics generalist — mid; story-first.
+- Tone: jumps between roles without tying them together. (~4-5 lines)
+- Story: mostly one type of work, with a recent shift in direction.
+- Skills: a couple of tools mentioned in context, not a full list.
+- Creds: little formal shown; practical history carries more weight.
+- Extra: has done a bit of everything, mastered none obvious.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: open to adding portfolio/links later if relevant.

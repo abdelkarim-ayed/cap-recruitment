@@ -1,0 +1,8 @@
+- Impression: Field sales — senior; patchy/no-clear-focus.
+- Tone: unpolished, honest about gaps. (~2 lines)
+- Story: odd mix of jobs; common thread not obvious yet.
+- Skills: hands-on basics; specifics to be pinned down later.
+- Creds: nothing concrete noted yet.
+- Extra: mentions languages in passing.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: volunteering/languages may exist, not specified.

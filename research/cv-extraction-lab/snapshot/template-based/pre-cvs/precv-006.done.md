@@ -1,0 +1,8 @@
+- Impression: QA-minded — entry; credential-first.
+- Tone: pragmatic, hands-on. (~6-8 lines)
+- Story: odd mix of jobs; common thread not obvious yet.
+- Skills: leans practical/problem-solving over terminology.
+- Creds: education hinted at, level/details missing.
+- Extra: mentions helping others informally.
+- Timeline: timeline unclear / partially known.
+- Social/supplementary: volunteering/languages may exist, not specified.

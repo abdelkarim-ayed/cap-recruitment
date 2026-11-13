@@ -1,0 +1,8 @@
+- Impression: Process/plant — senior; story-first.
+- Tone: jumps between roles without tying them together. (~6-8 lines)
+- Story: short stints, hard to tell main focus from this impression alone.
+- Skills: leans practical/problem-solving over terminology.
+- Creds: nothing concrete noted yet.
+- Extra: has done a bit of everything, mastered none obvious.
+- Timeline: has a vague gap in timeline.
+- Social/supplementary: community-adjacent, details TBD.

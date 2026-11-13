@@ -1,0 +1,20 @@
+{
+  "parser": "pdf-inspector",
+  "parser_version": "1.25.2",
+  "method": "process_pdf; native text only; no OCR",
+  "source_pdf": "template-based/outputs/calligraphics/precv-055-calligraphics.pdf",
+  "pdf_sha256": "c181d64779fa5f9c74a93c9f4a5f6341ff8c7319db3cd5c9a6916d996603c093",
+  "markdown_path": "parser-evaluation/outputs/pdf-inspector/corpus-native-001/precv-055-calligraphics.md",
+  "markdown_sha256": "dd003398b744fd7f48229bf596d4606ef86d099c3d3c96d65fea3c9e579c5cd9",
+  "markdown_bytes": 2331,
+  "pdf_type": "text_based",
+  "page_count": 1,
+  "pages_needing_ocr": [],
+  "has_encoding_issues": false,
+  "pages_with_columns": [
+    1
+  ],
+  "pages_with_tables": [
+    1
+  ]
+}
