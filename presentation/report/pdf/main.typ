@@ -171,10 +171,31 @@
   }
 }
 
-// Exactly two intentionally empty institutional cover placeholders.
+// Page 1 stays blank for the institution's own cover template.
 #box()
 #pagebreak()
-#box()
+// Page 2: simple text title page, to be replaced by the institution template later.
+#align(center + horizon)[
+  #text(size: 13pt, fill: muted)[Esprit School of Engineering]
+  #v(2pt)
+  #text(size: 11pt, fill: muted)[Génie informatique]
+  #v(60pt)
+  #text(size: 34pt, weight: "bold", fill: accent)[CAP]
+  #v(16pt)
+  #text(size: 17pt)[Plateforme de gestion du recrutement]
+  #v(6pt)
+  #text(size: 12pt, fill: muted)[Centralisation et Assistance au Parcours de recrutement]
+  #v(50pt)
+  #text(size: 11pt, fill: muted)[Projet de fin d’études · Rapport technique]
+  #v(40pt)
+  #text(size: 13pt)[Ayed Abdelkarim]
+  #v(4pt)
+  #text(size: 11pt, fill: muted)[Encadrant : Aziz Ben Ismail]
+  #v(4pt)
+  #text(size: 11pt, fill: muted)[Organisme d’accueil : BeeCoders]
+  #v(30pt)
+  #text(size: 11pt, fill: muted)[Année universitaire 2026–2027]
+]
 #pagebreak()
 #set page(numbering: "i", header: none, footer: context align(center, counter(page).display("i")))
 #counter(page).update(1)

@@ -1,12 +1,14 @@
 {
   "codename": "CAP",
+  "fullName": "Centralisation et Assistance au Parcours de recrutement",
   "subtitle": "Plateforme de gestion du recrutement",
-  "mission": "Centralisation et Assistance au Parcours de recrutement — conception et réalisation d’une plateforme avec extraction structurée des CV",
-  "occasion": "Pré-soutenance · Projet de fin d’études",
+  "mission": "Conception et réalisation d’une plateforme de gestion du recrutement avec extraction structurée des CV et décision humaine conservée",
+  "occasion": "Soutenance · Projet de fin d’études",
   "author": "Ayed Abdelkarim",
   "supervisor": "Aziz Ben Ismail",
-  "institution": "[Établissement · Formation]",
+  "institution": "Esprit School of Engineering",
+  "program": "Génie informatique",
   "organization": "BeeCoders",
-  "date": "Novembre 2026",
+  "date": "Décembre 2026",
   "academicYear": "2026–2027"
 }
