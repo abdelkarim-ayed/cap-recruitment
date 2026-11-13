@@ -2,10 +2,11 @@ import { Injectable, Logger, type OnModuleInit, type OnModuleDestroy } from '@ne
 import { chmod } from 'node:fs/promises';
 import { createServer, type Server, type Socket } from 'node:net';
 import { JevCredentials } from './jev-credentials.js';
-import { jevKeyAddress, requirePrivateJevDirectory } from './jev-key-address.js';
+import { jevBackendKeyAddress, jevKeyAddress, requirePrivateJevDirectory } from './jev-key-address.js';
 import { JEV_KEY_CONTROL_TIMEOUT_MS, JEV_KEY_MESSAGE_BYTES, jevKeyCommandSchema, type JevKeyReply } from './jev-key-protocol.js';
 import type { JevKeyCommand } from './jev-key-protocol.js';
 import { restrictWindowsJevPipe } from './jev-key-windows.js';
+import { fileURLToPath } from 'node:url';
 
 /** Local IPC only; no HTTP/TCP endpoint, key getter, persistence, provider
  * validation, task wake/retry or spending reset. Trust boundary: same OS user.
@@ -17,10 +18,19 @@ export class JevKeyControl implements OnModuleInit, OnModuleDestroy {
   private readonly clients = new Set<Socket>();
   private readonly startupClients = new Set<Socket>();
   private ready = false;
+  private backend = false;
   constructor(private readonly credentials: JevCredentials) {}
 
   async onModuleInit() {
-    const address = jevKeyAddress(process.pid);
+    if (this.server) return; // API bootstrap already acquired its singleton pipe.
+    await this.start(jevKeyAddress(process.pid));
+  }
+  async startBackend() {
+    if (this.server) throw new Error('Local control was already initialized.');
+    this.backend = true;
+    await this.start(jevBackendKeyAddress());
+  }
+  private async start(address: ReturnType<typeof jevKeyAddress>) {
     if (address.directory) await requirePrivateJevDirectory(address.directory, true);
     const server = createServer(socket => this.handle(socket));
     this.server = server;
@@ -44,10 +54,11 @@ export class JevKeyControl implements OnModuleInit, OnModuleDestroy {
       this.ready = true;
       // CLI-only contexts must still exit; this listener is not a job/daemon.
       server.unref();
-      this.logger.log(`RAM-only Jev key control ready for PID ${process.pid}; starts empty. Use pnpm --filter @recruitment/api jev:key set --pid ${process.pid}.`);
+      const cli = fileURLToPath(new URL('./jev-key-cli.js', import.meta.url));
+      this.logger.log(`RAM-only Jev key control ready for PID ${process.pid}; starts empty. Use node "${cli}" set${this.backend ? '' : ` --worker-pid ${process.pid}`}.`);
     } catch {
       await this.close();
-      throw new Error('Local Jev credential control could not start safely.');
+      throw new Error('Local control socket/pipe is occupied, stale or unavailable. Another backend may be running. Startup refused; no socket was removed.');
     }
   }
   private handle(socket: Socket) {
@@ -88,7 +99,7 @@ export class JevKeyControl implements OnModuleInit, OnModuleDestroy {
     this.credentials.onModuleDestroy();
     for (const client of this.clients) client.destroy();
     for (const client of this.startupClients) client.destroy();
-    if (this.server) await new Promise<void>(resolve => this.server!.close(() => resolve()));
+    if (this.server?.listening) await new Promise<void>(resolve => this.server!.close(() => resolve()));
   }
   onModuleDestroy() { return this.close(); }
 }

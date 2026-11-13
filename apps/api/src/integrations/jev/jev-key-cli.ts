@@ -1,22 +1,23 @@
 import { emitKeypressEvents } from 'node:readline';
 import { createConnection } from 'node:net';
-import { jevKeyAddress, requirePrivateJevDirectory, requirePrivateJevSocket } from './jev-key-address.js';
+import { jevBackendKeyAddress, jevKeyAddress, requirePrivateJevDirectory, requirePrivateJevSocket } from './jev-key-address.js';
 import { JEV_KEY_MAX_BYTES, validJevKey } from './jev-key-value.js';
 import { JEV_KEY_CONTROL_TIMEOUT_MS, JEV_KEY_MESSAGE_BYTES, JEV_KEY_REPLY_BYTES, jevKeyReplySchema, type JevKeyCommand, type JevKeyReply } from './jev-key-protocol.js';
 import { exchangeWindowsJevKey } from './jev-key-windows.js';
 
-const usage = 'Usage: jev:key set|clear|status --pid BACKEND_PID [--stdin (set only)]. Never pass a key as an argument.';
+const usage = 'Usage: jev:key set|clear|status [--pid EXPECTED_BACKEND_PID | --worker-pid CLI_PID] [--stdin (set only)]. Default: the single backend. Never pass a key as an argument.';
 function options(args:string[]) {
   const [op,...rest]=args;
   if(!['set','clear','status'].includes(op))throw new Error(usage);
-  let pid:number|undefined,fromStdin=false;
+  let pid:number|undefined,workerPid:number|undefined,fromStdin=false;
   for(let i=0;i<rest.length;i++) {
-    if(rest[i]==='--pid'&&pid===undefined&&/^\d+$/.test(rest[i+1]??''))pid=Number(rest[++i]);
+    if(rest[i]==='--pid'&&pid===undefined&&workerPid===undefined&&/^\d+$/.test(rest[i+1]??''))pid=Number(rest[++i]);
+    else if(rest[i]==='--worker-pid'&&pid===undefined&&workerPid===undefined&&/^\d+$/.test(rest[i+1]??''))workerPid=Number(rest[++i]);
     else if(rest[i]==='--stdin'&&!fromStdin&&op==='set')fromStdin=true;
     else throw new Error(usage);
   }
-  if(!pid||!Number.isSafeInteger(pid))throw new Error(usage);
-  return {op:op as 'set'|'clear'|'status',pid,fromStdin};
+  if([pid,workerPid].some(value=>value!==undefined&&(!Number.isSafeInteger(value)||value<1)))throw new Error(usage);
+  return {op:op as 'set'|'clear'|'status',pid,workerPid,fromStdin};
 }
 async function hiddenKey():Promise<string> {
   if(!process.stdin.isTTY||!process.stderr.isTTY)throw new Error('Use an interactive terminal, or --stdin with a trusted producer.');
@@ -68,8 +69,8 @@ async function pipedKey():Promise<string> {
     return key;
   } finally { clearTimeout(timeout);for(const chunk of chunks)chunk.fill(0);chunks=[]; }
 }
-async function exchange(pid:number,command:JevKeyCommand):Promise<JevKeyReply> {
-  const address=jevKeyAddress(pid),body=JSON.stringify(command);
+async function exchange(address:ReturnType<typeof jevKeyAddress>,command:JevKeyCommand):Promise<JevKeyReply> {
+  const body=JSON.stringify(command);
   if(Buffer.byteLength(body)+1>JEV_KEY_MESSAGE_BYTES)throw new Error('Control input exceeds the local bound.');
   let response:Buffer;
   if(process.platform==='win32')response=await exchangeWindowsJevKey(address.path,body);
@@ -100,18 +101,19 @@ async function exchange(pid:number,command:JevKeyCommand):Promise<JevKeyReply> {
 }
 
 try {
-  const {op,pid,fromStdin}=options(process.argv.slice(2));
-  const status=await exchange(pid,{version:1,op:'status'});
-  if(!status.ok)throw new Error('Local credential status unavailable.');
-  if(op==='status')console.log(`PID ${pid}: key ${status.configured?'loaded':'empty'}; revision ${status.revision}; instance ${status.instanceId}.`);
+  const {op,pid,workerPid,fromStdin}=options(process.argv.slice(2));
+  const address=workerPid===undefined?jevBackendKeyAddress():jevKeyAddress(workerPid);
+  const status=await exchange(address,{version:1,op:'status'});
+  if(!status.ok||(pid??workerPid)!==undefined&&status.pid!==(pid??workerPid))throw new Error('Local credential status unavailable or selected PID changed.');
+  if(op==='status')console.log(`PID ${status.pid}: key ${status.configured?'loaded':'empty'}; revision ${status.revision}; instance ${status.instanceId}.`);
   else {
     let key:string|undefined;
     try {
       if(op==='set') { key=fromStdin?await pipedKey():await hiddenKey();if(!validJevKey(key))throw new Error('Invalid key input; use one nonempty header-safe token.'); }
       const command:JevKeyCommand=op==='set'?{version:1,op,instanceId:status.instanceId,expectedRevision:status.revision,key:key!}:{version:1,op,instanceId:status.instanceId,expectedRevision:status.revision};
-      const result=await exchange(pid,command);
-      if(!result.ok)throw new Error('Credential update refused; run status and retry deliberately.');
-      console.log(`PID ${pid}: key ${result.configured?'loaded in RAM':'cleared'}. No provider call, extraction activation or spending reset.`);
+       const result=await exchange(address,command);
+       if(!result.ok||result.pid!==status.pid)throw new Error('Credential update refused; run status and retry deliberately.');
+       console.log(`PID ${result.pid}: key ${result.configured?'loaded in RAM':'cleared'}. No provider probe, mode change or spending reset.`);
     } finally { key=undefined; }
   }
 } catch {

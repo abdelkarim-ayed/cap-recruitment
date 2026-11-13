@@ -2,8 +2,10 @@
 
 2026-11-13: bounded CV/key-control source `82698b8` locally merged into main;
 the original transfer/plans are separately preserved in `a35a521`. No push.
-**Final source is unbuilt/untested by instruction, not deployed or live-validated.**
-Migrations 009/010 and legacy dataset recreation have not run. The
+The resumed `feat/cv-offline-demo` worktree is built/running with migrations
+009/010 and reserved dataset recreation applied. Fixes are separately committed,
+not merged/pushed. Current approved new synthetic submissions use real Jev after
+user key loading, not canned answers. **No tests or agent live validation.** The
 [current contract](../current/contracts/processing-review-api.md) owns exact
 implemented wire/persistence/closure behavior; [checkpoint notes](research/cv-extraction-implementation.md)
 separate earlier foundation evidence from later unverified integration.
@@ -28,26 +30,29 @@ First publication freezes the UTC reference date, carried in submission snapshot
 Draft edits, retries, close and processing time do not move it. Legacy development
 records are not backdated or converted; recreation requires scoped consent.
 
-Parser and validated-response caches are bounded **in memory**, not filesystem/
-durable caches. Parser identity includes PDF hash/version/options; Jev identity
+Parser and validated-response caches now use private atomic **files**, superseding
+the earlier memory choice. Parser identity includes PDF hash/version/options; Jev identity
 hashes the actual fully hydrated effective serialized request. Raw distributions,
 confidence/model/usage remain unmodified; no thresholds, caps or fabricated
 non-mention/zero on failure. Success replay is not another billed observation.
-Durable send guards, unlike caches, survive restart and are never reset with demo
+Durable send guards remain separate from caches and are never reset with demo
 data. Ambiguous sends/cache loss do not authorize another paid attempt.
 
-## Next discussion, not automatic implementation/execution
+## Current real-worker launch and remainder
 
-Start at the [demo launch handoff](cv-demo-launch.md): agree a bounded build,
-current-schema fixture dataset/data scope and named-service startup before one
-user-manual fixture → correction → CSV demonstration. The user stopped tests;
-neither a merge nor this plan authorizes them or any data/process/provider action.
-Automatic runner supports trusted fixtures only and stays disabled by default.
-Live activation requires separate consent and operational/safety resolution under
-[Jev safeguards](../current/jev-safety.md). RAM-only key loading is not spending
-permission and does not enable extraction or reset counters.
+Start at the [demo launch handoff](cv-demo-launch.md) for the user-manual
+submission → native parse → real Jev → correction → CSV route. User explicitly
+approved real new-synthetic-submission scope and restart, unchanged controls;
+tests remain forbidden. Defaults stay disabled; current `jev` mode has a fixed
+submission boundary, post-submit wake + 5s DB scan and serial work. Key-empty mode
+makes no claims. Validated responses cache before DB settlement; interrupted
+saves can replay locally without another paid send. Unknown send/cache loss never
+permits a paid fallback. No current live acceptance/privacy/race pass. Additional
+activation needs separate scope under [Jev safeguards](../current/jev-safety.md).
 
-T2b launcher and T1 mail-history/viewer remain unimplemented; file mail capture
+Full T2b service launcher and T1 mail-history/viewer remain unimplemented; a bounded
+`demo:setup seed|reset` applies migrations and invokes scoped dataset setup, never
+on normal server restart. File mail capture
 and the latest-mail CLI exist. Old test/smoke/view fixtures and static OpenAPI
 need new-contract alignment; no fresh all-suite, DB/HTTP/privacy/native/race or
 Windows/quality pass exists. Existing Q-* gates remain open, not missing features.

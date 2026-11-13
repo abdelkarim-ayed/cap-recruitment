@@ -6,7 +6,7 @@ import { DatabaseService } from '../database/database.service.js';
 import type { CvExtractorArgs } from '@recruitment/domain';
 import type { ExecutionResult, TaskFixture } from './execution.js';
 
-export interface TaskRow { application_id: string; task_id: string; source_input_id: string; output_key: string; type: 'cvExtractor'; args: CvExtractorArgs; fixture_key: string | null; status: string; attempts: number; retryable: boolean }
+export interface TaskRow { application_id: string; task_id: string; source_input_id: string; output_key: string; type: 'cvExtractor'; args: CvExtractorArgs; fixture_key: string | null; status: string; attempts: number; retryable: boolean; cache_only?: boolean }
 @Injectable()
 export class ProcessingRepository {
   constructor(private readonly database: DatabaseService) {}
@@ -26,17 +26,21 @@ export class ProcessingRepository {
       }
     });
   }
-  async claim(id?: string, fixtureOnly = false) {
+  async claim(id?: string, fixtureOnly = false, liveSince?: string) {
     return this.database.transaction(async client => {
       const result = await client.query(`SELECT * FROM applications WHERE ($1::uuid IS NULL OR id=$1) AND
         stage IN ('received','review_ready') AND review_status<>'completed' AND processing_released_at IS NULL AND
+        ($3::timestamptz IS NULL OR (submitted_at>=$3 AND vacancy_snapshot->'processingDefinition'->>'version'='2' AND jsonb_array_length(vacancy_snapshot->'processingDefinition'->'tasks')>0)) AND
         (NOT $2::boolean OR (EXISTS(SELECT 1 FROM application_tasks t WHERE t.application_id=applications.id)
           AND NOT EXISTS(SELECT 1 FROM jsonb_array_elements(vacancy_snapshot->'processingDefinition'->'tasks') d
             LEFT JOIN application_tasks t ON t.application_id=applications.id AND t.task_id=d->>'id' WHERE t.fixture_key IS NULL))) AND
         (processing_state='pending' OR (processing_state='processing' AND processing_lease_until<now()) OR
-        (processing_state='completed_with_errors' AND processing_next_at<=now())) ORDER BY submitted_at,id FOR UPDATE SKIP LOCKED LIMIT 1`, [id ?? null, fixtureOnly]);
+        (processing_state='completed_with_errors' AND processing_next_at<=now())) ORDER BY submitted_at,id FOR UPDATE SKIP LOCKED LIMIT 1`, [id ?? null, fixtureOnly, liveSince ?? null]);
       const row = result.rows[0]; if (!row) return undefined;
       await this.initialize(client, row.id, row.vacancy_snapshot);
+      const interrupted = await client.query<{task_id:string;cache_only:boolean}>(`SELECT t.task_id,
+        EXISTS(SELECT 1 FROM cv_request_attempts g WHERE g.application_id=t.application_id AND g.task_id=t.task_id AND g.state IN ('send_started','uncertain','succeeded','terminal')) AS cache_only
+        FROM application_tasks t WHERE application_id=$1 AND status='processing'`, [row.id]);
       // Expiration is not proof a paid request never completed. Only work with
       // no durable send boundary (or a proven unsent failure) is retryable.
       await client.query(`UPDATE application_tasks t SET status='failed',
@@ -52,7 +56,7 @@ export class ProcessingRepository {
       const tasks = await client.query<TaskRow>('SELECT * FROM application_tasks WHERE application_id=$1 ORDER BY task_id', [row.id]);
       // Task type comes from the immutable snapshot; no migration/rewrite of existing rows.
       const definitions = (row.vacancy_snapshot as Vacancy).processingDefinition.tasks;
-      return { id: row.id as string, token, referenceDate: (row.vacancy_snapshot as Vacancy).extractionReferenceDate, tasks: definitions.map(definition => ({ ...tasks.rows.find(task=>task.task_id===definition.id)!, type: definition.type, args:definition.args, source_input_id:definition.sourceInputId, output_key:definition.outputKey })) };
+      return { id: row.id as string, token, referenceDate: (row.vacancy_snapshot as Vacancy).extractionReferenceDate, tasks: definitions.map(definition => ({ ...tasks.rows.find(task=>task.task_id===definition.id)!, cache_only:interrupted.rows.some(task=>task.task_id===definition.id&&task.cache_only), type: definition.type, args:definition.args, source_input_id:definition.sourceInputId, output_key:definition.outputKey })) };
     });
   }
   private async fenced<T>(id: string, token: string, operation: (client: PoolClient) => Promise<T>) {
@@ -63,9 +67,12 @@ export class ProcessingRepository {
       return operation(client);
     });
   }
-  start(id: string, token: string, taskId: string) {
+  start(id: string, token: string, taskId: string, cacheOnly = false) {
     return this.fenced(id, token, async client => {
-      const result = await client.query("UPDATE application_tasks SET status='processing',attempts=attempts+1,failure_category=NULL,updated_at=now() WHERE application_id=$1 AND task_id=$2 AND attempts<3 AND (status='pending' OR (status='failed' AND retryable=true)) RETURNING *", [id, taskId]);
+      const result = await client.query(`UPDATE application_tasks t SET status='processing',attempts=attempts+CASE WHEN $3::boolean THEN 0 ELSE 1 END,failure_category=NULL,updated_at=now()
+        WHERE application_id=$1 AND task_id=$2 AND
+        (($3::boolean AND status='failed' AND EXISTS(SELECT 1 FROM cv_request_attempts g WHERE g.application_id=t.application_id AND g.task_id=t.task_id AND g.state IN ('send_started','uncertain','succeeded','terminal')))
+        OR (NOT $3::boolean AND attempts<3 AND (status='pending' OR (status='failed' AND retryable=true)))) RETURNING *`, [id, taskId,cacheOnly]);
       if (result.rowCount) await client.query('UPDATE applications SET review_revision=review_revision+1 WHERE id=$1', [id]);
       return result.rows[0] as TaskRow | undefined;
     });
@@ -79,11 +86,12 @@ export class ProcessingRepository {
       await client.query("UPDATE applications SET review_revision=review_revision+1,review_status=CASE WHEN review_status='completed' THEN 'in_review' ELSE review_status END,reviewed_at=NULL WHERE id=$1", [id]);
     });
   }
-  finish(id: string, token: string, stopWithoutRetry = false) {
+  finish(id: string, token: string, stopWithoutRetry = false, retryDelaySeconds = 43200) {
+    if (!Number.isSafeInteger(retryDelaySeconds) || retryDelaySeconds < 30) throw new Error('Invalid retry delay.');
     return this.fenced(id, token, async client => {
       await client.query(`UPDATE applications SET processing_state=CASE WHEN EXISTS(SELECT 1 FROM application_tasks WHERE application_id=$1 AND status<>'completed') THEN 'completed_with_errors' ELSE 'completed' END,
-        processing_next_at=CASE WHEN NOT $2::boolean AND EXISTS(SELECT 1 FROM application_tasks WHERE application_id=$1 AND (status='pending' OR (status='failed' AND retryable=true AND attempts<3))) THEN now()+interval '12 hours' ELSE NULL END,
-        processing_token=NULL,processing_lease_until=NULL,review_revision=review_revision+1 WHERE id=$1`, [id,stopWithoutRetry]);
+        processing_next_at=CASE WHEN NOT $2::boolean AND EXISTS(SELECT 1 FROM application_tasks WHERE application_id=$1 AND (status='pending' OR (status='failed' AND retryable=true AND attempts<3))) THEN now()+make_interval(secs => $3) ELSE NULL END,
+        processing_token=NULL,processing_lease_until=NULL,review_revision=review_revision+1 WHERE id=$1`, [id,stopWithoutRetry,retryDelaySeconds]);
     });
   }
   async source(id: string, inputId: string) {

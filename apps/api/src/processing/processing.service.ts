@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { createHash } from 'node:crypto';
 import { cvReferenceDateSchema } from '@recruitment/domain';
 import { DOCUMENT_STORAGE, type DocumentStorage } from '../documents/document-storage.js';
@@ -6,22 +6,25 @@ import { DOCUMENT_MARKDOWN_READER, TASK_EXECUTOR, type DocumentMarkdownReader, t
 import { ProcessingRepository } from './processing.repository.js';
 import { ProcessingFailure } from './processing-failure.js';
 import { CvParserFailure } from './cv-parser-contract.js';
-import { CvInvalidResponseFailure, CvProviderAttemptFailure } from './cv-attempts.js';
+import { CvCachedResponsePending, CvInvalidResponseFailure, CvProviderAttemptFailure } from './cv-attempts.js';
 
 @Injectable()
 export class ProcessingService {
+  private readonly logger = new Logger(ProcessingService.name);
   private guardStopped = false;
   constructor(private readonly repository: ProcessingRepository, @Inject(DOCUMENT_STORAGE) private readonly storage: DocumentStorage,
     @Inject(DOCUMENT_MARKDOWN_READER) private readonly reader: DocumentMarkdownReader, @Inject(TASK_EXECUTOR) private readonly executor: TaskExecutor) {}
-  async processOne(id?: string, signal?: AbortSignal, fixtureOnly = false) {
+  isExecutorReady() { return this.executor.isReady?.() ?? true; }
+  async processOne(id?: string, signal?: AbortSignal, fixtureOnly = false, retryDelaySeconds = 43200, liveSince?: string) {
     if (signal?.aborted || this.guardStopped) return false;
     // Empty/cleared credentials must not consume pending live work. Explicitly
     // bound trusted fixtures remain usable with the normal executor disabled.
-    const claim = await this.repository.claim(id, fixtureOnly || this.executor.isReady?.() === false); if (!claim) return false;
+    const claim = await this.repository.claim(id, fixtureOnly || this.executor.isReady?.() === false, liveSince); if (!claim) return false;
+    this.logger.log(`Processing application ${claim.id}: ${claim.tasks.length} configured extractor(s).`);
     let stopWithoutRetry = false;
     for (const task of claim.tasks) {
       if (signal?.aborted) break;
-      const started = await this.repository.start(claim.id, claim.token, task.task_id); if (!started) continue;
+      const started = await this.repository.start(claim.id, claim.token, task.task_id, task.cache_only); if (!started) continue;
       let provenance: ExecutionResult['provenance'] = task.fixture_key === null ? { mode: 'disabled' } : { mode: 'fixture', fixtureId: task.fixture_key };
       let outcome: ExecutionResult;
       try {
@@ -30,7 +33,7 @@ export class ProcessingService {
         await this.repository.assertActive(claim.id, claim.token);
         const source = await this.repository.source(claim.id, task.source_input_id);
         if (!source) throw new ProcessingFailure('Source document was not submitted.', false, 'ordinary_terminal');
-        const context: ExecutionContext = { applicationId: claim.id, documentId: source.id, sourceHash: source.content_hash, taskId: task.task_id, token: claim.token, referenceDate: claim.referenceDate!, args: task.args, signal, ...(task.fixture_key === null ? {} : { fixtureKey: task.fixture_key }) };
+        const context: ExecutionContext = { applicationId: claim.id, documentId: source.id, sourceHash: source.content_hash, taskId: task.task_id, token: claim.token, referenceDate: claim.referenceDate!, args: task.args, signal, cacheOnly:task.cache_only, ...(task.fixture_key === null ? {} : { fixtureKey: task.fixture_key }) };
         provenance = this.executor.describe?.(context) ?? provenance;
         let timer: ReturnType<typeof setTimeout> | undefined;
         let bytes: Buffer;
@@ -46,7 +49,8 @@ export class ProcessingService {
         outcome = await this.executor.execute(document, context);
         outcome.result = taskResultSchema.parse(outcome.result);
       } catch (error) {
-        if (error instanceof CvProviderAttemptFailure || provenance.mode === 'live' && error instanceof ProcessingFailure && error.category === 'uncertain') {
+        if (error instanceof CvCachedResponsePending) throw error; // Keep processing lease for local-only recovery.
+        if (error instanceof CvProviderAttemptFailure && !error.retryable || provenance.mode === 'live' && error instanceof ProcessingFailure && error.category === 'uncertain') {
           this.guardStopped = true; stopWithoutRetry = !error.retryable;
         }
         const storageFailure = error instanceof Error && ['ENOENT','EACCES','EIO','ENOSPC'].includes((error as NodeJS.ErrnoException).code ?? '');
@@ -58,8 +62,9 @@ export class ProcessingService {
           ...(error instanceof CvInvalidResponseFailure ? { rawResponse: error.rawResponse } : {}) } };
       }
       await this.repository.save(claim.id, claim.token, task.task_id, outcome);
+      this.logger.log(`Application ${claim.id}: extractor ${outcome.result.status}, mode=${outcome.provenance.mode}${outcome.result.status === 'failed' ? `, category=${outcome.result.failureCategory ?? 'unclassified'}` : ''}.`);
       if(this.guardStopped)break;
     }
-    await this.repository.finish(claim.id, claim.token, stopWithoutRetry); return true;
+    await this.repository.finish(claim.id, claim.token, stopWithoutRetry, retryDelaySeconds); return true;
   }
 }

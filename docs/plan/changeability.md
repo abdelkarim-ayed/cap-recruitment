@@ -54,16 +54,31 @@ SI already added application-linked screening notifications with scoped reads/de
 ## Processing and operations
 
 - Current normal parse failures persist terminal/null, but timeouts/storage failures can persist retryable results. Aggregate `completed_with_errors` alone cannot prove a review-ready terminal workload. Stopped service leaves pending; interrupted processing stays processing until expired-lease recovery. Earlier discussion claiming all storage/infrastructure failures leave work open was incorrect.
-- Expired-lease recovery currently makes all interrupted tasks retryable, without durable live-admission state. Need a conservative attempt boundary/uncertain outcome policy before continuous execution. Do not test/reset the real spending guard to investigate this.
-- New CV-extractor direction adds separate PDF-hash/parser-options Markdown and exact hydrated-request caches, neither implemented. Persist request-level attempt state before sending and coordinate identical requests across workers; an expiring lock/success cache alone cannot resolve unknown paid completion. Gateway reserializes/overrides model, so its effective bytes must agree with hashed request identity. [Integration gaps](research/cv-extraction-lab.md#gaps-the-first-integration-plan-must-resolve).
+- Recovery now consults durable `cv_request_attempts`; uncertain/succeeded/terminal
+  send history cannot automatically authorize another payment. Final live
+  PostgreSQL/HTTP/race verification remains pending. Never test/reset spending
+  controls to investigate it.
+- Runtime private file caches use PDF hash/parser options and exact effective
+  request bytes, validating hits and separating fixture/live responses. Ledger
+  guards remain necessary when a cache is absent/corrupt. Gateway and hashing
+  share serialization; no counter/model/endpoint changes. See the
+  [current contract](../current/contracts/processing-review-api.md).
 - B1-R implements shared-HR release of any unfinished work, attribution, durable closure and late-write/review fencing; B1-J/UI provides explicit confirmation and per-field review. No paid restart or false extraction success. Real races/rollback/privacy remain Q-B1R/J.
 - SI/release/completion eligibility is enforced at claim/start/pre-execution/save/finish/bind, not only between batches. Preserve transactional fencing when adding task types. External cancellation remains best-effort, not a billing guarantee; uncertain interrupted-live admission is still unresolved.
-- `ProcessingService.processOne` invokes executor once per skills task and reuses bytes/text only in local Maps. Selected CV-extractor questions may share one document request; map batch responses back to stable fields and preserve whole-application readiness/closure, response validation and spending guards. No persistent cache/background runner exists merely because the lab handoff describes one.
+- `ProcessingService.processOne` invokes once per CV extractor containing ordered
+  questions, with independent result fields/corrections/CSV. Preserve storage
+  integrity, readiness/closure and immutable results when adding families.
 - CLI can continue other tasks/applications after a returned failure. Terminal task failure does not itself prove a whole batch stops on a gateway block. Define run-level stop behavior separately; gateway blocking must remain a stop condition.
-- Runner topology (standalone Nest context, backend child or other bounded process), recovery and shutdown remain open. No queue/BullMQ is required merely because Redis exists. Avoid duplicate runners and automatic draining when API starts.
+- Offline runner lives in the API: bounded memory wake hints, 5s DB scans, one
+  serial application/request per process, native parsing in a killable child.
+  Disabled by default; explicitly enabled offline launch is distinct from live
+  bulk drain. No BullMQ/service added. Multiple API workers still use DB claims;
+  same-request live exclusion remains the ledger/gateway responsibility.
 - Work counts can use cache-aside with short TTL and browser polling; DB remains authoritative. Define stale count indication/error fallback, role/scope cache keys and logout/login reset. No Redis namespace interaction with spending counters.
 - File quota accounting spans PostgreSQL and filesystem; a sum-before-write alone races. Retain existing upload caps/compensation; global reservations/reconciliation need an explicit later design, not decorative gateway wrappers.
-- No publication timestamp/reference date exists in current vacancy schema/record/snapshot. New publication-relative extraction needs a stored first-publication date under the existing publication lock, explicit timezone/snapshot propagation and a legacy-vacancy policy; creation/last-update time must not masquerade as historical publication.
+- Migration 010 adds first-publication UTC date; publication stamps it under the
+  existing lock and submission freezes it. Old definitions are not backdated;
+  the authorized reserved demo recreation replaces legacy records explicitly.
 
 ## Export/import and schema impact
 

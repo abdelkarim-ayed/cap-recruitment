@@ -2,7 +2,7 @@ import { Injectable, type OnModuleDestroy } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { validJevKey } from './jev-key-value.js';
 
-export interface JevCredentialStatus { instanceId: string; revision: number; configured: boolean }
+export interface JevCredentialStatus { instanceId: string; revision: number; configured: boolean; pid: number }
 
 /** Empty on every process start, with no environment/file fallback. JS strings
  * cannot promise secure erasure; no key/fingerprint appears in public status.
@@ -15,7 +15,7 @@ export class JevCredentials implements OnModuleDestroy {
   #waiters = new Set<(available:boolean)=>void>();
   readonly instanceId = randomUUID();
 
-  status(): JevCredentialStatus { return { instanceId: this.instanceId, revision: this.#revision, configured: this.#key !== undefined }; }
+  status(): JevCredentialStatus { return { instanceId: this.instanceId, revision: this.#revision, configured: this.#key !== undefined, pid: process.pid }; }
   captureForGateway(): string | undefined { return this.#key; }
   waitUntilConfigured(signal:AbortSignal):Promise<void> {
     if(signal.aborted)return Promise.reject(new Error('Credential wait cancelled.'));

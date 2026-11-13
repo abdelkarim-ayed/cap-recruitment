@@ -1,10 +1,19 @@
 # Manual demo — implemented workflows
 
-**2026-11-13 CV cutover:** source integration is not a demo launch. The final
-source has not been built/tested; migrations 009/010 and any scoped recreation of
-the old skills dataset remain unexecuted. T2b launcher and T1 mail viewer are still
-planned, not delivered. [Launch handoff](../../plan/cv-demo-launch.md) is the next
-session's starting point. Do not run the old setup block below blindly.
+**2026-11-13 offline cutover:** the separate `feat/cv-offline-demo` worktree is
+built/running with migrations 009/010 and refreshed reserved fixtures. No tests
+or authenticated workflow acceptance; [launch handoff](../../plan/cv-demo-launch.md)
+is the current manual route. `demo:setup` handles migrations/scoped seed/reset;
+full T2b service launcher and T1 mail viewer remain planned. The explicit processing
+commands below require the automatic runner disabled; do not run them concurrently
+with the active worker.
+
+**Subsequent correction:** the active worker is now **real Jev**, not the optional
+offline executor. User approved new synthetic submissions only and an empty-key
+restart; [root launch README](../../../LAUNCH.md) owns exact commands/boundary.
+Seeded navigation snapshots remain labelled fixtures, not actual provider output.
+Do not run explicit fixture commands concurrently with the active worker or
+assume that a synthetic PDF implies a mocked answer.
 
 For the separate five-vacancy/25-application dataset, see [lifecycle fixtures](lifecycle-demo.md). Local setup applied migrations 007/008 and seeded it on 2026-11-07; Q-T2A and other functional/manual gates remain pending. API/frontend run in the shared [RMUX workspace](rmux.md). Commands below remain operator reference, not blanket authorization for future migrations, reseeds or process changes.
 

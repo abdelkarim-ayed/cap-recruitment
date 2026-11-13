@@ -23,7 +23,13 @@ Use the [task board](tasks.md) for implementation/verification state and [curren
 | No extraction tasks | No human review required or attributed; screening immediately actionable |
 | Screening committed | No screening reversal/batch undo; preselected applications continue to interviews/owner finalization and may later be rejected through subsequent recruitment actions |
 
-**[selected CV-extractor direction, not implemented]** Minimize requests with configured questions sharing one CV/date and success-only exact-request reuse, within existing gateway bounds. Current `ProcessingService.processOne` still executes each skills task separately with only invocation-local document/text reuse. New source/question batching and persistent parser/request caches need the [integration contract/plan](extraction-design.md), durable uncertain-attempt protection and preserved whole-application readiness/fencing. No live calls or control changes are authorized.
+**[CV source implemented; scoped real worker active]** One configured extractor executes
+one multi-question request with frozen date and success-only exact-request reuse.
+Runtime parser/response caches use private files; durable request guards remain
+separate. Post-commit wake + periodic DB scans are enabled only for the explicitly
+selected mode. User approved real new synthetic submissions, fixed boundary and
+unchanged controls; preserve readiness/closure and gateway bounds. No agent paid
+diagnostics; [contract](../current/contracts/processing-review-api.md).
 
 ## Publication and vacancy lifecycle
 
@@ -89,6 +95,15 @@ Delivered slices: R3a backend [draft vacancy PATCH](../current/contracts/vacancy
 
 ## QA-driven UX follow-ups
 
+**[implemented in unmerged CV demo worktree]** CV authoring should read as the
+question with inline blanks, not a schema form followed by provider debug output.
+HR supplies skill/credential/scope and optional accepted keywords, not category
+rubrics or protocol instructions. Keep exact provider wording secondary, no
+repeated scope/date/competence lectures. Draft date remains a read-only today
+preview; first-publication freezing is unchanged. New field identities derive
+from targets in lower snake case with collision suffixes, preserving saved IDs.
+User GUI acceptance pending; no tests or browser automation.
+
 **UI preservation baseline:** the [current design guide](../current/guides/frontend-design.md) records implemented entity/role/intent hierarchy, restrained visual/HR language, native navigation and focused dialogs, role-relevant actions, independent work/recruitment state, scoped filter memory and the selected page/view boundaries. It is a durable guide, not a log or still-open competing design proposal. [Remaining follow-ups](ui-ux-overhaul.md) stay bounded; no framework migration or blanket backlog approval. Preserve backend authority/privacy/revisions and existing dirty/pending/conflict guards.
 
 Vacancy convenience filters are implemented and locally merged: staff owner/status selection, My drafts (session owner + draft) and All vacancies (clear owner/status, keep sort), persisted with other list preferences. All owner options/count/page semantics are server-side, not current-page inference; no authority change or public owner projection. The completed UI merge is not authorization to push or implement more cards.
@@ -107,19 +122,29 @@ UX-ID/form-authoring subset is also approved/source-implemented: explicit fixed 
 
 Consistency choices: Inbox belongs in the top bar only; plan viewing is readable rather than a disabled editor, scoped pages name their vacancy, navigation/status/validation use consistent human labels, and submitted choice answers use frozen labels. Duplicate import is one row per validated application with grouped source numbers, link, email and one proposed screening result: agreement is prefilled, conflict requires selection, final confirmation is the only commitment. Source proposal selection retains outcome/reason together; an explicit outcome override must not inherit an unrelated reason. [Durable baseline](../current/guides/frontend-design.md).
 
-Extraction output/export shape belongs to the predefined task, not a generic UI formatter: separate columns for meaningful independent flags/questions, one column for a true list result. The newly selected five families normally return one field per question, including integer coverage. Exact destination descriptors/keys/null-source encoding and legacy compatibility still need the [CV-extractor contract](extraction-design.md#proposed-data-path-not-a-migration-spec); no current provider/CSV change is claimed by research or readable form answers.
+Extraction output/export shape belongs to the predefined task, not a generic UI
+formatter: one field per configured CV question, including integer coverage.
+Descriptors, stable keys and unknown/correction/source encoding are implemented
+in the [current contract](../current/contracts/processing-review-api.md). Research
+observations remain distinct from delivered behavior and quality evidence.
 
 UX-CAND-ENTRY is implemented and locally merged: vacancy summary → separate checked `/apply`, existing-submission lookup before mounting a form, View your application for existing applicants, and application-first My applications links. Candidate Not applied yet filtering runs server-side before count/page. Loading/error fails closed; backend duplicate-return protection remains the racing-client backstop. No actual resubmission/overwrite/withdrawal was added. Authenticated/native/race verification remains separate on the board.
 
-## CV extraction research handoff — selected, not implemented
+## CV extraction research handoff — implemented source, verification remainder
 
 The [selected design](extraction-design.md) and [lab integration/asset map](research/cv-extraction-lab.md) replace the earlier second-template exploration. Priority is PDF → structured fields → persistence → HR correction → effective CSV for presentation/demo, not candidate ranking/filtering/decisions or more open-ended research. Existing explicit human screening/recruitment workflows remain intact.
 
 - Attach one logical CV extractor to a file/document field with repeated flat uniquely identified questions: education level, one certification (no validity), experience duration bins, coverage count, individual skill evidence. Skills/credentials accept names or named aliases; accepted skill terms can be directional, not symmetric synonyms. Code-owned deterministic question preview; Jinja is the readable spec, TypeScript builder acceptable.
 - Freeze reference date at **first vacancy publication**, not draft modification or parsing. Draft preview today is provisional; expected-education look-ahead is publication-relative, omitted/zero completed-only. No rolling refresh and no separate awarded/expected result field; display the question/window accurately.
-- Preserve raw Choice probabilities/confidence/usage and independent machine/HR/effective values. Failure/unavailable is not non-mention/zero; no thresholds/caps/calibration or automatic acceptance policy selected. Legacy Noul >=0.8 is existing starter behavior, not the new conversion rule.
-- Two phases: portable assets/provenance/licenses are now copied and verified under [research/cv-extraction-lab](../../research/cv-extraction-lab/README.md), originals preserved; destination contract-first backend async integration remains next in a fresh worktree. Markdown parser cache uses PDF hash plus parser version/options; inference cache uses exact hydrated credential-free request bytes/content hash. The transferred offline observations are not runtime cache entries; no CLI/environment/latch transplant. Scheduling/cache/provider internals can evolve with scoped approval; frugality and destination safeguards remain.
-- Node `@firecrawl/pdf-inspector` 1.25.2 availability is documented, **Node parsing/parity untested**. Native execution isolation and attempt-before-send/recovery/cache concurrency are destination blockers to resolve before unattended live operation. No paid calls, install/transfer/data/deployment/default/control changes follow from this documentation.
+- Preserve raw Choice probabilities/confidence/usage and independent machine/HR/effective values. Failure/unavailable is not non-mention/zero; no thresholds/caps/calibration or automatic acceptance policy selected. Legacy Noul >=0.8 was the old starter, not the CV conversion rule.
+- Portable assets/provenance/licenses preserved; destination source is implemented.
+  The resumed offline-demo worktree adds private file caches (PDF/parser identity
+  and exact hydrated request hash), async wake/scans and setup. Archived provider
+  observations are never populated as runtime cache entries; no latch transplant.
+- Project-pinned Node parser 1.25.2 has earlier small foundation parity evidence
+  and one observed native parse in this offline launch. Neither is full parser,
+  workflow, privacy/race or live-quality acceptance. Durable send guards remain
+  mandatory; unscoped/historical live draining stays refused. Tests remain forbidden.
 
 Evidence/highlighting, suggestions/skills graph, advanced retrieval, additional evaluation and exact corpus regeneration are not near-term prerequisites. The 20 lab artifacts / 102 answers / 14 identities are exploratory/provisional, not a validated accuracy percentage or destination live evidence.
 
@@ -128,6 +153,22 @@ Evidence/highlighting, suggestions/skills graph, advanced retrieval, additional 
 Selected simple layout: `mail-outbox/<email-address>/<timestamp>.email`, UTF-8 plain text with `Metadata-Name: value` header lines, a `---` separator, then body. Include recipient, subject and capture timestamp; no HTML/read-state lifecycle. Keep the address recognizable as a safe single directory component. UUID filenames are unnecessary; exclusive creation and advancing to an available timestamp prevents simultaneous capture overwrites. Viewer lists addresses and messages. Current capture still stores only the latest message per hashed address; history/layout change is future work, not implemented by this decision. Recruitment mail remains independent of notifications.
 
 ## Data, fixtures, testing and sequencing
+
+- **Latest clarification:** the intended demonstration must use real Jev with
+  RAM-loaded credentials, retaining today's hard gateway constants; offline
+  declarations alone do not satisfy that goal. User explicitly approved new
+  synthetic submissions after the fixed boundary, unchanged controls and a
+  backend restart/user key reload. That real worker is now active, key-empty at
+  startup. Singleton rotation and cached local DB recovery are implemented.
+  No agent paid diagnostics, old queue drain, limit increase or spending reset.
+
+- **2026-11-13 resumed offline demo:** file-backed parser/validated-response caches
+  supersede memory caching. Async post-commit wake plus periodic DB scans, one
+  request at a time; bounded memory is only scheduling, not durable task ownership.
+  New offline submissions use truthful declared fixture outcomes, never paid
+  inference. Build/repair, migration/reseed and RMUX launch approved; tests remain
+  forbidden. Normal restart is nondestructive; setup/reset is explicit. Preserve
+  passwords, request ledger and all spending state. See [launch checkpoint](cv-demo-launch.md).
 
 - Current records are fake/demo. User explicitly accepts deleting/reseeding development recruitment data, including manual entries, when simpler for QA/migration; no real records need legacy preservation. Major ER departures still require review. This is not permission to wipe infrastructure volumes, credentials or Jev counters. Existing scoped seed behavior stays documented; local launch needed no deletion.
 - Prefer relational IDs, ownership, foreign keys, uniqueness and transition-critical guarantees. JSONB suits dynamic typed results/answers/corrections. Do not invent full review history because a table example mentioned generations; detail deferred.

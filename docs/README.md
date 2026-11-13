@@ -10,11 +10,12 @@ Read by question; do not reload the whole documentation tree.
 | What did the user request next? | [Planning index](plan/README.md), [product decisions](plan/product-decisions.md) |
 | Next checkpoints / deferred work | [Task board](plan/tasks.md) |
 | Refactor evidence and unresolved obstacles | [Changeability review](plan/changeability.md) |
-| Selected CV-extractor direction versus current skills implementation | [Extraction design](plan/extraction-design.md), [integration map](plan/research/cv-extraction-lab.md), [portable lab assets/manifest](../research/cv-extraction-lab/README.md) |
+| CV extractor and its offline launch/remainder | [Current processing contract](current/contracts/processing-review-api.md), [extraction direction](plan/extraction-design.md), [portable provenance](../research/cv-extraction-lab/README.md) |
 | Implemented frontend product/interaction/style decisions to preserve | [Durable frontend baseline](current/guides/frontend-design.md) |
 | Jev safety / opt-in execution | [Mandatory safeguards](current/jev-safety.md); load project `typesafe-ai` skill before Jev work |
 | Locally load/rotate a running gateway's RAM-only key | [Local key control](current/guides/jev-key-control.md); no environment/file fallback or paid validation |
-| Is the new CV feature ready to demonstrate? | [Demo launch handoff](plan/cv-demo-launch.md): unbuilt source/unapplied schema, fixture path, mail CLI versus planned viewer/launcher |
+| Run/inspect the CV demo | [Launch handoff](plan/cv-demo-launch.md): active worktree/RMUX, real new-synthetic-submission scope, accounts/PDFs, setup and singleton rotation; no agent live validation |
+| Copyable launch/build/setup commands and mode/queue explanation | [Root launch README](../LAUNCH.md); explicit fixture/live boundary and research-only Jev health findings |
 | Report-support history | [Journal](journal.md): selective context, not the current specification |
 
 ## Meaning of the folders

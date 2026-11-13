@@ -7,7 +7,7 @@ import type { ParsedCvDocument } from './cv-parser-contract.js';
 import { ProcessingFailure } from './processing-failure.js';
 import { serializeJevRequest } from '../integrations/jev/jev-request.js';
 
-export interface ExecutionContext { applicationId: string; documentId: string; sourceHash: string; taskId: string; token: string; referenceDate: string; args: CvExtractorArgs; fixtureKey?: string; signal?: AbortSignal }
+export interface ExecutionContext { applicationId: string; documentId: string; sourceHash: string; taskId: string; token: string; referenceDate: string; args: CvExtractorArgs; fixtureKey?: string; signal?: AbortSignal; cacheOnly?: boolean }
 const failure = z.strictObject({ status: z.literal('failed'), value: z.null(), reason: z.string().min(1).max(2000), retryable: z.boolean(), failureCategory: z.enum(['ordinary_terminal','operational','uncertain','unclassified']).optional(), rawResponse: z.unknown().optional() });
 const fieldValue = z.union([z.string(), z.boolean(), z.number().int().nonnegative()]);
 export const taskResultSchema = z.discriminatedUnion('status', [

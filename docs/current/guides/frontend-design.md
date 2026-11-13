@@ -78,6 +78,19 @@ No private record payloads, answers/files, editor/import/dialog drafts, credenti
 - Automated extraction values keep their task-defined shape, not the submitted-answer formatter. A future predefined template owns its output descriptors and CSV shape: independent flags/questions should remain separate fields, a true list remains a list column. This preservation rule does not implement additional templates, new keys/list encodings, quotations or provider execution; those remain [bounded extraction work](../../plan/extraction-design.md).
 - Import has Upload / Review selection / Confirm stages. One valid grouped application row shows source record numbers, application link, account email and one screening-decision selector. Matching outcome/reason proposals are prefilled/included; conflicting outcomes start with Select screening decision. These are pending proposals, **never committed before final wizard confirmation**. Differing reasons need a source choice; choosing a source takes its outcome and reason together. A deliberate outcome override never silently carries the other outcome's reason. Bar invalid/mismatched rows, distinguish structural CSV errors, grey already-decided/excluded entries, always with text/icons. Whole-file errors preserve prior staging. Links require server-resolved identity; fresh eligibility, unique included IDs and atomic apply remain authoritative.
 - Builder leads with readable question types and optional Automated document checks / Skills to check. IDs, answer keys, stored choice values, result prefixes and additional byte limits are secondary disclosures, not removed or rewritten. New checks do not invent skill choices or execute a provider. Preserve stable IDs, explicit saves and publication locks.
+- CV questions are sentence-style controls: the skill, credential or scope is
+  entered in the readable question itself, with optional accepted keywords below.
+  HR does not author provider instructions or answer-category rubrics; exact
+  wording/options remain in a closed technical disclosure. Avoid duplicated
+  argument forms plus prominent provider/debug previews or operational lectures.
+  Draft date shows today's preview, read-only; the backend still freezes the
+  actual UTC date on publication. Ongoing-qualification options are secondary.
+- New CV fields use collision-safe readable lower-snake IDs (`skill_sql`,
+  `cert_aws_certified_developer`, suffix `_2` when needed) generated from the
+  target on first blur; existing saved/imported IDs are never automatically
+  renamed. New extractor task/prefix names derive from their source field.
+  Technical field settings show the exact resulting CSV column; definitions
+  still freeze at publication. This is authoring convenience, not a schema rewrite.
 - Account email is fixed/read-only in builder, preview and candidate intake, and described in staff inspection. Preview uses a labelled example; real intake shows the signed-in candidate email. It is not a custom answer or client-writable identity: the backend freezes session email. Do not silently delete existing custom questions.
 
 ## Verification and scope

@@ -4,8 +4,7 @@ import type { DatabaseService } from '../database/database.service.js';
 import type { DocumentStorage } from '../documents/document-storage.js';
 import { FixtureRegistry, type TaskFixture } from '../processing/execution.js';
 import { lifecycleId, type LifecycleCatalog } from './lifecycle-catalog.js';
-import { samplePdf } from './sample-pdf.js';
-import { declaredCvResponse } from './cv-fixture.js';
+import { profilePdf, profileMarkdown, profileResponse } from './offline-profiles.js';
 import { buildCvRequest } from '@recruitment/domain';
 import { normalizeCvResponse } from '../processing/cv-response.js';
 
@@ -13,16 +12,17 @@ type Application = LifecycleCatalog['applications'][number];
 const json = JSON.stringify;
 const hash = (bytes: Buffer) => createHash('sha256').update(bytes).digest('hex');
 
-export function lifecycleTaskFixture(application: Application): TaskFixture | undefined {
-  const {scenario,job,id,documentId,lines} = application;
+export async function lifecycleTaskFixture(application: Application): Promise<TaskFixture | undefined> {
+  const {scenario,job,id,documentId} = application;
   const task = job.vacancy.processingDefinition.tasks[0];
   if (!task) return;
   const category = scenario.processing === 'ordinary' ? 'ordinary_terminal' : scenario.processing === 'uncertain' ? 'uncertain' : 'operational';
   const referenceDate=job.vacancy.extractionReferenceDate!;
-  return {fixtureKey:`lifecycle-v2-${scenario.key}`,applicationId:id,documentId,sourceHash:hash(samplePdf(lines)),taskId:task.id,args:task.args,referenceDate,
-    markdown:lines.join('\n'),result:['ordinary','operational','uncertain'].includes(scenario.processing)
+  const markdown = await profileMarkdown(application.profile);
+  return {fixtureKey:`lifecycle-v3-${scenario.key}`,applicationId:id,documentId,sourceHash:hash(await profilePdf(application.profile)),taskId:task.id,args:task.args,referenceDate,
+    markdown,result:['ordinary','operational','uncertain'].includes(scenario.processing)
       ? {status:'failed',value:null,reason:`FIXTURE ONLY: declared ${category} failure; no provider attempt.`,retryable:false,failureCategory:category}
-      : {status:'completed',response:declaredCvResponse(task.args,lines.join('\n'),referenceDate,scenario.processing==='empty')}};
+      : {status:'completed',response:profileResponse(application.profile,task.args,markdown,referenceDate)}};
 }
 
 async function prerequisites(client: PoolClient) {
@@ -86,15 +86,15 @@ async function clearDataset(client: PoolClient, catalog: LifecycleCatalog, owned
   await client.query('DELETE FROM applications WHERE id=ANY($1::uuid[])',[applications]);
   await client.query('DELETE FROM interview_steps WHERE vacancy_id=ANY($1::uuid[])',[jobs]);
   await client.query('DELETE FROM vacancies WHERE id=ANY($1::uuid[])',[jobs]);
-  const removed = await client.query('DELETE FROM stored_files WHERE id=ANY($1::uuid[]) RETURNING storage_ref',[owned.extraFileIds]);
-  // Accounts/passwords/sessions and canonical stored_files/bytes survive. Re-link
-  // those verified PDFs; retire only extra manual demo-submission objects.
+  const removed = await client.query('DELETE FROM stored_files WHERE id=ANY($1::uuid[]) AND NOT EXISTS(SELECT 1 FROM application_documents d WHERE d.stored_file_id=stored_files.id) RETURNING storage_ref',[[...owned.extraFileIds,...catalog.applications.map(application=>application.fileId)]]);
+  // Explicit dataset recreation retires only its now-unreferenced objects; new
+  // immutable PDF objects are inserted, never overwritten. Passwords survive.
   return removed.rows.map(row=>row.storage_ref as string);
 }
 
 async function insertApplication(client: PoolClient, application: Application, storage: DocumentStorage, created: {id:string;ref:string}[]) {
   const {scenario,job,candidate,id} = application;
-  const bytes = samplePdf(application.lines), contentHash = hash(bytes);
+  const bytes = await profilePdf(application.profile), contentHash = hash(bytes);
   const previous = (await client.query('SELECT storage_ref,content_hash FROM stored_files WHERE id=$1 FOR UPDATE',[application.fileId])).rows[0];
   let ref: string;
   if (previous) {
@@ -124,7 +124,7 @@ async function insertApplication(client: PoolClient, application: Application, s
     application.rejected?'FIXTURE ONLY: screening outcome selected for QA.':null,
   ]);
   await client.query('INSERT INTO application_documents(id,application_id,input_id,stored_file_id) VALUES($1,$2,\'cv\',$3)',[application.documentId,id,application.fileId]);
-  const fixture = lifecycleTaskFixture(application);
+  const fixture = await lifecycleTaskFixture(application);
   if (fixture && !['pending','released'].includes(scenario.processing)) {
     // Validate fixtures using the same trusted fixture schema as demo:process.
     new FixtureRegistry().load([fixture]);

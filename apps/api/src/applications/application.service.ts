@@ -13,6 +13,7 @@ import { processingClosed, type ProcessingBoundary } from '../processing/process
 import { readinessView, reviewReadinessSql } from '../review/review-readiness.js';
 import { applicationWorkSql,recruitmentStatusSql } from './application-work.js';
 import { candidateStage } from './candidate-stage.js';
+import { ProcessingWake } from '../processing/processing-wake.js';
 
 type Actor = AuthenticatedRequest['actor'];
 const applicationListSchema=vacancyListSchema.pick({limit:true,offset:true}).extend({
@@ -37,7 +38,7 @@ function visible(row: ApplicationRow, actor: Actor):Omit<ApplicationView,'docume
 }
 @Injectable()
 export class ApplicationService {
-  constructor(private readonly database: DatabaseService, @Inject(DOCUMENT_STORAGE) private readonly storage: DocumentStorage) {}
+  constructor(private readonly database: DatabaseService, @Inject(DOCUMENT_STORAGE) private readonly storage: DocumentStorage, private readonly wake: ProcessingWake) {}
   private async authorize(actor: Actor, candidateId: string, applicationId:string) {
     let hasAssignment=false;
     if(actor.role==='interviewer') {
@@ -83,6 +84,7 @@ export class ApplicationService {
         }
         return { created: true, id };
       });
+      if (result.created) this.wake.enqueue(result.id);
       return { created: result.created, application: await this.get(result.id, actor) };
     } catch (error) {
       // COMMIT/connection failures can have ambiguous outcomes. Never delete bytes

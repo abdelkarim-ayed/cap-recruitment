@@ -1,84 +1,58 @@
 # RAM-only Jev key control
 
-Source implementation locally merged to main; **not built, tested or
-activated**. No service operation accompanied the merge. No key was read/set,
-provider request made or spending counter changed during implementation.
+The API has one owner-restricted **stable backend socket/pipe**, acquired by root
+bootstrap before workers initialize. It is also the single-instance lock across
+checkouts/HTTP ports. An occupied/stale address refuses startup; no automatic
+unlinking, PID stealing, TCP credential route or key persistence.
 
-## Start empty, update locally
+## Commands
 
-Each backend process starts with an empty credential holder. `JEV_API_KEY` is
-ignored by the gateway: no environment/secret-file fallback. A restart, including
-a development watch restart, loses the loaded key. Existing unrelated environment
-loading is unchanged; remove an old environment key yourself if desired.
-
-The backend logs its non-secret PID and control command. From the **same checkout
-and OS user**, use these commands after separately building/starting the updated
-source. Replace `12345` with the actual backend PID:
+Use the built CLI directly, avoiding recursive package-name selection. Current
+checkout (works from any directory as the same OS user):
 
 ```sh
-pnpm --filter @recruitment/api jev:key status --pid 12345
-pnpm --filter @recruitment/api jev:key set --pid 12345
-pnpm --filter @recruitment/api jev:key clear --pid 12345
+node /home/ubuntu/cv-offline-demo/apps/api/dist/integrations/jev/jev-key-cli.js status
+node /home/ubuntu/cv-offline-demo/apps/api/dist/integrations/jev/jev-key-cli.js set
+node /home/ubuntu/cv-offline-demo/apps/api/dist/integrations/jev/jev-key-cli.js clear
 ```
 
-`set` opens a hidden terminal prompt. Paste/type the key there, **not into chat,
-a shell command, an argument, a file or an environment variable**. Ctrl-C cancels;
-Backspace edits and Ctrl-U clears input. No key, suffix, fingerprint or length is
-printed. Input is validated only as a bounded header-safe token, not by contacting
-Jev; “loaded” does not mean the provider accepted it.
+No PID is required for the one backend. Optional `--pid PID` checks the expected
+backend PID before prompting/updating. Non-HTTP explicit processing CLI workers
+retain separate PID-specific controls: use `--worker-pid PID` for those, from
+their checkout. An API key is not shared with separate CLI workers.
 
-For a trusted program supplying the key through stdin, use `set --pid 12345
---stdin` as the receiving command. The producer must not echo/log/persist it or
-put it in its own arguments. One terminal line ending is accepted; embedded
-newlines/whitespace, empty or oversized input are rejected. No key is intentionally
-written to disk. Do not pipe a literal key from a command saved in shell history.
+`set` opens a hidden prompt. Never place a key in chat, arguments, files, shell
+history or an environment variable. Ctrl-C cancels, Backspace edits, Ctrl-U clears.
+No key/fingerprint/length is printed. A trusted nonlogging producer can use
+`set --stdin`; this is not permission to pipe a literal key saved in history.
+All success/status replies expose PID, instance, revision and loaded/empty only.
+The same observed instance/revision fences updates across races/restarts.
 
-## Rotation semantics
+## Semantics and safety
 
-- Updates replace only this process's in-memory credential, not model/endpoint,
-  admission limits, Redis namespace, counters, caches or request-attempt guards.
-- A request captures its key once before gateway admission. Already-started
-  requests keep that capture; subsequent requests use the replacement. Clearing
-  blocks future sends; it is not a billing cancellation guarantee.
-- Setting a key does not enable reader/executor/runner, enqueue work, retry
-  failed tasks, reset a stopped invocation or perform a provider probe.
-- Status exposes configured/empty, process instance and local revision only.
-  Set/clear compare the instance/revision observed before prompting, refusing a
-  competing update or process restart. Unknown acknowledgements are never retried
-  automatically: inspect status and choose deliberately.
-- Actual credential creation/revocation is still performed through the provider.
-  Allow admitted requests to settle before revoking the old credential if needed.
+- Every process starts empty, including after development watch restarts.
+  Gateway ignores `JEV_API_KEY`; no secret-file/environment fallback.
+- Rotation changes only RAM credentials. An admitted request keeps its captured
+  key; later requests use the replacement. Clear is not billing cancellation.
+- No provider probe, mode change, limit change, cache/ledger/counter reset or
+  automatic retry is caused by the control command.
+- **If live mode was explicitly enabled**, the periodic worker can process its
+  already-authorized cohort once a key is loaded. Setting a key is then sufficient
+  to unblock those submissions, not a separate authorization for arbitrary work.
+- Unknown control acknowledgements are not retried automatically. Inspect status
+  and choose deliberately. Provider key creation/revocation remains outside this
+  tool; never supply real keys to agent tools.
 
-The explicit live processing CLI is a **different process**, with its own empty
-holder/PID. Once all existing selection/synthetic-consent gates pass, it waits up
-to two minutes for local loading before any application claim/provider admission.
-Loading its key lets that already-requested invocation continue; it does not
-authorize a paid run. Loading the API server's key does not populate CLI workers.
-Automatic live background processing remains refused.
+Unix directory/socket modes are verified 0700/0600 with current-user ownership.
+Windows uses a local named pipe, current-user DACL before command acceptance and
+same-handle owner verification in the helper; no unchecked/TCP fallback. Windows
+is source-only/unverified. Both API and worker controls use bounded messages,
+connections and timeouts, without payload/parser logging. Graceful shutdown clears
+credentials and closes its own listener. Hard crashes can leave stale state;
+cleanup needs an explicit operator decision after checking live processes.
 
-## Local transport and security limits
-
-No HTTP or TCP credential endpoint, ZeroMQ dependency or additional service.
-Node `net` carries one bounded command/reply per local connection:
-
-- Unix: per-project/user temporary directory, verified owner/mode `0700`, socket
-  mode `0600`, PID-specific address. CLI verifies ownership/type/mode before
-  sending. The socket inode is not a file containing the key. No automatic stale
-  socket removal; startup refuses unsafe permissions or an occupied address.
-- Windows: PID-specific local named pipe. Stock Windows PowerShell/.NET applies
-  a current-user-only pipe DACL before command acceptance. The Windows CLI helper
-  verifies the same pipe handle's owner before sending the command. Key bytes
-  travel through stdin, never PowerShell arguments/environment/files. The helper
-  is bounded and emits only the restricted control reply. Missing ACL support,
-  owner mismatch or helper failure fails closed—no TCP/unchecked-pipe fallback.
-  Windows behavior has **not been runtime-verified**; use the same user/elevation.
-
-Connection count, message/reply size and lifetime are bounded. Malformed input,
-parser errors and input values are never logged/reflected. Shutdown clears the
-holder and closes only the process's own control listener/connections.
-
-This trusts processes running under the same OS account and privileged OS
-administrators. RAM-only is not protection from debuggers, dumps, swap, clipboard
-history or forced OS logging; JavaScript strings cannot guarantee secure erasure.
-No agent/global secret-access restrictions were changed. Do not supply real keys
-to agent tools. Existing [Jev safeguards](../jev-safety.md) still apply.
+RAM-only does not defeat same-user debuggers, privileged administrators, dumps,
+swap or clipboard history; JavaScript strings cannot promise secure erasure.
+No global secret-access restrictions changed. [Jev safeguards](../jev-safety.md)
+and [launch scope/PID](../../../LAUNCH.md) remain authoritative. No real rotation
+or provider verification was performed by the agent.
