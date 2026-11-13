@@ -9,7 +9,8 @@ scoped real Jev scheduling/local cache-only persistence recovery, singleton key
 control, setup and sentence-style authoring. Builds/setup/readiness observed;
 no tests or agent paid calls. User approved the new synthetic cohort, unchanged
 limits and restart; user loads the empty-start key. No old queue drain, merge or
-push. [Launch README](../../LAUNCH.md)/[handoff](cv-demo-launch.md) own runtime
+push at the implementation checkpoint; user subsequently approved publication and
+the fixes were merged through `e1f1d86`. [Launch README](../../LAUNCH.md)/[handoff](cv-demo-launch.md) own runtime
 boundaries; see the [actual remainder](tasks.md#non-qa-implementation-remainder).
 
 Screening may happen before extraction/review finishes; either outcome freezes extraction/review without inventing completion. The interview plan may be empty, freezes at publication, and never replaces explicit owner Offer/Hired actions. See [product decisions](product-decisions.md) for the selected rules and [task board](tasks.md) for proposed decomposition, dependencies and remaining gates. Earlier mandatory reviewed-only screening/minimum-one-interview directions are superseded, not implemented contracts.

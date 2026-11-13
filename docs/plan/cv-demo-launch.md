@@ -2,8 +2,10 @@
 
 **[Root launch README](../../LAUNCH.md)** owns copyable startup, key rotation,
 accounts/PDFs, modes, cache/recovery policy and operating boundaries. Read it
-before managing processes. Main remains `c77aebe`; source fixes are separately
-committed on `feat/cv-offline-demo`, not merged/pushed.
+before managing processes. Main merge `e1f1d86` preserves the separate source fixes
+and portable launch/install docs. User explicitly approved push to existing
+GitHub origin; check Git/remote refs for publication state. Services stay on the
+retained feature worktree, not restarted by the merge.
 
 ## Corrected runtime, 2026-11-13
 
@@ -57,5 +59,6 @@ authenticated `GET /v1/models`, no dedicated health endpoint/explicit billing
 guarantee found; no `/health/jev` route or credential-bearing probe implemented.
 
 Next: user reloads key, makes a **new synthetic submission**, inspects actual
-live results in HR review/CSV, then explicitly instructs merge/push when ready.
+live results in HR review/CSV. Main merge/push was subsequently explicitly approved;
+that publication is not evidence of a completed live walkthrough.
 No automatic backlog implementation or deployment follows from this handoff.

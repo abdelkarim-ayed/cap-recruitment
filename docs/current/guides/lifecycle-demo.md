@@ -5,7 +5,7 @@ T2a is source-implemented. Authorized local setup on 2026-11-07 applied migratio
 **2026-11-13 offline cutover:** authorized `demo:setup reset` applied 009/010 and
 recreated the reserved dataset with version-2 CV fixtures and unchanged transferred
 PDFs. Source fixes in `feat/cv-offline-demo` are separately committed/built/running,
-not merged/pushed. The current new-synthetic-submission cohort uses **real Jev**
+merged on main through `e1f1d86`. The current new-synthetic-submission cohort uses **real Jev**
 after user key loading; historical seed snapshots remain declared fixtures.
 No tests; authenticated/manual/privacy/race gates remain pending. See the
 [launch handoff](../../plan/cv-demo-launch.md) for current worktree/process details.

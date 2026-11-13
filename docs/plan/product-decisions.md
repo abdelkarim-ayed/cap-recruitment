@@ -95,7 +95,7 @@ Delivered slices: R3a backend [draft vacancy PATCH](../current/contracts/vacancy
 
 ## QA-driven UX follow-ups
 
-**[implemented in unmerged CV demo worktree]** CV authoring should read as the
+**[implemented and merged through `e1f1d86`]** CV authoring should read as the
 question with inline blanks, not a schema form followed by provider debug output.
 HR supplies skill/credential/scope and optional accepted keywords, not category
 rubrics or protocol instructions. Keep exact provider wording secondary, no

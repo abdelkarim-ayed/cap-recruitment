@@ -11,7 +11,8 @@ CV source `82698b8` and transfer `a35a521` remain merged on main. Separately
 committed fixes on `feat/cv-offline-demo` now include private file caches, real Jev
 background processing for the explicitly approved new synthetic cohort, local
 cache-only DB recovery, singleton rotation and sentence-style authoring. Built/
-running; not merged/pushed. 009/010 + reserved reset were already applied, no new
+running; merged through `e1f1d86`, user approved GitHub publication. 009/010 +
+reserved reset were already applied, no new
 migration needed. [Launch README](../../LAUNCH.md) owns exact scope/PID/commands.
 No tests, agent paid calls/key loading or spending reset.
 Earlier main/backlog QA statuses below remain open, not implicit passes.
@@ -28,7 +29,7 @@ slice, never a destructive normal server startup.
 pending.** Real runner is enabled for the fixed new synthetic cohort, starts
 key-empty and makes no claims until user key loading. One earlier seeded fixture
 completion is not live evidence. No agent authenticated workflow/provider test;
-all earlier Q-* remain pending. No merge/push.
+all earlier Q-* remain pending. Main merge/publication approval is not a QA pass.
 
 **Deadline/user GUI follow-up:** sentence-style CV authoring and automatic new
 field IDs implemented in this worktree; web build/typecheck pass, user review
@@ -36,7 +37,8 @@ pending (no tests/browser). Root [launch README](../../LAUNCH.md) added. Jev hea
 request was **research only**, no route/call: published authenticated model listing
 exists, no dedicated health documented or explicit billing guarantee found.
 The subsequent explicit user approval enabled only the bounded new-submission
-live scope; unknown-send restrictions remain. No merge/push until instructed.
+live scope; unknown-send restrictions remain. User subsequently approved main
+merge/GitHub push, without runtime/data/provider/test or presentation side effects.
 
 | ID / state | Work and dependency | Acceptance / meaningful checks |
 | --- | --- | --- |
@@ -79,7 +81,7 @@ live scope; unknown-send restrictions remain. No merge/push until instructed.
 | R4a — proposed after dependency inventory | Retire unused legacy extraction wiring; clarify local config/constants ownership | Active ports/fixture provenance and frozen definitions retained; no limits/default changes or live calls; relevant builds/typechecks/offline processing checks |
 | R4b — implemented by merged CV source | Typed five-family descriptors, stable task/question/output identities, machine/correction/effective projections and CSV; legacy definitions fail explicitly rather than being silently converted | Do not schedule this again. Current source/contract own behavior; remaining regression/privacy/manual evidence belongs to Q-* |
 | B4-S / B4-R — source implemented; approved live cohort active, verification pending | Durable attempt guards, cache-before-DB response receipt, local-only interrupted-save replay; submit wake/5s scan and serial real Jev for the approved new synthetic cohort | No second paid attempt on ambiguity/cache loss; preserve closure fences/defaults and unchanged limits. API starts key-empty, user loads key; no historical queue drain. Builds/readiness are not live/recovery/race acceptance |
-| B5 — base merged; offline follow-up running unmerged | PDF → Markdown → five families → persistence → independent corrections/CSV; file caches replace memory; post-submit wake/5s scans in explicit offline mode | Builds/setup and one seeded pending fixture completion observed; 009/010 applied. No tests/authenticated workflow/privacy/race/live-quality pass; no ranking/decisions |
+| B5 — source merged (`e1f1d86`), scoped real runtime active | PDF → Markdown → five families → persistence → corrections/CSV; file caches; submit wake/5s scans; real new synthetic cohort after user key loading | Builds/setup/readiness and earlier fixture completion observed; 009/010 applied. No tests/agent live/privacy/race/quality pass; no ranking/decisions |
 | B5-T — portable transfer complete and checkpointed | [Archive/manifest](../../research/cv-extraction-lab/README.md): 63 PDFs, all 13 families, source/resources/licenses, native Markdown/provenance and 20 recorded pairs preserved in `a35a521` | Original checksums/provenance retained; no copied environments/caches/credentials. Hash checks are not parser/model/platform acceptance |
 | B5-I — base merged (`82698b8`); offline runtime in `feat/cv-offline-demo` | Native reader, file caches/send guards, frozen date, review/CSV/UI and declared profile fixtures; empty-start local key control | Bounded builds/setup/RMUX launch approved/completed, tests still forbidden. Earlier foundation checks are not current acceptance; old fixtures/static-schema and privacy/race/manual remain. No paid calls/key access/push |
 | T1 — planned, not demo-delivered | Address-directory/timestamp.email UTF-8 history with metadata/body separator, then tiny operator-local viewer; no read lifecycle. Existing latest-per-recipient capture + CLI are not this viewer | Scope separately if essential for the demo; no automatic mail-driver switch. Safe address component, collision-safe history, no overwrite/code leak/public auth bypass; retain latest-reader compatibility |
@@ -188,7 +190,7 @@ or cache replacement is needed merely to add local persistence replay.
 - Candidate withdrawal/resubmission/corrections, public communication copy, guest invitations, admin override, saved drafts, clone/repost, descriptive edits to published jobs.
 - Five CV families, publication-date freeze, shared-CV question request and parser/
   request caches are source-implemented (file-cache follow-up in the current
-  unmerged worktree). Do not reimplement them from old research text. Later:
+  merged source). Do not reimplement them from old research text. Later:
   language/management families, highlighting/quotes/geometry, suggestions/graph,
   retrieval, OCR/DOCX, validity/rolling dates, alternatives/evaluation. No arbitrary
   prompts/DAG or gateway-control changes implied.

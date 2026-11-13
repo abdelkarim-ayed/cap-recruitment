@@ -2,7 +2,8 @@
 
 2026-11-13: main includes `82698b8`; separately committed fixes on
 `feat/cv-offline-demo` are built/running with the explicitly scoped real Jev worker,
-not merged/pushed. Migrations through 010 are applied locally; no further cache/
+merged on main through `e1f1d86`; Git owns remote publication state. Migrations
+through 010 are applied locally; no further cache/
 recovery migration. **No tests or agent live validation**; manual/privacy/race
 acceptance remains pending. The user loads the key; startup is empty.
 See [launch handoff](../../plan/cv-demo-launch.md) and [status](../status.md).

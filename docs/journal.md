@@ -9,7 +9,9 @@ synthetic submissions only and a backend restart/user key reload, unchanged
 gateway controls. Separate fixes committed on `feat/cv-offline-demo`: sentence UI
 `4e78d53`, root singleton control/rotation `8737c2a`, private caches/response receipt
 `ade7596`, setup/transferred PDFs `9030c8c`, real worker/local-only recovery
-`0586394`. No merge/push. No archived provider observations used as runtime cache.
+`0586394`. User subsequently authorized main merge/GitHub publication; `e1f1d86`
+preserves separate fixes plus portable launch/install docs, with services left
+on the retained feature worktree. No archived provider observations used as runtime cache.
 
 Domain/API/web builds passed, 009/010 applied, five reserved vacancies/25 scenarios
 recreated with passwords/spending/ledger preserved. Existing host-network DB/Redis

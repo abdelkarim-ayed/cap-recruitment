@@ -49,7 +49,10 @@ budget/config/known provider failures stop. No live end-to-end/recovery/race pas
 
 Separate commits: `8737c2a` singleton/rotation, `ade7596` filesystem cache/receipt
 ordering, `9030c8c` explicit setup/synthetic PDFs, `0586394` real worker/local replay.
-Main remains `c77aebe`; changes stay on `feat/cv-offline-demo`, not merged/pushed.
+User subsequently approved main merge/GitHub push. Merge `e1f1d86` preserves the
+separate fixes and portable launch/install documentation. Services remain on the
+retained feature worktree; no build/test/restart/data/provider operation accompanied
+publication preparation. Git/remote refs own actual publication state.
 
 Observed: offline frozen dependency install reused local store; domain/API/web
 builds passed (web had harmless dependency annotation warnings). Existing
@@ -210,7 +213,7 @@ Feedback disposition: email/form clarity, visual/action hierarchy, candidate pub
 
 The static OpenAPI files lag the version-2 CV definitions, first-publication
 context, Choice result envelope and question-level correction/review/export
-contract in the unmerged worktree (and previously lagged skills extensions).
+contract in the merged CV source (and previously lagged skills extensions).
 Use the processing contract/source until aligned; no final schema check was
 run after the user's stop instruction. Their earlier move into `contracts/`
 did not fix schemas. `review_ready` remains accepted though no current command

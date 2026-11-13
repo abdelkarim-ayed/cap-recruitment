@@ -4,7 +4,7 @@
 the original transfer/plans are separately preserved in `a35a521`. No push.
 The resumed `feat/cv-offline-demo` worktree is built/running with migrations
 009/010 and reserved dataset recreation applied. Fixes are separately committed,
-not merged/pushed. Current approved new synthetic submissions use real Jev after
+merged on main through `e1f1d86`. Current approved new synthetic submissions use real Jev after
 user key loading, not canned answers. **No tests or agent live validation.** The
 [current contract](../current/contracts/processing-review-api.md) owns exact
 implemented wire/persistence/closure behavior; [checkpoint notes](research/cv-extraction-implementation.md)
