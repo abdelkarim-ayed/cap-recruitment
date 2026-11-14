@@ -7,14 +7,10 @@
 ## Documents utiles
 
 - [draft.md](draft.md) : texte finalisable et notes orales, une seule source éditoriale.
-- [plan.md](plan.md) : structure, pagination, arbitrages et gates de revue.
-- [brief.md](brief.md) : périmètre autorisé et informations manquantes.
-- [notes.md](notes.md) : analyse des exemples, synthèse technique et preuves pour le rapport.
-- [report-plan.md](report-plan.md) : **plan de correction du rapport**, en six chapitres ; le [retour détaillé](CAP_report_agent_handoff_feedback.md) remplace les anciens briefs.
+- [report/BUILD.md](report/BUILD.md) : sources et construction du rapport, numérotation et renvois Typst.
+- [report/references.bib](report/references.bib) : bibliographie du rapport.
 - [cost-model.md](cost-model.md) : unité d’appel, tarif primaire TypeSafe et scénarios conditionnels.
-- [report-outline.md](report-outline.md) : version longue du plan de rapport, non exécutée ; `report-plan.md` prime en cas de divergence.
 - [report-frontmatter.md](report-frontmatter.md) : gabarits réservés pour couverture, page de garde, résumé, mots-clés, sommaire et glossaire.
-- [report-orchestration.md](report-orchestration.md) : comment lancer la rédaction par chapitre, prompt type, ordre de dispatch, contrôles qualité.
 - [assets/requests.md](assets/requests.md) : huit captures reçues et logos, avec provenance et contenu.
 - [assets/manifest.json](assets/manifest.json) : provenance des anciens visuels et inventaire courant.
 - [diagrams/README.md](diagrams/README.md) : sources, périmètre et réutilisation des diagrammes.
@@ -42,4 +38,4 @@ PDF compilé et diagrammes rendus. La dernière passe autorisée sur le rapport 
 
 Le corps des diapositives s’ajuste automatiquement sur quatre contenus plus denses (`bodySize` dans `scripts/prepare-reading-slides.mjs`) pour éviter le débordement de la zone de texte.
 
-Rapport : [PDF](exports/report.pdf), [synthèse de correction](report/correction-summary.md), [guide du présentateur](report/presenter-guide.md), [scénario de démonstration](report/demo-script.md), [points à finaliser par l’étudiant](report/student-checklist.md). Le corps conserve six chapitres, sans contrainte de remplissage. Typst gère nativement la bibliographie, les citations et les renvois. La qualité IA et le gain de temps ne sont pas mesurés.
+Rapport : [PDF](exports/report.pdf), [guide du présentateur](report/presenter-guide.md), [scénario de démonstration](report/demo-script.md), [points à finaliser par l’étudiant](report/student-checklist.md). Le corps conserve six chapitres, sans contrainte de remplissage. Typst gère nativement la bibliographie, les citations et les renvois. La qualité IA et le gain de temps ne sont pas mesurés.

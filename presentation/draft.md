@@ -1,6 +1,6 @@
 # CAP — Pré-soutenance PFE
 
-Version de travail du 13 novembre 2026, prête pour relecture de l’encadrant. CAP : « Centralisation et Assistance au Parcours de recrutement », développement proposé du nom existant. 32 diapositives principales, deux annexes, six intercalaires : **40 pages**. Correspondance physique dans `dist/page-map.md`. Notes orales non affichées dans le PDF. Sources dans [notes.md](notes.md), captures dans [assets/requests.md](assets/requests.md), plan de production du rapport dans [report-plan.md](report-plan.md).
+Version de travail pour relecture de l’encadrant. CAP : « Centralisation et Assistance au Parcours de recrutement ». 34 diapositives principales, deux annexes, six intercalaires : **42 pages**. Correspondance physique dans `dist/page-map.md`. Notes orales non affichées dans le PDF. Captures dans [assets/requests.md](assets/requests.md), bibliographie dans [report/references.bib](report/references.bib).
 
 ## 01 — CAP
 **Plateforme de gestion du recrutement**
