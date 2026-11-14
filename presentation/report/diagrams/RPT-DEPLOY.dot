@@ -1,36 +1,21 @@
-// Logical local development topology; no actual addresses, paths or identities.
+// Local logical topology, grouped resources keep labels readable on A4.
 digraph Deploy {
-  graph [rankdir=TB, bgcolor="white", pad=0.12, nodesep=0.3, ranksep=0.35,
-    fontname="Liberation Sans", fontsize=13, fontcolor="#172B4D",
-    label="RPT-DEPLOY · Topologie locale logique", labelloc=t];
+  graph [rankdir=TB, bgcolor="white", pad=0.15, nodesep=0.3, ranksep=0.45,
+    fontname="Liberation Sans", fontsize=14, fontcolor="#172B4D", label="Topologie locale de démonstration", labelloc=t];
   node [shape=box, style="rounded,filled", fillcolor="white", color="#0F766E",
-    fontname="Liberation Sans", fontsize=11, fontcolor="#172B4D", margin="0.13,0.1"];
-  edge [fontname="Liberation Sans", fontsize=10, color="#172B4D", fontcolor="#172B4D", arrowsize=0.65];
+    fontname="Liberation Sans", fontsize=12, fontcolor="#172B4D", margin="0.14,0.12"];
+  edge [fontname="Liberation Sans", fontsize=11, color="#64748B", fontcolor="#475569", arrowsize=0.7];
   browser [label="Navigateur\nCandidat · RH · interviewer"];
-  subgraph cluster_local {
-    label="Machine de développement · frontières logiques"; color="#172B4D";
-    web [label="Frontend React / Vite\nUI et relais /api en développement"];
-    subgraph cluster_api {
-      label="Un processus API NestJS"; color="#0F766E";
-      http [label="HTTP · session · autorisations\nServices métier / transactions"];
-      runner [label="Worker intégré à l’API\nRéveil après commit + scan périodique\nClaims PostgreSQL / exécution sérielle"];
-      gateway [label="JevGateway\nAdmission · transport borné\nClé en mémoire seulement"];
-      http -> runner [label="signal mémoire\nnon durable"];
-      runner -> gateway [label="requête hydratée\nmulti-question"];
-    }
-    resources [shape=plain, label=<<TABLE BORDER="1" COLOR="#0F766E" CELLBORDER="0" CELLSPACING="0" CELLPADDING="6">
-      <TR><TD COLSPAN="2" BGCOLOR="#E8F4F1"><B>Ressources locales partagées</B></TD></TR>
-      <TR><TD ALIGN="LEFT">Worker → IPC enfant</TD><TD ALIGN="LEFT"><B>Parseur natif éphémère</B><BR ALIGN="LEFT"/>PDF → Markdown, sans identifiants<BR ALIGN="LEFT"/>Borné et terminable, sans OCR</TD></TR>
-      <TR><TD ALIGN="LEFT">HTTP / worker → SQL</TD><TD ALIGN="LEFT"><B>PostgreSQL</B><BR ALIGN="LEFT"/>Métier, tâches, gardes d’envoi</TD></TR>
-      <TR><TD ALIGN="LEFT">HTTP / worker → fichiers</TD><TD ALIGN="LEFT"><B>Stockage privé</B><BR ALIGN="LEFT"/>PDF originaux ; caches parseur<BR ALIGN="LEFT"/>et réponses séparés</TD></TR>
-      <TR><TD ALIGN="LEFT">Gateway → admission</TD><TD ALIGN="LEFT"><B>Redis</B><BR ALIGN="LEFT"/>Verrou et compteurs persistants<BR ALIGN="LEFT"/>Pas une file de tâches</TD></TR>
-      <TR><TD ALIGN="LEFT">HTTP → MailSender</TD><TD ALIGN="LEFT"><B>Mail de développement</B><BR ALIGN="LEFT"/>Capture fichier, pas preuve d’envoi</TD></TR>
-    </TABLE>>];
-    web -> http [label="HTTP /api"];
-    gateway -> resources [style=invis];
-  }
-  provider [label="Fournisseur Jev externe\nUniquement si activation consentie"];
+  web [label="React / Vite\nRelais /api local"];
+  api [label="API NestJS · un processus\nHTTP / sessions / services métier\nRunner : réveil et découverte SQL\nJevGateway : admission et transport"];
+  resources [label="Ressources locales\nPostgreSQL : dossiers, tâches et tentatives\nRedis : verrou et compteurs d’admission\nFichiers privés : PDF et caches séparés\nCourrier : capture en fichier"];
+  parser [label="Enfant natif\nPDF → Markdown\nSans OCR"];
+  provider [label="TypeSafe / Jev\nService externe", fillcolor="#FFF8EB", color="#B7791F"];
+  {rank=same; resources; parser;}
   browser -> web [label="HTTP local"];
-  gateway -> provider [label="HTTPS · aucune relance interne"];
+  web -> api [label="HTTP /api"];
+  api -> resources;
+  api -> parser [label="IPC"];
   resources -> provider [style=invis];
+  api -> provider [label="HTTPS"];
 }

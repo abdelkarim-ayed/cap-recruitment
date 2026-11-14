@@ -9,7 +9,7 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(5.76 763.76)">
 <title>Sequence</title>
 <polygon fill="white" stroke="none" points="-5.76,5.76 -5.76,-763.76 352.22,-763.76 352.22,5.76 -5.76,5.76"/>
-<text xml:space="preserve" text-anchor="middle" x="173.23" y="-742.3" font-family="Liberation Sans" font-size="13.00" fill="#172b4d">RPT&#45;SEQUENCE · Un extracteur, une requête groupée</text>
+<text xml:space="preserve" text-anchor="middle" x="173.23" y="-742.3" font-family="Liberation Sans" font-size="13.00" fill="#172b4d">Traitement d’un extracteur documentaire</text>
 <!-- success -->
 <g id="node1" class="node">
 <title>success</title>

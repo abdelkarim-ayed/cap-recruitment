@@ -1,14 +1,10 @@
 # Préliminaires du rapport
 
-Les deux premières pages sont réservées au gabarit institutionnel.
+Le PDF commence directement par une page de garde textuelle provisoire. Aucune page blanche n’est réservée avant elle.
 
 ## Première page
 
-Page 1 : **vide**, à remplacer par la couverture officielle de l'établissement (format imposé non fourni).
-
-## Deuxième page
-
-Page 2 : **page de garde textuelle** simple, générée par `report/pdf/main.typ`, en attendant le gabarit officiel.
+Page 1 : page de garde générée par `report/pdf/main.typ`, à remplacer par le modèle officiel si nécessaire.
 
 Valeurs utilisées (source : `metadata.json`) :
 

@@ -94,10 +94,45 @@ Limite : source de planification, pas preuve de succès ni autorisation d’exé
 
 [Consulter le modèle](../cost-model.md).
 
-Origine des hypothèses : indication de l’utilisateur, dans la demande de rédaction du 13 novembre 2026, concernant des essais individuels variés avec au plus 5 000 tokens d’entrée pour la requête complète, sans campagne par lots. Prix d’entrée supposé pour l’illustration : 0,05 USD par million, non tarif vérifié par le rapport.
+Scénarios arithmétiques de 2 000, 5 000 et 8 000 tokens d’entrée complets. Tarif direct TypeSafe consulté : 0,042 USD par million ; sorties gratuites. La configuration de CAP pointe directement sur l’API TypeSafe.
 
-Affirmations soutenues : calcul reproductible de la part d’entrée ; 0,00025 USD = 0,025 cent US par requête de 5 000 tokens ; 0,25 USD d’entrée pour mille documents avec un seul extracteur et une requête de cette taille chacun ; absence de multiplication par cinq familles ; coût local non nul ; inconnue explicite des autres composantes selon les conditions de facturation réellement applicables.
+Calcul : 5 000 tokens complets coûtent 0,000210 USD par requête, soit 0,210 USD pour mille requêtes. Aucun multiplicateur par famille ; hébergement et revue humaine hors estimation.
 
-Limite : aucune facture, latence, taille moyenne représentative ou comparaison de coût total n’est établie. Aucune facturation de tokens de sortie générés n’est présumée. Les anciens ratios commerciaux fondés sur une unité générique par page et le montant annuel spéculatif ne sont pas retenus comme références.
+Portée : scénarios conditionnels, non facture ni taille moyenne mesurée.
 
-Les protocoles d’annotation, d’utilité, de coût, de latence et de panne du chapitre 6 sont des propositions méthodologiques du rapport. Ils ne sont associés à aucun résultat exécuté. Les passages conceptuels sur la supervision ne constituent aucune qualification juridique, exemption ou affirmation de conformité.
+## Documentation primaire des dépendances
+
+### REF-JEV-PRICE
+
+- **Auteur :** TypeSafe AI.
+- **Titre :** How much does Jev cost?
+- **URL :** https://help.typesafe.ai/articles/5187202169-how-much-does-jev-cost
+- **Consultation :** 13 novembre 2026.
+
+### REF-JEV-CONFIDENCE
+
+- **Auteur :** TypeSafe AI.
+- **Titre :** Confidence.
+- **URL :** https://docs.typesafe.ai/confidence
+- **Consultation :** 13 novembre 2026.
+
+### REF-JEV-API
+
+- **Auteur :** TypeSafe AI.
+- **Titre :** HTTP API — System One.
+- **URL :** https://docs.typesafe.ai/go/api.md
+- **Consultation :** 13 novembre 2026.
+
+### REF-JEV-INTRO
+
+- **Auteur :** Diogo Almeida, TypeSafe AI.
+- **Titre :** Introducing System One Models & Jev.
+- **URL :** https://typesafe.ai/blog/introducing-system-one-models-and-jev
+- **Consultation :** 13 novembre 2026.
+
+### REF-PDF-INSPECTOR
+
+- **Auteur :** Firecrawl.
+- **Titre :** pdf-inspector — README de la révision du paquet Node.js 1.25.2.
+- **URL :** https://github.com/firecrawl/pdf-inspector/blob/ef52f77850b29189048797a48b24862251f54fe7/README.md
+- **Consultation :** 13 novembre 2026.

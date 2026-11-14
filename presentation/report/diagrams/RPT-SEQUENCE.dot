@@ -3,7 +3,7 @@
 digraph Sequence {
   graph [rankdir=TB, bgcolor="white", pad=0.08, ranksep=0.25,
     fontname="Liberation Sans", fontsize=13, fontcolor="#172B4D",
-    label="RPT-SEQUENCE · Un extracteur, une requête groupée", labelloc=t];
+    label="Traitement d’un extracteur documentaire", labelloc=t];
   node [shape=plain, fontname="Liberation Sans", fontsize=11, fontcolor="#172B4D"];
   edge [style=invis];
   success [label=<<TABLE BORDER="1" COLOR="#0F766E" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5">

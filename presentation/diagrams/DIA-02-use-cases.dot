@@ -16,7 +16,7 @@ digraph UseCases {
     feedback [label="Évaluer son entretien\n{assignation requise}"];
     configure [label="Configurer l’offre\net son parcours\n{propriétaire}"];
     schedule [label="Présélectionner et\nplanifier les entretiens"];
-    decision [label="Enregistrer Offer/Hired\n{propriétaire}"];
+    decision [label="Proposition et embauche\n{propriétaire}"];
     {rank=same; deposit; review; feedback;}
     {rank=same; configure; schedule; decision;}
     deposit -> review -> feedback [style=invis];

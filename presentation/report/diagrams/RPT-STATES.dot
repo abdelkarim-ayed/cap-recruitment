@@ -2,7 +2,7 @@
 digraph States {
   graph [rankdir=TB, bgcolor="white", pad=0.12, nodesep=0.25, ranksep=0.4,
     fontname="Liberation Sans", fontsize=13, fontcolor="#172B4D",
-    label="RPT-STATES · Deux machines et une barrière", labelloc=t, compound=true];
+    label="Tâches et connaissance des envois", labelloc=t, compound=true];
   node [shape=box, style="rounded,filled", fillcolor="white", color="#0F766E",
     fontname="Liberation Sans", fontsize=11, fontcolor="#172B4D", margin="0.1,0.08"];
   edge [fontname="Liberation Sans", fontsize=10, color="#172B4D", fontcolor="#172B4D", arrowsize=0.65];

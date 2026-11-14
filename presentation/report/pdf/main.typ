@@ -1,5 +1,6 @@
 // All assets are rooted in presentation; compile with --root . from that directory.
 #let report = json(sys.inputs.at("report-data", default: "/dist/report/report.json"))
+#let meta = json("/metadata.json")
 #let ink = rgb("263343")
 #let accent = rgb("315b70")
 #let muted = rgb("65727b")
@@ -9,19 +10,34 @@
 #set text(font: ("Libertinus Serif", "DejaVu Serif"), size: 11.5pt, lang: "fr", fill: ink)
 #set page(paper: "a4", margin: (top: 25mm, bottom: 25mm, left: 26mm, right: 24mm), numbering: none)
 #set par(justify: true, leading: 0.65em, spacing: 0.85em)
-#set heading(numbering: none)
+#let heading-numbering(..values) = {
+  let nums = values.pos()
+  if nums.len() == 1 { "Chapitre " + numbering("1", ..nums) + " —" }
+  else { numbering("1.1", ..nums) }
+}
+#set heading(numbering: heading-numbering, supplement: [section])
+#show ref: it => {
+  let target = it.element
+  if target != none and target.func() == heading {
+    let supplement = if it.supplement == auto { target.supplement } else { it.supplement }
+    link(target.location(), [#if supplement != none { [#supplement~] }#context numbering("1.1", ..counter(heading).at(target.location()))])
+  } else { it }
+}
 #set outline(indent: 1.2em)
 #show link: set text(fill: accent)
-#show heading.where(level: 1): it => block(above: 0pt, below: 17pt)[
-  #text(size: 22pt, weight: "bold", fill: accent, it.body)
-]
-#show heading.where(level: 2): it => block(above: 15pt, below: 8pt)[
-  #text(size: 15pt, weight: "bold", it.body)
-]
-#show heading.where(level: 3): it => block(above: 11pt, below: 6pt)[
-  #text(size: 12pt, weight: "bold", it.body)
-]
+#show heading.where(level: 1): set text(size: 22pt, weight: "bold", fill: accent)
+#show heading.where(level: 1): set block(above: 0pt, below: 17pt)
+#show heading.where(level: 2): set text(size: 15pt, weight: "bold")
+#show heading.where(level: 2): set block(above: 15pt, below: 8pt)
+#show heading.where(level: 3): set text(size: 12pt, weight: "bold")
+#show heading.where(level: 3): set block(above: 11pt, below: 6pt)
 #show raw: set text(font: ("DejaVu Sans Mono", "Liberation Mono"), size: 8.5pt)
+#show raw.where(block: true): it => {
+  set text(font: ("DejaVu Sans Mono", "Liberation Mono"), size: 8.5pt)
+  set text(hyphenate: false)
+  set par(justify: false, leading: 5pt, spacing: 0pt)
+  it.text.split("\n").map(line => text(line)).join(linebreak())
+}
 #show figure.caption: set text(size: 9pt)
 
 #let inlines(nodes, bibliography: false) = {
@@ -41,17 +57,9 @@
       }
     }
     else if node.type == "citation" {
-      let body = text(size: 9pt)[[#node.key]]
-      if not bibliography and node.key in report.bibliographyKeys {
-        link(label("bib-" + node.key), body)
-      } else { body }
+      cite(label(node.key))
     }
-  }
-}
-
-#let anchors(node) = {
-  for key in node.at("anchors", default: ()) {
-    [#metadata(key)#label("bib-" + key)]
+    else if node.type == "reference" { ref(label(node.target)) }
   }
 }
 
@@ -59,8 +67,6 @@
   let asset = "/" + node.path
   let title = node.title
   let sizing = node.at("sizing", default: none)
-  let dedicated = sizing != none and sizing.dedicatedPage
-  if dedicated { pagebreak(weak: true) }
   let body = if node.available {
     if sizing != none {
       // Preserve SVG proportions and avoid upscaling short diagrams. The portrait
@@ -82,8 +88,7 @@
       ]
     ]
   }
-  figure(body, kind: image, caption: [#title #text(fill: muted)[(#node.id)]], supplement: [Figure], placement: none)
-  if dedicated { pagebreak(weak: true) }
+  [#figure(body, kind: image, caption: [#title], supplement: [Figure], placement: none)#label(node.id)]
 }
 
 #let inlines-text(value) = text(size: 9pt, value.replace("Tableau — ", ""))
@@ -94,7 +99,7 @@
   for row in node.rows {
     for cell in row { cells.push(inlines(cell, bibliography: bibliography)) }
   }
-  figure(
+  [#figure(
     table(
       columns: (1fr,) * columns,
       align: (x, y) => alignment.at(x, default: left),
@@ -108,25 +113,26 @@
     caption: inlines-text(node.caption),
     supplement: [Tableau],
     placement: none,
-  )
+  )#label(node.id)]
 }
 // Long tables must be able to span pages; header rows repeat on subsequent pages.
 #show figure.where(kind: table): set block(breakable: true)
 #show figure.where(kind: table): set text(size: 9pt)
+#show figure.where(kind: table): set figure.caption(position: top)
+#show figure.caption.where(position: top): set block(sticky: true)
 
 #let blocks(nodes, bibliography: false, frontmatter: false) = {
   for node in nodes {
-    anchors(node)
     if node.type == "heading" {
-      if bibliography {
-        heading(level: calc.min(node.level + 1, 4), outlined: false, inlines(node.children, bibliography: true))
+      if node.level == 1 { pagebreak(weak: true) }
+      let item = if bibliography {
+        heading(level: calc.min(node.level + 1, 4), numbering: none, outlined: false, inlines(node.children, bibliography: true))
       } else if frontmatter {
-        if node.level == 1 { pagebreak(weak: true) }
-        heading(level: node.level, outlined: false, inlines(node.children))
+        heading(level: node.level, numbering: none, outlined: false, inlines(node.children))
       } else {
-        if node.level == 1 { pagebreak(weak: true) }
-        heading(level: node.level, inlines(node.children))
+        heading(level: node.level, outlined: node.numbered or node.level == 1, supplement: if node.level == 1 { [chapitre] } else { [section] }, numbering: if node.numbered { heading-numbering } else { none }, inlines(node.children))
       }
+      [#item#label(node.id)]
     }
     else if node.type == "paragraph" {
       inlines(node.children, bibliography: bibliography)
@@ -134,7 +140,6 @@
     }
     else if node.type == "list" {
       for entry in node.entries {
-        anchors(entry)
         block(above: 3pt, below: 3pt, inset: (left: (entry.depth * 10 + 12) * 1pt))[
           #grid(
             columns: (18pt, 1fr),
@@ -147,15 +152,6 @@
       parbreak()
     }
     else if node.type == "table" { render-table(node, bibliography: bibliography) }
-    else if node.type == "reference-entry" {
-      block(above: 10pt, below: 4pt)[#strong(inlines(node.identifier, bibliography: true))]
-      for field in node.fields {
-        strong(inlines(field.label, bibliography: true))
-        [: ]
-        inlines(field.children, bibliography: true)
-        parbreak()
-      }
-    }
     else if node.type == "figure" { render-figure(node) }
     else if node.type == "code" {
       block(width: 100%, breakable: true, fill: pale, inset: 9pt)[
@@ -171,30 +167,27 @@
   }
 }
 
-// Page 1 stays blank for the institution's own cover template.
-#box()
-#pagebreak()
-// Page 2: simple text title page, to be replaced by the institution template later.
+// Start directly with the provisional title page; no empty cover placeholder.
 #align(center + horizon)[
-  #text(size: 13pt, fill: muted)[Esprit School of Engineering]
+  #text(size: 13pt, fill: muted)[#meta.institution]
   #v(2pt)
-  #text(size: 11pt, fill: muted)[Génie informatique]
+  #text(size: 11pt, fill: muted)[#meta.program]
   #v(60pt)
-  #text(size: 34pt, weight: "bold", fill: accent)[CAP]
+  #text(size: 34pt, weight: "bold", fill: accent)[#meta.codename]
   #v(16pt)
-  #text(size: 17pt)[Plateforme de gestion du recrutement]
+  #text(size: 17pt)[#meta.subtitle]
   #v(6pt)
-  #text(size: 12pt, fill: muted)[Centralisation et Assistance au Parcours de recrutement]
+  #text(size: 12pt, fill: muted)[#meta.fullName]
   #v(50pt)
   #text(size: 11pt, fill: muted)[Projet de fin d’études · Rapport technique]
   #v(40pt)
-  #text(size: 13pt)[Ayed Abdelkarim]
+  #text(size: 13pt)[#meta.author]
   #v(4pt)
-  #text(size: 11pt, fill: muted)[Encadrant : Aziz Ben Ismail]
+  #text(size: 11pt, fill: muted)[Encadrant : #meta.supervisor]
   #v(4pt)
-  #text(size: 11pt, fill: muted)[Organisme d’accueil : BeeCoders]
+  #text(size: 11pt, fill: muted)[Organisme d’accueil : #meta.organization]
   #v(30pt)
-  #text(size: 11pt, fill: muted)[Année universitaire 2026–2027]
+  #text(size: 11pt, fill: muted)[Année universitaire #meta.academicYear]
 ]
 #pagebreak()
 #set page(numbering: "i", header: none, footer: context align(center, counter(page).display("i")))
@@ -203,7 +196,7 @@
   blocks(section.blocks, frontmatter: true)
   pagebreak(weak: true)
 }
-#outline(title: [Table des matières], depth: 3)
+#outline(title: [Table des matières], depth: 2)
 #pagebreak()
 #outline(title: [Liste des figures], target: figure.where(kind: image))
 #pagebreak()
@@ -228,10 +221,8 @@
 }
 #context [#metadata((main_body_pages: counter(page).get().first())) <report-main-body-pages>]
 #pagebreak()
-#heading(level: 1)[Bibliographie]
-#if report.missingReferences.len() > 0 {
-  block(fill: pale, inset: 9pt)[Sources bibliographiques non fournies : #report.missingReferences.join(", ").]
-}
-#for section in report.references {
-  blocks(section.blocks, bibliography: true)
-}
+#block[
+  #set text(size: 10pt)
+  #set par(justify: false, leading: 0.5em, spacing: 0.65em)
+  #bibliography("/report/references.bib", title: [Bibliographie], style: "ieee")
+]

@@ -1,28 +1,21 @@
-// Both revision checks and reference-date write share the vacancy transaction.
+// Selected publication mechanism; detailed checks are explained in Chapter 3.
 digraph Publish {
-  graph [rankdir=TB, bgcolor="white", pad=0.12, nodesep=0.25, ranksep=0.3,
-    fontname="Liberation Sans", fontsize=13, fontcolor="#172B4D",
-    label="RPT-PUBLISH · Publication atomique", labelloc=t];
+  graph [rankdir=TB, bgcolor="white", pad=0.15, nodesep=0.35, ranksep=0.4,
+    fontname="Liberation Sans", fontsize=14, fontcolor="#172B4D", label="Publication atomique", labelloc=t];
   node [shape=box, style="rounded,filled", fillcolor="white", color="#0F766E",
-    fontname="Liberation Sans", fontsize=11, fontcolor="#172B4D", margin="0.12,0.08"];
-  edge [fontname="Liberation Sans", fontsize=10, color="#172B4D", fontcolor="#172B4D", arrowsize=0.65];
-  ui [label="RH propriétaire : revoir l’offre et le plan sauvegardé\nPOST publish : expectedRevision\n+ expectedInterviewRevision (compteurs distincts)"];
+    fontname="Liberation Sans", fontsize=12, fontcolor="#172B4D", margin="0.15,0.12"];
+  edge [fontname="Liberation Sans", fontsize=11, color="#172B4D", arrowsize=0.7];
+  ui [label="Propriétaire : confirmer la publication\nRévisions attendues de l’offre et du plan"];
   subgraph cluster_tx {
-    label="Une transaction PostgreSQL"; color="#172B4D";
-    lock [label="Verrouiller vacancies : FOR UPDATE\nMême verrou pour éditer l’offre / sauver le plan"];
-    owner [label="Contrôler le propriétaire\nDéjà published ? retour inchangé, sans écrire"];
-    rev [label="Transition draft → published seulement\nComparer expectedRevision à revision"];
-    defs [label="Valider formulaire + tâches\nAu moins un champ non séparateur\nZéro extracteur reste valide"];
-    plan [label="Lire interview_revision + interview_steps\nSur cette transaction, sous le même verrou\nComparer expectedInterviewRevision séparément"];
-    valid [label="Valider le plan sauvegardé : 0 à 10 étapes\nOrdre / noms / consignes · plan vide valide\nPas d’interviewer ni de créneau exigé"];
-    save [label="UPDATE vacancies : published ; revision + 1\nSi date absente : extraction_reference_date\n= date UTC de statement_timestamp()\nPlan, IDs et interview_revision inchangés"];
-    lock -> owner -> rev -> defs -> plan -> valid -> save;
+    label="Transaction PostgreSQL"; color="#172B4D";
+    lock [label="Verrouiller l’offre\nVérifier propriétaire et état"];
+    checks [label="Comparer les deux révisions\nValider formulaire, extracteurs et plan sauvegardé\nUn plan vide reste valide"];
+    save [label="Publier et incrémenter la révision de l’offre\nFixer la première date de publication UTC\nConserver les étapes et leur révision"];
+    lock -> checks -> save;
   }
+  done [label="Validation : configuration figée\nLa référence accompagne les candidatures"];
+  conflict [label="Contrôle refusé : aucune publication\nConflit de révision ou configuration invalide", color="#B7791F"];
   ui -> lock;
-  commit [label="COMMIT : configuration et plan figés\nDate conservée dans les snapshots de candidature\nÉdition, fermeture et reprise ne déplacent pas la date"];
-  save -> commit;
-  fail [label="Échec d’un contrôle : aucune publication\nRévision périmée : 409 · contenu invalide : 400\nRelire explicitement ; pas de retry UI automatique"];
-  race [label="Course avec une sauvegarde du plan\nPlan modifié d’abord : publication périmée refusée\nPublication d’abord : sauvegarde du plan refusée"];
-  commit -> race [style=dashed, arrowhead=none];
-  race -> fail [style=invis];
+  checks -> conflict [label="refus"];
+  save -> done;
 }

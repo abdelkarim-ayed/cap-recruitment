@@ -5,7 +5,6 @@ import { dirname, resolve, relative, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const presentation = fileURLToPath(new URL('../../', import.meta.url));
-const report = resolve(presentation, 'report');
 const output = resolve(presentation, 'dist/report');
 const chapterNames = [
   '00-introduction',
@@ -18,11 +17,11 @@ const chapterNames = [
   '07-conclusion-perspectives',
   '08-resume-mots-cles-glossaire',
 ];
-const referenceNames = ['references-context.md', 'references-architecture.md', 'references-extraction.md'];
+const bibliographyPath = 'report/references.bib';
 const figureDefinitions = {
   'DIA-02': ['dist/diagrams/DIA-02-use-cases.svg', 'Acteurs et cas d’utilisation'],
   'DIA-03': ['dist/diagrams/DIA-03-classes.svg', 'Modèle métier conceptuel'],
-  'DIA-04': ['dist/diagrams/DIA-04-architecture.svg', 'Architecture actuelle'],
+  'DIA-04': ['dist/diagrams/DIA-04-architecture-report.svg', 'Architecture actuelle'],
   'DIA-05': ['dist/diagrams/DIA-05-processing.svg', 'Extraction documentaire'],
   'DIA-06': ['dist/diagrams/DIA-06-lifecycle.svg', 'Parcours de recrutement'],
   'DIA-07': ['dist/diagrams/DIA-07-review.svg', 'Source, correction et valeur effective'],
@@ -45,6 +44,7 @@ const slash = (value) => value.replaceAll('\\', '/');
 const cleanText = (value) => value.replace(/\r\n?/g, '\n').replace(/^\uFEFF/, '');
 const refKeys = new Set();
 const citedKeys = new Set();
+const referencedLabels = new Set();
 const figures = [];
 const warnings = [];
 
@@ -74,6 +74,19 @@ function inline(value) {
     }
     if ((match = /^(`+)([\s\S]*?)\1(?!`)/.exec(tail))) {
       nodes.push({ type: 'code', text: match[2] }); i += match[0].length; continue;
+    }
+    if ((match = /^\[\[REF:([A-Za-z0-9_.:-]+)\]\]/.exec(tail))) {
+      referencedLabels.add(match[1]);
+      nodes.push({ type: 'reference', target: match[1] });
+      i += match[0].length; continue;
+    }
+    if ((match = /^\[((?:REF-[A-Za-z0-9_.:-]+)(?:\s*[;,]\s*REF-[A-Za-z0-9_.:-]+)+)\](?!\()/.exec(tail))) {
+      for (const [index, key] of match[1].split(/\s*[;,]\s*/).entries()) {
+        if (index) text(' ');
+        citedKeys.add(key);
+        nodes.push({ type: 'citation', key });
+      }
+      i += match[0].length; continue;
     }
     if ((match = /^\[\[?(REF-[A-Za-z0-9_.:-]+)\]?\](?!\()/.exec(tail))) {
       citedKeys.add(match[1]);
@@ -151,13 +164,11 @@ function svgSizing(path, id) {
   if (!height && width && ratio) height = width / ratio;
   if (!width && !height && ratio) { width = 160; height = width / ratio; }
   if (!(width > 0 && height > 0)) return null;
-  const dedicatedPage = id.startsWith('RPT-') && height > width && height > 150;
-  const scale = Math.min(1, 160 / width, (dedicatedPage ? 230 : 140) / height);
+  const scale = Math.min(1, 160 / width, (id === 'DIA-03' ? 150 : 205) / height);
   const rounded = (value) => Math.floor(value * 1000) / 1000;
   return {
     naturalWidthMm: rounded(width), naturalHeightMm: rounded(height),
     widthMm: rounded(width * scale), heightMm: rounded(height * scale),
-    dedicatedPage,
   };
 }
 
@@ -172,28 +183,23 @@ function addFigure(id, source, line, caption, explicitPath) {
   return { type: 'figure', ...figure };
 }
 
-// Definitions are structural, never arbitrary citation mentions in prose. A wildcard
-// such as [REF-*] cannot satisfy this key grammar.
-function definitionKey(raw) {
-  const value = raw.trim().replace(/^(\*\*|__|`)(.*?)\1(?=$|\s|:)/, '$2');
-  const match = /^(?:\[\[(REF-[A-Za-z0-9]+(?:[-_.:][A-Za-z0-9]+)*)\]\]|\[(REF-[A-Za-z0-9]+(?:[-_.:][A-Za-z0-9]+)*)\]|(REF-[A-Za-z0-9]+(?:[-_.:][A-Za-z0-9]+)*))(?=$|\s|:|—|–)/.exec(value);
-  return match ? match[1] ?? match[2] ?? match[3] : null;
-}
-
-export function parse(markdown, source, bibliography = false) {
+export function parse(markdown, source) {
   const lines = cleanText(markdown).split('\n');
   const blocks = [];
-  const anchor = (block, raw, definition = false) => {
-    if (!bibliography) return block;
-    const key = definition ? definitionKey(raw) : null;
-    block.anchors = key && !refKeys.has(key) ? [key] : [];
-    for (const key of block.anchors) refKeys.add(key);
-    return block;
-  };
+  let pendingTable;
   for (let i = 0; i < lines.length;) {
     const line = lines[i];
     let match;
     if (!line.trim() || /^\s*<!--.*-->\s*$/.test(line)) { i++; continue; }
+    if ((match = /^\[\[LABEL:([A-Za-z0-9_.:-]+)\]\]\s*$/.exec(line.trim()))) {
+      if (blocks.at(-1)?.type !== 'heading') throw new Error(`${source}:${i + 1}: LABEL requires a preceding heading`);
+      blocks.at(-1).id = match[1];
+      i++; continue;
+    }
+    if ((match = /^\[\[TABLE:([A-Za-z0-9_.:-]+)\]\]\s+(.+)$/.exec(line.trim()))) {
+      pendingTable = { id: match[1], caption: match[2] };
+      i++; continue;
+    }
     if (/^\s*<!--/.test(line)) {
       while (i < lines.length && !lines[i].includes('-->')) i++;
       i++; continue;
@@ -210,12 +216,16 @@ export function parse(markdown, source, bibliography = false) {
       continue;
     }
     if ((match = /^(#{1,6})\s+(.+?)\s*#*\s*$/.exec(line))) {
-      blocks.push(anchor({ type: 'heading', level: match[1].length, children: inline(match[2]) }, match[2], true));
+      blocks.push({ type: 'heading', level: match[1].length, children: inline(match[2]) });
       i++; continue;
     }
     if ((match = figureMatch(line))) {
-      blocks.push(addFigure(match[1], source, i + 1, match[2]));
-      i++; continue;
+      const sourceLine = i + 1;
+      let next = i + 1;
+      while (next < lines.length && !lines[next].trim()) next++;
+      const description = /^\*Figure\s*[—:]\s*(.*?)\*\s*$/.exec(lines[next] ?? '');
+      blocks.push(addFigure(match[1], source, sourceLine, match[2] || description?.[1]));
+      i = description ? next + 1 : i + 1; continue;
     }
     if ((match = /^\s*!\[([^\]]*)\]\(([^\s)]+)(?:\s+"[^"]*")?\)\s*$/.exec(line))) {
       const path = safeAsset(match[2], source);
@@ -243,24 +253,14 @@ export function parse(markdown, source, bibliography = false) {
       const width = Math.max(headers.length, ...rawRows.map((row) => row.length));
       while (headers.length < width) headers.push('');
       while (rules.length < width) rules.push('---');
-      if (bibliography && rawRows.some((row) => definitionKey(row[0] ?? ''))) {
-        // Source registers are easier to read as individual entries than four
-        // narrow columns. Preserve every field and its original header verbatim.
-        for (const row of rawRows) {
-          const key = definitionKey(row[0] ?? '');
-          blocks.push(anchor({ type: 'reference-entry', key,
-            identifier: inline(row[0] ?? ''),
-            fields: headers.slice(1).map((header, index) => ({
-              label: inline(header), children: inline(row[index + 1] ?? ''),
-            })),
-          }, row[0] ?? '', true));
-        }
-        continue;
-      }
       const rows = rawRows.map((row) => headers.map((_, index) => inline(row[index] ?? '')));
+      const preceding = [...blocks].reverse().find((node) => node.type === 'heading');
+      const subject = preceding ? plain(preceding.children).replace(/^\d+(?:\.\d+)*\.?\s+/, '') : 'Synthèse';
       blocks.push({ type: 'table', headers: headers.map(inline), rows,
         align: rules.map((rule) => rule.startsWith(':') && rule.endsWith(':') ? 'center' : rule.endsWith(':') ? 'right' : 'left'),
-        caption: `Tableau — ${headers.join(' / ')}` });
+        caption: pendingTable?.caption ?? subject,
+        id: pendingTable?.id ?? `table-${source.split('/').at(-1).replace('.md', '')}-${blocks.filter(node => node.type === 'table').length + 1}` });
+      pendingTable = undefined;
       continue;
     }
     if (listMatch(line)) {
@@ -274,25 +274,25 @@ export function parse(markdown, source, bibliography = false) {
         i++;
         // Indented continuation belongs to this entry; nested list markers stay separate.
         while (i < lines.length && lines[i].trim() && !listMatch(lines[i]) && /^\s+/.test(lines[i])) raw += ` ${lines[i++].trim()}`;
-        entries.push(anchor({ depth: Math.floor(indent / 2), ordered, marker: item[2], children: inline(raw) }, raw, true));
+        entries.push({ depth: Math.floor(indent / 2), ordered, marker: item[2], children: inline(raw) });
       }
       blocks.push({ type: 'list', entries }); continue;
     }
     if (/^\s*>/.test(line)) {
       const quote = [];
       while (i < lines.length && /^\s*>/.test(lines[i])) quote.push(lines[i++].replace(/^\s*>\s?/, ''));
-      blocks.push({ type: 'quote', blocks: parse(quote.join('\n'), source, bibliography) });
+      blocks.push({ type: 'quote', blocks: parse(quote.join('\n'), source) });
       continue;
     }
     const paragraph = [line.trim()];
     i++;
     while (i < lines.length && lines[i].trim()) {
-      if (/^\s*(#{1,6}\s|`{3,}|~{3,}|>|<!--)/.test(lines[i]) || listMatch(lines[i]) || figureMatch(lines[i]) ||
+      if (/^\s*(#{1,6}\s|`{3,}|~{3,}|>|<!--|\[\[(?:TABLE|LABEL):)/.test(lines[i]) || listMatch(lines[i]) || figureMatch(lines[i]) ||
           /^\s*!\[/.test(lines[i]) || (lines[i].includes('|') && isTableRule(lines[i + 1])) || /^\s*([-*_])(?:\s*\1){2,}\s*$/.test(lines[i])) break;
       paragraph.push(lines[i++].trim());
     }
     const raw = paragraph.join(' ');
-    blocks.push(anchor({ type: 'paragraph', children: inline(raw) }, raw));
+    blocks.push({ type: 'paragraph', children: inline(raw) });
   }
   return blocks;
 }
@@ -304,85 +304,6 @@ export function parserState() {
 function plain(nodes) {
   return nodes.map((node) => node.type === 'citation' ? `[${node.key}]` : node.type === 'link'
     ? node.href : node.children ? plain(node.children) : node.text ?? '').join('');
-}
-
-function bibliographyField(label, children) {
-  const name = plain(label).trim().replace(/\s*:\s*$/, '');
-  // Evidence assertions, caveats and editorial instructions stay in the source register.
-  if (!/^(?:auteur(?: institutionnel)?|organisme|éditeur|titre|url(?:\s.*)?|lien|chemin(?:\s.*)?|source|consultation|consulté(?:e)?(?: le)?|date(?: de consultation)?)$/iu.test(name)) return null;
-  return { label: inline(name), children };
-}
-
-function conciseSource(children, key, anchors, sharedDate) {
-  const fields = [];
-  const title = children.find((node) => node.type === 'strong');
-  if (title) {
-    const rendered = plain(title.children).replace(/[.,]+$/, '');
-    const quoted = /^(.+?),\s*(?:.*?,\s*)?«\s*(.+?)\s*»\.?$/.exec(rendered);
-    if (quoted) {
-      fields.push({ label: inline('Auteur'), children: inline(quoted[1]) });
-      fields.push({ label: inline('Titre'), children: inline(quoted[2]) });
-    } else fields.push({ label: inline('Titre'), children: title.children });
-  }
-  const paths = children.filter((node) => node.type === 'code' && /(?:\/|\.[A-Za-z][A-Za-z0-9-]*$)/.test(node.text));
-  if (paths.length) fields.push({ label: inline('Chemin'), children: paths.flatMap((node, index) => index ? [{ type: 'text', text: ' ; ' }, node] : [node]) });
-  const links = children.filter((node) => node.type === 'link');
-  if (links.length) fields.push({ label: inline('URL'), children: links.flatMap((node, index) => index ? [{ type: 'text', text: ' ; ' }, node] : [node]) });
-  if (sharedDate) fields.push({ label: inline('Consultation'), children: inline(sharedDate) });
-  return fields.length && title ? { type: 'reference-entry', key, identifier: inline(key), anchors, fields } : null;
-}
-
-export function bibliography(markdown, source) {
-  const parsed = parse(markdown, source, true);
-  const entries = [];
-  const sharedDate = /(?:Consultation documentaire\s*:\s*|consult[ée]es?(?: le)?\s+)(?:\*\*)?(\d{1,2}\s+\p{L}+\s+\d{4})/iu.exec(markdown)?.[1];
-  for (let index = 0; index < parsed.length; index++) {
-    const node = parsed[index];
-    if (node.type === 'reference-entry') {
-      const fields = node.fields.map((field) => bibliographyField(field.label, field.children)).filter(Boolean);
-      if (sharedDate && !fields.some((field) => /consult/i.test(plain(field.label)))) {
-        fields.push({ label: inline('Consultation'), children: inline(sharedDate) });
-      }
-      entries.push({ ...node, fields });
-    } else if (node.type === 'list') {
-      for (const row of node.entries) {
-        const key = definitionKey(plain(row.children));
-        if (!key) continue;
-        const entry = conciseSource(row.children, key, row.anchors, sharedDate);
-        if (entry) entries.push(entry);
-        else {
-          warnings.push(`${source}: ${key} has no recognized concise source fields; preserving its source entry`);
-          entries.push({ type: 'list', entries: [row] });
-        }
-      }
-    } else if (node.type === 'heading' && definitionKey(plain(node.children))) {
-      const key = definitionKey(plain(node.children));
-      const fields = [];
-      for (let next = index + 1; next < parsed.length && parsed[next].type !== 'heading'; next++) {
-        const block = parsed[next];
-        const rows = block.type === 'list' ? block.entries : block.type === 'paragraph' ? [block] : [];
-        for (const row of rows) {
-          const match = /^([^:]+)\s*:\s*(.+)$/.exec(plain(row.children));
-          if (match) {
-            const field = bibliographyField(inline(match[1]), inline(match[2]));
-            if (field) fields.push(field);
-          }
-        }
-      }
-      if (fields.length) entries.push({ type: 'reference-entry', key, identifier: inline(key), anchors: node.anchors, fields });
-      else if (parsed[index + 1]?.type === 'paragraph' && conciseSource(parsed[index + 1].children, key, node.anchors, sharedDate)) {
-        entries.push(conciseSource(parsed[index + 1].children, key, node.anchors, sharedDate));
-      }
-      else {
-        warnings.push(`${source}: ${key} has no recognized bibliographic fields; preserving its source blocks`);
-        entries.push(node);
-        for (let next = index + 1; next < parsed.length && parsed[next].type !== 'heading'; next++) entries.push(parsed[next]);
-      }
-    }
-  }
-  if (entries.length) return entries;
-  warnings.push(`${source}: unrecognized bibliography register; preserving plain structured source`);
-  return parsed;
 }
 
 function main() {
@@ -397,6 +318,8 @@ if (args.includes('--help')) {
   return;
 }
 const partial = args.includes('--partial');
+const bibliographyText = readFileSync(resolve(presentation, bibliographyPath), 'utf8');
+for (const match of bibliographyText.matchAll(/@\w+\s*\{\s*([^\s,]+)\s*,/g)) refKeys.add(match[1]);
 const required = chapterNames.map((name) => `report/chapters/${name}.md`);
 const missing = required.filter((path) => !existsSync(resolve(presentation, path)));
 const empty = required.filter((path) => existsSync(resolve(presentation, path)) && !readFileSync(resolve(presentation, path), 'utf8').trim());
@@ -408,27 +331,41 @@ const sections = required.filter((path) => !missing.includes(path) && !empty.inc
   source: path,
   blocks: parse(readFileSync(resolve(presentation, path), 'utf8'), path),
 }));
+// Keep semantic headings and stable labels in the data. Typst owns all chapter,
+// section, figure/table and citation numbering, as well as page references.
+const slug = value => value.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+for (const section of sections) {
+  const chapter = Number(/\/(0[1-6])-/.exec(section.source)?.[1]) || null;
+  const prefix = chapter ? `chapter-${chapter}` : section.source.includes('/00-') ? 'introduction' : section.source.includes('/07-') ? 'conclusion' : 'frontmatter';
+  for (const node of section.blocks) {
+    if (node.type !== 'heading') continue;
+    const title = plain(node.children).replace(/^Chapitre\s+\d+\s*[—–-]\s*/i, '').replace(/^\d+(?:\.\d+)*\.?\s+/, '');
+    node.numbered = chapter !== null && !/^(?:Introduction|Conclusion(?: du chapitre)?)$/i.test(title);
+    node.children = inline(title);
+    node.id ??= node.level === 1 ? prefix : `${prefix}-${slug(title)}`;
+  }
+}
 const frontmatter = sections.filter((section) => section.source.endsWith('/08-resume-mots-cles-glossaire.md'));
 const chapters = sections.filter((section) => !frontmatter.includes(section));
-const missingReferences = referenceNames.filter((name) => !existsSync(resolve(report, name)));
-const references = referenceNames.filter((name) => !missingReferences.includes(name)).map((name) => ({
-  source: `report/${name}`,
-  blocks: bibliography(readFileSync(resolve(report, name), 'utf8'), `report/${name}`),
-}));
-const unresolvedCitations = [...citedKeys].filter((key) => !refKeys.has(key)).sort();
-if (missingReferences.length) warnings.push(`Missing bibliography files: ${missingReferences.join(', ')}`);
-if (unresolvedCitations.length) warnings.push(`Unresolved citations: ${unresolvedCitations.join(', ')}`);
+const bodyCitations = [...citedKeys];
+const unresolvedCitations = bodyCitations.filter((key) => !refKeys.has(key)).sort();
+const labels = sections.flatMap(section => section.blocks).filter(node => node.id).map(node => node.id);
+if (new Set(labels).size !== labels.length) throw new Error('Duplicate heading/figure/table label. Use an explicit LABEL marker.');
+const unresolvedLabels = [...referencedLabels].filter(key => !labels.includes(key));
+if (unresolvedCitations.length || unresolvedLabels.length) throw new Error(`Unresolved references: ${[...unresolvedCitations, ...unresolvedLabels].join(', ')}`);
 const data = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   partial: partial || missing.length > 0 || empty.length > 0,
   missingChapters: missing,
   emptyChapters: empty,
-  missingReferences,
+  bibliographyPath,
   bibliographyKeys: [...refKeys].sort(),
+  citedKeys: bodyCitations,
+  referencedLabels: [...referencedLabels],
   unresolvedCitations,
+  unresolvedLabels,
   frontmatter,
   chapters,
-  references,
   warnings,
 };
 mkdirSync(output, { recursive: true });

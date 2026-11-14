@@ -14,18 +14,18 @@ const defaults = `graph [rankdir=LR, bgcolor="transparent", pad=0.15, nodesep=0.
 node [fontname="Liberation Sans", fontsize=22, color="#0f766e", fontcolor="#172b4d", penwidth=1.3];
 edge [fontname="Liberation Sans", fontsize=18, color="#64748b", fontcolor="#475569", penwidth=1.2];`;
 const classDot = `graph Classes {
-${defaults}
+${defaults.replace('rankdir=LR', 'rankdir=TB').replace('nodesep=0.3, ranksep=0.45', 'nodesep=0.65, ranksep=0.9')}
 ${classes.map(c => `${c.id} [shape=plain, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="8" COLOR="#0f766e"><TR><TD BGCOLOR="#e0f2f1"><B>${escape(c.title)}</B></TD></TR><HR/><TR><TD ALIGN="LEFT">${c.fields.map(escape).join('<BR ALIGN="LEFT"/>')}</TD></TR></TABLE>>];`).join('\n')}
 {rank=same; Offre; Etape;}
 {rank=same; Candidature; Entretien;}
 {rank=same; Document; Tache;}
 Offre -- Candidature -- Document -- Correction [style=invis];
 Etape -- Entretien -- Tache [style=invis];
-${associations.map(([a, b, from, to]) => `${a} -- ${b} [taillabel=${q(from)}, headlabel=${q(to)}, labeldistance=1.6, labelangle=25, constraint=false];`).join('\n')}
+${associations.map(([a, b, from, to]) => `${a} -- ${b} [taillabel=${q(from)}, headlabel=${q(to)}, labeldistance=2.2, labelangle=35, constraint=false];`).join('\n')}
 }`;
 const classMermaid = `%% Generated from models.mjs; conceptual UML, selected relationships only.
 classDiagram
-direction LR
+direction TB
 ${classes.map(c => `class ${c.id}["${c.title}"] {\n${c.fields.map((_, i) => `  ${['details', 'suivi'][i]}`).join('\n')}\n}`).join('\n')}
 ${associations.map(([a, b, from, to]) => `${a} "${from}" -- "${to}" ${b}`).join('\n')}
 `;
@@ -64,6 +64,12 @@ for (const [name, dot, mermaid] of [
   writeFileSync(resolve(source, `${name}.mmd`), mermaid);
 }
 const viz = await instance();
+// Same semantic model, portrait-oriented arrangement for the A4 report only.
+// The presentation keeps its existing wide architecture layout.
+const reportArchDot = archDot.replace('rankdir=LR', 'rankdir=TB')
+  .replace('{rank=same; Web; Mail;}', '{rank=same; Data; Extraction; Mail;}')
+  .replaceAll(', constraint=false', '');
+writeFileSync(resolve(output, 'DIA-04-architecture-report.svg'), viz.renderString(reportArchDot, { format: 'svg', engine: 'dot' }));
 for (const name of ['DIA-02-use-cases', 'DIA-03-classes', 'DIA-04-architecture', 'DIA-05-processing', 'DIA-06-lifecycle', 'DIA-07-review']) {
   const dot = readFileSync(resolve(source, `${name}.dot`), 'utf8');
   const svg = viz.renderString(dot, { format: 'svg', engine: 'dot' });

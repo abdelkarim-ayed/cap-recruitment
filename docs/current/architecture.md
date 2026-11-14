@@ -6,7 +6,7 @@ One pnpm workspace, one Nest application, one PostgreSQL database; React/Vite fr
 
 | Owner | Current responsibilities |
 | --- | --- |
-| `packages/domain/src/vacancies.ts` | Strict form/task definitions, source constraints, normalized skills and tri-state skill projection |
+| `packages/domain/src/vacancies.ts`, `extractors.ts`, `cv-extractor.ts` | Strict form/task definitions, CV question families, request construction, typed normalization and field corrections |
 | `packages/domain/src/applications.ts` | Shared intake validation and operational upload limits |
 | `packages/domain/src/index.ts` | Stage vocabulary and legacy generic extraction types; vocabulary does not own transitions |
 | `packages/domain/src/actions.ts`, `workflow-views.ts` | Static role eligibility, action-availability contracts and shared typed response views; no trusted resource grants |
@@ -15,7 +15,7 @@ One pnpm workspace, one Nest application, one PostgreSQL database; React/Vite fr
 | `apps/api/src/vacancies/` | Service owns draft/owner/publication policy, repository SQL and projections |
 | `apps/api/src/applications/application.service.ts` | Submit transaction, file compensation, authorization, snapshot/list/detail/download SQL and projections |
 | `apps/api/src/documents/` | Storage port/local adapter, opaque references, integrity-checked bytes, bounded multipart collection |
-| `apps/api/src/processing/` | Service orchestration; repository leases/task state/review invalidation; typed ports, trusted fixtures, PDF child and guarded skills adapter; CLI invocation |
+| `apps/api/src/processing/` | Background runner and CLI; repository leases/task state; native PDF child; private preparation/response caches; guarded Jev execution and durable send-attempt coordination |
 | `apps/api/src/review/review.service.ts` | Shared review SQL, separate corrections, effective projection, CSV column naming/serialization and snapshot export |
 | `apps/api/src/interviews/interview.service.ts` | Request schemas, authority, locks/SQL, scheduling, progression, transactional notification persistence, inbox reads/writes and projections |
 | `apps/api/src/interviews/interview-cause.ts`, `interview-notification.policy.ts` | Command-cause types and pure typed staff notification intents: recipients, deduplication, content and deliberate no-effect decisions; no DB/network work |
@@ -28,17 +28,17 @@ One pnpm workspace, one Nest application, one PostgreSQL database; React/Vite fr
 
 Relational: vacancy owner/status/revision, application candidate/vacancy uniqueness, document ownership/storage metadata, task/correction identity, pipeline steps, interview assignment/uniqueness/composite foreign keys, notification recipient/read time.
 
-JSONB: frozen candidate identity and vacancy/form/task snapshot; dynamic answers; task args/result/provenance; correction values; workflow causes. Corrections are relational rows keyed by application/task, not one unstructured review document. Runtime validation constrains dynamic values; TypeScript alone does not validate JSON from clients or stored rows.
+JSONB: frozen candidate identity and vacancy/form/task snapshot; dynamic answers; task args/result/provenance; correction values; workflow causes. Current CV corrections are relational rows keyed by application/task/question, not one unstructured review document. Runtime validation constrains dynamic values; TypeScript alone does not validate JSON from clients or stored rows.
 
 Current business stage orchestration remains in InterviewService; scoped policy functions own its extracted prerequisites. SessionGuard resolves static action-role eligibility; service policies resolve current records, with revision/input/overlap checks kept separate. ReviewService retains its controller role boundary for trusted internal callers. Assigned document access is still resolved in ApplicationService, with an additional InterviewController lookup. See the [action inventory](contracts/action-policies.md) for exact current-versus-planned boundaries.
 
 ## Transactions and external work
 
 - Vacancy edits/publish/close and interview-plan saves lock the same vacancy row. Publish lazily reads/validates saved plan content and its independent revision through the repository on that transaction. Publication status freezes plan editing; no plan row replacement/revision bump at publication. Intake uses candidate/vacancy advisory + vacancy share locks; storage compensation retains files on ambiguous commit.
-- Processing runs outside submission HTTP; row locks/token/expiry plus stage/review eligibility fence closed work. Review completion/screening prevents late saves, without changing original results or claiming cancellation avoids external cost. Source bytes/text reused per invocation; uncertain live recovery remains unresolved.
+- Processing runs outside submission HTTP; row locks/token/expiry plus stage/review eligibility fence closed work. Review completion/screening prevents late saves, without changing original results or claiming cancellation avoids external cost. Private file caches survive restart; durable send history blocks blind paid resends, with cache-only recovery after a known send. Recovery/race acceptance remains pending; see the [processing contract](contracts/processing-review-api.md).
 - Interview commands lock vacancy → application → interview, plus interviewer advisory locks for overlapping appointments. State, cancellations and notifications commit together. Commands supply typed causes and loaded context to the pure staff notification policy, then persist its intents through the same transaction client; SQL updates do not infer events. There is no event bus or automatic mail coupling.
-- CSV export uses repeatable read, 1,000 applications/10 MiB. Import locks vacancy then included applications in deterministic order, validates all before writing, and commits shared screening decisions/notices atomically. Additive migration 007 is not applied; no export ledger, reservation, vote or assignment store.
-- Retention CLI runs once or daily with `--watch`; no extraction poller, event bus, job queue, outbox or persistent parser cache exists.
+- CSV export uses repeatable read, 1,000 applications/10 MiB. Import locks vacancy then included applications in deterministic order, validates all before writing, and commits shared screening decisions/notices atomically. No export ledger, reservation, vote or assignment store. Schema through migration 010 has been applied locally; migration application is not functional acceptance.
+- Retention CLI can run once or daily with `--watch`; it is separate from extraction. The explicitly enabled CV runner uses post-submit wake hints and five-second PostgreSQL discovery scans, with sequential work. No separate message broker, event bus or outbox is used.
 
 ## Existing seams worth retaining
 

@@ -9,7 +9,7 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(8.64 613.72)">
 <title>ER</title>
 <polygon fill="white" stroke="none" points="-8.64,8.64 -8.64,-613.72 414.69,-613.72 414.69,8.64 -8.64,8.64"/>
-<text xml:space="preserve" text-anchor="middle" x="203.02" y="-589.38" font-family="Liberation Sans" font-size="13.00" fill="#172b4d">RPT&#45;ER · Noyau relationnel du dossier CV</text>
+<text xml:space="preserve" text-anchor="middle" x="203.02" y="-589.38" font-family="Liberation Sans" font-size="13.00" fill="#172b4d">Noyau relationnel du dossier documentaire</text>
 <!-- user -->
 <g id="node1" class="node">
 <title>user</title>

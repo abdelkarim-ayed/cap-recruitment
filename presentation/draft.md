@@ -146,9 +146,9 @@ Note orale : configuration par questions structurées, pas prompt libre. La date
 - **Lecture locale :** texte PDF natif sur CPU, sans étape OCR ni appel vision.
 - **Une requête par extracteur** : toutes les questions voyagent ensemble.
 - **Réutilisation :** caches privés du Markdown et de la réponse validée.
-- **Ordre de grandeur :** ≤ 5 000 tokens à 0,05 $ / million → **≈ 0,00025 $ par CV**.
+- **Scénario fournisseur :** 5 000 tokens complets à 0,042 $ / million → **0,000210 $ par requête** ; sorties gratuites.
 
-Note orale : hypothèses de travail communiquées par l’utilisateur, pas un tarif fournisseur vérifié ni une facture observée. Le contrat envoie une seule requête multi-questions par extracteur : les cinq familles ne coûtent pas cinq appels. La sortie s’ajoute à son propre tarif et peut doubler le montant. À ce niveau, la question n’est plus technique mais organisationnelle : la revue humaine reste-t-elle le goulot ? Repère public : un parseur commercial facturé 0,05 à 0,20 $ la page. Comparaison de coût d’appel, pas de qualité : ni OCR, ni DOCX, ni 150 champs multilingues chez nous. Voir cost-model.md.
+Note orale : tarif direct TypeSafe consulté le 13 novembre 2026 : 0,042 dollar par million de tokens d’entrée, sorties gratuites. Une requête multi-question par extracteur, et non cinq appels pour cinq familles. À 5 000 tokens complets par requête, mille requêtes représentent 0,210 dollar de fournisseur. C’est un scénario, pas une taille moyenne ou une facture mesurée ; hébergement, stockage et revue humaine sont exclus. Le tarif ne démontre ni débit ni gain face à un ATS complet. Voir cost-model.md.
 
 ## 18 — Corriger sans effacer l’original
 `[DIA-07 — filiation d’un champ, de la source à la valeur effective]`

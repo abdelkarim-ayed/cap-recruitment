@@ -1,103 +1,48 @@
-# Assemblage du rapport
+# Construction du rapport
 
-Outils statiques, sans dépendance Node supplémentaire ni appel réseau. Le script ne compile pas le PDF et ne lance ni application, ni navigateur. Aucun chapitre n’est généré ou complété automatiquement.
+## Commandes
 
-## Commandes finales
-
-Depuis `presentation/` :
+Depuis la racine du dépôt :
 
 ```sh
-node report/scripts/assemble.mjs
-node scripts/typst.mjs compile report/pdf/main.typ exports/report.pdf --root .
+pnpm --filter @recruitment/presentation report:build
+pnpm --filter @recruitment/presentation report:pages
 ```
 
-Pour une **préversion explicitement incomplète**, remplacer la première commande par :
+La première commande rend les sources vectorielles, assemble les neuf manuscrits et compile `presentation/exports/report.pdf`. La seconde lit la métadonnée du nombre de pages du corps, sans images de pages. Typst local 0.15.1 est utilisé via `presentation/scripts/typst.mjs` ; `TYPST_BIN` permet un compilateur explicite.
 
-```sh
-node report/scripts/assemble.mjs --partial
-```
+## Sources
 
-Un assemblage normal refuse les neuf fichiers de chapitre absents ou vides. `--partial` ajoute un avertissement dans le PDF, même lorsque tous les fichiers existent. La présence d’un fichier ne prouve pas sa complétude éditoriale. Les fichiers bibliographiques absents et les citations non résolues produisent des avertissements, non une erreur bloquante.
+- `chapters/00…07` : introduction, six chapitres et conclusion.
+- `chapters/08-resume-mots-cles-glossaire.md` : préliminaires.
+- `references.bib` : bibliographie BibLaTeX lue directement par Typst. Les sources extérieures déjà consultées y sont conservées ; le projet dispose d’une seule référence consolidée.
+- `references-context.md`, `references-architecture.md`, `references-extraction.md` : correspondances de travail antérieures, non utilisées pour construire le PDF.
+- `pdf/main.typ` : composition A4 ; `../metadata.json` fournit les informations institutionnelles communes.
+- `../assets/images/` et sources DOT : figures et captures fournies.
 
-Le wrapper emploie le compilateur local `.local/tools/typst-0.15.1/typst` (à la racine du dépôt), puis `typst` du PATH en repli ; `TYPST_BIN` permet un chemin explicite. Aucun téléchargement n’est effectué par ces scripts. Typst doit avoir accès à une police Serif et Mono ; Libertinus/DejaVu sont privilégiées.
+Le PDF commence par une page de garde textuelle, sans page blanche préalable ; résumé, glossaire et listes sont numérotés en romain. La pagination arabe commence à l’introduction. La bibliographie est exclue du compteur du corps. Aucune page n’est ajoutée pour atteindre une longueur cible.
 
-## Entrées et sorties
+## Assemblage
 
-Les neuf fichiers requis sous `report/chapters/` sont :
+`scripts/assemble.mjs` produit `../dist/report/report.json` et `figures.json`. Ces intermédiaires sont ignorés. Le mode normal refuse un chapitre absent ou vide ; `--partial` est réservé à une préversion incomplète explicitement signalée.
 
-1. `00-introduction.md`
-2. `01-cadre-objectifs-demarche.md`
-3. `02-besoins-solutions-existantes.md`
-4. `03-conception-metier-donnees-garanties.md`
-5. `04-architecture-realisation.md`
-6. `05-assistance-documentaire-supervision.md`
-7. `06-verification-demonstration-discussion.md`
-8. `07-conclusion-perspectives.md`
-9. `08-resume-mots-cles-glossaire.md`
+Le sous-ensemble Markdown comprend titres ATX, paragraphes, listes, citations, blocs de code, tableaux, liens et images locales. Le HTML et le code Typst du manuscrit ne sont jamais exécutés. Les images distantes ne sont pas téléchargées.
 
-Le fichier `08-resume-mots-cles-glossaire.md` est un **préliminaire** : il apparaît après les deux couvertures vides, avant la table des matières. Seuls les fichiers 00–07 composent le corps. Le JSON sépare explicitement `frontmatter` et `chapters` (schéma 2).
+- Citations : `[REF-CLE]`, `[[REF-CLE]]` ou `[REF-UNE ; REF-DEUX]` deviennent des appels natifs à `cite`. `bibliography` lit `references.bib`, applique le style IEEE et sélectionne les seules sources citées. L’assembleur ne calcule aucun numéro bibliographique.
+- Figures : `[[FIG:CAP-12]]`, éventuellement suivi d’une légende sur la même ligne. Une ligne `*Figure — Description.*` après le marqueur est absorbée comme légende, sans paragraphe doublonné. Les identifiants restent dans le manifeste, pas dans les légendes imprimées.
+- Tableaux : `[[TABLE:identifiant]] Légende` avant le tableau ; légende en haut liée au premier contenu, en-tête répété en cas de tableau multipage. Une légende de repli est tirée du sujet de la section.
+- Sections : titres sémantiques transmis à `heading`, qui numérote les six chapitres et leurs sections. Les anciens préfixes Markdown sont ignorés ; ils ne déterminent aucun compteur. Introduction et conclusion de chapitre restent sans numéro de section.
+- Renvois : `[[REF:identifiant]]` devient un appel natif à `ref`. Les figures prennent leur identifiant de marqueur ; les tableaux leur identifiant de légende ; les chapitres possèdent les labels `chapter-1` à `chapter-6`. `[[LABEL:identifiant]]` après un titre permet un label de section explicite. Numéros, liens et pages sont résolus par Typst. Les références absentes et labels dupliqués font échouer l’assemblage.
+- Sommaire et listes : `outline`, limité à deux niveaux pour les titres et ciblant les figures/tableaux pour les deux listes. Ces listes étaient déjà natives avant cette passe.
 
-La bibliographie combine `report/references-context.md`, `report/references-architecture.md` et `report/references-extraction.md`, dans cet ordre. Les registres Markdown restent inchangés. Le PDF en extrait des entrées concises avec clé, auteur, titre, URL/chemin et date de consultation lorsque ces champs existent. Les assertions soutenues/non soutenues, instructions de revue et notes de contexte restent dans les registres, hors de la bibliographie PDF. Aucun auteur ou renseignement manquant n’est inventé.
+Les chemins d’assets restent sous la racine `presentation/`. Les SVG sont intégrés en conservant leurs proportions, dans une boîte maximale de 160 × 205 mm (150 mm de hauteur pour le modèle conceptuel), sans saut de page forcé autour de chaque diagramme. L’architecture possède un arrangement A4 issu du même modèle sémantique, sans changer la disposition large de la présentation. Les captures sont intégrées sans recadrage automatique. Les longues lignes des blocs de code peuvent revenir à la ligne sans réécriture de leur contenu.
 
-Les définitions sont reconnues structurellement : clé `REF-CLE` (nue ou entre crochets) au début d’un titre, ou dans la première cellule d’une ligne de tableau bibliographique. La première définition fournit la cible interne ; une simple citation dans un paragraphe ne crée pas de définition. Le motif documentaire `[REF-*]` n’est jamais enregistré comme clé. Les tableaux de registre sont transformés en entrées lisibles et ne figurent pas dans la liste des tableaux du rapport. Les formats non reconnus conservent un repli en texte structuré avec avertissement, plutôt que de perdre silencieusement une source.
+## Contrôles et limites
 
-Sorties déterministes (pas d’horodatage) dans le répertoire ignoré `dist/report/` :
+La compilation documentaire, les citations résolues et la disponibilité des fichiers ne prouvent ni la lisibilité des captures ni l’absence de débordement visuel. La dernière passe de rendu autorisée a inspecté trois pages ciblées : couverture, pseudocode de publication et exemple documentaire. Les PNG intermédiaires restent ignorés dans `dist/report/`. La relecture globale appartient à l’étudiant ; aucun navigateur ni inspection automatique de toutes les pages.
 
-- `report.json` : arbre de contenu, état partiel, clés bibliographiques et avertissements ;
-- `figures.json` : chaque occurrence de figure, source/ligne, titre, chemin stable et disponibilité.
+Une extraction **textuelle native** du PDF construit peut servir à rechercher des consignes résiduelles, codes d’assets et clés bibliographiques visibles. Elle ne remplace pas la relecture visuelle et peut perdre l’ordre ou la segmentation de certains blocs.
 
-L’assemblage vérifie les chemins des images, pas leur validité graphique. Il faut relancer l’assemblage lorsqu’un visuel est ajouté : sa disponibilité est figée dans le JSON. Aucun fichier n’est copié hors de `presentation/`.
+Cette chaîne n’exécute aucun test applicatif, parcours authentifié ou appel fournisseur. Les guides `presenter-guide.md` et `demo-script.md` sont des supports distincts, non inclus dans le corps du rapport.
 
-## Markdown pris en charge
-
-- Titres ATX `#`, `##`, `###` (également niveaux 4–6), paragraphes, gras, italique, code inline, liens usuels, autoliens et URL HTTP(S) nues.
-- Listes à puces/numérotées, indentation simple, citations `>`, séparateurs, blocs de code clôturés.
-- Tableaux à séparateurs `|` : retour à la ligne dans les cellules, colonnes de même largeur, alignements Markdown, en-tête répété si le tableau se prolonge. `\|` fonctionne dans les cellules. Une légende est dérivée des en-têtes pour alimenter la liste des tableaux.
-- Citations `[REF-CLE]` ou `[[REF-CLE]]`, reliées à la bibliographie si la clé existe.
-- Images locales autonomes `![Légende](chemin.svg)`, relatives au fichier Markdown et limitées à la racine `presentation/`. Les images distantes ne sont jamais téléchargées. Les liens HTTP(S)/mailto sont cliquables ; les liens locaux conservent leur libellé et leur destination lisibles, sans résolution automatique vers une page du PDF.
-
-Le parseur n’est pas CommonMark complet : pas de HTML exécuté, notes de bas de page, mathématiques, listes multiblocs complexes, titres Setext, résolution automatique de références Markdown ou numérotation hiérarchique implicite. Le code Typst contenu dans le Markdown reste du texte et n’est jamais évalué. Les longs blocs de code et tableaux très larges demandent une relecture manuelle ; éviter les lignes de code non sécables et les tableaux trop nombreux en colonnes. Utiliser des titres de chapitre explicites ; chaque titre de niveau 1 commence une nouvelle page. Aucun numéro de chapitre n’est ajouté aux titres déjà rédigés.
-
-## Figures stables
-
-Placer le marqueur sur une ligne distincte :
-
-```text
-[[FIG:DIA-04]]
-[[FIG:RPT-ER]] Légende spécifique facultative
-[[FIG:CAP-12]]
-```
-
-- `DIA-02` à `DIA-07` : SVG existants de `dist/diagrams/`, noms de la présentation conservés.
-- `RPT-ER`, `RPT-DEPLOY`, `RPT-PUBLISH`, `RPT-SEQUENCE`, `RPT-STATES` : `report/diagrams/ID.svg`.
-- `RPT-STATES` désigne les états des tâches et des tentatives d’envoi, non le parcours de recrutement.
-- `CAP-10` à `CAP-15` : noms exacts de `assets/requests.md` dans `assets/images/`.
-- Un identifiant inconnu attend `report/diagrams/ID.svg` et reste visible dans le manifeste.
-
-Un fichier manquant devient un emplacement titré, portant son chemin stable et une mention explicite d’absence. Aucun faux écran n’est produit. Un fichier existant est intégré sans recadrage (`contain`), avec une légende et une entrée dans la liste des figures. Le type Typst `image` est explicite, y compris pour les emplacements manquants : ceux-ci restent donc dans la même liste des figures. La présence d’un fichier n’atteste pas sa provenance ou sa pertinence ; la revue humaine conserve cette responsabilité.
-
-Le parseur lit les attributs vectoriels `width`, `height` et `viewBox` pour renseigner `sizing` dans le manifeste. Les RPT portrait de plus de 150 mm occupent une page dédiée, sans étirement : dimensions naturelles plafonnées à **160 × 230 mm**, laissant au moins 17 mm pour la légende dans le corps A4 de 247 mm. Les diagrammes courts ne sont pas agrandis ; les autres SVG sont plafonnés à 160 × 140 mm. Ainsi un RPT de 240 mm est légèrement réduit à 230 mm, et non à 140 mm. Cette réduction diminue aussi légèrement son texte : le minimum annoncé à la taille SVG n’est pas une garantie identique après mise à l’échelle. La géométrie n’est pas une relecture visuelle. Les captures matricielles conservent une boîte maximale de 105 mm de hauteur.
-
-## Pagination et contrôle final
-
-A4, corps 11 pt, marges proches de 25 mm. Les deux premières pages sont **entièrement vides** pour les couvertures institutionnelles ; viennent le résumé/mots-clés/glossaire, la table des matières et les listes de figures/tableaux, numérotés en romain. Les titres du préliminaire ne sont pas réinjectés dans le sommaire du corps. La pagination arabe commence au corps ; bibliographie ensuite. Il n’y a aucun remplissage pour atteindre artificiellement la cible de **70–84 pages de corps**.
-
-Après intégration et compilation par le responsable, cette commande de métadonnées mesure les pages du corps (chapitres 00–07, hors couvertures, résumé/glossaire, sommaires et bibliographie), sans rasterisation :
-
-```sh
-node scripts/typst.mjs query report/pdf/main.typ '<report-main-body-pages>' --field value --one --root .
-```
-
-Le résultat est un objet `main_body_pages`, pas une attestation du contenu. La bibliographie prolonge la numérotation arabe mais reste exclue de cette mesure. La longueur finale et les débordements éventuels se vérifient après intégration réelle ; aucune garantie de 70–84 pages ne résulte du seul assemblage. La relecture visuelle appartient à l’utilisateur : aucune rasterisation, capture d’écran, automatisation navigateur ou inspection d’image n’est requise par cet outillage.
-
-## Contrôle isolé de l’outillage
-
-Depuis `presentation/` :
-
-```sh
-node report/scripts/check-renderer.mjs
-```
-
-Ce contrôle ne lit aucun vrai chapitre. Il importe seulement le parseur (sans déclencher son assemblage), crée un JSON synthétique dans un sous-répertoire unique de `dist/report/`, compile un PDF temporaire et interroge la métadonnée de pagination. Il vérifie notamment les clés bibliographiques nues, l’exclusion des notes de preuve et le rendu d’un tableau multipage. Il supprime uniquement son propre sous-répertoire, même en cas d’erreur ; il ne remplace jamais le vrai `report.json` ni `exports/report.pdf`. Le paramètre Typst `--input report-data=/dist/report/.../fixture.json` permet cette isolation. Aucun rendu raster ou navigateur n’est utilisé.
-
-Le contrôle synthétique compile et la requête de métadonnées fonctionne avec Typst local 0.15.1 (qui avertit que la sous-commande `query` est dépréciée). Les seuls échantillons réels consultés pour l’adaptation sont les chapitres 01/02 terminés et `references-context.md` : 17 définitions/entrées, aucune citation non résolue pour ces deux chapitres. Cela n’atteste ni l’assemblage complet, ni les autres registres, ni la pagination finale. La compilation et la relecture du rapport réel après intégration restent à effectuer.
+Documentation Typst consultée le 14 novembre 2026 pour cette correction : [Bibliography](https://typst.app/docs/reference/model/bibliography/), [Cite](https://typst.app/docs/reference/model/cite/), [Reference](https://typst.app/docs/reference/model/ref/), [Outline](https://typst.app/docs/reference/model/outline/), [Heading](https://typst.app/docs/reference/model/heading/), [Figure](https://typst.app/docs/reference/model/figure/) et [Raw](https://typst.app/docs/reference/text/raw/). Ces références d’outillage ne sont pas ajoutées à la bibliographie métier du mémoire.

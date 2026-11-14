@@ -1,24 +1,32 @@
 // Source: docs/current/contracts/processing-review-api.md. Success path, not a job topology.
 digraph Processing {
-  graph [rankdir=TB, bgcolor="transparent", pad=0.15, nodesep=0.4, ranksep=0.15, splines=polyline, fontname="Liberation Sans", fontsize=21, labelloc=b, label="Aucune décision de recrutement automatique"];
+  graph [rankdir=TB, bgcolor="transparent", pad=0.15, nodesep=0.3, ranksep=0.4, splines=polyline, fontname="Liberation Sans"];
   node [shape=box, style="rounded,filled", fillcolor="#f0f7f6", color="#0f766e", fontcolor="#172b4d", fontname="Liberation Sans", fontsize=22, margin="0.18,0.12", penwidth=1.4];
   edge [fontname="Liberation Sans", fontsize=20, color="#64748b", fontcolor="#475569", penwidth=1.3];
   pdf [label="PDF privé\noriginal"];
-  markdown [label="Lecture PDF native\n→ Markdown"];
-  request [label="JevGateway\nUne requête multi-question", fillcolor="#fff8eb", color="#b7791f"];
-  families [shape=plain, fontsize=19, label="5 familles de questions\nFormation · Certification\nExpérience · Couverture · Compétence"];
-  result [label="Résultat original\nbrut + champs typés"];
+  markdown [label="Lecteur natif local\npdf-inspector → Markdown"];
+  builder [label="Constructeur de requête\nMarkdown + questions / critères\n+ date de première publication"];
+  request [label="JevGateway\nadmission et transport", fillcolor="#fff8eb", color="#b7791f"];
+  jev [label="Jev · TypeSafe\nUne requête multi-question"];
+  validated [label="Validation complète\nréponses typées / distributions"];
+  result [label="Original enregistré\nchamps + réponse brute"];
   human [label="Revue RH / corrections\nséparées par champ"];
   effective [label="Valeurs effectives\nrevue / export"];
-  cache [label="Caches locaux privés\nMarkdown + réponse validée", style="rounded,dashed,filled", fillcolor="#f8fafc", color="#64748b", fontsize=19];
-  {rank=same; pdf; markdown; request;}
-  {rank=same; families; cache;}
-  {rank=same; effective; human; result;}
-  pdf -> markdown -> request;
-  request -> result;
+  parserCache [label="Cache de préparation\nPDF + lecteur / options", style="rounded,dashed,filled", fillcolor="#f8fafc", color="#64748b", fontsize=18];
+  responseCache [label="Cache de réponse validée\nrequête effective complète", style="rounded,dashed,filled", fillcolor="#f8fafc", color="#64748b", fontsize=18];
+  {rank=same; pdf; markdown; builder;}
+  {rank=same; validated; jev; request;}
+  {rank=same; result; human; effective;}
+  pdf -> markdown -> builder;
+  builder -> request;
+  request -> jev -> validated [constraint=false];
+  validated -> jev -> request [style=invis];
+  markdown -> parserCache [style=dashed, arrowhead=none];
+  parserCache -> jev [style=invis];
+  validated -> responseCache [style=dashed, arrowhead=none];
+  responseCache -> result [style=invis];
+  validated -> result;
   result -> human [constraint=false];
   human -> effective [constraint=false];
-  effective -> human -> result [style=invis];
-  request -> families [style=dotted, arrowhead=none];
-  families -> effective [style=invis];
+  result -> human -> effective [style=invis];
 }

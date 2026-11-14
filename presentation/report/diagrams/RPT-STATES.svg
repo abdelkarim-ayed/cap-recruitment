@@ -9,7 +9,7 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(8.64 786.44)">
 <title>States</title>
 <polygon fill="white" stroke="none" points="-8.64,8.64 -8.64,-786.44 505.64,-786.44 505.64,8.64 -8.64,8.64"/>
-<text xml:space="preserve" text-anchor="middle" x="248.5" y="-762.1" font-family="Liberation Sans" font-size="13.00" fill="#172b4d">RPT&#45;STATES · Deux machines et une barrière</text>
+<text xml:space="preserve" text-anchor="middle" x="248.5" y="-762.1" font-family="Liberation Sans" font-size="13.00" fill="#172b4d">Tâches et connaissance des envois</text>
 <g id="clust1" class="cluster">
 <title>cluster_task</title>
 <polygon fill="white" stroke="#0f766e" points="68,-500.68 68,-746.2 359,-746.2 359,-500.68 68,-500.68"/>

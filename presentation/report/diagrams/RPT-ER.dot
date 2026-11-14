@@ -3,7 +3,7 @@
 digraph ER {
   graph [rankdir=TB, bgcolor="white", pad=0.12, nodesep=0.3, ranksep=0.4,
     fontname="Liberation Sans", fontsize=13, fontcolor="#172B4D",
-    label="RPT-ER · Noyau relationnel du dossier CV", labelloc=t, splines=polyline];
+    label="Noyau relationnel du dossier documentaire", labelloc=t, splines=polyline];
   node [shape=box, fontname="Liberation Sans", fontsize=11, color="#0F766E",
     fontcolor="#172B4D", style=filled, fillcolor="white", margin="0.1,0.08"];
   edge [color="#172B4D", fontcolor="#172B4D", fontname="Liberation Sans", fontsize=10, arrowsize=0.65];

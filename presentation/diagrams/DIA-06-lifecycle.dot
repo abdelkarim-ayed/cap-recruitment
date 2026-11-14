@@ -16,7 +16,7 @@ digraph Lifecycle {
   preselected -> interviews [label="1re\nplanification"];
   preselected -> offer [label="0 entretien\n+ action explicite"];
   interviews -> offer [label="tous Pass\n+ action explicite"];
-  interviews -> rejected [label="un Fail : fin\nannule les autres\nen cours", color="#be123c", fontcolor="#be123c"];
+  interviews -> rejected [label="un Fail : fin\nannule les autres\nplanifiés", color="#be123c", fontcolor="#be123c"];
   rejected -> offer [style=invis];
   offer -> hired [label="action\nséparée"];
 }
